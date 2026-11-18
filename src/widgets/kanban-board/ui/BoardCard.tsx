@@ -89,6 +89,13 @@ export function BoardCard({
           {priorityLabels[task.priority]}
         </span>
       </div>
+      {task.status === "REVIEW" && !!task.reviewers?.length && (
+        <p className="board-card-note board-card-reviewers">
+          <span className="sr-only">리뷰어</span>
+          <span aria-hidden="true">리뷰</span>{" "}
+          {task.reviewers.map((person) => person.name).join(", ")}
+        </p>
+      )}
       {task.deadline && (
         <p className="board-card-note">마감 {formatDate(task.deadline)}</p>
       )}
