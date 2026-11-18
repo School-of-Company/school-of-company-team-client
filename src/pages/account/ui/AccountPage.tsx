@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { meQueryKey, updateProfile, type User } from "@/entities/user";
 import { AuthGuard, authErrorMessage, OAuthButton } from "@/features/auth";
 import { unlinkDiscord } from "../api/unlink-discord";
-import { Badge, Button, Dialog, Field, Input } from "@/shared/ui";
+import { Badge, Button, Dialog, Field, Input, ThemeSelect } from "@/shared/ui";
 
 function ProfileForm({ user }: { readonly user: User }) {
   const client = useQueryClient();
@@ -126,7 +126,7 @@ function AccountContent({ user }: { readonly user: User }) {
   return (
     <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
       <header className="grid gap-2">
-        <h1 className="text-2xl font-semibold">내 계정</h1>
+        <h1 className="text-2xl font-semibold">설정</h1>
         <p className="text-sm text-muted">
           프로필과 로그인·알림 계정을 관리합니다.
         </p>
@@ -185,6 +185,18 @@ function AccountContent({ user }: { readonly user: User }) {
         ) : (
           <OAuthButton provider="discord" />
         )}
+      </section>
+      <section
+        aria-labelledby="appearance-title"
+        className="grid gap-4 border-t border-border pt-8"
+      >
+        <h2 id="appearance-title" className="text-lg font-semibold">
+          화면 테마
+        </h2>
+        <p className="text-sm text-muted">
+          시스템을 고르면 기기 설정을 따라 자동으로 바뀝니다.
+        </p>
+        <ThemeSelect />
       </section>
       <Dialog
         open={confirming}

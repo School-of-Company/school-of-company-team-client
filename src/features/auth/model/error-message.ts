@@ -39,7 +39,7 @@ export function authErrorMessage(error: unknown): string {
     case "DISCORD_ACCOUNT_IN_USE":
       return "다른 사용자에게 연결된 Discord 계정입니다. 다른 계정으로 다시 시도해 주세요.";
     case "DISCORD_ALREADY_LINKED":
-      return "이미 Discord 계정이 연결되어 있습니다. 내 계정에서 연결 상태를 확인해 주세요.";
+      return "이미 Discord 계정이 연결되어 있습니다. 설정에서 연결 상태를 확인해 주세요.";
     case "REJECTED":
       return "가입 승인이 거절되었습니다. 관리자에게 문의해 주세요.";
     case "SUSPENDED":

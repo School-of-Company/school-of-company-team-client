@@ -40,9 +40,12 @@ export function formatDate(
 
 export {
   applyTheme,
+  applyThemePreference,
+  readThemePreference,
   readTheme,
   subscribeTheme,
   themeBootScript,
   THEME_STORAGE_KEY,
   type Theme,
+  type ThemePreference,
 } from "./theme";

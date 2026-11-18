@@ -275,6 +275,59 @@ body {
   font-size: var(--text-sm);
   border-radius: var(--radius-input);
 }
+.ui-identity .ui-button-secondary,
+.ui-identity .ui-button-ghost {
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  background: color-mix(in oklab, var(--surface) 55%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.ui-identity .ui-button-secondary:hover:not(:disabled),
+.ui-identity .ui-button-ghost:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
+  filter: none;
+}
+.ui-segmented {
+  display: inline-grid;
+  grid-auto-flow: column;
+  gap: var(--space-3xs);
+  justify-self: start;
+  padding: var(--space-3xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+}
+.ui-segmented-option {
+  position: relative;
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  border-radius: calc(var(--radius-md) - 2px);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+.ui-segmented-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ui-segmented-option:hover {
+  color: var(--foreground);
+}
+.ui-segmented-option:has(input:checked) {
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--border);
+}
+.ui-segmented-option:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
 .ui-link-button {
   justify-self: center;
   padding: var(--space-2xs) var(--space-xs);
