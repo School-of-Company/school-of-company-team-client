@@ -48,7 +48,12 @@ export function Textarea({
   className = "",
   ...props
 }: ComponentProps<"textarea">) {
-  return <textarea className={`ui-input min-h-28 ${className}`} {...props} />;
+  return (
+    <textarea
+      className={`ui-input ui-textarea min-h-28 ${className}`}
+      {...props}
+    />
+  );
 }
 export function Select({ className = "", ...props }: ComponentProps<"select">) {
   return <select className={`ui-input ${className}`} {...props} />;

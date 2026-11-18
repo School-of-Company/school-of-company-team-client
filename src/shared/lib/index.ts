@@ -37,3 +37,12 @@ export function formatDate(
     ...options,
   }).format(date);
 }
+
+export {
+  applyTheme,
+  readTheme,
+  subscribeTheme,
+  themeBootScript,
+  THEME_STORAGE_KEY,
+  type Theme,
+} from "./theme";

@@ -35,7 +35,7 @@ function AdminContent({ user }: { readonly user: User }) {
   const creating = useSearchParams()?.get("create") === "project";
   const refresh = () => client.invalidateQueries({ queryKey: projectKeys.all });
   return (
-    <div className="mx-auto grid w-full max-w-3xl min-w-0 gap-8 p-4 sm:p-8">
+    <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="grid gap-2">
           <h1 className="text-2xl font-semibold">

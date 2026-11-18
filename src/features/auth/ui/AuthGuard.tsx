@@ -12,6 +12,7 @@ import {
 import { ErrorState, Spinner } from "@/shared/ui";
 import { authErrorCode, authErrorMessage } from "../model/error-message";
 import { guardDestination } from "../model/guard-destination";
+import { guardView } from "../model/guard-view";
 
 export function AuthGuard({
   children,
@@ -35,7 +36,14 @@ export function AuthGuard({
       router.replace(`/pending?status=${code}`);
   }, [ready, token, destination, code, router, restriction]);
 
-  if (me.isError)
+  const view = guardView({
+    ready,
+    hasToken: Boolean(token),
+    isError: me.isError,
+    hasUser: Boolean(me.data),
+    redirecting: destination !== undefined && destination !== null,
+  });
+  if (view === "error")
     return (
       <ErrorState
         description={authErrorMessage(me.error)}
@@ -44,7 +52,7 @@ export function AuthGuard({
         }}
       />
     );
-  if (!ready || !token || !me.data || destination !== null)
+  if (view === "loading" || !me.data)
     return <Spinner label="계정 상태 확인 중" />;
   return typeof children === "function" ? children(me.data) : children;
 }

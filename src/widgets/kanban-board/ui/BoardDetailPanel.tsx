@@ -37,7 +37,7 @@ export function BoardDetailPanel({
     >
       <Link
         href={`/tasks/${encodeURIComponent(taskId)}`}
-        className="mb-5 inline-flex min-h-11 items-center text-sm text-brand underline"
+        className="mb-3 inline-flex min-h-11 items-center text-sm text-muted underline hover:text-foreground"
       >
         전체 페이지로 열기
       </Link>
