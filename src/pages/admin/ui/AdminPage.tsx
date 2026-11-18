@@ -3,11 +3,20 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { projectKeys } from "@/entities/project";
 import { useMe } from "@/entities/user";
+import { AuthGuard } from "@/features/auth";
 import { AdminSettings } from "./AdminSettings";
 import { normalizeApiError } from "@/shared/api";
 import { ErrorState, Spinner } from "@/shared/ui";
 
 export function AdminPage() {
+  return (
+    <AuthGuard>
+      <AdminContent />
+    </AuthGuard>
+  );
+}
+
+function AdminContent() {
   const me = useMe();
   const client = useQueryClient();
   if (me.isError)

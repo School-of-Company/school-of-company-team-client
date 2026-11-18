@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectAccess, projectKeys, projectQueries } from "@/entities/project";
 import { activeUsersQueryOptions, useMe } from "@/entities/user";
+import { AuthGuard } from "@/features/auth";
 import { settingsErrorMessage } from "@/features/project-settings";
 import { SettingsPanels } from "./SettingsPanels";
 import { normalizeApiError } from "@/shared/api";
@@ -15,6 +16,14 @@ export function ProjectSettingsPage({
 }: {
   readonly projectId: string;
 }) {
+  return (
+    <AuthGuard>
+      <ProjectSettingsContent projectId={projectId} />
+    </AuthGuard>
+  );
+}
+
+function ProjectSettingsContent({ projectId }: { readonly projectId: string }) {
   const me = useMe();
   const client = useQueryClient();
   const project = useQuery({
