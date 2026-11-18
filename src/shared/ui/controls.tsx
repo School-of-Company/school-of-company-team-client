@@ -22,8 +22,8 @@ export function Button({
       aria-busy={loading || undefined}
       {...props}
     >
-      {loading && <span className="ui-spinner absolute" aria-hidden="true" />}
-      <span className={loading ? "opacity-0" : undefined}>{children}</span>
+      {loading && <span className="ui-spinner" aria-hidden="true" />}
+      <span>{children}</span>
     </button>
   );
 }
@@ -58,11 +58,7 @@ export function Checkbox({
   ...props
 }: Omit<ComponentProps<"input">, "type">) {
   return (
-    <input
-      type="checkbox"
-      className={`size-5 accent-brand ${className}`}
-      {...props}
-    />
+    <input type="checkbox" className={`ui-checkbox ${className}`} {...props} />
   );
 }
 export function Label(props: ComponentProps<"label">) {

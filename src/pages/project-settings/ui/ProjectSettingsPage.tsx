@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import "./settings.css";
+import { Suspense } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectAccess, projectKeys, projectQueries } from "@/entities/project";
 import { activeUsersQueryOptions, type User } from "@/entities/user";
@@ -8,7 +9,7 @@ import { AuthGuard } from "@/features/auth";
 import { settingsErrorMessage } from "@/features/project-settings";
 import { SettingsPanels } from "./SettingsPanels";
 import { normalizeApiError } from "@/shared/api";
-import { routes } from "@/shared/config";
+import { ProjectNav } from "@/widgets/project-nav";
 import { ErrorState, Spinner } from "@/shared/ui";
 
 export function ProjectSettingsPage({
@@ -73,23 +74,20 @@ function ProjectSettingsContent({
   return (
     <div className="mx-auto grid w-full max-w-3xl min-w-0 gap-8 p-4 sm:p-8">
       <header className="grid gap-3">
-        <Link
-          href={routes.project(projectId)}
-          className="w-fit text-sm text-brand underline underline-offset-4"
-        >
-          프로젝트 보드로
-        </Link>
-        <h1 className="text-3xl font-semibold break-all">
+        <h1 className="text-2xl font-semibold break-words">
           {project.data.name} 설정
         </h1>
       </header>
-      <SettingsPanels
-        key={projectId}
-        project={project.data}
-        user={user}
-        candidates={users.data ?? []}
-        onSaved={refresh}
-      />
+      <ProjectNav project={project.data} user={user} />
+      <Suspense fallback={<Spinner label="설정 불러오는 중" />}>
+        <SettingsPanels
+          key={projectId}
+          project={project.data}
+          user={user}
+          candidates={users.data ?? []}
+          onSaved={refresh}
+        />
+      </Suspense>
     </div>
   );
 }

@@ -26,6 +26,7 @@ export function DiscordChannelForm({
   const channel = useDiscordChannel(projectId, true);
   const link = useLinkDiscordChannel(projectId);
   const [validation, setValidation] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
   const prefix = projectId === null ? "team-channel" : "project-channel";
   if (channel.isPending) return <Spinner label="Discord 채널 불러오는 중" />;
   if (channel.isError)
@@ -58,76 +59,113 @@ export function DiscordChannelForm({
         Discord 역할·채널·기존 스레드 권한은 자동으로 변경되지 않습니다. 공개
         범위나 참여자가 바뀌면 관리자가 직접 점검한 뒤 다시 연결하세요.
       </p>
-      <form
-        key={channel.data.channelId}
-        className="grid gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (disabled || link.isPending) return;
-          const form = new FormData(event.currentTarget);
-          const channelId = String(form.get("channelId") ?? "").trim();
-          const privacyConfirmed = form.get("privacyConfirmed") === "on";
-          const error = validateDiscordChannel(
-            channelId,
-            membersOnly,
-            privacyConfirmed,
-          );
-          setValidation(error);
-          if (!error) link.mutate({ channelId, privacyConfirmed });
-        }}
-      >
-        <fieldset
-          disabled={disabled || link.isPending}
-          className="grid min-w-0 gap-4"
+      {!disabled && !editing && (
+        <Button
+          variant="secondary"
+          className="justify-self-start"
+          onClick={() => {
+            link.reset();
+            setEditing(true);
+          }}
         >
-          <Field
-            id={prefix}
-            label="Discord 채널 ID"
-            hint="Discord 개발자 모드 → 채널 우클릭 → ID 복사"
+          Discord 채널 편집
+        </Button>
+      )}
+      {link.isSuccess && !editing && (
+        <p role="status" className="text-sm">
+          채널 검증을 마쳤습니다. 현재 상태: {statusLabels[link.data.status]}
+        </p>
+      )}
+      {editing && (
+        <form
+          key={channel.data.channelId}
+          className="grid gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (disabled || link.isPending) return;
+            const form = new FormData(event.currentTarget);
+            const channelId = String(form.get("channelId") ?? "").trim();
+            const privacyConfirmed = form.get("privacyConfirmed") === "on";
+            const error = validateDiscordChannel(
+              channelId,
+              membersOnly,
+              privacyConfirmed,
+            );
+            setValidation(error);
+            if (!error)
+              link.mutate(
+                { channelId, privacyConfirmed },
+                { onSuccess: () => setEditing(false) },
+              );
+          }}
+        >
+          <fieldset
+            disabled={disabled || link.isPending}
+            className="grid min-w-0 gap-4"
           >
-            <Input
+            <Field
               id={prefix}
-              name="channelId"
-              inputMode="numeric"
-              pattern="[0-9]{17,20}"
-              required
-              defaultValue={channel.data.channelId ?? ""}
-              aria-describedby={`${prefix}-hint`}
-            />
-          </Field>
-          {membersOnly && (
-            <label className="flex items-start gap-3 text-sm">
-              <Checkbox
-                name="privacyConfirmed"
+              label="Discord 채널 ID"
+              hint="Discord 개발자 모드 → 채널 우클릭 → ID 복사"
+            >
+              <Input
+                id={prefix}
+                name="channelId"
+                inputMode="numeric"
+                pattern="[0-9]{17,20}"
                 required
-                className="mt-1 shrink-0"
+                defaultValue={channel.data.channelId ?? ""}
+                aria-describedby={`${prefix}-hint`}
               />
-              <span>
-                이 채널을 볼 수 있는 역할·사용자를 프로젝트 참여자로 제한했고,
-                기존 스레드 권한도 직접 점검했습니다.
-              </span>
-            </label>
+            </Field>
+            {membersOnly && (
+              <label className="flex items-start gap-3 text-sm">
+                <Checkbox
+                  name="privacyConfirmed"
+                  required
+                  className="mt-1 shrink-0"
+                />
+                <span>
+                  이 채널을 볼 수 있는 역할·사용자를 프로젝트 참여자로 제한했고,
+                  기존 스레드 권한도 직접 점검했습니다.
+                </span>
+              </label>
+            )}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="submit"
+                variant="secondary"
+                loading={link.isPending}
+              >
+                검증 후 연결
+              </Button>
+              <Button
+                variant="ghost"
+                disabled={link.isPending}
+                onClick={() => setEditing(false)}
+              >
+                취소
+              </Button>
+            </div>
+          </fieldset>
+          {validation && (
+            <p role="alert" className="text-sm text-danger">
+              {validation}
+            </p>
           )}
-          <Button type="submit" variant="secondary" loading={link.isPending}>
-            검증 후 연결
-          </Button>
-        </fieldset>
-        {validation && (
-          <p role="alert" className="text-sm text-danger">
-            {validation}
-          </p>
-        )}
-        {link.isError && (
-          <p role="alert" className="text-sm text-danger">
-            {normalizeApiError(link.error).message}
-          </p>
-        )}
-        {link.isSuccess && (
-          <p role="status" className="text-sm">
-            채널 검증을 마쳤습니다. 현재 상태: {statusLabels[link.data.status]}
-          </p>
-        )}
-      </form>
+          {link.isError && (
+            <p role="alert" className="text-sm text-danger">
+              {normalizeApiError(link.error).message}
+            </p>
+          )}
+          {link.isSuccess && (
+            <p role="status" className="text-sm">
+              채널 검증을 마쳤습니다. 현재 상태:{" "}
+              {statusLabels[link.data.status]}
+            </p>
+          )}
+        </form>
+      )}
     </div>
   );
 }

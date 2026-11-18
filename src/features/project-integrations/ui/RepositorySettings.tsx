@@ -1,12 +1,14 @@
 "use client";
 
-import { normalizeApiError } from "@/shared/api";
+import { useState } from "react";
+import { githubErrorMessage } from "../model/github-error";
 import {
   Badge,
   Button,
   EmptyState,
   ErrorState,
   Field,
+  Input,
   Select,
   Spinner,
 } from "@/shared/ui";
@@ -26,20 +28,15 @@ export function RepositorySettings({
   const repositories = useProjectRepositories(projectId, true);
   const installable = useInstallableRepositories(projectId, !disabled);
   const change = useRepositoryChange(projectId);
+  const [editing, setEditing] = useState(false);
+  const [search, setSearch] = useState("");
   if (repositories.isPending || (!disabled && installable.isPending))
     return <Spinner label="저장소 불러오는 중" />;
   if (repositories.isError)
     return (
       <ErrorState
-        description={normalizeApiError(repositories.error).message}
+        description={githubErrorMessage(repositories.error)}
         onRetry={() => void repositories.refetch()}
-      />
-    );
-  if (!disabled && installable.isError)
-    return (
-      <ErrorState
-        description={normalizeApiError(installable.error).message}
-        onRetry={() => void installable.refetch()}
       />
     );
   const available =
@@ -50,11 +47,15 @@ export function RepositorySettings({
           (linked) => linked.repositoryId === repo.repositoryId,
         ),
     ) ?? [];
+  const matches = available.filter((repo) =>
+    repo.fullName.toLowerCase().includes(search.toLowerCase()),
+  );
   return (
     <div className="grid gap-4">
       <p className="text-sm text-muted">
-        GitHub App 설치에서 허용한 저장소만 연결할 수 있습니다. 기본 발행
-        저장소는 신규 업무의 선택 기본값이며 기존 업무를 발행하지 않습니다.
+        GitHub 로그인은 본인 확인에 사용하며, 저장소 접근은 별도 GitHub App
+        설치가 필요합니다. 설치에서 허용한 저장소만 연결할 수 있습니다. 기본
+        발행 저장소는 신규 업무의 선택 기본값이며 기존 업무를 발행하지 않습니다.
       </p>
       {repositories.data.length === 0 ? (
         <EmptyState
@@ -76,7 +77,7 @@ export function RepositorySettings({
                   {repo.isDefault && <Badge>기본 발행</Badge>}
                 </div>
               </div>
-              {!disabled && (
+              {!disabled && editing && (
                 <Button
                   variant="ghost"
                   disabled={change.isPending}
@@ -95,29 +96,53 @@ export function RepositorySettings({
           ))}
         </ul>
       )}
-      <Field id="default-repository" label="기본 발행 저장소">
-        <Select
-          id="default-repository"
-          disabled={disabled || change.isPending}
-          value={repositories.data.find((repo) => repo.isDefault)?.id ?? ""}
-          onChange={(event) =>
-            change.mutate({
-              action: "default",
-              projectRepositoryId: event.target.value || null,
-            })
-          }
+      <p className="text-sm text-muted">
+        기본 발행 저장소:{" "}
+        {repositories.data.find((repo) => repo.isDefault)?.fullName ?? "없음"}
+      </p>
+      {!disabled && !editing && (
+        <Button
+          variant="secondary"
+          className="justify-self-start"
+          onClick={() => {
+            change.reset();
+            setEditing(true);
+          }}
         >
-          <option value="">없음</option>
-          {repositories.data
-            .filter((repo) => repo.publishable)
-            .map((repo) => (
-              <option key={repo.id} value={repo.id}>
-                {repo.fullName}
-              </option>
-            ))}
-        </Select>
-      </Field>
-      {!disabled && (
+          저장소 편집
+        </Button>
+      )}
+      {!disabled && installable.isError && (
+        <ErrorState
+          description={githubErrorMessage(installable.error)}
+          onRetry={() => void installable.refetch()}
+        />
+      )}
+      {editing && (
+        <Field id="default-repository" label="기본 발행 저장소">
+          <Select
+            id="default-repository"
+            disabled={disabled || change.isPending}
+            value={repositories.data.find((repo) => repo.isDefault)?.id ?? ""}
+            onChange={(event) =>
+              change.mutate({
+                action: "default",
+                projectRepositoryId: event.target.value || null,
+              })
+            }
+          >
+            <option value="">없음</option>
+            {repositories.data
+              .filter((repo) => repo.publishable)
+              .map((repo) => (
+                <option key={repo.id} value={repo.id}>
+                  {repo.fullName}
+                </option>
+              ))}
+          </Select>
+        </Field>
+      )}
+      {!disabled && editing && !installable.isError && (
         <form
           className="grid gap-3"
           onSubmit={(event) => {
@@ -137,6 +162,14 @@ export function RepositorySettings({
               });
           }}
         >
+          <Field id="repository-search" label="허용된 저장소 검색">
+            <Input
+              id="repository-search"
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </Field>
           <Field id="installable-repository" label="연결할 저장소">
             <Select
               id="installable-repository"
@@ -148,7 +181,7 @@ export function RepositorySettings({
               <option value="" disabled>
                 저장소 선택
               </option>
-              {available.map((repo) => (
+              {matches.map((repo) => (
                 <option key={repo.repositoryId} value={repo.repositoryId}>
                   {repo.fullName}
                   {repo.private ? " (비공개)" : " (공개)"}
@@ -162,6 +195,11 @@ export function RepositorySettings({
               여부를 확인하세요.
             </p>
           )}
+          {available.length > 0 && matches.length === 0 && (
+            <p className="text-sm text-muted">
+              검색 결과가 없습니다. 검색어를 바꿔보세요.
+            </p>
+          )}
           <Button
             type="submit"
             variant="secondary"
@@ -172,9 +210,19 @@ export function RepositorySettings({
           </Button>
         </form>
       )}
+      {editing && (
+        <Button
+          variant="ghost"
+          className="justify-self-start"
+          disabled={change.isPending}
+          onClick={() => setEditing(false)}
+        >
+          편집 마침
+        </Button>
+      )}
       {change.isError && (
         <p role="alert" className="text-sm text-danger">
-          {normalizeApiError(change.error).message}
+          {githubErrorMessage(change.error)}
         </p>
       )}
       {change.isSuccess && (

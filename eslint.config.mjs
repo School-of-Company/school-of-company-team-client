@@ -9,5 +9,12 @@ export default defineConfig([
   ...nextTs,
   ...pluginQuery.configs["flat/recommended"],
   prettier,
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    ".agents/**",
+    ".claude/**",
+  ]),
 ]);

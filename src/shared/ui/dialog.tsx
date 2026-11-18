@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { IconButton } from "./controls";
+import { Icon } from "./icons";
 
 export function Dialog({
   open,
@@ -26,10 +27,10 @@ export function Dialog({
   }, [open]);
   useEffect(() => {
     if (!open) return;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const overflow = document.body.style.overflowY;
+    document.body.style.overflowY = "clip";
     return () => {
-      document.body.style.overflow = overflow;
+      document.body.style.overflowY = overflow;
     };
   }, [open]);
   return (
@@ -57,10 +58,13 @@ export function Dialog({
         }
       }}
       onCancel={(event) => {
+        event.stopPropagation();
         event.preventDefault();
         onClose();
       }}
-      onClose={onClose}
+      onClose={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
       className={`ui-dialog ${className}`}
     >
       <div className="mb-6 flex items-center justify-between gap-4">
@@ -68,7 +72,7 @@ export function Dialog({
           {title}
         </h2>
         <IconButton aria-label="닫기" variant="ghost" onClick={onClose}>
-          ×
+          <Icon name="close" />
         </IconButton>
       </div>
       {children}
