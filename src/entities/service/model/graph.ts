@@ -6,8 +6,10 @@ export type PlacedNode = GraphNode & {
   readonly layer: number;
 };
 export type PlacedEdge = GraphEdge & {
-  /** 레이어가 거꾸로 가는 간선(순환의 일부). 곡선을 아래로 돌려 그린다. */
+  /** 레이어가 거꾸로 가는 간선(순환의 일부). 노드 아래 통로(lane)로 돌아가 다른 노드를 지나지 않는다. */
   readonly back: boolean;
+  /** 되돌아가는 간선의 가로 통로 y와 순번(겹치지 않게 조금씩 띄운다). */
+  readonly lane?: { readonly y: number; readonly index: number };
 };
 export type GraphLayout = {
   readonly nodes: readonly PlacedNode[];
@@ -21,6 +23,8 @@ export const NODE_HEIGHT = 44;
 const COLUMN_GAP = 64;
 const ROW_GAP = 16;
 const PAD = 8;
+const BACK_GUTTER = 32;
+const LANE_GAP = 10;
 
 /**
  * 의존하는 서비스(왼쪽) → 의존받는 서비스(오른쪽) 순서의 층 배치.
@@ -28,7 +32,10 @@ const PAD = 8;
  * ponytail: 교차 최소화는 한 번만 한다. 서비스가 수십 개를 넘어 겹침이 보이면 반복 횟수를 늘린다.
  */
 export function layoutGraph(graph: DependencyGraph): GraphLayout {
-  const nodes = [...graph.nodes].sort((a, b) => a.key.localeCompare(b.key));
+  // 순환(A→B, B→A)이면 호출 쪽이 같은 서비스를 두 번 넘길 수 있다. 노드는 id로 하나만 둔다.
+  const nodes = [
+    ...new Map(graph.nodes.map((node) => [node.id, node])).values(),
+  ].sort((a, b) => a.key.localeCompare(b.key));
   const ids = new Set(nodes.map((node) => node.id));
   const edges = graph.edges.filter(
     (edge) => ids.has(edge.from) && ids.has(edge.to) && edge.from !== edge.to,
@@ -86,6 +93,8 @@ export function layoutGraph(graph: DependencyGraph): GraphLayout {
 
   const tallest = Math.max(1, ...columns.map((column) => column?.length ?? 0));
   const height = PAD * 2 + tallest * NODE_HEIGHT + (tallest - 1) * ROW_GAP;
+  // 되돌아가는 간선은 첫 열 왼쪽 여백과 노드 아래 통로를 지나므로 그만큼 바깥 여백을 둔다.
+  const side = backEdges.size ? BACK_GUTTER : PAD;
   const placed = columns.flatMap((column, index) => {
     const columnHeight =
       column.length * NODE_HEIGHT + (column.length - 1) * ROW_GAP;
@@ -93,21 +102,29 @@ export function layoutGraph(graph: DependencyGraph): GraphLayout {
     return column.map((node, position) => ({
       ...node,
       layer: index,
-      x: PAD + index * (NODE_WIDTH + COLUMN_GAP),
+      x: side + index * (NODE_WIDTH + COLUMN_GAP),
       y: top + position * (NODE_HEIGHT + ROW_GAP),
     }));
   });
   const width =
-    PAD * 2 +
+    side * 2 +
     Math.max(1, columns.length) * NODE_WIDTH +
     Math.max(0, columns.length - 1) * COLUMN_GAP;
+  let backIndex = 0;
+  const placedEdges = edges.map((edge) => {
+    const back = (layer.get(edge.to) ?? 0) <= (layer.get(edge.from) ?? 0);
+    if (!back) return { ...edge, back };
+    const index = backIndex++;
+    return {
+      ...edge,
+      back,
+      lane: { y: height + LANE_GAP * (index + 1), index },
+    };
+  });
   return {
     nodes: placed,
-    edges: edges.map((edge) => ({
-      ...edge,
-      back: (layer.get(edge.to) ?? 0) <= (layer.get(edge.from) ?? 0),
-    })),
+    edges: placedEdges,
     width,
-    height: height + (backEdges.size ? NODE_HEIGHT : 0),
+    height: height + (backIndex ? LANE_GAP * (backIndex + 1) : 0),
   };
 }

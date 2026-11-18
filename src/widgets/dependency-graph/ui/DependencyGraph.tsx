@@ -17,14 +17,12 @@ import { routes } from "@/shared/config";
 const kinds: readonly DependencyKind[] = ["API", "EVENT", "DATA", "OTHER"];
 
 function edgePath(edge: PlacedEdge, from: PlacedNode, to: PlacedNode) {
-  if (edge.back) {
-    // 순환을 닫는 간선은 두 노드 아래로 돌아간다.
-    const x1 = from.x + NODE_WIDTH / 2;
-    const x2 = to.x + NODE_WIDTH / 2;
-    const y1 = from.y + NODE_HEIGHT;
-    const y2 = to.y + NODE_HEIGHT;
-    const dip = Math.max(y1, y2) + NODE_HEIGHT * 0.8;
-    return `M${x1},${y1} C${x1},${dip} ${x2},${dip} ${x2},${y2 + 6}`;
+  if (edge.back && edge.lane) {
+    // 순환을 닫는 간선: 오른쪽으로 나와 노드 아래 통로를 지나 대상 왼쪽으로 들어간다(노드 위를 지나지 않는다).
+    const shift = edge.lane.index * 4;
+    const right = from.x + NODE_WIDTH + 12 + shift;
+    const left = to.x - 16 - shift;
+    return `M${from.x + NODE_WIDTH},${from.y + NODE_HEIGHT / 2 + shift} H${right} V${edge.lane.y} H${left} V${to.y + NODE_HEIGHT / 2 + shift} H${to.x - 6}`;
   }
   const x1 = from.x + NODE_WIDTH;
   const y1 = from.y + NODE_HEIGHT / 2;

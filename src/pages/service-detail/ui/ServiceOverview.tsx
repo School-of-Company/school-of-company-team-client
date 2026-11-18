@@ -16,6 +16,7 @@ import {
   ServiceRepositories,
 } from "@/features/manage-service";
 import { DependencyGraph } from "@/widgets/dependency-graph";
+import { neighbourGraph } from "../model/neighbour-graph";
 import { Button } from "@/shared/ui";
 import { formatDate } from "@/shared/lib";
 import { DeploymentEntry, DeploymentsState } from "./ServiceDeployments";
@@ -169,50 +170,9 @@ function RecentDeployments({ service }: { readonly service: ServiceDetail }) {
 /** 상세의 의존 그림: 이 서비스와 바로 이웃한 서비스만. 전체 그래프는 목록의 "의존관계" 보기에 있다. */
 function NeighbourGraph({ service }: { readonly service: ServiceDetail }) {
   if (service.upstream.length + service.downstream.length === 0) return null;
-  const self = {
-    id: service.id,
-    key: service.key,
-    name: service.name,
-    tier: service.tier,
-    archived: service.archived,
-  };
-  const pick = ({
-    serviceId,
-    key,
-    name,
-    tier,
-    archived,
-  }: ServiceDetail["upstream"][number]) => ({
-    id: serviceId,
-    key,
-    name,
-    tier,
-    archived,
-  });
   return (
     <section aria-label="이웃 의존 그래프" className="service-neighbours">
-      <DependencyGraph
-        highlight={service.id}
-        graph={{
-          nodes: [
-            self,
-            ...service.upstream.map(pick),
-            ...service.downstream.map(pick),
-          ],
-          edges: [
-            ...service.upstream.map((edge) => ({
-              from: service.id,
-              to: edge.serviceId,
-              kind: edge.kind,
-            })),
-            ...service.downstream.map((edge) => ({
-              from: edge.serviceId,
-              to: service.id,
-              kind: edge.kind,
-            })),
-          ],
-        }}
-      />
+      <DependencyGraph highlight={service.id} graph={neighbourGraph(service)} />
     </section>
   );
 }

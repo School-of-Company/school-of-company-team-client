@@ -49,3 +49,38 @@ test("edges to unknown nodes or to themselves are dropped", () => {
   assert.equal(layout.edges.length, 0);
   assert.equal(layout.nodes[0]?.layer, 0);
 });
+
+test("the same service passed twice becomes one node", () => {
+  const layout = layoutGraph({
+    nodes: [node("a"), node("b"), node("b")],
+    edges: [
+      { from: "a", to: "b", kind: "API" },
+      { from: "b", to: "a", kind: "EVENT" },
+    ],
+  });
+  assert.deepEqual(
+    layout.nodes.map((n) => n.key),
+    ["a", "b"],
+  );
+  assert.equal(layout.edges.length, 2);
+  assert.equal(layout.edges.filter((edge) => edge.back).length, 1);
+});
+
+test("back edges run in lanes below every node and inside the margins", () => {
+  const layout = layoutGraph({
+    nodes: [node("client"), node("server"), node("db"), node("cache")],
+    edges: [
+      { from: "client", to: "server", kind: "API" },
+      { from: "server", to: "db", kind: "DATA" },
+      { from: "server", to: "cache", kind: "DATA" },
+      { from: "db", to: "client", kind: "EVENT" },
+    ],
+  });
+  const bottom = Math.max(...layout.nodes.map((n) => n.y + 44));
+  const back = layout.edges.filter((edge) => edge.back);
+  assert.equal(back.length, 1);
+  assert.ok((back[0]?.lane?.y ?? 0) > bottom);
+  assert.ok((back[0]?.lane?.y ?? Infinity) < layout.height);
+  // 첫 열 왼쪽에 통로가 지날 여백이 있다.
+  assert.ok(Math.min(...layout.nodes.map((n) => n.x)) >= 24);
+});
