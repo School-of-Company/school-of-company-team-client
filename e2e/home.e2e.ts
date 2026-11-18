@@ -369,6 +369,76 @@ test("10초 폴링 동안 홈 행이 사라지거나 스켈레톤으로 바뀌�
   ).toEqual([]);
 });
 
+test("홈 API가 404를 주면 다음 조회에서 바로 마지막 내용을 비운다", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await open(page, seed.member.tokens, "/");
+  await expect(page.getByText(titles.progress).first()).toBeVisible();
+  await page.route("**/api/v1/home", (route) =>
+    route.fulfill({
+      status: 404,
+      contentType: "application/json",
+      body: JSON.stringify({ code: "TASK_NOT_FOUND", message: "주입한 오류" }),
+    }),
+  );
+  await expect(page.getByText(titles.progress)).toHaveCount(0, {
+    timeout: 15_000,
+  });
+  await expect(
+    page.getByRole("heading", { name: "최신 정보를 불러오지 못했습니다" }),
+  ).toBeVisible();
+});
+
+test("홈에서 연 업무가 404가 되면 뒤로 가도 홈 캐시에서 다시 보이지 않는다", async ({
+  page,
+}) => {
+  const title = "홈 캐시 점검 업무";
+  const created = await call<{ id: string }>(
+    "POST",
+    "/api/v1/tasks",
+    seed.member.tokens,
+    {
+      scope: "PROJECT",
+      projectId: seed.project.id,
+      assigneeIds: [seed.member.id],
+      title,
+      type: "TASK",
+      priority: "P2",
+      status: "IN_PROGRESS",
+    },
+  );
+  await open(page, seed.member.tokens, "/");
+  const today = page.getByRole("region", { name: "오늘 할 일" });
+  await expect(today.getByText(title)).toBeVisible();
+  await call("DELETE", `/api/v1/tasks/${created.id}`, seed.member.tokens);
+  await today.getByRole("link", { name: new RegExp(title) }).click();
+  await expect(
+    page.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+  ).toBeVisible();
+  await page.evaluate((text) => {
+    const w = window as unknown as { reappeared: boolean };
+    w.reappeared = false;
+    new MutationObserver(() => {
+      if (document.body.innerText.includes(text)) w.reappeared = true;
+    }).observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }, title);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(today).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByText(title)).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { reappeared: boolean }).reappeared,
+    ),
+  ).toBe(false);
+});
+
 test("a member without managed projects gets no scope switch", async ({
   page,
 }) => {

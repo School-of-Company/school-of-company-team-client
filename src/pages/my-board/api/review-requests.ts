@@ -1,7 +1,8 @@
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import type { MyReviewRequest } from "@/entities/task";
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
+import { keepPreviousKey } from "@/shared/lib";
 
 export const reviewRequestQueries = {
   mine: () =>
@@ -14,7 +15,7 @@ export const reviewRequestQueries = {
           )
         ).data,
       refetchInterval: BOARD_POLL_INTERVAL,
-      placeholderData: keepPreviousData,
+      placeholderData: keepPreviousKey(["me", "github", "review-requests"]),
       retry: false,
     }),
 };

@@ -1,6 +1,7 @@
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
+import { keepPreviousKey } from "@/shared/lib";
 
 // 서버 계약: docs/spec/s5-home.md 3.4. 부하·역할은 조회자가 읽을 수 있는 업무·프로젝트로만 센다.
 export type Member = {
@@ -37,7 +38,7 @@ export const memberQueries = {
       queryFn: async () =>
         (await api.get<readonly Member[]>("/api/v1/members")).data,
       refetchInterval: BOARD_POLL_INTERVAL,
-      placeholderData: keepPreviousData,
+      placeholderData: keepPreviousKey(["members"]),
       retry: false,
     }),
 };

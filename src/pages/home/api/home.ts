@@ -1,7 +1,8 @@
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import type { MyReviewRequest, TaskCard, TaskStatus } from "@/entities/task";
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
+import { keepPreviousKey } from "@/shared/lib";
 
 // 서버 계약: docs/spec/s5-home.md(feat/s5-home). 판정은 서버가 하고 화면은 보여 주기만 한다.
 export const attentionRules = [
@@ -75,7 +76,7 @@ export const homeQueries = {
       queryKey: ["home"],
       queryFn: async () => (await api.get<Home>("/api/v1/home")).data,
       refetchInterval: BOARD_POLL_INTERVAL,
-      placeholderData: keepPreviousData,
+      placeholderData: keepPreviousKey(["home"]),
       retry: false,
     }),
   // 범위를 바꾸면 키가 바뀐다. 다른 범위의 목록을 placeholder로 보여 주지 않도록 keepPreviousData를 쓰지 않는다.

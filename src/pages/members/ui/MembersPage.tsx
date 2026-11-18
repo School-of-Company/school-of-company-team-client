@@ -3,14 +3,16 @@
 import { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { TaskError } from "@/entities/task";
 import { avatarSrc, isHeadAdmin, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
+import { normalizeApiError } from "@/shared/api";
+import { useLastData } from "@/shared/lib";
 import {
   Avatar,
   Badge,
   Button,
   EmptyState,
+  ErrorState,
   Skeleton,
   Spinner,
 } from "@/shared/ui";
@@ -45,7 +47,9 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
   const params = new URLSearchParams(useSearchParams()?.toString());
   const sort = readSort(params.get("sort"));
   const members = useQuery(memberQueries.list());
-  const rows = members.data ? sortMembers(members.data, sort) : [];
+  // 일시 장애면 60초까지만 마지막 목록을 두고, 권한·존재 오류(4xx)면 바로 비운다.
+  const { data, stale } = useLastData(members);
+  const rows = data ? sortMembers(data, sort) : [];
   // 연결 열은 헤드 어드민에게만. 다른 사람은 자기 행 이름 아래에서 자기 연결만 본다.
   const connectionColumn = isHeadAdmin(viewer);
 
@@ -64,9 +68,9 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
       <header className="board-header flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">팀원</h1>
-          {members.data && (
+          {data && (
             <p className="mt-1 text-xs text-muted tabular-nums">
-              활성 팀원 {members.data.length}명
+              활성 팀원 {data.length}명
             </p>
           )}
         </div>
@@ -84,7 +88,7 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
           ))}
         </div>
       </header>
-      {members.isError && members.data && (
+      {stale && (
         <div
           role="status"
           className="flex flex-wrap items-center gap-3 text-sm"
@@ -111,9 +115,10 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
             <Skeleton key={index} className="h-12" />
           ))}
         </div>
-      ) : members.isError && !members.data ? (
-        <TaskError
-          error={members.error}
+      ) : members.isError && !data ? (
+        <ErrorState
+          title="최신 정보를 불러오지 못했습니다"
+          description={normalizeApiError(members.error).message}
           onRetry={() => void members.refetch()}
         />
       ) : rows.length === 0 ? (

@@ -8,7 +8,7 @@ import { CiChip, SignalChip, priorityLabels } from "@/entities/task";
 import { isHeadAdmin, type User } from "@/entities/user";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
-import { formatDate, relativeSince } from "@/shared/lib";
+import { formatDate, relativeSince, useLastData } from "@/shared/lib";
 import { Icon, Select, Skeleton } from "@/shared/ui";
 import { homeQueries, type Attention, type AttentionItem } from "../api/home";
 import {
@@ -63,7 +63,8 @@ export function AttentionSection({
     ...homeQueries.project(projectId ?? ""),
     enabled: projectId !== null,
   });
-  const attention = projectId ? project.data : mine;
+  const kept = useLastData(project);
+  const attention = projectId ? kept.data : mine;
   const total = attention?.items.length;
 
   const changeScope = (value: string) => {
@@ -99,7 +100,7 @@ export function AttentionSection({
         )
       }
     >
-      {projectId && project.isError && project.data && (
+      {projectId && kept.stale && (
         <RetryNote
           role="status"
           message="최신 목록을 불러오지 못해 마지막으로 받은 목록을 보여 줍니다."
@@ -115,7 +116,7 @@ export function AttentionSection({
           <Skeleton className="w-2/3" />
           <Skeleton className="w-1/2" />
         </div>
-      ) : projectId && project.isError && !project.data ? (
+      ) : projectId && project.isError && !kept.data ? (
         <ProjectError
           error={project.error}
           onRetry={() => void project.refetch()}
@@ -168,7 +169,7 @@ function ProjectError({
   ) : (
     <RetryNote
       role="alert"
-      message={`확인 필요 항목을 불러오지 못했습니다. ${problem.message}`}
+      message={`최신 정보를 불러오지 못했습니다. ${problem.message}`}
       onRetry={onRetry}
     />
   );

@@ -5,15 +5,15 @@ import { Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   ReviewRequestList,
-  TaskError,
   priorityLabels,
   type TaskCard,
 } from "@/entities/task";
 import type { User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { routes } from "@/shared/config";
-import { formatDate } from "@/shared/lib";
-import { Skeleton, Spinner } from "@/shared/ui";
+import { formatDate, useLastData } from "@/shared/lib";
+import { ErrorState, Skeleton, Spinner } from "@/shared/ui";
+import { normalizeApiError } from "@/shared/api";
 import { homeQueries, type ActiveSprint, type Home } from "../api/home";
 import { dueLabel, seoulToday } from "../model/attention";
 import { AttentionSection } from "./AttentionSection";
@@ -33,7 +33,8 @@ export function HomePage() {
 
 function HomeContent({ user }: { readonly user: User }) {
   const home = useQuery(homeQueries.mine());
-  const data = home.data;
+  // 일시 장애면 60초까지만 마지막 내용을 두고, 권한·존재 오류(4xx)면 바로 비운다.
+  const { data, stale } = useLastData(home);
   return (
     <div className="grid gap-5">
       <header className="board-header">
@@ -45,7 +46,7 @@ function HomeContent({ user }: { readonly user: User }) {
           })}
         </p>
       </header>
-      {home.isError && data && (
+      {stale && (
         <RetryNote
           role="status"
           message="최신 정보를 불러오지 못해 마지막으로 받은 내용을 보여 줍니다."
@@ -55,7 +56,11 @@ function HomeContent({ user }: { readonly user: User }) {
       {home.isPending ? (
         <HomeSkeleton />
       ) : home.isError && !data ? (
-        <TaskError error={home.error} onRetry={() => void home.refetch()} />
+        <ErrorState
+          title="최신 정보를 불러오지 못했습니다"
+          description={normalizeApiError(home.error).message}
+          onRetry={() => void home.refetch()}
+        />
       ) : (
         data && <HomeSections data={data} user={user} />
       )}

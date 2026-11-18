@@ -1,4 +1,4 @@
-export { taskApi, taskKeys, taskQueries } from "./api/tasks";
+export { forgetTask, taskApi, taskKeys, taskQueries } from "./api/tasks";
 export { TaskError } from "./ui/TaskError";
 export {
   boardFilterKeys,
