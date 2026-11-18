@@ -1,4 +1,14 @@
-import { Spinner } from "@/shared/ui";
+import { Skeleton } from "@/shared/ui";
 export default function Loading() {
-  return <Spinner label="프로젝트를 불러오는 중" />;
+  return (
+    <div
+      role="status"
+      aria-label="프로젝트 화면 불러오는 중"
+      aria-busy="true"
+      className="grid gap-3"
+    >
+      <Skeleton className="h-7 w-48" />
+      <Skeleton className="h-9 w-64 max-w-full" />
+    </div>
+  );
 }
