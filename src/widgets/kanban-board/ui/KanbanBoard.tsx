@@ -169,6 +169,11 @@ export function KanbanBoard({
             })
           : null;
         const total = laneTotal(group);
+        // 보관 버킷 레인은 드롭처럼 생성도 받지 않는다(새로 넣을 수 없음).
+        const archivedLane =
+          groupBy === "bucket" &&
+          group.key !== null &&
+          archivedBuckets.includes(group.key);
         const bodyId = `board-lane-${index}`;
         return (
           <section
@@ -193,13 +198,11 @@ export function KanbanBoard({
                     <span className="sr-only">건</span>
                   </span>
                 </button>
-                {group.key &&
-                  groupBy === "bucket" &&
-                  archivedBuckets.includes(group.key) && (
-                    <span className="board-lane-note">
-                      보관됨 · 새로 넣을 수 없음
-                    </span>
-                  )}
+                {archivedLane && (
+                  <span className="board-lane-note">
+                    보관됨 · 새로 넣을 수 없음
+                  </span>
+                )}
               </h2>
             )}
             <div
@@ -269,7 +272,7 @@ export function KanbanBoard({
                           {count}
                         </span>
                       </Heading>
-                      {onCreate && (
+                      {onCreate && !archivedLane && (
                         <IconButton
                           variant="ghost"
                           aria-label={`${statusLabels[status]} 업무 추가`}

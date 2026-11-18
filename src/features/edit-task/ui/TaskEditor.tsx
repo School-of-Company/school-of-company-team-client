@@ -81,7 +81,10 @@ export function TaskEditor({
     useState<readonly string[]>(initialReviewers);
   const initialBucket = initial
     ? (initial.planningBucket?.id ?? "")
-    : (initialBucketId ?? "");
+    : // 새 업무는 활성 버킷만 기본값이 된다(보관 버킷 id를 그대로 보내지 않는다).
+      (buckets.find(
+        (bucket) => bucket.id === initialBucketId && !bucket.archived,
+      )?.id ?? "");
   // 보관된 버킷은 새로 고를 수 없지만 지금 들어 있는 업무에는 그대로 보여 준다.
   const bucketChoices = buckets.filter(
     (bucket) => !bucket.archived || bucket.id === initial?.planningBucket?.id,
