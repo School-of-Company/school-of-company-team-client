@@ -39,7 +39,6 @@ export type PublicationRepository = {
   readonly fullName: string;
   readonly private: boolean;
   readonly isDefault: boolean;
-  readonly publishable: boolean;
 };
 export const publicationLabels: Readonly<Record<PublicationState, string>> = {
   WAITING: "발행 예정",

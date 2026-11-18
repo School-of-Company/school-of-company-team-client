@@ -19,7 +19,6 @@ export type ProjectRepository = {
   readonly fullName: string;
   readonly private: boolean;
   readonly isDefault: boolean;
-  readonly publishable: boolean;
   readonly import: RepositoryImport | null;
 };
 
