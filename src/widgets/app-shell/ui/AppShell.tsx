@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { projectQueries } from "@/entities/project";
 import { useMe, userDestination } from "@/entities/user";
@@ -16,6 +16,7 @@ import {
   Skeleton,
   type IconName,
 } from "@/shared/ui";
+import { headingAnnouncement, shouldFocusMain } from "../model/route-focus";
 
 export type AppShellProps = {
   readonly children: ReactNode;
@@ -32,6 +33,45 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
+  const main = useRef<HTMLElement>(null);
+  const [announcement, setAnnouncement] = useState("");
+  const shownPath = useRef(pathname);
+  // 화면 이동(링크·router.push·뒤로가기) 뒤 포커스를 본문으로 옮기고 새 화면 제목을 알린다.
+  // 쿼리만 바뀌는 탭·필터·업무 패널(`?tab=`, `?task=`)은 같은 화면이라 건드리지 않는다.
+  // 스크롤은 Next.js 가 정한다(새 화면은 맨 위, 뒤로가기는 이전 위치). preventScroll 로 그대로 둔다.
+  useEffect(() => {
+    if (shownPath.current === pathname) return;
+    shownPath.current = pathname;
+    const region = main.current;
+    if (!region) return;
+    if (shouldFocusMain(document.activeElement, region, document.body))
+      region.focus({ preventScroll: true });
+    setAnnouncement("");
+    // 이동 직후에는 이전 화면이 잠시 남아 있을 수 있다(새 화면이 준비될 때까지).
+    // 그래서 h1 이 새 요소로 바뀌면 바로 알리고, 1초 안에 바뀌지 않으면 지금 h1 을 새 화면 제목으로 본다.
+    // 데이터를 불러온 뒤에 제목이 생기는 화면도 있어 최대 5초 지켜본다.
+    const start = region.querySelector("h1");
+    const announce = (heading: Element | null) => {
+      const text = headingAnnouncement(heading?.textContent);
+      if (text) setAnnouncement(text);
+      return !!text;
+    };
+    const observer = new MutationObserver(() => {
+      const heading = region.querySelector("h1");
+      if (heading !== start && announce(heading)) observer.disconnect();
+    });
+    observer.observe(region, { childList: true, subtree: true });
+    const settle = window.setTimeout(() => {
+      const heading = region.querySelector("h1");
+      if (heading === start) announce(heading);
+    }, 1000);
+    const stop = window.setTimeout(() => observer.disconnect(), 5000);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(settle);
+      window.clearTimeout(stop);
+    };
+  }, [pathname]);
   const me = useMe();
   const projects = useQuery({
     ...projectQueries.list(),
@@ -180,12 +220,16 @@ export function AppShell({
           <div className="ml-auto min-w-0">{mobileUserSlot}</div>
         </header>
         <main
+          ref={main}
           id="main-content"
           tabIndex={-1}
           className="app-main mx-auto w-full max-w-[90rem] min-w-0 p-4 outline-none min-[60rem]:p-[var(--page-inset)]"
         >
           {children}
         </main>
+        <p role="status" aria-live="polite" className="sr-only">
+          {announcement}
+        </p>
       </div>
       <Dialog
         open={menuOpen}
