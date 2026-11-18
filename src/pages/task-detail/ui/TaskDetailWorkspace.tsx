@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,8 +17,10 @@ import { TaskContent } from "./TaskContent";
 export function TaskDetailWorkspace({
   taskId,
   user,
+  headerAction,
 }: {
   readonly taskId: string;
+  readonly headerAction?: ReactNode;
   readonly user?: {
     readonly id: string;
     readonly role: string;
@@ -119,20 +121,23 @@ export function TaskDetailWorkspace({
     : (assignees.data ?? data.assignees);
   return (
     <div className="task-detail mx-auto grid max-w-4xl gap-5 [overflow-wrap:anywhere] break-keep">
-      <Link
-        href={
-          data.projectId
-            ? `/projects/${encodeURIComponent(data.projectId)}`
-            : data.scope === "TEAM"
-              ? "/team"
-              : "/me"
-        }
-        className="inline-flex min-h-11 items-center text-sm text-muted underline hover:text-foreground"
-      >
-        {data.projectName ??
-          (data.scope === "TEAM" ? "팀 공용 보드" : "내 보드")}
-        로 이동
-      </Link>
+      <div className="flex flex-wrap gap-2">
+        {headerAction}
+        <Link
+          href={
+            data.projectId
+              ? `/projects/${encodeURIComponent(data.projectId)}`
+              : data.scope === "TEAM"
+                ? "/team"
+                : "/me"
+          }
+          className="ui-button ui-button-secondary ui-button-sm"
+        >
+          {data.projectName ??
+            (data.scope === "TEAM" ? "팀 공용 보드" : "내 보드")}
+          로 이동
+        </Link>
+      </div>
       <header className="grid gap-4">
         <p className="text-sm text-muted">
           {data.key ??

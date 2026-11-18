@@ -1,11 +1,12 @@
 "use client";
 
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
 import Link from "next/link";
 import { Dialog } from "@/shared/ui";
 
 export type BoardDetailComponent = ComponentType<{
   readonly taskId: string;
+  readonly headerAction?: ReactNode;
   readonly user?: {
     readonly id: string;
     readonly role: string;
@@ -33,15 +34,21 @@ export function BoardDetailPanel({
       open
       onClose={onClose}
       title="업무 상세"
-      className="board-detail-panel inset-y-0! right-0! left-auto! m-0! h-dvh! max-h-dvh! w-full! max-w-2xl! rounded-none! border-y-0! border-r-0!"
+      className="board-detail-panel w-[min(48rem,calc(100%-2rem))]!"
     >
-      <Link
-        href={`/tasks/${encodeURIComponent(taskId)}`}
-        className="mb-3 inline-flex min-h-11 items-center text-sm text-muted underline hover:text-foreground"
-      >
-        전체 페이지로 열기
-      </Link>
-      <Detail key={taskId} taskId={taskId} user={user} />
+      <Detail
+        key={taskId}
+        taskId={taskId}
+        user={user}
+        headerAction={
+          <Link
+            href={`/tasks/${encodeURIComponent(taskId)}`}
+            className="ui-button ui-button-secondary ui-button-sm"
+          >
+            전체 페이지로 열기
+          </Link>
+        }
+      />
     </Dialog>
   );
 }

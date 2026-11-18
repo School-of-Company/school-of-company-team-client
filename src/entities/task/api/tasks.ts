@@ -1,6 +1,6 @@
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
-import { queryOptions } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { boardRequestParams } from "../model/board";
 import type {
   Board,
@@ -50,6 +50,7 @@ export const taskQueries = {
       queryKey: [...taskKeys.all, "board", personal, params.toString()],
       queryFn: () => taskApi.board(params, personal),
       refetchInterval: BOARD_POLL_INTERVAL,
+      placeholderData: keepPreviousData,
       retry: false,
     });
   },

@@ -43,7 +43,7 @@ export function BoardViewControls({
         onChange={(value) => change("sort", value)}
       />
       {sort !== "manual" && (
-        <p className="text-xs text-muted">
+        <p className="board-view-hint text-xs text-muted">
           순서 이동은 수동 순서에서만 가능해요.
         </p>
       )}

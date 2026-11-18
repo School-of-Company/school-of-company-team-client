@@ -6,6 +6,7 @@ import type { TaskDetail } from "@/entities/task";
 import { taskKeys } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import {
+  Badge,
   Button,
   Checkbox,
   ErrorState,
@@ -88,32 +89,27 @@ export function TaskGithubPanel({
     );
   const publication = github.data.publication;
   const targetLocked = publication && publication.state !== "WAITING";
+  const linkedPrimary = github.data.links.some((item) => item.primary);
   return (
-    <section className="grid gap-5 border-t border-border pt-6">
-      <h2 className="text-lg font-semibold">GitHub Issue · PR</h2>
-      {publication && (
-        <div className="grid gap-2 text-sm">
-          <p className="font-semibold">
+    <section className="grid gap-4 border-t border-border pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">GitHub</h2>
+        {publication && (
+          <Badge>
             {publicationLabels[publication.state]} ·{" "}
             {publication.repositoryFullName}
-          </p>
-          {publication.publiclyVisible && (
+          </Badge>
+        )}
+      </div>
+      {publication && (
+        <div className="grid gap-1 text-sm empty:hidden">
+          {publication.publiclyVisible && publication.state !== "SUCCEEDED" && (
             <p className="text-danger">
-              {publication.state === "SUCCEEDED"
-                ? "공개 저장소에 발행됨"
-                : "공개 저장소 발행 시 제목·설명·업무 링크가 공개됩니다."}
-            </p>
-          )}
-          {publication.state === "WAITING" && (
-            <p className="text-muted">
-              진행 예정 이상으로 변경하면 Issue 발행이 시작됩니다.
+              공개 저장소라 제목·설명·업무 링크가 공개됩니다.
             </p>
           )}
           {publication.state === "UNCERTAIN" && (
-            <p className="text-muted">
-              발행 결과를 확인하고 있습니다. 확인 없이 새 Issue를 만들지
-              않습니다.
-            </p>
+            <p className="text-muted">발행 결과를 확인하고 있습니다.</p>
           )}
           {publication.errorMessage && (
             <p className="text-danger">
@@ -124,6 +120,7 @@ export function TaskGithubPanel({
           {publication.state === "FAILED" && editable && (
             <Button
               variant="secondary"
+              className="justify-self-start"
               loading={pending}
               onClick={() => void run(() => taskGithubApi.retry(task.id))}
             >
@@ -135,11 +132,11 @@ export function TaskGithubPanel({
       {editable && task.scope === "PROJECT" && (
         <Field
           id="publication-target"
-          label="발행 저장소"
+          label="Issue 발행 저장소"
           hint={
             task.status === "BACKLOG"
-              ? "검토 필요에서는 발행을 기다립니다. 진행 예정 이상으로 변경하면 발행합니다."
-              : "저장소를 선택하면 Issue 발행이 시작됩니다."
+              ? "진행 예정으로 옮기면 발행됩니다."
+              : undefined
           }
         >
           <Select
@@ -159,14 +156,9 @@ export function TaskGithubPanel({
           >
             <option value="">발행하지 않음</option>
             {repositories.data?.map((repository) => (
-              <option
-                key={repository.id}
-                value={repository.id}
-                disabled={!repository.publishable}
-              >
+              <option key={repository.id} value={repository.id}>
                 {repository.fullName}
-                {repository.private ? " (비공개)" : " (공개: 업무 내용 공개)"}
-                {!repository.publishable ? " · 발행 불가" : ""}
+                {repository.private ? "" : " · 공개"}
               </option>
             ))}
           </Select>
@@ -183,78 +175,82 @@ export function TaskGithubPanel({
           팀 공용·개인 업무는 자동 발행하지 않습니다.
         </p>
       )}
-      {github.data.links.length === 0 ? (
-        <p className="text-sm text-muted">연결된 Issue·PR이 없습니다.</p>
-      ) : (
-        <ul className="grid gap-3">
-          {github.data.links.map((item) => (
-            <li
-              key={item.id}
-              className="flex min-w-0 flex-wrap items-center justify-between gap-2"
-            >
-              <div className="min-w-0 text-sm">
+      <div className="grid gap-2">
+        <h3 className="text-sm font-medium">연결된 Issue · PR</h3>
+        {github.data.links.length === 0 ? (
+          <p className="text-sm text-muted">없음</p>
+        ) : (
+          <ul className="divide-y divide-border rounded-md border border-border">
+            {github.data.links.map((item) => (
+              <li
+                key={item.id}
+                className="flex min-w-0 items-center justify-between gap-2 px-3 py-2"
+              >
                 {item.accessible && item.url ? (
                   <a
-                    className="inline-flex min-h-11 items-center break-all text-brand underline"
+                    className="min-w-0 truncate text-sm hover:underline"
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    title={item.title ?? undefined}
                   >
-                    {item.primary ? "주 Issue · " : ""}
-                    {item.kind === "ISSUE" ? "Issue" : "PR"}{" "}
-                    {item.repositoryFullName} #{item.number} · {item.title}
+                    <span className="text-muted">
+                      {item.kind === "ISSUE" ? "Issue" : "PR"} #{item.number}
+                    </span>{" "}
+                    {item.title}
+                    {item.primary && <Badge className="ml-2">주</Badge>}
+                    {item.state && (
+                      <span className="ml-2 text-xs text-muted">
+                        {item.state}
+                      </span>
+                    )}
                   </a>
                 ) : (
-                  <span>
-                    원본 접근 권한을 확인할 수 없습니다. GitHub 권한을 확인해
-                    주세요.
+                  <span className="text-sm text-muted">
+                    접근 권한 없음 · GitHub 권한을 확인해 주세요
                   </span>
                 )}
-                {item.accessible && (
-                  <p className="text-xs text-muted">
-                    원본 상태: {item.state ?? "확인 중"}
-                  </p>
+                {editable && (
+                  <Button
+                    variant="ghost"
+                    className="shrink-0"
+                    disabled={pending}
+                    onClick={() =>
+                      void run(() => taskGithubApi.unlink(task.id, item.id))
+                    }
+                  >
+                    해제
+                  </Button>
                 )}
-              </div>
-              {editable && (
-                <Button
-                  variant="ghost"
-                  disabled={pending}
-                  onClick={() =>
-                    void run(() => taskGithubApi.unlink(task.id, item.id))
-                  }
-                >
-                  연결 해제
-                </Button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-      {editable && (
-        <form className="grid gap-3" onSubmit={link}>
-          <Field id="github-link-url" label="기존 Issue·PR URL">
-            <Input
-              id="github-link-url"
-              name="url"
-              type="url"
-              required
-              maxLength={500}
-              placeholder="https://github.com/org/repo/issues/1"
-            />
-          </Field>
-          <label className="flex min-h-11 items-center gap-3 text-sm">
-            <Checkbox
-              name="primary"
-              disabled={github.data.links.some((item) => item.primary)}
-            />
-            주 Issue로 연결 (업무당 하나)
-          </label>
-          <Button type="submit" variant="secondary" loading={pending}>
-            링크 연결
-          </Button>
-        </form>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
+        {editable && (
+          <form className="grid gap-2" onSubmit={link}>
+            <div className="flex gap-2">
+              <Input
+                id="github-link-url"
+                name="url"
+                type="url"
+                required
+                maxLength={500}
+                aria-label="기존 Issue·PR URL"
+                placeholder="Issue·PR URL 붙여넣기"
+                className="min-w-0 flex-1"
+              />
+              <Button type="submit" variant="secondary" loading={pending}>
+                연결
+              </Button>
+            </div>
+            {!linkedPrimary && (
+              <label className="flex items-center gap-2 text-xs text-muted">
+                <Checkbox name="primary" />주 Issue로 연결
+              </label>
+            )}
+          </form>
+        )}
+      </div>
       {error && (
         <p role="alert" className="text-sm text-danger">
           {error}

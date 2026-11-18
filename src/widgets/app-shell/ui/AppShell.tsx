@@ -113,8 +113,9 @@ export function AppShell({
               onClick={() => setMenuOpen(false)}
               className={`ui-nav-link flex min-h-11 min-w-0 items-center gap-2 rounded-md px-3 text-sm ${active ? "bg-brand-soft text-brand" : "text-muted hover:bg-surface-hover hover:text-foreground"}`}
             >
-              <span className="shrink-0 font-mono text-xs">{project.key}</span>
-              <span className="truncate">{project.name}</span>
+              <span className="truncate" title={project.key}>
+                {project.name}
+              </span>
             </Link>
           );
         })
