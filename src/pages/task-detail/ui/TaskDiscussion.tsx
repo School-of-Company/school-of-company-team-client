@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { taskGithubQueries } from "@/features/link-github-issue";
 import { normalizeApiError } from "@/shared/api";
 import { Button, Field, Input } from "@/shared/ui";
 import { taskDiscordApi, type Discussion } from "../api/discord";
+
+const PRIVATE_SOURCE_NOTICE =
+  "비공개 저장소에서 가져온 업무라 Discord에서 논의할 수 없어요. 공유 채널에서는 원본 저장소 권한이 없는 사람에게도 제목·내용이 보일 수 있어요.";
 
 const messages: Readonly<Record<string, string>> = {
   DISCORD_NOT_CONFIGURED:
@@ -34,6 +39,10 @@ export function TaskDiscussion({
   readonly manages: boolean;
   readonly onAccessLost: (error: unknown) => void;
 }) {
+  // 상세 패널과 같은 쿼리 키라 추가 요청 없이 캐시를 공유한다.
+  const restricted =
+    useQuery(taskGithubQueries.detail(taskId)).data?.source
+      ?.discordRestricted === true;
   const [discussion, setDiscussion] = useState<Discussion | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -75,7 +84,9 @@ export function TaskDiscussion({
   return (
     <section className="grid gap-4 border-t border-border pt-6">
       <h2 className="text-lg font-semibold">Discord 논의</h2>
-      {discussion ? (
+      {restricted && !discussion ? (
+        <p className="text-sm text-muted">{PRIVATE_SOURCE_NOTICE}</p>
+      ) : discussion ? (
         <div className="grid gap-2">
           <a
             className="ui-button ui-button-secondary justify-self-start"
@@ -109,9 +120,11 @@ export function TaskDiscussion({
           논의 열기
         </Button>
       )}
-      <p className="text-sm text-muted">
-        최초 클릭 시 스레드를 만들고, 이후 같은 스레드로 이동합니다.
-      </p>
+      {!restricted && (
+        <p className="text-sm text-muted">
+          최초 클릭 시 스레드를 만들고, 이후 같은 스레드로 이동합니다.
+        </p>
+      )}
       {error && (
         <p role="alert" className="text-sm text-danger">
           {error}

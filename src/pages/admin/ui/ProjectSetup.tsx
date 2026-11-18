@@ -68,7 +68,11 @@ export function ProjectSetup({
           <p className="text-sm text-muted">
             저장소 연결은 건너뛰고 프로젝트 설정에서 이어갈 수 있습니다.
           </p>
-          <RepositorySettings projectId={project.id} disabled={false} />
+          <RepositorySettings
+            projectId={project.id}
+            projectKey={project.key}
+            disabled={false}
+          />
           <Link
             className="ui-button ui-button-primary justify-self-start"
             href={routes.project(project.id)}

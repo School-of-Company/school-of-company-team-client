@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { githubErrorMessage } from "../model/github-error";
+import { ImportStatus } from "./ImportStatus";
 import {
   Badge,
   Button,
@@ -20,9 +21,11 @@ import {
 
 export function RepositorySettings({
   projectId,
+  projectKey,
   disabled,
 }: {
   readonly projectId: string;
+  readonly projectKey: string;
   readonly disabled: boolean;
 }) {
   const repositories = useProjectRepositories(projectId, true);
@@ -77,6 +80,12 @@ export function RepositorySettings({
                   {!repo.publishable && <Badge>링크 연결만 가능</Badge>}
                   {repo.isDefault && <Badge>기본 발행</Badge>}
                 </div>
+                <ImportStatus
+                  projectId={projectId}
+                  projectKey={projectKey}
+                  repository={repo}
+                  disabled={disabled}
+                />
               </div>
               {!disabled && editing && (
                 <Button
