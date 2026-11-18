@@ -22,6 +22,8 @@ export function Dialog({
   const titleId = useId();
   // 열기 직전 포커스(보통 연 버튼). 대화상자 안 요소면 연 곳을 알 수 없어 본문으로 돌린다.
   const opener = useRef<HTMLElement | null>(null);
+  // 실제로 열려 있었는지. 닫힌 채 언마운트되는 대화상자가 남의 포커스를 빼앗지 않게 한다.
+  const shown = useRef(false);
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
@@ -34,9 +36,11 @@ export function Dialog({
           ? active
           : null;
       dialog.showModal();
+      shown.current = true;
     }
     if (!open && dialog.open) {
       dialog.close();
+      shown.current = false;
       restoreFocus(opener.current);
       opener.current = null;
     }
@@ -45,7 +49,7 @@ export function Dialog({
   // (개발 모드 StrictMode 의 가짜 언마운트에서는 대화상자가 아직 모달이라 바깥 포커스가 막혀 아무 일도 없다.)
   useEffect(
     () => () => {
-      restoreFocus(opener.current);
+      if (shown.current) restoreFocus(opener.current);
     },
     [],
   );
