@@ -150,7 +150,7 @@ async function githubSignals(created: readonly { key: string }[]) {
   const state: StubState = {
     installationId: 77,
     repo: { id: githubId, fullName: `acme/hub-${seed.run}` },
-    logins: { [githubId]: `member-${seed.run}` },
+    logins: { [githubId]: `member-${seed.run}`, 1999999: "admin-gh" },
     pulls: {
       11: {
         title: `${created[3].key} 홈 API 응답 연결`,
@@ -186,8 +186,11 @@ async function githubSignals(created: readonly { key: string }[]) {
     suites: [],
   };
   stub = await startGithubStub(state, stubPort);
+  // 저장소 연결은 GitHub 계정이 연결된 헤드 어드민만 할 수 있다. 헤드 어드민은 실행마다 같은 사용자라 고정 ID를 쓴다.
+  const admin = await apiGet<{ id: string }>("/api/v1/me", seed.admin);
   insertOAuthRows(process.env.E2E_PG_CONTAINER!, [
     { userId: seed.member.id, githubId, login: `member-${seed.run}` },
+    { userId: admin.id, githubId: 1_999_999, login: "admin-gh" },
   ]);
   await call(
     "POST",
@@ -317,7 +320,7 @@ test("GitHub signals reach home through the stub and signed webhooks", async ({
     attention.getByRole("heading", { name: /merge됐지만 미완료/ }),
   ).toBeVisible();
   const reviews = page.getByRole("region", { name: "리뷰 요청" });
-  await expect(reviews.getByText("24시간 초과")).toBeVisible();
+  await expect(reviews.getByText("24시간 초과", { exact: true })).toBeVisible();
 });
 
 test("a member without managed projects gets no scope switch", async ({

@@ -165,21 +165,23 @@ function MemberRow({
 }) {
   return (
     <tr>
-      <th scope="row" className="members-person">
-        <Avatar name={member.name} src={avatarSrc(member.avatarUrl)} />
-        <span className="min-w-0">
-          <span className="members-name">
-            {member.name}
-            {self && <Badge className="members-badge">나</Badge>}
-            {member.role === "LEAD" && (
-              <Badge className="members-badge">헤드 어드민</Badge>
+      <th scope="row">
+        <div className="members-person">
+          <Avatar name={member.name} src={avatarSrc(member.avatarUrl)} />
+          <span className="min-w-0">
+            <span className="members-name">
+              {member.name}
+              {self && <Badge className="members-badge">나</Badge>}
+              {member.role === "LEAD" && (
+                <Badge className="members-badge">헤드 어드민</Badge>
+              )}
+            </span>
+            <span className="members-username">{member.username}</span>
+            {self && !connectionColumn && member.connections && (
+              <Connections value={member.connections} />
             )}
           </span>
-          <span className="members-username">{member.username}</span>
-          {self && !connectionColumn && member.connections && (
-            <Connections value={member.connections} />
-          )}
-        </span>
+        </div>
       </th>
       <td data-label="전공">
         {member.major ?? <span className="text-muted">미입력</span>}

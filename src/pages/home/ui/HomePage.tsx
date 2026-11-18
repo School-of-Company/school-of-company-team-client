@@ -84,7 +84,7 @@ function HomeSections({
         <Panel
           id="home-today"
           title="오늘 할 일"
-          meta={`${data.today.inProgress.length + data.today.dueSoon.length}건`}
+          meta={`${todayCount(data)}건`}
         >
           <TaskGroup
             title="진행 중"
@@ -141,6 +141,12 @@ function HomeSections({
     </div>
   );
 }
+
+/** 진행 중이면서 마감 임박인 업무는 두 묶음에 다 나오지만 한 번만 센다. */
+const todayCount = (data: Home) =>
+  new Set(
+    [...data.today.inProgress, ...data.today.dueSoon].map((task) => task.id),
+  ).size;
 
 function reviewOverdue(data: Home) {
   const overdue = data.reviewRequests.filter((item) => item.overdue).length;

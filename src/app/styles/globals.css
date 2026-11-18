@@ -1747,6 +1747,12 @@ select.ui-input {
   font-size: var(--text-xs);
   font-weight: 400;
 }
+.home-row-source {
+  flex: none;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
 .home-row-icon {
   width: 14px;
   height: 14px;
@@ -1903,7 +1909,7 @@ select.ui-input {
     padding: 0;
     border: 0;
   }
-  .members-person {
+  .members-table tbody th {
     flex-basis: 100%;
   }
   .members-table td[data-label]::before {

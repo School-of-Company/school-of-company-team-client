@@ -50,7 +50,10 @@ export function TaskRow({
         aria-label={statusLabels[task.status]}
       />
       <Link href={routes.task(task.id)} className="home-row-title">
-        <span className="home-row-key" title={source}>
+        <span
+          className={task.key ? "home-row-key" : "home-row-source"}
+          title={source}
+        >
           {task.key ?? source}
         </span>
         <span className="min-w-0 break-words">{task.title}</span>

@@ -146,9 +146,7 @@ export function SettingsPanels(props: SettingsProps) {
           <NotificationSettingsForm
             projectId={props.project.id}
             editable={permissions.manage}
-            channelHref={
-              manager ? `${pathname}?tab=integrations` : undefined
-            }
+            channelHref={manager ? `${pathname}?tab=integrations` : undefined}
           />
         </section>
       )}

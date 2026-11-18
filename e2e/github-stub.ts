@@ -94,8 +94,16 @@ function route(state: StubState, path: string): [number, unknown] {
   if (rest === "") return [200, repository(state)];
   if (rest === "/installation") return [200, { id: state.installationId }];
   if (rest === "/issues") return [200, []];
-  if (/^\/collaborators\/[^/]+\/permission$/.test(rest))
-    return [200, { permission: "write", role_name: "write" }];
+  const permission = rest.match(/^\/collaborators\/([^/]+)\/permission$/);
+  if (permission)
+    return [
+      200,
+      {
+        permission: "write",
+        role_name: "write",
+        user: { login: decodeURIComponent(permission[1]) },
+      },
+    ];
   if (/^\/assignees\/[^/]+$/.test(rest)) return [204, undefined];
   const pr = rest.match(/^\/(issues|pulls)\/(\d+)(\/.*)?$/);
   if (pr) {
