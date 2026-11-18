@@ -15,6 +15,12 @@ const messages: Readonly<Record<string, string>> = {
   CANNOT_DEMOTE_SELF: "자신의 헤드 어드민 역할은 직접 해제할 수 없습니다.",
   CANNOT_SUSPEND_SELF: "자신의 계정은 직접 이용 중지할 수 없습니다.",
   DUPLICATE_PART_NAME: "같은 이름의 파트가 있습니다. 다른 이름을 입력하세요.",
+  DUPLICATE_PLANNING_BUCKET_NAME:
+    "같은 이름의 버킷이 있습니다(보관된 버킷 포함). 다른 이름을 입력하세요.",
+  STALE_BUCKET_ORDER:
+    "그 사이 버킷 목록이 바뀌었습니다. 최신 목록에서 다시 옮겨 주세요.",
+  PLANNING_BUCKET_NOT_FOUND:
+    "이미 삭제된 버킷입니다. 최신 목록을 다시 불러왔습니다.",
   ALREADY_PROJECT_MEMBER:
     "이미 프로젝트에 참여한 사용자입니다. 목록을 새로고침하세요.",
   NOT_PROJECT_MEMBER: "프로젝트 참여자 중에서 선택해 주세요.",

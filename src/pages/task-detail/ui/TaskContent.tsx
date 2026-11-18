@@ -5,6 +5,7 @@ import {
   type TaskDetail,
   type TaskStatus,
 } from "@/entities/task";
+import type { PlanningBucket } from "@/entities/project";
 import { formatDate } from "@/shared/lib";
 import { Markdown, Select } from "@/shared/ui";
 
@@ -13,12 +14,24 @@ export function TaskProperties({
   editable,
   pending,
   onStatus,
+  buckets,
+  bucketPending,
+  onBucket,
 }: {
   readonly task: TaskDetail;
   readonly editable: boolean;
   readonly pending: boolean;
   readonly onStatus: (status: TaskStatus) => void;
+  /** 프로젝트 업무일 때만. 없으면 버킷 행을 읽기 전용으로 보인다. */
+  readonly buckets?: readonly PlanningBucket[];
+  readonly bucketPending: boolean;
+  readonly onBucket: (bucketId: string) => void;
 }) {
+  const current = task.planningBucket ?? null;
+  const choices =
+    buckets?.filter(
+      (bucket) => !bucket.archived || bucket.id === current?.id,
+    ) ?? [];
   return (
     <aside className="task-props" aria-label="업무 속성">
       <dl>
@@ -79,6 +92,64 @@ export function TaskProperties({
             )}
           </dd>
         </div>
+        {task.scope === "PROJECT" && (
+          <div>
+            <dt>버킷</dt>
+            <dd>
+              {editable && choices.length > 0 ? (
+                <Select
+                  aria-label="계획 버킷 변경"
+                  value={current?.id ?? ""}
+                  disabled={bucketPending}
+                  onChange={(event) => onBucket(event.target.value)}
+                >
+                  <option value="">없음</option>
+                  {choices.map((bucket) => (
+                    <option
+                      key={bucket.id}
+                      value={bucket.id}
+                      disabled={bucket.archived}
+                    >
+                      {bucket.archived ? `${bucket.name} (보관)` : bucket.name}
+                    </option>
+                  ))}
+                </Select>
+              ) : current ? (
+                <>
+                  {current.name}
+                  {current.archived && (
+                    <span className="text-muted"> (보관)</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-muted">없음</span>
+              )}
+            </dd>
+          </div>
+        )}
+        {task.type === "DEV" && task.scope !== "PERSONAL" && (
+          <div>
+            <dt>리뷰어</dt>
+            <dd>
+              {task.reviewers?.length ? (
+                <ul className="task-reviewers">
+                  {task.reviewers.map((person) => (
+                    <li key={person.id}>
+                      <span>{person.name}</span>
+                      {person.githubLogin && (
+                        <span className="text-xs text-muted">
+                          @{person.githubLogin}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <span className="text-muted">없음</span>
+              )}
+            </dd>
+          </div>
+        )}
         <div>
           <dt>파트</dt>
           <dd>

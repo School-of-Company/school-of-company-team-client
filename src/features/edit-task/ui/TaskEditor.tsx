@@ -12,7 +12,7 @@ import {
   type TaskStatus,
   type UpdateTask,
 } from "@/entities/task";
-import type { ProjectDetail } from "@/entities/project";
+import type { PlanningBucket, ProjectDetail } from "@/entities/project";
 import { normalizeApiError } from "@/shared/api";
 import { TaskAssignees } from "./TaskAssignees";
 import {
@@ -36,6 +36,9 @@ type Props = {
   readonly project?: ProjectDetail;
   readonly initial?: TaskDetail;
   readonly initialStatus?: TaskStatus;
+  readonly initialBucketId?: string;
+  /** 프로젝트 계획 버킷(아카이브 포함). 프로젝트 업무에서만 쓴다. */
+  readonly buckets?: readonly PlanningBucket[];
   readonly candidates: readonly {
     readonly id: string;
     readonly name: string;
@@ -50,6 +53,8 @@ export function TaskEditor({
   project,
   initial,
   initialStatus,
+  initialBucketId,
+  buckets = [],
   candidates,
   onCreate,
   onUpdate,
@@ -71,10 +76,32 @@ export function TaskEditor({
   const [assignees, setAssignees] = useState<readonly string[]>(
     initial?.assignees.map((user) => user.id) ?? [],
   );
+  const initialReviewers = initial?.reviewers?.map((user) => user.id) ?? [];
+  const [reviewers, setReviewers] =
+    useState<readonly string[]>(initialReviewers);
+  const initialBucket = initial
+    ? (initial.planningBucket?.id ?? "")
+    : // 새 업무는 활성 버킷만 기본값이 된다(보관 버킷 id를 그대로 보내지 않는다).
+      (buckets.find(
+        (bucket) => bucket.id === initialBucketId && !bucket.archived,
+      )?.id ?? "");
+  // 보관된 버킷은 새로 고를 수 없지만 지금 들어 있는 업무에는 그대로 보여 준다.
+  const bucketChoices = buckets.filter(
+    (bucket) => !bucket.archived || bucket.id === initial?.planningBucket?.id,
+  );
   const [blocked, setBlocked] = useState(initial?.blocked ?? false);
   const people = [
     ...new Map(
       [...candidates, ...(initial?.assignees ?? [])].map((person) => [
+        person.id,
+        person,
+      ]),
+    ).values(),
+  ];
+
+  const reviewerPeople = [
+    ...new Map(
+      [...candidates, ...(initial?.reviewers ?? [])].map((person) => [
         person.id,
         person,
       ]),
@@ -98,6 +125,12 @@ export function TaskEditor({
     }
     const description = String(form.get("description") ?? "");
     const partId = String(form.get("partId") ?? "");
+    const bucketId = String(form.get("planningBucketId") ?? initialBucket);
+    // 리뷰어는 개발 업무만(계약 D3-a). 일반 업무로 바꾸면 같은 요청에서 비운다.
+    const nextReviewers =
+      scope === "PERSONAL" || type !== "DEV" ? [] : reviewers;
+    const reviewersChanged =
+      [...nextReviewers].sort().join() !== [...initialReviewers].sort().join();
     setPending(true);
     setError("");
     try {
@@ -109,6 +142,8 @@ export function TaskEditor({
           priority,
           partId,
           ...(scope === "PERSONAL" ? {} : { assigneeIds: assignees }),
+          ...(bucketId !== initialBucket ? { planningBucketId: bucketId } : {}),
+          ...(reviewersChanged ? { reviewerIds: nextReviewers } : {}),
           ...(deadline ? { deadline } : { clearDeadline: true }),
           blocked,
           blockedReason: String(form.get("blockedReason") ?? "").trim(),
@@ -124,6 +159,8 @@ export function TaskEditor({
           status,
           assigneeIds: scope === "PERSONAL" ? [] : assignees,
           ...(partId ? { partId } : {}),
+          ...(bucketId ? { planningBucketId: bucketId } : {}),
+          ...(nextReviewers.length ? { reviewerIds: nextReviewers } : {}),
           ...(deadline ? { deadline } : {}),
         });
       }
@@ -269,6 +306,22 @@ export function TaskEditor({
             </Select>
           </Field>
         )}
+        {project && bucketChoices.length > 0 && (
+          <Field id={`${prefix}-bucket`} label="계획 버킷">
+            <Select
+              id={`${prefix}-bucket`}
+              name="planningBucketId"
+              defaultValue={initialBucket}
+            >
+              <option value="">없음</option>
+              {bucketChoices.map((bucket) => (
+                <option key={bucket.id} value={bucket.id}>
+                  {bucket.archived ? `${bucket.name} (보관)` : bucket.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        )}
       </div>
       {scope === "PERSONAL" ? (
         <p className="text-sm text-muted">담당자는 본인으로 고정됩니다.</p>
@@ -279,6 +332,22 @@ export function TaskEditor({
           onChange={setAssignees}
         />
       )}
+      {scope !== "PERSONAL" && type === "DEV" && (
+        <TaskAssignees
+          legend="리뷰어 (개발 업무만 · 복수 선택)"
+          empty="선택할 수 있는 리뷰어가 없습니다."
+          people={reviewerPeople}
+          selected={reviewers}
+          onChange={setReviewers}
+        />
+      )}
+      {scope !== "PERSONAL" &&
+        type === "TASK" &&
+        initialReviewers.length > 0 && (
+          <p className="text-sm text-muted">
+            일반 업무로 바꾸면 리뷰어 {initialReviewers.length}명이 해제됩니다.
+          </p>
+        )}
       {initial && (
         <>
           <label className="flex min-h-11 items-center gap-3">
