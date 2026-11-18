@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { getMe, userDestination } from "@/entities/user";
-import { Spinner } from "@/shared/ui";
 import { completeOAuth, type OAuthProvider } from "../api/oauth";
 import { authErrorMessage } from "../model/error-message";
 import { IdentityPanel } from "./IdentityPanel";
@@ -43,13 +42,17 @@ export function OAuthCallbackPage({
     >
       {error ? (
         <>
-          <p role="alert" className="text-sm text-danger">
+          <p role="alert" className="min-h-12 text-sm leading-6 text-danger">
             {authErrorMessage(error)}
           </p>
           <OAuthButton provider={provider} />
         </>
       ) : (
-        <Spinner label="인증 결과를 확인하고 있습니다" />
+        <p role="status" className="ui-identity-status">
+          {provider === "github"
+            ? "GitHub 계정을 확인하고 있어요"
+            : "Discord 연결을 마무리하고 있어요"}
+        </p>
       )}
     </IdentityPanel>
   );

@@ -330,6 +330,23 @@ body {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
+.ui-identity-status {
+  min-height: 3rem;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.5rem;
+  text-align: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-identity-status {
+    animation: ui-breathe 1.6s var(--ease-in-out) infinite;
+  }
+}
+@keyframes ui-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
 .ui-link-button {
   justify-self: center;
   padding: var(--space-2xs) var(--space-xs);
@@ -394,9 +411,6 @@ body {
 .board-filters summary {
   padding-inline: var(--space-xs);
   font-weight: 500;
-}
-.board-filters[open] {
-  padding-bottom: var(--space-md);
 }
 .board-columns {
   gap: var(--space-sm);
@@ -539,6 +553,184 @@ body {
   border-radius: var(--radius-input);
 }
 
+/* Filters: popover panel instead of pushing the board down. */
+.board-filters {
+  position: relative;
+}
+.board-filters-panel {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + 6px);
+  left: 0;
+  width: min(52rem, calc(100vw - 32px));
+  max-height: min(70vh, 36rem);
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+}
+.board-filters-grid {
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+/* Sort hint sits under the controls without taking layout space. */
+.board-view-controls {
+  position: relative;
+}
+.board-view-hint {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  white-space: nowrap;
+}
+/* Columns read as stages: step number and coloured top rule. */
+.board-column {
+  --stage: var(--rule-strong);
+  position: relative;
+  border-top: 3px solid var(--stage);
+}
+.board-column[data-status="PLANNED"] {
+  --stage: oklch(62% 0.13 250);
+}
+.board-column[data-status="IN_PROGRESS"] {
+  --stage: oklch(72% 0.15 70);
+}
+.board-column[data-status="REVIEW"] {
+  --stage: oklch(58% 0.17 300);
+}
+.board-column[data-status="DONE"] {
+  --stage: var(--success);
+}
+.board-step {
+  display: inline-grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--stage);
+  color: var(--color-paper);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* Priority: colour per level on cards and in the editor picker. */
+[data-priority="P0"] {
+  --priority: var(--danger);
+}
+[data-priority="P1"] {
+  --priority: oklch(65% 0.16 50);
+}
+[data-priority="P2"] {
+  --priority: oklch(62% 0.13 250);
+}
+[data-priority="P3"] {
+  --priority: var(--muted);
+}
+.board-priority[data-priority] {
+  color: var(--priority);
+}
+.ui-priority-picker {
+  display: grid;
+  grid-auto-flow: initial;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  justify-self: stretch;
+}
+.ui-priority-picker .ui-segmented-option {
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding-inline: var(--space-xs);
+}
+.ui-priority-picker .ui-segmented-option > .font-semibold {
+  color: var(--priority);
+}
+.ui-priority-picker .ui-segmented-option:has(input:checked) {
+  background: color-mix(in oklab, var(--priority) 14%, var(--surface));
+  box-shadow: 0 0 0 1.5px var(--priority);
+}
+/* Theme picker with a mini screen preview per option. */
+.ui-theme-select {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 9rem));
+  gap: var(--space-sm);
+}
+.ui-theme-option {
+  position: relative;
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+.ui-theme-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ui-theme-option:hover {
+  color: var(--foreground);
+  border-color: var(--rule-strong);
+}
+.ui-theme-option:has(input:checked) {
+  color: var(--foreground);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+.ui-theme-option:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.ui-theme-preview {
+  --p-bg: #ffffff;
+  --p-side: #f4f5f7;
+  --p-line: #d9dce3;
+  --p-accent: #d92a4a;
+  display: grid;
+  grid-template-columns: 28% 1fr;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--rule-subtle);
+  border-radius: var(--radius-input);
+  background: var(--p-bg);
+}
+.ui-theme-preview[data-preview="dark"] {
+  --p-bg: #111318;
+  --p-side: #1a1d24;
+  --p-line: #363c4a;
+  --p-accent: #ff5c78;
+}
+.ui-theme-preview[data-preview="system"] {
+  --p-side: oklch(60% 0.01 258 / 0.25);
+  --p-line: oklch(60% 0.01 258 / 0.45);
+  background: linear-gradient(135deg, #ffffff 50%, #111318 50%);
+}
+.ui-theme-preview-side {
+  background: var(--p-side);
+}
+.ui-theme-preview-main {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  padding: 8px;
+}
+.ui-theme-preview-main > span {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--p-line);
+}
+.ui-theme-preview-main > span:first-child {
+  width: 45%;
+  background: var(--p-accent);
+}
+.ui-theme-preview-main > span:last-child {
+  width: 70%;
+}
+
 /* Motion: state only, transform/opacity, off for reduced motion. */
 @keyframes ui-fade-up {
   from {
@@ -563,7 +755,6 @@ body {
     animation: ui-fade-up var(--dur-short) var(--ease-out);
   }
   .board-card {
-    animation: ui-fade-up var(--dur-short) var(--ease-out) both;
     transition:
       transform var(--dur-micro) var(--ease-out),
       border-color var(--dur-micro) var(--ease-out),
@@ -610,8 +801,5 @@ body {
   }
   .board-toolbar .ui-input {
     width: 100%;
-  }
-  .board-view-controls p {
-    grid-column: 1 / -1;
   }
 }
