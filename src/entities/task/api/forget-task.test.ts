@@ -12,6 +12,9 @@ test("업무가 사라지면 업무 쿼리와 화면에 없는 목록 캐시를 
     ["home"],
     ["me", "github", "review-requests"],
     ["members"],
+    ["projects", "p1", "github-repositories"],
+    ["settings-repositories", "p1"],
+    ["settings-installable-repositories", "p1"],
   ];
   for (const key of keys) client.setQueryData(key, { cached: true });
   const unrelated = ["identity", "me"];

@@ -72,6 +72,8 @@ export type PublicationRepository = {
   readonly id: string;
   readonly repositoryId: number;
   readonly fullName: string;
+  /** 서버가 비공개 저장소 이름을 숨길 때 false. 지금 서버는 목록에서 빼므로 보통 없다. */
+  readonly accessible?: boolean;
   readonly private: boolean;
   readonly isDefault: boolean;
 };

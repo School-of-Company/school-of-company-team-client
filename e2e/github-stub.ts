@@ -7,6 +7,9 @@ import { apiUrl } from "./support";
 // 가짜 GITHUB_APP_ID·로컬 RSA 키로 띄웠을 때만 쓴다(계획 3.3-6·7). 응답 모양은 GitHub REST 문서 기준이며
 // 단계 2 검증(V-2) 스텁과 같은 경로만 답한다.
 
+/** 실행(seed.run)마다 같은 시험 팀원 GitHub ID. 여러 e2e 파일이 한 실행에서 같은 연결 행을 쓴다. */
+export const memberGithubId = (run: string) => 2_000_000 + parseInt(run, 16);
+
 export type StubPull = {
   title: string;
   sha: string;
@@ -19,7 +22,10 @@ export type StubPull = {
 };
 export type StubState = {
   installationId: number;
-  repo: { id: number; fullName: string };
+  /** private 를 true 로 바꾸면 비공개 전환을 흉내 낸다. */
+  repo: { id: number; fullName: string; private?: boolean };
+  /** login → 저장소 권한. 없으면 write. "none" 이면 404(권한 없음). */
+  permissions?: Record<string, string>;
   logins: Record<number, string>;
   pulls: Record<number, StubPull>;
   suites: { id: number; head_sha: string; conclusion: string }[];
@@ -31,13 +37,13 @@ const user = (state: StubState, id: number) => ({
   type: "User",
 });
 
-const repository = (state: StubState) => {
+export const repository = (state: StubState) => {
   const [owner, name] = state.repo.fullName.split("/");
   return {
     id: state.repo.id,
     name,
     full_name: state.repo.fullName,
-    private: false,
+    private: state.repo.private ?? false,
     archived: false,
     has_issues: true,
     owner: { login: owner },
@@ -95,15 +101,13 @@ function route(state: StubState, path: string): [number, unknown] {
   if (rest === "/installation") return [200, { id: state.installationId }];
   if (rest === "/issues") return [200, []];
   const permission = rest.match(/^\/collaborators\/([^/]+)\/permission$/);
-  if (permission)
-    return [
-      200,
-      {
-        permission: "write",
-        role_name: "write",
-        user: { login: decodeURIComponent(permission[1]) },
-      },
-    ];
+  if (permission) {
+    const login = decodeURIComponent(permission[1]);
+    const level = state.permissions?.[login] ?? "write";
+    return level === "none"
+      ? notFound
+      : [200, { permission: level, role_name: level, user: { login } }];
+  }
   if (/^\/assignees\/[^/]+$/.test(rest)) return [204, undefined];
   const pr = rest.match(/^\/(issues|pulls)\/(\d+)(\/.*)?$/);
   if (pr) {

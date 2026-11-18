@@ -2,6 +2,7 @@ import type { Server } from "node:http";
 import { expect, test, type Page } from "@playwright/test";
 import {
   insertOAuthRows,
+  memberGithubId,
   pullJson,
   sendWebhook,
   startGithubStub,
@@ -46,7 +47,7 @@ async function call<T>(
 }
 
 test.beforeAll(async () => {
-  const githubId = 3_000_000 + parseInt(seed.run, 16);
+  const githubId = memberGithubId(seed.run);
   const task = await call<{ id: string; key: string }>(
     "POST",
     "/api/v1/tasks",
@@ -64,7 +65,7 @@ test.beforeAll(async () => {
   taskId = task.id;
   const state: StubState = {
     installationId: 77,
-    repo: { id: githubId, fullName: `acme/cache-${seed.run}` },
+    repo: { id: githubId + 1, fullName: `acme/cache-${seed.run}` },
     logins: { [githubId]: `member-${seed.run}`, 1999999: "admin-gh" },
     pulls: {
       21: {
