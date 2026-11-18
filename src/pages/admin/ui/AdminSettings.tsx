@@ -1,18 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useAdminUsers, useAdminUserChange } from "../api/users";
 import { DiscordChannelForm } from "@/features/project-integrations";
 import { settingsErrorMessage } from "@/features/project-settings";
 import { normalizeApiError } from "@/shared/api";
 import { Badge, Button, EmptyState, ErrorState, Spinner } from "@/shared/ui";
-import { CreateProjectForm } from "./CreateProjectForm";
 
 export function AdminSettings({
   user,
-  onProjectCreated,
 }: {
   readonly user: { readonly id: string; readonly role: string };
-  readonly onProjectCreated: () => Promise<unknown>;
 }) {
   const users = useAdminUsers(user.role === "LEAD");
   const change = useAdminUserChange();
@@ -179,7 +177,15 @@ export function AdminSettings({
         <h2 id="create-project-heading" className="text-xl font-semibold">
           프로젝트 생성
         </h2>
-        <CreateProjectForm onSaved={onProjectCreated} />
+        <p className="text-sm text-muted">
+          이름과 키를 정하고 팀원·PM, 저장소를 순서대로 연결합니다.
+        </p>
+        <Link
+          href="/admin?create=project"
+          className="ui-button ui-button-secondary justify-self-start"
+        >
+          새 프로젝트 만들기
+        </Link>
       </section>
       <section className="grid gap-5" aria-labelledby="team-channel-heading">
         <h2 id="team-channel-heading" className="text-xl font-semibold">

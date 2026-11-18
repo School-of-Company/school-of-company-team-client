@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectAccess, projectKeys, projectQueries } from "@/entities/project";
 import { activeUsersQueryOptions, type User } from "@/entities/user";
@@ -83,13 +84,15 @@ function ProjectSettingsContent({
           {project.data.name} 설정
         </h1>
       </header>
-      <SettingsPanels
-        key={projectId}
-        project={project.data}
-        user={user}
-        candidates={users.data ?? []}
-        onSaved={refresh}
-      />
+      <Suspense fallback={<Spinner label="설정 불러오는 중" />}>
+        <SettingsPanels
+          key={projectId}
+          project={project.data}
+          user={user}
+          candidates={users.data ?? []}
+          onSaved={refresh}
+        />
+      </Suspense>
     </div>
   );
 }
