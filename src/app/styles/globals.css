@@ -1318,18 +1318,19 @@ select.ui-input {
   min-width: 0;
   max-width: 100%;
   align-items: center;
+  min-height: var(--chip-height);
   gap: var(--space-1);
   padding: 0 var(--space-2) 0 var(--space-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--foreground-2);
-  font-size: 11px;
-  line-height: 18px;
+  font-size: var(--text-xs);
+  line-height: 1;
   white-space: nowrap;
 }
 .signal-chip svg {
-  width: 12px;
-  height: 12px;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   flex: none;
   color: var(--tone);
   stroke-width: 2.2;
@@ -1436,7 +1437,7 @@ select.ui-input {
   max-width: 100%;
   align-items: center;
   gap: var(--space-2);
-  min-height: 22px;
+  min-height: var(--chip-height);
   padding: 0 var(--space-2);
   border-radius: var(--radius-sm);
   color: var(--foreground-2);
@@ -1464,14 +1465,16 @@ select.ui-input {
 .notify-row + .notify-row {
   border-top: 1px solid var(--border);
 }
+/* Track fill is the 3:1 input line colour, so the switch needs no border. */
 .notify-switch {
+  --switch-knob: calc(var(--switch-height) - var(--space-1));
   position: relative;
-  width: 36px;
-  height: 20px;
+  width: var(--switch-width);
+  height: var(--switch-height);
   flex: none;
-  border: 1px solid var(--border-input);
-  border-radius: 999px;
-  background: var(--surface-active);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--border-input);
   appearance: none;
   cursor: pointer;
   transition: background-color var(--dur-1) var(--ease-out);
@@ -1479,21 +1482,20 @@ select.ui-input {
 .notify-switch::after {
   content: "";
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--foreground-2);
+  top: calc((var(--switch-height) - var(--switch-knob)) / 2);
+  left: calc((var(--switch-height) - var(--switch-knob)) / 2);
+  width: var(--switch-knob);
+  height: var(--switch-knob);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
   transition: transform var(--dur-1) var(--ease-out);
 }
 .notify-switch:checked {
-  border-color: var(--brand);
   background: var(--brand);
 }
 .notify-switch:checked::after {
   background: var(--on-brand);
-  transform: translateX(16px);
+  transform: translateX(calc(var(--switch-width) - var(--switch-height)));
 }
 .notify-switch:disabled {
   cursor: not-allowed;
@@ -1516,14 +1518,7 @@ select.ui-input {
 }
 @media (pointer: coarse) {
   .notify-switch {
-    width: 44px;
-    height: 26px;
-  }
-  .notify-switch::after {
-    width: 20px;
-    height: 20px;
-  }
-  .notify-switch:checked::after {
-    transform: translateX(18px);
+    --switch-width: var(--control-touch);
+    --switch-height: var(--control-sm);
   }
 }
