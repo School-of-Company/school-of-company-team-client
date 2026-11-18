@@ -1,6 +1,37 @@
 [
  {
   "scope": "app",
+  "mode": "build",
+  "depth": "full",
+  "shape": "app screen",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell; sidebar regrouped per docs/ia.md (내 일: 홈 · 내 보드 · 팀 공용 · 프로젝트 / 조직: 팀원 / 관리)",
+  "hero": "none (app screen)",
+  "footer": "none",
+  "signature": "Needs Attention grouped by rule with the reason on each row (PM·head admin can switch to a managed project)",
+  "imagery": "none",
+  "photos": [],
+  "entry": "src/app/styles/globals.css (/* Home */ block)",
+  "fingerprint": "two-column home: attention + today | review requests + active sprints; members table that stacks under 48rem",
+  "sections": [
+   "home: 확인 필요",
+   "home: 오늘 할 일",
+   "home: 리뷰 요청",
+   "home: 진행 중 Sprint",
+   "members table"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "prompt": "Stage 5 F5 Home, Needs Attention and Members (/members) on real API",
+  "sweep": "sloplint --scope app: 0 FAIL, 0 WARN, 4 DISMISSED (41 .home-panel inherits --foreground on a raised surface, same as board card); render tier not run (no puppeteer), Playwright real-API screenshots light/dark x 1440/390 instead; contrast: --muted on --surface-raised 5.04 light / 5.5 dark",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
   "mode": "redesign",
   "depth": "polish",
   "theme": "project design.md (locked)",
