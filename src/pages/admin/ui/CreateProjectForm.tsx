@@ -49,9 +49,11 @@ export function CreateProjectForm({
       }}
     >
       <fieldset disabled={create.isPending} className="grid min-w-0 gap-4">
-        <p className="text-sm text-muted">
-          1. 기본 정보 / 2. 팀원·PM / 3. 저장소 연결
-        </p>
+        <ol className="ui-steps" aria-label="프로젝트 생성 단계">
+          <li aria-current="step">기본 정보</li>
+          <li>팀원·PM</li>
+          <li>저장소 연결</li>
+        </ol>
         <p className="text-sm">
           기본 정보를 저장하면 프로젝트가 생성됩니다. 이후 팀원과 저장소를
           설정하세요.
@@ -102,7 +104,11 @@ export function CreateProjectForm({
             <option value="TEAM">팀 전체 공개</option>
           </Select>
         </Field>
-        <Button type="submit" loading={create.isPending}>
+        <Button
+          type="submit"
+          className="justify-self-start"
+          loading={create.isPending}
+        >
           프로젝트 만들고 계속
         </Button>
       </fieldset>

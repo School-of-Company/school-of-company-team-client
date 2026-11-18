@@ -37,9 +37,13 @@ export function ProjectSetup({
       <p role="status" className="text-sm">
         {project.name} 프로젝트를 생성했습니다.
       </p>
-      <p className="text-sm text-muted">
-        {step === "team" ? "2. 팀원·PM" : "3. 저장소 연결 (선택)"}
-      </p>
+      <ol className="ui-steps" aria-label="프로젝트 생성 단계">
+        <li>기본 정보</li>
+        <li aria-current={step === "team" ? "step" : undefined}>팀원·PM</li>
+        <li aria-current={step === "team" ? undefined : "step"}>
+          저장소 연결 (선택)
+        </li>
+      </ol>
       {step === "team" ? (
         <>
           {detail.isPending || users.isPending ? (
