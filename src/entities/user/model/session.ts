@@ -30,6 +30,19 @@ export function replaceSession(tokens: SessionTokens) {
   listeners.forEach((listener) => listener());
 }
 
+export function getRefreshToken(): string | null {
+  return typeof window === "undefined"
+    ? null
+    : sessionStorage.getItem(REFRESH_KEY);
+}
+
+/** Same user, new tokens: no session-change notification, so caches stay. */
+export function rotateSession(tokens: SessionTokens) {
+  sessionStorage.setItem(ACCESS_KEY, tokens.accessToken);
+  sessionStorage.setItem(REFRESH_KEY, tokens.refreshToken);
+  listeners.forEach((listener) => listener());
+}
+
 export function clearSession(restriction?: "REJECTED" | "SUSPENDED") {
   sessionChangeListeners.forEach((listener) => listener());
   if (restriction) sessionStorage.setItem(RESTRICTION_KEY, restriction);

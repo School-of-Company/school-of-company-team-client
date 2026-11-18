@@ -2,7 +2,7 @@ import { test } from "node:test";
 import { strict as assert } from "node:assert";
 import { AxiosError, AxiosHeaders } from "axios";
 import { ApiError, normalizeApiError } from "./error";
-import { api, subscribeApiErrors } from "./instance";
+import { api, setAccessRefresher, subscribeApiErrors } from "./instance";
 
 test("normalization preserves server authorization codes and is idempotent", () => {
   const error = new AxiosError(
@@ -40,4 +40,41 @@ test("API error subscriptions receive normalized errors and clean up", async () 
   unsubscribe();
   await assert.rejects(request(), ApiError);
   assert.equal(received.length, 1);
+});
+
+test("an expired access token is refreshed once and the request replayed", async () => {
+  let calls = 0;
+  let refreshes = 0;
+  const adapter = api.defaults.adapter;
+  api.defaults.adapter = async (config) => {
+    calls += 1;
+    if (calls === 1)
+      throw new AxiosError("expired", "ERR_BAD_REQUEST", config, undefined, {
+        status: 401,
+        statusText: "Unauthorized",
+        headers: {},
+        config,
+        data: { code: "EXPIRED_TOKEN", message: "만료" },
+      });
+    return { data: "ok", status: 200, statusText: "OK", headers: {}, config };
+  };
+  setAccessRefresher(async () => {
+    refreshes += 1;
+    return true;
+  });
+  try {
+    assert.equal((await api.get("/x")).data, "ok");
+    assert.deepEqual([calls, refreshes], [2, 1]);
+    // A failed refresh surfaces the 401 instead of looping.
+    calls = 0;
+    setAccessRefresher(async () => false);
+    await assert.rejects(
+      api.get("/x"),
+      (e: unknown) => e instanceof ApiError && e.status === 401,
+    );
+    assert.equal(calls, 1);
+  } finally {
+    api.defaults.adapter = adapter;
+    setAccessRefresher(async () => false);
+  }
 });

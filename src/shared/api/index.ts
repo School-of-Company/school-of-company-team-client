@@ -1,2 +1,2 @@
-export { api, subscribeApiErrors } from "./instance";
+export { api, setAccessRefresher, subscribeApiErrors } from "./instance";
 export { ApiError, normalizeApiError, type ErrorResponse } from "./error";

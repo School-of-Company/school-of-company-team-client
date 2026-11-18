@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 import { normalizeApiError, type ApiError } from "./error";
 
 export const api = axios.create({
@@ -16,6 +16,22 @@ export function subscribeApiErrors(
   return () => api.interceptors.response.eject(id);
 }
 
-api.interceptors.response.use(undefined, (error: unknown) =>
-  Promise.reject(normalizeApiError(error)),
-);
+// Set by the auth feature: gets a fresh access token, resolves false when it can't.
+let refreshAccess: (() => Promise<boolean>) | null = null;
+export function setAccessRefresher(refresher: () => Promise<boolean>) {
+  refreshAccess = refresher;
+}
+
+// Registered first so it sees the raw axios error: an expired access token is
+// refreshed once and the request replayed before anyone is told about a 401.
+api.interceptors.response.use(undefined, async (error: unknown) => {
+  if (axios.isAxiosError(error) && error.response?.status === 401) {
+    const config = error.config as
+      (InternalAxiosRequestConfig & { retried?: boolean }) | undefined;
+    if (config && !config.retried && refreshAccess && (await refreshAccess())) {
+      config.retried = true;
+      return api.request(config);
+    }
+  }
+  return Promise.reject(normalizeApiError(error));
+});
