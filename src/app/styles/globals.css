@@ -1,17 +1,10 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Cobalt (deal 3/3, seed github-discord-utilitarian-modern-minimal-3d53·1fca0681·2026-11-18·r0) · redesign: full
+ * nav: project workbench sidebar · signature: task board · states: loading empty error full
+ * axes: light/grotesk-sans/cool · posture: restrained · contrast: pending verification · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S3 R5 V3 · weakest: S, retained project keys and task destinations as the navigation material */
 @import "tailwindcss";
-
-:root {
-  color-scheme: light;
-  --background: #f7f8fa;
-  --foreground: #18212f;
-  --surface: #ffffff;
-  --surface-hover: #eef1f5;
-  --muted: #566477;
-  --border: #8996a8;
-  --brand: #2454ba;
-  --brand-soft: #e9efff;
-  --danger: #b42332;
-}
+@import "./tokens.css";
+@import "./base.css";
 
 @theme inline {
   --color-background: var(--background);
@@ -23,31 +16,19 @@
   --color-brand: var(--brand);
   --color-brand-soft: var(--brand-soft);
   --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-outlier);
   --spacing: 0.25rem;
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --background: #11151c;
-    --foreground: #e7edf5;
-    --surface: #191f29;
-    --surface-hover: #273140;
-    --muted: #a9b5c7;
-    --border: #73839b;
-    --brand: #a9c3ff;
-    --brand-soft: #233559;
-    --danger: #ffabb3;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 }
 
 @layer base {
@@ -81,10 +62,12 @@ body {
     padding: 0.625rem 1rem;
     font-size: 0.875rem;
     font-weight: 600;
+    border: 1px solid var(--color-transparent);
+    line-height: 1.4;
   }
   .ui-button-primary {
     background: var(--brand);
-    color: var(--surface);
+    color: var(--color-accent-ink);
   }
   .ui-button-secondary {
     background: var(--surface);
@@ -96,10 +79,28 @@ body {
   }
   .ui-button-danger {
     background: var(--danger);
-    color: var(--surface);
+    color: var(--color-accent-ink);
   }
   .ui-button:hover:not(:disabled) {
     filter: brightness(0.93);
+  }
+  .ui-button:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .ui-button[aria-busy="true"],
+  .ui-input[aria-busy="true"],
+  .ui-checkbox[aria-busy="true"] {
+    cursor: progress;
+  }
+  .ui-button[aria-invalid="true"],
+  .ui-checkbox[aria-invalid="true"] {
+    outline: 2px solid var(--danger);
+    outline-offset: 2px;
+  }
+  .ui-button[data-state="success"],
+  .ui-input[data-state="success"],
+  .ui-checkbox[data-state="success"] {
+    border-color: var(--success);
   }
   .ui-icon-button {
     width: 2.75rem;
@@ -110,7 +111,7 @@ body {
     width: 100%;
     min-width: 0;
     min-height: 2.75rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--muted);
     border-radius: var(--radius-md);
     background: var(--surface);
     padding: 0.625rem 0.75rem;
@@ -120,6 +121,28 @@ body {
   .ui-input::placeholder {
     color: var(--muted);
   }
+  .ui-input:hover:not(:disabled) {
+    background: var(--color-paper-2);
+  }
+  .ui-input:active:not(:disabled) {
+    border-color: var(--foreground);
+  }
+  .ui-input:focus-visible {
+    outline-offset: -3px;
+  }
+  .ui-checkbox {
+    width: 1.375rem;
+    height: 1.375rem;
+    margin: 0.6875rem;
+    accent-color: var(--brand);
+  }
+  .ui-checkbox:hover:not(:disabled) {
+    outline: 1px solid var(--muted);
+    outline-offset: 2px;
+  }
+  .ui-checkbox:active:not(:disabled) {
+    filter: brightness(0.85);
+  }
   .ui-input[aria-invalid="true"] {
     border-color: var(--danger);
   }
@@ -128,7 +151,7 @@ body {
     width: 1rem;
     height: 1rem;
     border: 2px solid currentColor;
-    border-right-color: transparent;
+    border-right-color: var(--color-transparent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -144,10 +167,9 @@ body {
     padding: 1.5rem;
     background: var(--surface);
     color: var(--foreground);
-    box-shadow: 0 20px 60px #0003;
   }
   .ui-dialog::backdrop {
-    background: #0008;
+    background: var(--color-overlay);
   }
   .ui-drawer {
     margin: 0;

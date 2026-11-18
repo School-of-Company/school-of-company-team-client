@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { routes } from "@/shared/config";
-import { Dialog, IconButton } from "@/shared/ui";
+import { Dialog, IconButton, Icon, type IconName } from "@/shared/ui";
 
 export type AppShellProps = {
   readonly children: ReactNode;
@@ -19,14 +19,24 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
-  const links = [
-    { href: routes.me, label: "내 보드", icon: "▦" },
-    { href: routes.team, label: "팀 공용", icon: "◎" },
-    { href: routes.projects, label: "프로젝트", icon: "▤" },
+  const links: readonly {
+    readonly href: string;
+    readonly label: string;
+    readonly icon: IconName;
+  }[] = [
+    { href: routes.me, label: "내 보드", icon: "board" },
+    { href: routes.team, label: "팀 공용", icon: "team" },
+    { href: routes.projects, label: "프로젝트", icon: "project" },
     ...(isHeadAdmin
-      ? [{ href: routes.admin, label: "관리자", icon: "⚙" }]
+      ? [
+          { href: routes.admin, label: "관리자", icon: "settings" } satisfies {
+            href: string;
+            label: string;
+            icon: IconName;
+          },
+        ]
       : []),
-    { href: routes.account, label: "내 계정", icon: "○" },
+    { href: routes.account, label: "내 계정", icon: "user" },
   ];
   const navigation = (
     <nav aria-label="주 메뉴" className="grid gap-1">
@@ -40,9 +50,7 @@ export function AppShell({
             onClick={() => setMenuOpen(false)}
             className={`flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium ${active ? "bg-brand-soft text-brand" : "text-muted hover:bg-surface-hover hover:text-foreground"}`}
           >
-            <span className="w-5 text-center" aria-hidden="true">
-              {icon}
-            </span>
+            <Icon name={icon} className="shrink-0" />
             {label}
           </Link>
         );
@@ -81,7 +89,7 @@ export function AppShell({
             className="md:hidden"
             onClick={() => setMenuOpen(true)}
           >
-            ☰
+            <Icon name="menu" />
           </IconButton>
           <span className="text-sm font-medium">
             {links.find(

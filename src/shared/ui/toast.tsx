@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { IconButton } from "./controls";
+import { Icon } from "./icons";
 
 type Toast = {
   readonly id: number;
@@ -43,7 +44,7 @@ export function ToastProvider({ children }: { readonly children: ReactNode }) {
           <div
             key={toast.id}
             role={toast.tone === "error" ? "alert" : "status"}
-            className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface p-4 shadow-lg"
+            className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface p-4"
           >
             <p
               className={
@@ -61,7 +62,7 @@ export function ToastProvider({ children }: { readonly children: ReactNode }) {
                 )
               }
             >
-              ×
+              <Icon name="close" />
             </IconButton>
           </div>
         ))}
