@@ -79,42 +79,57 @@ export function AppShell({
   });
   const activeProjects =
     projects.data?.filter((project) => !project.archived) ?? [];
-  const links: readonly {
+  type NavLink = {
     readonly href: string;
     readonly label: string;
     readonly icon: IconName;
-  }[] = [
+  };
+  // 순서와 그룹은 docs/ia.md "완성 후 사이드바"를 따른다. 관리자·설정은 맨 아래.
+  const workLinks: readonly NavLink[] = [
     { href: routes.me, label: "내 보드", icon: "board" },
     { href: routes.team, label: "팀 공용", icon: "team" },
     { href: routes.projects, label: "프로젝트", icon: "project" },
+  ];
+  const orgLinks: readonly NavLink[] = [
+    { href: routes.services, label: "서비스", icon: "service" },
+  ];
+  const accountLinks: readonly NavLink[] = [
     ...(isHeadAdmin
-      ? [
-          { href: routes.admin, label: "관리자", icon: "shield" } satisfies {
-            href: string;
-            label: string;
-            icon: IconName;
-          },
-        ]
+      ? [{ href: routes.admin, label: "관리자", icon: "shield" } as const]
       : []),
     { href: routes.account, label: "설정", icon: "settings" },
   ];
+  const navLinks = (links: readonly NavLink[]) =>
+    links.map(({ href, label, icon }) => {
+      const active = pathname === href || pathname.startsWith(`${href}/`);
+      return (
+        <Link
+          key={href}
+          href={href}
+          aria-current={active ? "page" : undefined}
+          onClick={() => setMenuOpen(false)}
+          className="ui-nav-link flex items-center"
+        >
+          <Icon name={icon} className="shrink-0" />
+          {label}
+        </Link>
+      );
+    });
   const navigation = (
-    <nav aria-label="주 메뉴" className="grid">
-      {links.map(({ href, label, icon }) => {
-        const active = pathname === href || pathname.startsWith(`${href}/`);
-        return (
-          <Link
-            key={href}
-            href={href}
-            aria-current={active ? "page" : undefined}
-            onClick={() => setMenuOpen(false)}
-            className="ui-nav-link flex items-center"
-          >
-            <Icon name={icon} className="shrink-0" />
-            {label}
-          </Link>
-        );
-      })}
+    <>
+      <nav aria-label="주 메뉴" className="grid">
+        <h2>내 일</h2>
+        {navLinks(workLinks)}
+      </nav>
+      <nav aria-label="조직" className="grid">
+        <h2>조직</h2>
+        {navLinks(orgLinks)}
+      </nav>
+    </>
+  );
+  const accountNavigation = (
+    <nav aria-label="관리" className="grid">
+      {navLinks(accountLinks)}
     </nav>
   );
   const projectNavigation = (
@@ -176,7 +191,8 @@ export function AppShell({
         </Link>
         {navigation}
         {projectNavigation}
-        <div className="mt-auto border-t border-border pt-5">
+        <div className="mt-auto pt-5">{accountNavigation}</div>
+        <div className="border-t border-border pt-5">
           {userSlot ?? (
             <p className="px-3 text-xs text-muted">School of Company</p>
           )}
@@ -223,6 +239,7 @@ export function AppShell({
       >
         {navigation}
         {projectNavigation}
+        {accountNavigation}
         <div className="mt-6 border-t border-border pt-4">{userSlot}</div>
       </Dialog>
     </div>

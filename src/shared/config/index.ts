@@ -9,6 +9,8 @@ export const routes = {
   projectSettings: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/settings`,
   task: (taskId: string) => `/tasks/${encodeURIComponent(taskId)}`,
+  services: "/services",
+  service: (key: string) => `/services/${encodeURIComponent(key)}`,
   admin: "/admin",
   account: "/account",
 } as const;
