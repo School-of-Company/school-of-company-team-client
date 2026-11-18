@@ -45,7 +45,9 @@ export function TaskGithubPanel({
   }, [github.error, onAccessLost]);
   const repositories = useQuery({
     ...taskGithubQueries.repositories(task.projectId ?? ""),
-    enabled: editable && task.scope === "PROJECT" && !!task.projectId,
+    // 읽기 전용 열람자도 받는다: 서버가 조회자 원본 권한으로 거른 목록이라, 권한 있는 열람자에게는
+    // 비공개 발행 대상 이름을 보여 주고 권한 없는 열람자에게는 숨긴다(선택 상자는 편집자만).
+    enabled: task.scope === "PROJECT" && !!task.projectId,
   });
   // 일시 장애면 60초까지만 마지막 선택지를 두고, 권한·존재 오류(4xx)면 바로 비운다.
   const { data: repositoryOptions } = useLastData(repositories);

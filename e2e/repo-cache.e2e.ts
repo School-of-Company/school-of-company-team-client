@@ -221,3 +221,29 @@ test("설정의 연결 저장소 목록은 화면 진입과 포커스 때마다 
   // 헤드 어드민은 원본 권한이 있어 이름이 보인다(권한 있는 사람에게는 그대로).
   await expect(page.getByText(state.repo.fullName).first()).toBeVisible();
 });
+
+test("편집 권한이 없어도 원본 권한이 있는 열람자에게는 비공개 발행 대상 이름을 보여 준다", async ({
+  page,
+}) => {
+  // 팀 전체 공개로 바꿔 비참여자(outsider)가 읽기 전용으로 업무를 보게 한다.
+  await call("PATCH", `/api/v1/projects/${seed.project.id}`, seed.admin, {
+    visibility: "TEAM",
+  });
+  const outsiderId = memberGithubId(seed.run) + 5;
+  const outsiderLogin = `outsider-${seed.run}`;
+  state.logins[outsiderId] = outsiderLogin;
+  state.permissions = { ...state.permissions, [outsiderLogin]: "write" };
+  insertOAuthRows(process.env.E2E_PG_CONTAINER!, [
+    { userId: seed.outsider.id, githubId: outsiderId, login: outsiderLogin },
+  ]);
+  await signIn(page, seed.outsider.tokens);
+  await page.goto(`/tasks/${taskId}`);
+  await expect(page.getByRole("heading", { name: "GitHub" })).toBeVisible();
+  // 읽기 전용이라 선택 상자는 없고, 발행 상태 배지에 이름이 보인다.
+  await expect(select(page)).toHaveCount(0);
+  await expect(page.getByText(state.repo.fullName).first()).toBeVisible();
+  // 다른 시험이 기대하는 참여자 공개로 되돌린다.
+  await call("PATCH", `/api/v1/projects/${seed.project.id}`, seed.admin, {
+    visibility: "MEMBERS",
+  });
+});
