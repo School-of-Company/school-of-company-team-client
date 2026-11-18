@@ -11,6 +11,15 @@ export type TaskGithub = {
     readonly errorMessage: string | null;
     readonly updatedAt: string;
   } | null;
+  // 저장소 자동 가져오기로 만든 업무만 non-null.
+  readonly source: {
+    readonly repositoryFullName: string;
+    readonly private: boolean;
+    readonly number: number;
+    readonly url: string;
+    readonly importedAt: string;
+    readonly discordRestricted: boolean;
+  } | null;
   readonly links: readonly {
     readonly id: string;
     readonly kind: "ISSUE" | "PULL_REQUEST";

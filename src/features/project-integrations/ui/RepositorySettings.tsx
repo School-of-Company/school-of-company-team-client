@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { githubErrorMessage } from "../model/github-error";
+import { ImportStatus } from "./ImportStatus";
 import {
   Badge,
   Button,
@@ -20,9 +21,11 @@ import {
 
 export function RepositorySettings({
   projectId,
+  projectKey,
   disabled,
 }: {
   readonly projectId: string;
+  readonly projectKey: string;
   readonly disabled: boolean;
 }) {
   const repositories = useProjectRepositories(projectId, true);
@@ -30,6 +33,7 @@ export function RepositorySettings({
   const change = useRepositoryChange(projectId);
   const [editing, setEditing] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedId, setSelectedId] = useState("");
   if (repositories.isPending || (!disabled && installable.isPending))
     return <Spinner label="저장소 불러오는 중" />;
   if (repositories.isError)
@@ -76,6 +80,12 @@ export function RepositorySettings({
                   {!repo.publishable && <Badge>링크 연결만 가능</Badge>}
                   {repo.isDefault && <Badge>기본 발행</Badge>}
                 </div>
+                <ImportStatus
+                  projectId={projectId}
+                  projectKey={projectKey}
+                  repository={repo}
+                  disabled={disabled}
+                />
               </div>
               {!disabled && editing && (
                 <Button
@@ -155,11 +165,14 @@ export function RepositorySettings({
               (item) => String(item.repositoryId) === repoId,
             );
             if (repo)
-              change.mutate({
-                action: "link",
-                installationId: repo.installationId,
-                repositoryId: repo.repositoryId,
-              });
+              change.mutate(
+                {
+                  action: "link",
+                  installationId: repo.installationId,
+                  repositoryId: repo.repositoryId,
+                },
+                { onSuccess: () => setSelectedId("") },
+              );
           }}
         >
           <Field id="repository-search" label="허용된 저장소 검색">
@@ -176,7 +189,8 @@ export function RepositorySettings({
               name="repository"
               required
               disabled={change.isPending || available.length === 0}
-              defaultValue=""
+              value={selectedId}
+              onChange={(event) => setSelectedId(event.target.value)}
             >
               <option value="" disabled>
                 저장소 선택
@@ -189,6 +203,13 @@ export function RepositorySettings({
               ))}
             </Select>
           </Field>
+          {available.find((repo) => String(repo.repositoryId) === selectedId)
+            ?.private && (
+            <p className="text-sm text-muted">
+              연결하면 열린 Issue를 업무로 가져옵니다. 비공개 저장소의 업무는
+              원본 저장소 권한이 있는 참여자에게만 보여요.
+            </p>
+          )}
           {available.length === 0 && (
             <p className="text-sm text-muted">
               새로 연결할 수 있는 저장소가 없습니다. 설치에 허용된 저장소와 보관

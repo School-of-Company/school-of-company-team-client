@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/shared/api";
+import { taskKeys } from "@/entities/task";
+import { api, normalizeApiError } from "@/shared/api";
+import { isImportActive, type RepositoryImport } from "../model/import-status";
+
+const IMPORT_POLL_INTERVAL = 3000;
 
 export type InstallableRepository = {
   readonly installationId: number;
@@ -16,6 +20,7 @@ export type ProjectRepository = {
   readonly private: boolean;
   readonly isDefault: boolean;
   readonly publishable: boolean;
+  readonly import: RepositoryImport | null;
 };
 
 export type ChannelLink = {
@@ -97,6 +102,82 @@ export function useRepositoryChange(projectId: string) {
       client.invalidateQueries({
         queryKey: ["settings-repositories", projectId],
       }),
+  });
+}
+
+const importKey = (
+  projectId: string,
+  projectKey: string,
+  projectRepositoryId: string,
+) =>
+  [
+    "settings-repository-import",
+    projectId,
+    projectKey,
+    projectRepositoryId,
+  ] as const;
+const importPath = (projectId: string, projectRepositoryId: string) =>
+  `/api/v1/projects/${projectId}/github/repositories/${projectRepositoryId}/import`;
+
+export function useRepositoryImport(
+  projectId: string,
+  projectKey: string,
+  repository: ProjectRepository,
+  enabled: boolean,
+) {
+  const client = useQueryClient();
+  return useQuery({
+    queryKey: importKey(projectId, projectKey, repository.id),
+    queryFn: async ({ queryKey }) => {
+      const previous = client.getQueryData<RepositoryImport | null>(queryKey);
+      let next: RepositoryImport | null;
+      try {
+        next = (
+          await api.get<RepositoryImport>(importPath(projectId, repository.id))
+        ).data;
+      } catch (error) {
+        if (normalizeApiError(error).code === "GITHUB_IMPORT_NOT_FOUND")
+          return null;
+        throw error;
+      }
+      // 새로 가져온 업무가 생기거나 실행이 끝나면 해당 프로젝트 보드만 갱신한다.
+      if (
+        previous &&
+        next &&
+        (next.imported !== previous.imported || next.status !== previous.status)
+      )
+        void client.invalidateQueries({
+          predicate: (query) =>
+            taskKeys.isProjectBoard(query.queryKey, projectKey),
+        });
+      return next;
+    },
+    initialData: repository.import ?? undefined,
+    enabled,
+    retry: false,
+    refetchInterval: (query) =>
+      isImportActive(query.state.data) ? IMPORT_POLL_INTERVAL : false,
+  });
+}
+
+export function useStartRepositoryImport(
+  projectId: string,
+  projectKey: string,
+  projectRepositoryId: string,
+) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async () =>
+      (
+        await api.post<RepositoryImport>(
+          importPath(projectId, projectRepositoryId),
+        )
+      ).data,
+    onSuccess: (data) =>
+      client.setQueryData(
+        importKey(projectId, projectKey, projectRepositoryId),
+        data,
+      ),
   });
 }
 

@@ -6,6 +6,7 @@ import type { TaskDetail } from "@/entities/task";
 import { taskKeys } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import {
+  Badge,
   Button,
   Checkbox,
   ErrorState,
@@ -91,6 +92,17 @@ export function TaskGithubPanel({
   return (
     <section className="grid gap-5 border-t border-border pt-6">
       <h2 className="text-lg font-semibold">GitHub Issue · PR</h2>
+      {github.data.source && (
+        <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
+          {github.data.source.private && <Badge>비공개 원본</Badge>}
+          <span>
+            {github.data.source.repositoryFullName}#{github.data.source.number}
+            에서 가져온 업무
+            {github.data.source.private &&
+              " · 원본 저장소 권한이 있는 참여자에게만 보여요"}
+          </span>
+        </p>
+      )}
       {publication && (
         <div className="grid gap-2 text-sm">
           <p className="font-semibold">
