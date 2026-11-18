@@ -24,6 +24,16 @@ export const statusLabels: Readonly<Record<TaskStatus, string>> = {
   REVIEW: "리뷰",
   DONE: "완료",
 };
+export type TaskPerson = {
+  readonly id: string;
+  readonly username: string;
+  readonly name: string;
+};
+export type TaskBucket = {
+  readonly id: string;
+  readonly name: string;
+  readonly archived: boolean;
+};
 export type TaskCard = {
   readonly id: string;
   readonly key: string | null;
@@ -37,11 +47,10 @@ export type TaskCard = {
   readonly type: TaskType;
   readonly status: TaskStatus;
   readonly priority: TaskPriority;
-  readonly assignees: readonly {
-    readonly id: string;
-    readonly username: string;
-    readonly name: string;
-  }[];
+  readonly assignees: readonly TaskPerson[];
+  /** 단계 3: 서버가 아직 보내지 않으면 없을 수 있다. */
+  readonly planningBucket?: TaskBucket | null;
+  readonly reviewers?: readonly TaskPerson[];
   readonly deadline: string | null;
   readonly blocked: boolean;
   readonly blockedReason: string | null;
@@ -58,7 +67,11 @@ export type TaskCard = {
   /** 열린 PR의 CI·리뷰 요약. 신호가 없거나 서버가 아직 보내지 않으면 null/없음. */
   readonly devSignal?: DevSignal | null;
 };
-export type TaskDetail = TaskCard & {
+export type TaskDetail = Omit<TaskCard, "reviewers"> & {
+  readonly reviewers?: readonly (TaskPerson & {
+    readonly githubLogin?: string | null;
+    readonly assignedAt?: string;
+  })[];
   readonly description: string | null;
   readonly createdBy: string;
   readonly createdAt: string;
@@ -68,6 +81,8 @@ export type Board = {
   readonly groups: readonly {
     readonly key: string | null;
     readonly label: string;
+    /** 레인의 상태별 고유 업무 수(DONE 자르기 전). */
+    readonly counts?: Readonly<Record<TaskStatus, number>>;
     readonly columns: Readonly<Record<TaskStatus, readonly TaskCard[]>>;
   }[];
   readonly counts: Readonly<Record<TaskStatus, number>>;
@@ -83,6 +98,8 @@ export type CreateTask = {
   readonly priority: TaskPriority;
   readonly status: TaskStatus;
   readonly deadline?: string;
+  readonly planningBucketId?: string;
+  readonly reviewerIds?: readonly string[];
 };
 export type DeadlineUpdate =
   | { readonly deadline?: string; readonly clearDeadline?: false }
@@ -94,6 +111,10 @@ export type UpdateTask = DeadlineUpdate & {
   readonly priority?: TaskPriority;
   readonly partId?: string;
   readonly assigneeIds?: readonly string[];
+  /** 빈 문자열은 버킷 해제. */
+  readonly planningBucketId?: string;
+  /** 배열은 전체 교체, `[]`는 모두 해제. */
+  readonly reviewerIds?: readonly string[];
   readonly blocked?: boolean;
   readonly blockedReason?: string;
 };
@@ -101,4 +122,6 @@ export type MoveTask = {
   readonly status: TaskStatus;
   readonly prevId: string | null;
   readonly nextId: string | null;
+  /** 버킷 레인 사이 이동. 빈 문자열은 "버킷 없음" 레인. */
+  readonly planningBucketId?: string;
 };

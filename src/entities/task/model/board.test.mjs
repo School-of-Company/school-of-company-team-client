@@ -6,6 +6,8 @@ import {
   sortTaskCards,
   taskMoveAt,
   boardTotal,
+  laneDrop,
+  laneTotal,
 } from "./board.ts";
 
 test("filter edits retain other axes and route context, deduplicate OR choices, and reset pagination", () => {
@@ -94,5 +96,54 @@ test("total uses unique server counts rather than duplicate or truncated lane ca
       counts: { BACKLOG: 2, PLANNED: 0, IN_PROGRESS: 1, REVIEW: 0, DONE: 70 },
     }),
     73,
+  );
+});
+
+test("lane drops change the bucket only between bucket lanes and never into archived buckets", () => {
+  const base = { archivedBuckets: ["B9"] };
+  assert.deepEqual(
+    laneDrop({ ...base, groupBy: "bucket", fromKey: "B1", toKey: "B1" }),
+    { allowed: true },
+  );
+  assert.deepEqual(
+    laneDrop({ ...base, groupBy: "bucket", fromKey: "B1", toKey: "B2" }),
+    { allowed: true, planningBucketId: "B2" },
+  );
+  assert.deepEqual(
+    laneDrop({ ...base, groupBy: "bucket", fromKey: "B1", toKey: null }),
+    { allowed: true, planningBucketId: "" },
+  );
+  assert.deepEqual(
+    laneDrop({ ...base, groupBy: "bucket", fromKey: null, toKey: "B9" }),
+    { allowed: false },
+  );
+  for (const groupBy of ["owner", "reviewer", "part"])
+    assert.deepEqual(
+      laneDrop({ ...base, groupBy, fromKey: "U1", toKey: "U2" }),
+      { allowed: false },
+    );
+  assert.deepEqual(
+    laneDrop({ ...base, groupBy: "owner", fromKey: "U1", toKey: "U1" }),
+    { allowed: true },
+  );
+});
+
+test("lane totals prefer server counts over truncated columns", () => {
+  const columns = {
+    BACKLOG: [{}],
+    PLANNED: [],
+    IN_PROGRESS: [],
+    REVIEW: [],
+    DONE: [{}, {}],
+  };
+  assert.equal(laneTotal({ key: null, label: "", columns }), 3);
+  assert.equal(
+    laneTotal({
+      key: null,
+      label: "",
+      columns,
+      counts: { BACKLOG: 1, PLANNED: 0, IN_PROGRESS: 0, REVIEW: 0, DONE: 73 },
+    }),
+    74,
   );
 });

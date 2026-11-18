@@ -47,6 +47,11 @@ export type BoardFilterProps = {
   readonly projects: readonly Project[];
   readonly people: readonly { readonly id: string; readonly name: string }[];
   readonly parts: readonly { readonly id: string; readonly name: string }[];
+  readonly buckets: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly archived: boolean;
+  }[];
   readonly personal: boolean;
   readonly repositories: readonly {
     readonly id: string;
@@ -77,7 +82,10 @@ export function BoardWorkspace({
   const search = useSearchParams()?.toString() ?? "";
   const params = new URLSearchParams(search);
   const queryClient = useQueryClient();
-  const [creating, setCreating] = useState<TaskStatus | null>(null);
+  const [creating, setCreating] = useState<{
+    readonly status: TaskStatus;
+    readonly bucketId?: string;
+  } | null>(null);
   const selectionTrigger = useRef<HTMLElement | null>(null);
   const selectedTask = params.get("task");
   useEffect(() => {
@@ -102,6 +110,10 @@ export function BoardWorkspace({
     enabled: !!projectId,
   });
   const projects = useQuery(projectQueries.list());
+  const buckets = useQuery({
+    ...projectQueries.buckets(projectId ?? ""),
+    enabled: !!projectId,
+  });
   const repositories = useQuery({
     ...taskGithubQueries.repositories(projectId ?? ""),
     enabled: !!projectId,
@@ -115,6 +127,9 @@ export function BoardWorkspace({
   boardParams.delete("column");
   if (scope !== "PERSONAL") boardParams.set("scope", scope);
   if (project.data) boardParams.set("project", project.data.key);
+  // 버킷 그룹은 프로젝트 보드 전용(계약 S-a). 공유 링크로 들어와도 400 대신 그룹 없이 보인다.
+  if (scope !== "PROJECT" && boardParams.get("groupBy") === "bucket")
+    boardParams.delete("groupBy");
   const board = useQuery({
     ...taskQueries.board(boardParams.toString(), scope === "PERSONAL"),
     enabled: !projectId || !!project.data,
@@ -125,6 +140,14 @@ export function BoardWorkspace({
       : params.get("sort") === "priority"
         ? "priority"
         : "manual";
+  const groupValue = params.get("groupBy");
+  const groupBy =
+    groupValue === "owner" ||
+    groupValue === "part" ||
+    groupValue === "reviewer" ||
+    (groupValue === "bucket" && scope === "PROJECT")
+      ? groupValue
+      : null;
   const access =
     project.data && user ? projectAccess(project.data, user) : undefined;
   const canCreate = !!user && (scope !== "PROJECT" || !!access?.editable);
@@ -156,7 +179,11 @@ export function BoardWorkspace({
       setMessage("업무를 이동했습니다.");
       await queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
-    onError: (cause) => setMessage(normalizeApiError(cause).message),
+    onError: async (cause) => {
+      setMessage(normalizeApiError(cause).message);
+      // 이웃·버킷이 그 사이 바뀌었을 수 있으니 최신 보드로 맞춘다.
+      await queryClient.invalidateQueries({ queryKey: taskKeys.all });
+    },
   });
   function change(next: string) {
     router.replace(`${pathname}${next ? `?${next}` : ""}`, { scroll: false });
@@ -196,7 +223,7 @@ export function BoardWorkspace({
         canCreate={canCreate}
         editable={!!access?.editable}
         signedIn={!!user}
-        onCreate={() => setCreating("BACKLOG")}
+        onCreate={() => setCreating({ status: "BACKLOG" })}
         onImport={(id) => router.push("/tasks/" + encodeURIComponent(id))}
       />
       {project.data && renderProjectNav?.(project.data)}
@@ -214,10 +241,24 @@ export function BoardWorkspace({
                 .map((part) => [part.id, part]),
             ).values(),
           ],
+          buckets: buckets.data ?? [
+            ...new Map(
+              cards
+                .flatMap((card) =>
+                  card.planningBucket ? [card.planningBucket] : [],
+                )
+                .map((bucket) => [bucket.id, bucket]),
+            ).values(),
+          ],
           personal: scope === "PERSONAL",
           repositories: repositories.data ?? [],
         })}
-        <BoardViewControls search={search} sort={sort} onChange={change} />
+        <BoardViewControls
+          search={search}
+          sort={sort}
+          scope={scope}
+          onChange={change}
+        />
       </div>
       {message && (
         <p role="status" aria-live="polite" className="text-sm">
@@ -232,6 +273,13 @@ export function BoardWorkspace({
         <KanbanBoard
           board={board.data}
           sort={sort}
+          groupBy={groupBy}
+          laneScope={pathname ?? ""}
+          archivedBuckets={
+            buckets.data
+              ?.filter((bucket) => bucket.archived)
+              .map((bucket) => bucket.id) ?? []
+          }
           visibleStatus={
             taskStatuses.find((status) => status === params.get("column")) ??
             "BACKLOG"
@@ -272,13 +320,25 @@ export function BoardWorkspace({
             );
             change(next.toString());
           }}
-          onCreate={canCreate ? setCreating : undefined}
+          onCreate={
+            canCreate
+              ? (status, laneKey) =>
+                  setCreating({
+                    status,
+                    ...(groupBy === "bucket" && laneKey
+                      ? { bucketId: laneKey }
+                      : {}),
+                  })
+              : undefined
+          }
         />
       )}
       {creating && (
         <BoardCreateDialog
           scope={scope}
-          initialStatus={creating}
+          initialStatus={creating.status}
+          initialBucketId={creating.bucketId}
+          buckets={buckets.data ?? []}
           project={project.data}
           people={people}
           onClose={() => setCreating(null)}
