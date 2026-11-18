@@ -35,3 +35,11 @@ function subscribe(listener: () => void) {
 export function useAccessToken() {
   return useSyncExternalStore(subscribe, getAccessToken, () => null);
 }
+
+export function useSessionReady() {
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+}
