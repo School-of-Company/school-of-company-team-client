@@ -60,6 +60,33 @@
  },
  {
   "scope": "app",
+  "mode": "build",
+  "depth": "full",
+  "shape": "app screen",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell; sidebar regrouped per docs/ia.md (내 일 · 조직 · 프로젝트 · 관리)",
+  "signature": "service dependency graph (SVG, no library) and deployment timeline",
+  "imagery": "none",
+  "entry": "src/app/styles/globals.css (/* Services */ block)",
+  "sections": [
+   "services list",
+   "dependency graph",
+   "service detail overview",
+   "releases + release note",
+   "deployment timeline"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "prompt": "Stage 6 F6 service catalog: ownership, dependencies, releases, deployments on real API",
+  "sweep": "sloplint --scope app: 0 FAIL, 0 WARN (fixed 19 dash in tier option, 24a deploy-marker margin, 54 section heading)",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
   "mode": "redesign",
   "depth": "polish",
   "theme": "project design.md (locked)",

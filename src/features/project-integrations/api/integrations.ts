@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { taskKeys } from "@/entities/task";
 import { api, normalizeApiError } from "@/shared/api";
+import { refetchOnVisit } from "@/shared/lib";
 import { isImportActive, type RepositoryImport } from "../model/import-status";
 
 const IMPORT_POLL_INTERVAL = 3000;
@@ -11,6 +12,7 @@ export type InstallableRepository = {
   readonly fullName: string;
   readonly private: boolean;
   readonly archived: boolean;
+  readonly accessible?: boolean;
 };
 
 export type ProjectRepository = {
@@ -19,6 +21,8 @@ export type ProjectRepository = {
   readonly fullName: string;
   readonly private: boolean;
   readonly isDefault: boolean;
+  /** 서버가 비공개 저장소 이름을 숨길 때 false. */
+  readonly accessible?: boolean;
   readonly import: RepositoryImport | null;
 };
 
@@ -48,6 +52,8 @@ export function useProjectRepositories(projectId: string, enabled: boolean) {
           `/api/v1/projects/${projectId}/github/repositories`,
         )
       ).data,
+    // 비공개로 바뀐 저장소 이름이 남지 않게 들어올 때·포커스 때마다 다시 받는다.
+    ...refetchOnVisit,
     enabled,
   });
 }
@@ -64,6 +70,7 @@ export function useInstallableRepositories(
           `/api/v1/projects/${projectId}/github/installable-repositories`,
         )
       ).data,
+    ...refetchOnVisit,
     enabled,
   });
 }
