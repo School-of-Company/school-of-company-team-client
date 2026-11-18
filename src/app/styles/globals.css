@@ -1214,3 +1214,47 @@ select.ui-input {
 .task-main section .grid:not([class*="grid-cols"]) {
   grid-template-columns: minmax(0, 1fr);
 }
+
+/* Step indicator for multi-step forms (project creation). */
+.ui-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.ui-steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  counter-increment: step;
+}
+.ui-steps li::before {
+  content: counter(step);
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-active);
+  font-size: 11px;
+}
+.ui-steps li + li::after {
+  content: "";
+  order: -1;
+  width: 16px;
+  height: 1px;
+  background: var(--border-strong);
+}
+.ui-steps li[aria-current="step"] {
+  color: var(--foreground);
+}
+.ui-steps li[aria-current="step"]::before {
+  background: var(--foreground);
+  color: var(--background);
+}

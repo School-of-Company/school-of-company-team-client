@@ -129,12 +129,6 @@ function ProfileForm({ user }: { readonly user: User }) {
       <div className="grid gap-5">
         <dl className="grid gap-4 text-sm">
           <div>
-            <dt className="text-muted">프로필 사진</dt>
-            <dd className="mt-2">
-              <AvatarSetting user={user} />
-            </dd>
-          </div>
-          <div>
             <dt className="text-muted">이름</dt>
             <dd className="mt-1 break-words">{user.name}</dd>
           </div>
@@ -248,6 +242,7 @@ function AccountContent({ user }: { readonly user: User }) {
         <h2 id="profile-title" className="text-lg font-semibold">
           프로필
         </h2>
+        <AvatarSetting user={user} />
         <ProfileForm user={user} />
       </section>
       <section
