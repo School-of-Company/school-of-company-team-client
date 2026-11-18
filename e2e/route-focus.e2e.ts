@@ -105,3 +105,37 @@ test("뒤로가기는 이전 스크롤 위치를 지키고(본문 포커스가 �
   await expect(page.locator(main)).toBeFocused();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(before);
 });
+
+test("사이드바 서비스 링크로 이동하면 본문으로 포커스가 가고 새 화면 제목을 한 번만 알린다", async ({
+  page,
+}) => {
+  await signIn(page, seed.member.tokens);
+  await page.goto("/me");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "내 보드" }),
+  ).toBeVisible();
+  // 알림 영역에 들어간 비어 있지 않은 문구를 모두 모은다.
+  await page.evaluate((selector) => {
+    const region = document.querySelector(selector)!;
+    const seen: string[] = [];
+    (window as unknown as { announced: string[] }).announced = seen;
+    new MutationObserver(() => {
+      const text = region.textContent?.trim();
+      if (text) seen.push(text);
+    }).observe(region, { childList: true, characterData: true, subtree: true });
+  }, live);
+  const link = page.getByRole("link", { name: "서비스", exact: true }).first();
+  await link.focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/services$/);
+  await expect(page.locator(main)).toBeFocused();
+  await expect(page.locator(live)).toHaveText("서비스 화면");
+  // 1초 정착 타이머와 5초 관찰이 끝날 때까지 기다려도 다시 알리지 않는다.
+  await page.waitForTimeout(5500);
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { announced: string[] }).announced,
+    ),
+  ).toEqual(["서비스 화면"]);
+  await expect(page.locator(main)).toBeFocused();
+});
