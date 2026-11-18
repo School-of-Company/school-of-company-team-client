@@ -32,6 +32,5 @@ export {
   SignalChip,
   CiChip,
   ReviewChip,
-  MergedChip,
 } from "./ui/SignalChip";
 export type { SignalTone } from "./ui/SignalChip";

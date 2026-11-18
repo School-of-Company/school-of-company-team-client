@@ -66,10 +66,3 @@ export function ReviewChip({
   );
 }
 
-export function MergedChip() {
-  return (
-    <SignalChip tone="merged" icon="merge">
-      merge됨
-    </SignalChip>
-  );
-}

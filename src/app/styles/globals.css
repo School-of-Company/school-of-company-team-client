@@ -1469,7 +1469,7 @@ select.ui-input {
   width: 36px;
   height: 20px;
   flex: none;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-input);
   border-radius: 999px;
   background: var(--surface-active);
   appearance: none;

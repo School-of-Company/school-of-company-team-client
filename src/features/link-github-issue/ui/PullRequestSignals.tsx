@@ -1,10 +1,10 @@
-import { CiChip, MergedChip, ReviewChip, SignalChip } from "@/entities/task";
+import { CiChip, ReviewChip, SignalChip } from "@/entities/task";
 import { formatDate } from "@/shared/lib";
 import type { PullRequestSignal } from "../model/types";
 
 const time = { hour: "2-digit", minute: "2-digit" } as const;
 
-/** PR 행 아래 한 줄: draft·CI·리뷰·merge. 신호가 없으면 이유를 짧게 알린다. */
+/** PR 행 아래 한 줄: draft·CI·리뷰(merge는 행의 상태 표시가 맡는다). 신호가 없으면 이유를 짧게 알린다. */
 export function PullRequestSignals({
   signal,
   merged,
@@ -29,7 +29,6 @@ export function PullRequestSignals({
     .join(", ");
   return (
     <div className="github-link-signals" role="group" aria-label="PR 신호">
-      {merged && <MergedChip />}
       {signal.draft && (
         <SignalChip tone="muted" icon="minus">
           초안
