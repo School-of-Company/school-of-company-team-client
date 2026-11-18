@@ -2,6 +2,7 @@
 
 import { useId, useState, type FormEvent } from "react";
 import {
+  priorityLabels,
   statusLabels,
   taskStatuses,
   type CreateTask,
@@ -14,14 +15,21 @@ import {
 import type { ProjectDetail } from "@/entities/project";
 import { normalizeApiError } from "@/shared/api";
 import { TaskAssignees } from "./TaskAssignees";
-import { Button, Checkbox, Field, Input, Select, Textarea } from "@/shared/ui";
+import {
+  Button,
+  Checkbox,
+  Field,
+  Input,
+  Label,
+  Markdown,
+  Select,
+  Textarea,
+} from "@/shared/ui";
 
-const priorityOptions = [
-  { value: "P0", label: "긴급" },
-  { value: "P1", label: "높음" },
-  { value: "P2", label: "보통" },
-  { value: "P3", label: "낮음" },
-] as const;
+const priorityOptions = (["P0", "P1", "P2", "P3"] as const).map((value) => ({
+  value,
+  label: priorityLabels[value],
+}));
 
 type Props = {
   readonly scope: TaskScope;
@@ -56,6 +64,10 @@ export function TaskEditor({
   );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [descriptionMode, setDescriptionMode] = useState<"write" | "preview">(
+    "write",
+  );
   const [assignees, setAssignees] = useState<readonly string[]>(
     initial?.assignees.map((user) => user.id) ?? [],
   );
@@ -134,13 +146,44 @@ export function TaskEditor({
           autoFocus
         />
       </Field>
-      <Field id={`${prefix}-description`} label="설명">
+      <div className="grid gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor={`${prefix}-description`}>설명</Label>
+          <div className="ui-segmented" role="group" aria-label="설명 보기">
+            {(["write", "preview"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                className="ui-segmented-option"
+                aria-pressed={descriptionMode === mode}
+                onClick={() => setDescriptionMode(mode)}
+              >
+                {mode === "write" ? "작성" : "미리보기"}
+              </button>
+            ))}
+          </div>
+        </div>
         <Textarea
           id={`${prefix}-description`}
           name="description"
-          defaultValue={initial?.description ?? ""}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          hidden={descriptionMode === "preview"}
+          aria-describedby={`${prefix}-description-hint`}
         />
-      </Field>
+        {descriptionMode === "preview" && (
+          <div className="min-h-28 rounded-md border border-border p-3">
+            {description.trim() ? (
+              <Markdown>{description}</Markdown>
+            ) : (
+              <p className="text-sm text-muted">미리 볼 내용이 없습니다.</p>
+            )}
+          </div>
+        )}
+        <p id={`${prefix}-description-hint`} className="text-xs text-muted">
+          마크다운을 지원합니다. (## 제목, - 목록, `코드`, [링크](url))
+        </p>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field id={`${prefix}-type`} label="업무 타입">
           <Select

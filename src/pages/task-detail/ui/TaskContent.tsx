@@ -1,11 +1,12 @@
 import {
+  priorityLabels,
   statusLabels,
   taskStatuses,
   type TaskDetail,
   type TaskStatus,
 } from "@/entities/task";
 import { formatDate } from "@/shared/lib";
-import { Badge, Select } from "@/shared/ui";
+import { Badge, Markdown, Select } from "@/shared/ui";
 
 export function TaskContent({
   task,
@@ -22,7 +23,7 @@ export function TaskContent({
     <section className="grid gap-5 border-t border-border pt-5">
       <div className="flex flex-wrap gap-2">
         <Badge>{task.type === "DEV" ? "개발 업무" : "일반 업무"}</Badge>
-        <Badge>{task.priority}</Badge>
+        <Badge>우선순위 {priorityLabels[task.priority]}</Badge>
         <Badge>{statusLabels[task.status]}</Badge>
         {task.blocked && <Badge>막힘</Badge>}
       </div>
@@ -81,9 +82,11 @@ export function TaskContent({
       )}
       <div>
         <h2 className="mb-3 text-lg font-semibold">설명</h2>
-        <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
-          {task.description || "설명이 없습니다."}
-        </p>
+        {task.description ? (
+          <Markdown>{task.description}</Markdown>
+        ) : (
+          <p className="text-sm text-muted">설명이 없습니다.</p>
+        )}
       </div>
     </section>
   );
