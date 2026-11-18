@@ -1370,6 +1370,9 @@ select.ui-input {
   color: var(--foreground-2);
   overflow-wrap: anywhere;
 }
+.task-props dl > div:has(.task-reviewers) {
+  align-items: start;
+}
 .task-reviewers {
   display: grid;
   gap: var(--space-1);
