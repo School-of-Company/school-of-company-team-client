@@ -8,7 +8,7 @@ import {
   type BoardFilterKey,
 } from "@/entities/task";
 import type { Project } from "@/entities/project";
-import { Button, Checkbox, Select } from "@/shared/ui";
+import { Badge, Button, Checkbox, Select } from "@/shared/ui";
 
 export function TaskFilters({
   search,
@@ -84,10 +84,43 @@ export function TaskFilters({
     },
   ];
   return (
-    <details className="rounded-md border border-border bg-surface p-4">
-      <summary className="min-h-6 cursor-pointer text-sm font-semibold">
-        필터 · 같은 항목은 OR, 다른 항목은 AND
+    <details className="min-w-0 border-y border-border bg-surface px-3 py-1">
+      <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">
+        <span className="ml-2 inline-flex max-w-full flex-wrap items-center gap-2 align-middle">
+          필터
+          {axes
+            .filter((axis) => selected(axis.key).length > 0)
+            .map((axis) => (
+              <Badge key={axis.key}>
+                {axis.label} {selected(axis.key).length}
+              </Badge>
+            ))}
+          {params.get("dueWithin") && (
+            <Badge>
+              마감{" "}
+              {params.get("dueWithin") === "0"
+                ? "오늘까지"
+                : `${params.get("dueWithin")}일 이내`}
+            </Badge>
+          )}
+          {params.get("blocked") && (
+            <Badge>
+              {params.get("blocked") === "true"
+                ? "막힌 업무"
+                : "막히지 않은 업무"}
+            </Badge>
+          )}
+          {selected("source").includes("PERSONAL") && (
+            <Badge>개인 업무만</Badge>
+          )}
+          {!boardFilterKeys.some((key) => params.has(key)) && (
+            <span className="font-normal text-muted">전체 업무</span>
+          )}
+        </span>
       </summary>
+      <p className="mt-3 text-sm text-muted">
+        같은 항목은 OR, 다른 항목은 AND로 적용합니다.
+      </p>
       <Button
         variant="ghost"
         className="mt-3"

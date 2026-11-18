@@ -10,8 +10,9 @@ import {
   type BoardSort,
   type MoveTask,
   type TaskCard,
+  type TaskStatus,
 } from "@/entities/task";
-import { Button } from "@/shared/ui";
+import { Button, EmptyState, Select } from "@/shared/ui";
 import { BoardCard } from "./BoardCard";
 
 export function KanbanBoard({
@@ -22,6 +23,9 @@ export function KanbanBoard({
   onMove,
   onMore,
   onCreate,
+  onSelect,
+  visibleStatus,
+  onVisibleStatus,
 }: {
   readonly board: Board;
   readonly sort: BoardSort;
@@ -29,17 +33,50 @@ export function KanbanBoard({
   readonly pending: boolean;
   readonly onMove: (id: string, move: MoveTask) => void;
   readonly onMore: () => void;
-  readonly onCreate?: () => void;
+  readonly onCreate?: (status: TaskStatus) => void;
+  readonly onSelect?: (id: string) => void;
+  readonly visibleStatus: TaskStatus;
+  readonly onVisibleStatus: (status: TaskStatus) => void;
 }) {
   const [dragged, setDragged] = useState<TaskCard | null>(null);
+  if (board.groups.length === 0)
+    return (
+      <EmptyState
+        title="업무가 없습니다"
+        description="필터를 조정하거나 새 업무를 추가해 주세요."
+        action={
+          onCreate && (
+            <Button onClick={() => onCreate("BACKLOG")}>업무 추가</Button>
+          )
+        }
+      />
+    );
   return (
     <div className="grid gap-8">
+      <label className="grid gap-2 text-sm md:hidden">
+        표시할 상태
+        <Select
+          value={visibleStatus}
+          onChange={(event) => {
+            const next = taskStatuses.find(
+              (status) => status === event.target.value,
+            );
+            if (next) onVisibleStatus(next);
+          }}
+        >
+          {taskStatuses.map((status) => (
+            <option key={status} value={status}>
+              {statusLabels[status]}
+            </option>
+          ))}
+        </Select>
+      </label>
       {board.groups.map((group, lane) => (
         <section key={`${group.key ?? "none"}-${lane}`} className="min-w-0">
           {group.label && (
             <h2 className="mb-4 text-lg font-semibold">{group.label}</h2>
           )}
-          <div className="grid min-w-0 gap-4 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="grid min-w-0 gap-3 md:grid-cols-3 xl:grid-cols-5">
             {taskStatuses.map((status) => {
               const cards = sortTaskCards(group.columns[status] ?? [], sort);
               const Heading = group.label ? "h3" : "h2";
@@ -61,7 +98,7 @@ export function KanbanBoard({
                 <section
                   key={status}
                   aria-label={`${group.label} ${statusLabels[status]}`}
-                  className="min-w-0 rounded-md bg-surface-hover p-3"
+                  className={`${status === visibleStatus ? "block" : "hidden md:block"} min-w-0 border-t border-border bg-surface-hover p-2`}
                   onDragOver={(event) => {
                     if (dragged && sort === "manual") event.preventDefault();
                   }}
@@ -72,7 +109,9 @@ export function KanbanBoard({
                 >
                   <Heading className="mb-4 flex flex-wrap justify-between gap-2 text-sm font-semibold">
                     <span>{statusLabels[status]}</span>
-                    <span>{cards.length}개 표시</span>
+                    <span className="font-normal text-muted">
+                      {cards.length}
+                    </span>
                   </Heading>
                   <div className="grid gap-3">
                     {cards.map((task) => (
@@ -102,6 +141,7 @@ export function KanbanBoard({
                           editable={editable(task)}
                           manual={sort === "manual"}
                           pending={pending}
+                          onSelect={onSelect}
                           onMove={(target) =>
                             onMove(task.id, {
                               status: target,
@@ -151,9 +191,9 @@ export function KanbanBoard({
                     <Button
                       variant="ghost"
                       className="mt-3 w-full"
-                      onClick={onCreate}
+                      onClick={() => onCreate(status)}
                     >
-                      업무 등록
+                      업무 추가
                     </Button>
                   )}
                   {status === "DONE" && cards.length > 0 && (
