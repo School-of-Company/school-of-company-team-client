@@ -53,6 +53,10 @@ export function userDestination(
     case "SUSPENDED":
       return "/pending";
     case "ACTIVE":
-      return user.discordLinked ? "/me" : "/connect-discord";
+      // 서버 AccessGate 와 같은 규칙: GitHub 미연결 비밀번호 계정(legacy 모드 전용)은 Discord 연결 없이 WORK 다.
+      // 운영 OAuth 모드에서는 서버가 이런 계정의 토큰을 거부하므로 여기까지 오지 않는다.
+      return user.discordLinked || user.githubId === null
+        ? "/me"
+        : "/connect-discord";
   }
 }

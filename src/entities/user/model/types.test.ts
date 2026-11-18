@@ -35,3 +35,16 @@ test("approved and linked users enter their board while only LEAD sees administr
   assert.equal(isHeadAdmin(user), true);
   assert.equal(isHeadAdmin({ ...user, role: "MEMBER" }), false);
 });
+
+test("a legacy password account (no GitHub) enters work without Discord, as the server's AccessGate allows", () => {
+  const legacy = {
+    ...user,
+    githubId: null,
+    githubLogin: null,
+    discordLinked: false,
+    discordUsername: null,
+  };
+  assert.equal(userDestination(legacy), "/me");
+  for (const status of ["PENDING", "REJECTED", "SUSPENDED"] as const)
+    assert.equal(userDestination({ ...legacy, status }), "/pending");
+});

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { projectQueries } from "@/entities/project";
-import { useMe } from "@/entities/user";
+import { useMe, userDestination } from "@/entities/user";
 import { routes } from "@/shared/config";
 import {
   BrandMark,
@@ -35,7 +35,7 @@ export function AppShell({
   const me = useMe();
   const projects = useQuery({
     ...projectQueries.list(),
-    enabled: me.data?.status === "ACTIVE" && me.data.discordLinked,
+    enabled: me.data !== undefined && userDestination(me.data) === "/me",
   });
   const activeProjects =
     projects.data?.filter((project) => !project.archived) ?? [];
