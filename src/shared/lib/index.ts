@@ -49,3 +49,6 @@ export {
   type Theme,
   type ThemePreference,
 } from "./theme";
+
+export { keepsLastData, useLastData, LAST_DATA_LIMIT } from "./last-data";
+export { keepPreviousKey } from "./query";

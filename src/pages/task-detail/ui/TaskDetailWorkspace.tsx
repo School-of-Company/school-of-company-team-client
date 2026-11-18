@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { taskApi, taskKeys, taskQueries, TaskError } from "@/entities/task";
+import {
+  forgetTask,
+  taskApi,
+  taskKeys,
+  taskQueries,
+  TaskError,
+} from "@/entities/task";
 import { projectAccess, projectQueries } from "@/entities/project";
 import { TaskEditor } from "@/features/edit-task";
 import { activeUsersQueryOptions } from "@/entities/user";
@@ -70,12 +76,14 @@ export function TaskDetailWorkspace({
     (projectProblem.status === 403 || projectProblem.status === 404)
       ? project.error
       : null);
+  // 업무 하나에 한 번만 정리한다. 정리가 다시 받게 한 쿼리가 또 404를 내도 되풀이하지 않는다.
+  const forgotten = useRef(false);
   useEffect(() => {
-    if (!taskError) return;
+    if (!taskError || forgotten.current) return;
     const problem = normalizeApiError(taskError);
     if (problem.status === 403 || problem.status === 404) {
-      client.removeQueries({ queryKey: taskKeys.all });
-      void client.invalidateQueries({ queryKey: ["projects"] });
+      forgotten.current = true;
+      forgetTask(client);
     }
   }, [taskError, client]);
   const changeStatus = useMutation({
