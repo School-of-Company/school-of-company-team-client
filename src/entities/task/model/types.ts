@@ -1,3 +1,5 @@
+import type { DevSignal } from "./dev-signal";
+
 export const taskStatuses = [
   "BACKLOG",
   "PLANNED",
@@ -62,6 +64,8 @@ export type TaskCard = {
     readonly url?: string;
     readonly private?: boolean;
   } | null;
+  /** 열린 PR의 CI·리뷰 요약. 신호가 없거나 서버가 아직 보내지 않으면 null/없음. */
+  readonly devSignal?: DevSignal | null;
 };
 export type TaskDetail = Omit<TaskCard, "reviewers"> & {
   readonly reviewers?: readonly (TaskPerson & {

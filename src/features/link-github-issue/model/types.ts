@@ -1,3 +1,5 @@
+import type { CiStatus } from "@/entities/task";
+
 export type PublicationState =
   "WAITING" | "PENDING" | "IN_FLIGHT" | "UNCERTAIN" | "SUCCEEDED" | "FAILED";
 export type TaskGithub = {
@@ -31,7 +33,40 @@ export type TaskGithub = {
     readonly state: "OPEN" | "CLOSED" | "MERGED" | "DELETED" | null;
     readonly url: string | null;
     readonly sourceUpdatedAt: string | null;
+    /** PR 신호. 웹훅을 받은 적 없거나 Issue·권한 없음이면 null(= "신호 없음"). */
+    readonly pullRequest?: PullRequestSignal | null;
   }[];
+};
+export type PullRequestSignal = {
+  readonly draft: boolean;
+  readonly headSha: string;
+  readonly mergedAt: string | null;
+  readonly closedAt: string | null;
+  readonly ci: {
+    readonly status: CiStatus;
+    readonly url: string;
+    readonly completedAt: string | null;
+  };
+  readonly review: {
+    readonly requested: readonly {
+      readonly githubLogin: string;
+      readonly userId: string | null;
+      readonly name: string | null;
+      readonly requestedAt: string | null;
+    }[];
+    readonly approvals: number;
+    readonly approved: boolean;
+    readonly changesRequested: boolean;
+  };
+  readonly syncedAt: string;
+};
+export const linkStateLabels: Readonly<
+  Record<"OPEN" | "CLOSED" | "MERGED" | "DELETED", string>
+> = {
+  OPEN: "열림",
+  CLOSED: "닫힘",
+  MERGED: "merge됨",
+  DELETED: "삭제됨",
 };
 export type PublicationRepository = {
   readonly id: string;

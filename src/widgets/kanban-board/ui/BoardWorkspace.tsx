@@ -78,6 +78,7 @@ export function BoardWorkspace({
   renderFilters,
   Detail,
   renderProjectNav,
+  aside,
 }: {
   readonly scope: TaskScope;
   readonly projectId?: string;
@@ -85,6 +86,8 @@ export function BoardWorkspace({
   readonly renderFilters: (props: BoardFilterProps) => ReactNode;
   readonly Detail?: BoardDetailComponent;
   readonly renderProjectNav?: (project: ProjectDetail) => ReactNode;
+  /** 헤더와 툴바 사이에 두는 보조 구역(내 보드의 리뷰 요청 등). */
+  readonly aside?: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -249,6 +252,7 @@ export function BoardWorkspace({
         onImport={(id) => router.push("/tasks/" + encodeURIComponent(id))}
       />
       {project.data && renderProjectNav?.(project.data)}
+      {aside}
       <div className="board-toolbar flex min-w-0 flex-wrap items-start justify-between gap-3">
         {renderFilters({
           search,

@@ -229,6 +229,10 @@ export function TaskDetailWorkspace({
             task={data}
             editable={editable}
             onAccessLost={setDenied}
+            onComplete={() => {
+              if (!changeStatus.isPending) changeStatus.mutate("DONE");
+            }}
+            completing={changeStatus.isPending}
           />
           {data.scope !== "PERSONAL" && (
             <TaskDiscussion
