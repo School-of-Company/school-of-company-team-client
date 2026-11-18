@@ -1,5 +1,7 @@
 import type { Board, MoveTask, TaskCard, TaskStatus } from "./types";
 
+type BoardGroup = Board["groups"][number];
+
 export const boardFilterKeys = [
   "project",
   "owner",
@@ -12,6 +14,9 @@ export const boardFilterKeys = [
   "groupBy",
   "source",
   "repository",
+  "bucket",
+  "reviewer",
+  "relation",
 ] as const;
 export type BoardFilterKey = (typeof boardFilterKeys)[number];
 export type BoardSort = "manual" | "priority" | "deadline";
@@ -107,4 +112,36 @@ export function taskMoveAt(input: {
     prevId: cards[index - 1]?.id ?? null,
     nextId: cards[index]?.id ?? null,
   };
+}
+
+/** 레인 헤더 개수: 서버 `counts`(고유 업무, DONE 자르기 전)가 있으면 그것을 쓴다. */
+export function laneTotal(group: BoardGroup) {
+  const counts = group.counts ?? group.columns;
+  return Object.values(counts).reduce<number>(
+    (total, value) =>
+      total + (typeof value === "number" ? value : value.length),
+    0,
+  );
+}
+
+/**
+ * 레인 사이 드롭 규칙. 버킷 레인 사이만 이동(= 버킷 변경)하고,
+ * 담당자·리뷰어·파트 레인 사이는 복수 담당 의미가 모호해 막는다(계약 S-b).
+ */
+export function laneDrop(input: {
+  readonly groupBy: string | null;
+  readonly fromKey: string | null;
+  readonly toKey: string | null;
+  readonly archivedBuckets: readonly string[];
+}):
+  | { readonly allowed: false }
+  | {
+      readonly allowed: true;
+      readonly planningBucketId?: string;
+    } {
+  if (input.fromKey === input.toKey) return { allowed: true };
+  if (input.groupBy !== "bucket") return { allowed: false };
+  if (input.toKey !== null && input.archivedBuckets.includes(input.toKey))
+    return { allowed: false };
+  return { allowed: true, planningBucketId: input.toKey ?? "" };
 }

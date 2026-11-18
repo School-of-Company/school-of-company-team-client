@@ -22,6 +22,14 @@ export type ProjectDetail = Project & {
   }[];
 };
 
+export type PlanningBucket = {
+  readonly id: string;
+  readonly name: string;
+  readonly position: number;
+  readonly archived: boolean;
+  readonly createdAt: string;
+};
+
 export function projectAccess(
   project: ProjectDetail,
   user: { readonly id: string; readonly role: string },
