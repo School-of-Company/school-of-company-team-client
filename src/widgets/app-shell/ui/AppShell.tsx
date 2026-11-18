@@ -92,6 +92,8 @@ export function AppShell({
   ];
   const orgLinks: readonly NavLink[] = [
     { href: routes.services, label: "서비스", icon: "service" },
+    { href: routes.incidents, label: "사고", icon: "alert" },
+    { href: routes.docs, label: "문서", icon: "doc" },
   ];
   const accountLinks: readonly NavLink[] = [
     ...(isHeadAdmin
