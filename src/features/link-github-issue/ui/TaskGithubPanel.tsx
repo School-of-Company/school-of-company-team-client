@@ -101,6 +101,17 @@ export function TaskGithubPanel({
           </Badge>
         )}
       </div>
+      {github.data.source && (
+        <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
+          {github.data.source.private && <Badge>비공개 원본</Badge>}
+          <span>
+            {github.data.source.repositoryFullName}#{github.data.source.number}
+            에서 가져온 업무
+            {github.data.source.private &&
+              " · 원본 저장소 권한이 있는 참여자에게만 보여요"}
+          </span>
+        </p>
+      )}
       {publication && (
         <div className="grid gap-1 text-sm empty:hidden">
           {publication.publiclyVisible && publication.state !== "SUCCEEDED" && (

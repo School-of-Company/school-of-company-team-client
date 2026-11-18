@@ -101,6 +101,7 @@ export function SettingsPanels(props: SettingsProps) {
                 </h2>
                 <RepositorySettings
                   projectId={props.project.id}
+                  projectKey={props.project.key}
                   disabled={!permissions.manage}
                 />
               </section>

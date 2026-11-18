@@ -1,6 +1,10 @@
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  queryOptions,
+  type QueryKey,
+} from "@tanstack/react-query";
 import { boardRequestParams } from "../model/board";
 import type {
   Board,
@@ -13,6 +17,16 @@ import type {
 export const taskKeys = {
   all: ["tasks"] as const,
   detail: (id: string) => ["tasks", "detail", id] as const,
+  // 해당 프로젝트로 필터된 보드 쿼리만 고른다(전체 invalidate 회피).
+  isProjectBoard: (key: QueryKey, projectKey: string) =>
+    key[0] === "tasks" &&
+    key[1] === "board" &&
+    typeof key[3] === "string" &&
+    (new URLSearchParams(key[3])
+      .get("project")
+      ?.split(",")
+      .includes(projectKey) ??
+      false),
 };
 export const taskApi = {
   board: async (params: URLSearchParams, personal: boolean) =>
