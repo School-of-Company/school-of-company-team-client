@@ -175,7 +175,7 @@ test("참여하지 않은 사용자는 비공개 프로젝트와 관리자 화�
   ).toHaveCount(0);
   await expect(
     page
-      .getByRole("navigation", { name: "주 메뉴" })
+      .getByRole("navigation", { name: "관리" })
       .getByRole("link", { name: "관리자" }),
   ).toHaveCount(0);
 

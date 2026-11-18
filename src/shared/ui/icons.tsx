@@ -24,6 +24,7 @@ const paths = {
     "M6 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4 M6 7v14 M18 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4 M6 9a9 9 0 0 0 10 7",
   clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 7v5l3 2",
   minus: "M5 12h14",
+  service: "M12 3 3 7.5l9 4.5 9-4.5z M3 12l9 4.5 9-4.5 M3 16.5 12 21l9-4.5",
 } as const;
 
 export type IconName = keyof typeof paths;

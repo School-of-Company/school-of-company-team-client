@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useProjectArchive } from "../api/archive";
@@ -30,6 +30,8 @@ export function SettingsPanels(props: SettingsProps) {
       ? selected
       : "general";
   const [confirmArchive, setConfirmArchive] = useState(false);
+  // 인라인 확인의 '취소'는 누르면 사라진다. 포커스를 확인을 연 버튼(같은 버튼)으로 돌린다.
+  const archiveButton = useRef<HTMLButtonElement>(null);
   const permissions = getSettingsPermissions(props.user, props.project);
   const archive = useProjectArchive(props.project.id, props.onSaved);
   const manager =
@@ -146,9 +148,7 @@ export function SettingsPanels(props: SettingsProps) {
           <NotificationSettingsForm
             projectId={props.project.id}
             editable={permissions.manage}
-            channelHref={
-              manager ? `${pathname}?tab=integrations` : undefined
-            }
+            channelHref={manager ? `${pathname}?tab=integrations` : undefined}
           />
         </section>
       )}
@@ -172,6 +172,7 @@ export function SettingsPanels(props: SettingsProps) {
           )}
           <div className="flex flex-wrap gap-2">
             <Button
+              ref={archiveButton}
               variant={
                 confirmArchive && !props.project.archived
                   ? "danger"
@@ -198,7 +199,10 @@ export function SettingsPanels(props: SettingsProps) {
               <Button
                 variant="ghost"
                 disabled={archive.isPending}
-                onClick={() => setConfirmArchive(false)}
+                onClick={() => {
+                  setConfirmArchive(false);
+                  archiveButton.current?.focus();
+                }}
               >
                 취소
               </Button>
