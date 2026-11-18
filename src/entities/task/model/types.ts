@@ -69,6 +69,17 @@ export type TaskDetail = Omit<TaskCard, "reviewers"> & {
     readonly assignedAt?: string;
   })[];
   readonly description: string | null;
+  /** 단계 4: 열린 Sprint 소속(없으면 null). 서버가 아직 보내지 않으면 없을 수 있다. */
+  readonly sprint?: {
+    readonly id: string;
+    readonly name: string;
+    readonly status: "PLANNED" | "ACTIVE" | "CLOSED";
+  } | null;
+  readonly milestone?: {
+    readonly id: string;
+    readonly name: string;
+    readonly dueDate: string | null;
+  } | null;
   readonly createdBy: string;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -96,6 +107,7 @@ export type CreateTask = {
   readonly deadline?: string;
   readonly planningBucketId?: string;
   readonly reviewerIds?: readonly string[];
+  readonly milestoneId?: string;
 };
 export type DeadlineUpdate =
   | { readonly deadline?: string; readonly clearDeadline?: false }
@@ -111,6 +123,8 @@ export type UpdateTask = DeadlineUpdate & {
   readonly planningBucketId?: string;
   /** 배열은 전체 교체, `[]`는 모두 해제. */
   readonly reviewerIds?: readonly string[];
+  /** 빈 문자열은 Milestone 해제. */
+  readonly milestoneId?: string;
   readonly blocked?: boolean;
   readonly blockedReason?: string;
 };

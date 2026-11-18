@@ -8,6 +8,12 @@ export const routes = {
   project: (projectId: string) => `/projects/${encodeURIComponent(projectId)}`,
   projectSettings: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/settings`,
+  projectSprints: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/sprints`,
+  projectSprint: (projectId: string, sprintId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
+  projectMilestones: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/milestones`,
   task: (taskId: string) => `/tasks/${encodeURIComponent(taskId)}`,
   admin: "/admin",
   account: "/account",
