@@ -42,7 +42,7 @@ export function ImportIssue({
   }
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>
+      <Button variant="ghost" onClick={() => setOpen(true)}>
         Issue 가져오기
       </Button>
       <Dialog

@@ -12,7 +12,7 @@ import {
   type TaskCard,
   type TaskStatus,
 } from "@/entities/task";
-import { Button, EmptyState, Select } from "@/shared/ui";
+import { Button, EmptyState, Select, Icon, IconButton } from "@/shared/ui";
 import { BoardCard } from "./BoardCard";
 
 export function KanbanBoard({
@@ -76,7 +76,7 @@ export function KanbanBoard({
           {group.label && (
             <h2 className="mb-4 text-lg font-semibold">{group.label}</h2>
           )}
-          <div className="grid min-w-0 gap-3 md:grid-cols-3 xl:grid-cols-5">
+          <div className="board-columns grid min-w-0 gap-3 md:grid-cols-3 xl:grid-cols-5">
             {taskStatuses.map((status) => {
               const cards = sortTaskCards(group.columns[status] ?? [], sort);
               const Heading = group.label ? "h3" : "h2";
@@ -98,7 +98,7 @@ export function KanbanBoard({
                 <section
                   key={status}
                   aria-label={`${group.label} ${statusLabels[status]}`}
-                  className={`${status === visibleStatus ? "block" : "hidden md:block"} min-w-0 border-t border-border bg-surface-hover p-2`}
+                  className={`board-column ${status === visibleStatus ? "block" : "hidden md:block"} min-w-0`}
                   onDragOver={(event) => {
                     if (dragged && sort === "manual") event.preventDefault();
                   }}
@@ -107,12 +107,23 @@ export function KanbanBoard({
                     drop(null);
                   }}
                 >
-                  <Heading className="mb-4 flex flex-wrap justify-between gap-2 text-sm font-semibold">
-                    <span>{statusLabels[status]}</span>
-                    <span className="font-normal text-muted">
-                      {cards.length}
-                    </span>
-                  </Heading>
+                  <div className="board-column-header">
+                    <Heading className="flex min-w-0 items-center gap-2 text-sm font-medium">
+                      <span>{statusLabels[status]}</span>
+                      <span className="font-normal text-muted tabular-nums">
+                        {cards.length}
+                      </span>
+                    </Heading>
+                    {onCreate && (
+                      <IconButton
+                        variant="ghost"
+                        aria-label={`${statusLabels[status]} 업무 추가`}
+                        onClick={() => onCreate(status)}
+                      >
+                        <Icon name="plus" />
+                      </IconButton>
+                    )}
+                  </div>
                   <div className="grid gap-3">
                     {cards.map((task) => (
                       <div
@@ -186,15 +197,6 @@ export function KanbanBoard({
                     <p className="py-8 text-center text-sm text-muted">
                       업무가 없습니다
                     </p>
-                  )}
-                  {onCreate && (
-                    <Button
-                      variant="ghost"
-                      className="mt-3 w-full"
-                      onClick={() => onCreate(status)}
-                    >
-                      업무 추가
-                    </Button>
                   )}
                   {status === "DONE" && cards.length > 0 && (
                     <Button

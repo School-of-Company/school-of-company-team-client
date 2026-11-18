@@ -2,14 +2,13 @@ import Link from "next/link";
 import { boardTotal, type Board, type TaskScope } from "@/entities/task";
 import type { ProjectDetail } from "@/entities/project";
 import { ImportIssue } from "@/features/link-github-issue";
-import { Button } from "@/shared/ui";
+import { Button, Icon } from "@/shared/ui";
 
 export function BoardHeader({
   scope,
   project,
   board,
   canCreate,
-  manages,
   editable,
   signedIn,
   onCreate,
@@ -19,43 +18,41 @@ export function BoardHeader({
   readonly project?: ProjectDetail;
   readonly board?: Board;
   readonly canCreate: boolean;
-  readonly manages: boolean;
   readonly editable: boolean;
   readonly signedIn: boolean;
   readonly onCreate: () => void;
   readonly onImport: (id: string) => void;
 }) {
-  const projectId = project?.id;
   return (
     <>
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className="board-header flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold break-words">
+          {project && (
+            <p className="board-breadcrumb">
+              <Link href="/projects">프로젝트</Link>
+              <span aria-hidden="true">/</span>
+              <span>{project.key}</span>
+            </p>
+          )}
+          <h1 className="text-xl font-semibold break-words">
             {project?.name ??
               (scope === "PERSONAL" ? "내 보드" : "팀 공용 보드")}
           </h1>
           {board && (
-            <p className="mt-2 text-sm text-muted">
+            <p className="mt-1 text-xs text-muted">
               고유 업무 {boardTotal(board)}개 / 완료 전체{" "}
               {board.counts.DONE ?? 0}개
             </p>
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          {projectId && manages && (
-            <Link
-              href={`/projects/${encodeURIComponent(projectId)}/settings`}
-              className="ui-button ui-button-secondary"
-            >
-              프로젝트 설정
-            </Link>
-          )}
           {canCreate && (
             <>
               {scope !== "TEAM" && (
                 <ImportIssue projectId={project?.id} onImported={onImport} />
               )}
               <Button onClick={onCreate}>
+                <Icon name="plus" className="inline-block" />{" "}
                 {scope === "PERSONAL" ? "개인 업무 등록" : "업무 등록"}
               </Button>
             </>
