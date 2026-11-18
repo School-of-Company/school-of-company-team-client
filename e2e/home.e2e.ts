@@ -1,4 +1,4 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import type { Server } from "node:http";
 import {
@@ -188,10 +188,12 @@ async function githubSignals(created: readonly { key: string }[]) {
   stub = await startGithubStub(state, stubPort);
   // 저장소 연결은 GitHub 계정이 연결된 헤드 어드민만 할 수 있다. 헤드 어드민은 실행마다 같은 사용자라 고정 ID를 쓴다.
   const admin = await apiGet<{ id: string }>("/api/v1/me", seed.admin);
-  insertOAuthRows(process.env.E2E_PG_CONTAINER!, [
+  const sql = insertOAuthRows(process.env.E2E_PG_CONTAINER!, [
     { userId: seed.member.id, githubId, login: `member-${seed.run}` },
     { userId: admin.id, githubId: 1_999_999, login: "admin-gh" },
   ]);
+  // 증거용: 넣은 SQL 그대로(비밀값 없음).
+  writeFileSync("e2e/.auth/github-seed.sql", `${sql}\n`);
   await call(
     "POST",
     `/api/v1/projects/${seed.project.id}/github/repositories`,
