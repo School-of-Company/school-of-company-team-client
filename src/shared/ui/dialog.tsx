@@ -45,14 +45,22 @@ export function Dialog({
       opener.current = null;
     }
   }, [open]);
-  // 호출부가 조건부 렌더로 열린 채 언마운트하면 위 분기를 거치지 않는다. 그때 돌려준다.
-  // (개발 모드 StrictMode 의 가짜 언마운트에서는 대화상자가 아직 모달이라 바깥 포커스가 막혀 아무 일도 없다.)
-  useEffect(
-    () => () => {
+  // 숨김·언마운트. Next.js(Cache Components)는 떠난 화면을 언마운트하지 않고 숨겨 두는데(Activity hidden),
+  // 그 화면의 대화상자가 열린 채 남으면 보이지 않는 모달이 문서 전체를 막는다(V-route-focus H1).
+  // 그래서 effect 가 정리될 때 onClose 를 부르지 않고 조용히 닫는다(호출부 상태·URL 은 그대로).
+  // 다시 보이면 위 effect 가 open 값대로 다시 연다. 열린 채 조건부 렌더로 사라질 때 포커스도 여기서 돌려준다.
+  const silent = useRef(false);
+  useEffect(() => {
+    const dialog = ref.current;
+    return () => {
+      if (dialog?.open) {
+        silent.current = true;
+        dialog.close();
+      }
       if (shown.current) restoreFocus(opener.current);
-    },
-    [],
-  );
+      shown.current = false;
+    };
+  }, []);
   useEffect(() => {
     if (!open) return;
     const overflow = document.body.style.overflowY;
@@ -91,7 +99,13 @@ export function Dialog({
         onClose();
       }}
       onClose={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target !== event.currentTarget) return;
+        // 숨김·언마운트로 조용히 닫은 것은 호출부에 알리지 않는다.
+        if (silent.current) {
+          silent.current = false;
+          return;
+        }
+        onClose();
       }}
       className={`ui-dialog ${className}`}
     >
