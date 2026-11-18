@@ -7,6 +7,7 @@ export function createQueryClient() {
     defaultOptions: {
       queries: {
         staleTime: BOARD_POLL_INTERVAL,
+        gcTime: 5 * 60_000,
         refetchOnWindowFocus: true,
         retry: (failureCount, error) => {
           if (
