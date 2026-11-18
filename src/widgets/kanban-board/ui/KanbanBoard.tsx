@@ -67,6 +67,8 @@ export function KanbanBoard({
   onSelect,
   visibleStatus,
   onVisibleStatus,
+  filtered,
+  onClearFilters,
 }: {
   readonly board: Board;
   readonly sort: BoardSort;
@@ -83,6 +85,9 @@ export function KanbanBoard({
   readonly onSelect?: (id: string) => void;
   readonly visibleStatus: TaskStatus;
   readonly onVisibleStatus: (status: TaskStatus) => void;
+  /** URL 에 보드 필터가 하나라도 걸려 있는지. 빈 보드 안내의 문구와 행동이 갈린다. */
+  readonly filtered: boolean;
+  readonly onClearFilters: () => void;
 }) {
   const [drag, setDrag] = useState<{
     readonly task: TaskCard;
@@ -109,10 +114,20 @@ export function KanbanBoard({
   const lanes = !!groupBy;
   // 업무가 하나도 없으면 빈 컬럼 다섯 개 대신 무엇을 할지 알려 준다.
   if (board.groups.length === 0 || boardTotal(board) === 0)
-    return (
+    return filtered ? (
+      <EmptyState
+        title="조건에 맞는 업무가 없습니다"
+        description="필터를 바꾸거나 초기화해 주세요."
+        action={
+          <Button variant="secondary" onClick={onClearFilters}>
+            필터 초기화
+          </Button>
+        }
+      />
+    ) : (
       <EmptyState
         title="업무가 없습니다"
-        description="필터를 조정하거나 새 업무를 추가해 주세요."
+        description={onCreate ? "첫 업무를 추가해 주세요." : undefined}
         action={
           onCreate && (
             <Button variant="secondary" onClick={() => onCreate("BACKLOG")}>

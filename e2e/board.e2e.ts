@@ -295,3 +295,35 @@ test("드래그 없이 키보드만으로 카드 메뉴를 열어 상태를 바�
       .status,
   ).toBe("IN_PROGRESS");
 });
+
+test("빈 보드 안내는 필터 유무에 따라 다르고, legacy 계정은 Discord 를 요구받지 않는다", async ({
+  page,
+}) => {
+  await signIn(page, seed.outsider.tokens);
+  await page.goto("/me");
+  await expect(
+    page.getByRole("heading", { name: "업무가 없습니다" }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "필터 초기화" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("button", { name: "업무 추가" })).toBeVisible();
+
+  await page.goto("/me?priority=P0");
+  await expect(
+    page.getByRole("heading", { name: "조건에 맞는 업무가 없습니다" }),
+  ).toBeVisible();
+  await page
+    .getByRole("main")
+    .getByRole("button", { name: "필터 초기화" })
+    .click();
+  await expect(page).toHaveURL(/\/me$/);
+  await expect(
+    page.getByRole("heading", { name: "업무가 없습니다" }),
+  ).toBeVisible();
+
+  await page.goto("/account");
+  const discord = page.getByRole("region", { name: "Discord 계정" });
+  await expect(discord.getByText("연결 안 됨")).toBeVisible();
+  await expect(discord.getByText("연결 필요")).toHaveCount(0);
+});
