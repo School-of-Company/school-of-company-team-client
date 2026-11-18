@@ -1,6 +1,5 @@
 "use client";
 
-import "./settings.css";
 import { Suspense } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectAccess, projectKeys, projectQueries } from "@/entities/project";

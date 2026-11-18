@@ -6,9 +6,9 @@ import {
   type TaskStatus,
 } from "@/entities/task";
 import { formatDate } from "@/shared/lib";
-import { Badge, Markdown, Select } from "@/shared/ui";
+import { Markdown, Select } from "@/shared/ui";
 
-export function TaskContent({
+export function TaskProperties({
   task,
   editable,
   pending,
@@ -20,74 +20,105 @@ export function TaskContent({
   readonly onStatus: (status: TaskStatus) => void;
 }) {
   return (
-    <section className="grid gap-5 border-t border-border pt-5">
-      <div className="flex flex-wrap gap-2">
-        <Badge>{task.type === "DEV" ? "개발 업무" : "일반 업무"}</Badge>
-        <Badge>우선순위 {priorityLabels[task.priority]}</Badge>
-        <Badge>{statusLabels[task.status]}</Badge>
-        {task.blocked && <Badge>막힘</Badge>}
-      </div>
-      {editable && (
-        <label className="grid max-w-xs gap-2 text-sm font-semibold">
-          상태 변경
-          <Select
-            value={task.status}
-            disabled={pending}
-            onChange={(event) => {
-              const status = taskStatuses.find(
-                (value) => value === event.target.value,
-              );
-              if (status) onStatus(status);
-            }}
-          >
-            {taskStatuses.map((status) => (
-              <option
-                key={status}
-                value={status}
-                disabled={task.type === "TASK" && status === "REVIEW"}
-              >
-                {statusLabels[status]}
-              </option>
-            ))}
-          </Select>
-        </label>
-      )}
-      <dl className="grid gap-5 text-sm sm:grid-cols-2">
+    <aside className="task-props" aria-label="업무 속성">
+      <dl>
         <div>
-          <dt className="mb-2 font-semibold">담당자</dt>
-          <dd className="break-words text-muted">
-            {task.assignees.map((person) => person.name).join(", ") || "미지정"}
+          <dt>상태</dt>
+          <dd>
+            {editable ? (
+              <Select
+                aria-label="상태 변경"
+                value={task.status}
+                disabled={pending}
+                onChange={(event) => {
+                  const status = taskStatuses.find(
+                    (value) => value === event.target.value,
+                  );
+                  if (status) onStatus(status);
+                }}
+              >
+                {taskStatuses.map((status) => (
+                  <option
+                    key={status}
+                    value={status}
+                    disabled={task.type === "TASK" && status === "REVIEW"}
+                  >
+                    {statusLabels[status]}
+                  </option>
+                ))}
+              </Select>
+            ) : (
+              <>
+                <span
+                  className="status-icon"
+                  data-status={task.status}
+                  aria-hidden="true"
+                />
+                {statusLabels[task.status]}
+              </>
+            )}
           </dd>
         </div>
         <div>
-          <dt className="mb-2 font-semibold">담당 파트</dt>
-          <dd className="text-muted">{task.part?.name ?? "미지정"}</dd>
+          <dt>우선순위</dt>
+          <dd>
+            <span className="priority-label" data-priority={task.priority}>
+              {priorityLabels[task.priority]}
+            </span>
+          </dd>
         </div>
         <div>
-          <dt className="mb-2 font-semibold">마감일</dt>
-          <dd className="text-muted">{formatDate(task.deadline)}</dd>
+          <dt>타입</dt>
+          <dd>{task.type === "DEV" ? "개발 업무" : "일반 업무"}</dd>
         </div>
         <div>
-          <dt className="mb-2 font-semibold">완료 시각</dt>
-          <dd className="text-muted">{formatDate(task.completedAt)}</dd>
+          <dt>담당자</dt>
+          <dd>
+            {task.assignees.map((person) => person.name).join(", ") || (
+              <span className="text-faint">미지정</span>
+            )}
+          </dd>
         </div>
+        <div>
+          <dt>파트</dt>
+          <dd>
+            {task.part?.name ?? <span className="text-faint">미지정</span>}
+          </dd>
+        </div>
+        <div>
+          <dt>마감일</dt>
+          <dd>{formatDate(task.deadline)}</dd>
+        </div>
+        {task.completedAt && (
+          <div>
+            <dt>완료</dt>
+            <dd>{formatDate(task.completedAt)}</dd>
+          </div>
+        )}
       </dl>
+    </aside>
+  );
+}
+
+export function TaskDescription({ task }: { readonly task: TaskDetail }) {
+  return (
+    <>
       {task.blocked && (
-        <div>
-          <h2 className="mb-2 text-lg font-semibold">막힌 사유</h2>
+        <section>
+          <h2 className="task-section-title">막힌 사유</h2>
           <p className="text-sm break-words whitespace-pre-wrap text-danger">
-            {task.blockedReason}
+            {task.blockedReason || "사유가 적혀 있지 않습니다."}
           </p>
-        </div>
+        </section>
       )}
-      <div>
-        <h2 className="mb-3 text-lg font-semibold">설명</h2>
+      <section>
+        <h2 className="task-section-title">설명</h2>
         {task.description ? (
           <Markdown>{task.description}</Markdown>
         ) : (
-          <p className="text-sm text-muted">설명이 없습니다.</p>
+          <p className="text-sm text-faint">설명이 없습니다.</p>
         )}
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

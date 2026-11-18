@@ -18,6 +18,18 @@ export async function updateProfile(profile: UpdateProfile): Promise<User> {
   return data;
 }
 
+export async function uploadAvatar(file: File): Promise<User> {
+  const body = new FormData();
+  body.append("file", file);
+  const { data } = await api.post<User>("/api/v1/me/avatar", body);
+  return data;
+}
+
+export async function deleteAvatar(): Promise<User> {
+  const { data } = await api.delete<User>("/api/v1/me/avatar");
+  return data;
+}
+
 export function useMe() {
   const token = useAccessToken();
   return useQuery({

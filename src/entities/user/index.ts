@@ -1,4 +1,11 @@
-export { getMe, updateProfile, useMe, meQueryKey } from "./api/me";
+export {
+  getMe,
+  updateProfile,
+  uploadAvatar,
+  deleteAvatar,
+  useMe,
+  meQueryKey,
+} from "./api/me";
 export { activeUsersQueryOptions, activeUsersQueryKey } from "./api/users";
 export type { UserSummary } from "./api/users";
 export {

@@ -12,7 +12,7 @@ import { TaskGithubPanel } from "@/features/link-github-issue";
 import { TaskDiscussion } from "./TaskDiscussion";
 import { normalizeApiError } from "@/shared/api";
 import { Button, Dialog, Skeleton } from "@/shared/ui";
-import { TaskContent } from "./TaskContent";
+import { TaskDescription, TaskProperties } from "./TaskContent";
 
 export function TaskDetailWorkspace({
   taskId,
@@ -120,8 +120,8 @@ export function TaskDetailWorkspace({
       }))
     : (assignees.data ?? data.assignees);
   return (
-    <div className="task-detail mx-auto grid max-w-4xl gap-5 [overflow-wrap:anywhere] break-keep">
-      <div className="flex flex-wrap gap-2">
+    <div className="task-detail">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         {headerAction}
         <Link
           href={
@@ -137,62 +137,75 @@ export function TaskDetailWorkspace({
             (data.scope === "TEAM" ? "팀 공용 보드" : "내 보드")}
           로 이동
         </Link>
-      </div>
-      <header className="grid gap-4">
-        <p className="text-sm text-muted">
-          {data.key ??
-            (data.scope === "PERSONAL" ? "개인 업무" : "팀 공용 업무")}
-        </p>
-        <h1 className="max-w-none text-2xl font-semibold [overflow-wrap:anywhere] break-keep">
-          {data.title}
-        </h1>
-        <div className="flex flex-wrap gap-2">
+        <span className="ml-auto flex flex-wrap gap-2">
           {editable && (
-            <Button onClick={() => setEditing(true)}>업무 수정</Button>
-          )}
-          {canDelete && (
-            <Button variant="ghost" onClick={() => setDeleting(true)}>
-              업무 삭제
+            <Button
+              variant="secondary"
+              className="ui-button-sm"
+              onClick={() => setEditing(true)}
+            >
+              수정
             </Button>
           )}
+          {canDelete && (
+            <Button
+              variant="ghost"
+              className="ui-button-sm"
+              onClick={() => setDeleting(true)}
+            >
+              삭제
+            </Button>
+          )}
+        </span>
+      </div>
+      <div className="task-detail-grid">
+        <div className="task-main">
+          <header className="grid gap-1">
+            <p className="font-mono text-xs text-muted">
+              {data.key ??
+                (data.scope === "PERSONAL" ? "개인 업무" : "팀 공용 업무")}
+            </p>
+            <h1 className="task-title">{data.title}</h1>
+          </header>
+          {project.data?.archived && (
+            <p className="text-sm text-muted">
+              아카이브된 프로젝트입니다. 조회만 가능합니다.
+            </p>
+          )}
+          {project.isError && (
+            <TaskError
+              error={project.error}
+              onRetry={() => void project.refetch()}
+            />
+          )}
+          {message && (
+            <p role="status" className="text-sm">
+              {message}
+            </p>
+          )}
+          <TaskDescription task={data} />
+          <TaskGithubPanel
+            task={data}
+            editable={editable}
+            onAccessLost={setDenied}
+          />
+          {data.scope !== "PERSONAL" && (
+            <TaskDiscussion
+              taskId={data.id}
+              manages={user?.role === "LEAD" || !!access?.manages}
+              onAccessLost={setDenied}
+            />
+          )}
         </div>
-      </header>
-      {project.data?.archived && (
-        <p className="text-sm text-muted">
-          아카이브된 프로젝트입니다. 조회만 가능합니다.
-        </p>
-      )}
-      {project.isError && (
-        <TaskError
-          error={project.error}
-          onRetry={() => void project.refetch()}
+        <TaskProperties
+          task={data}
+          editable={editable}
+          pending={changeStatus.isPending}
+          onStatus={(status) => {
+            if (!changeStatus.isPending) changeStatus.mutate(status);
+          }}
         />
-      )}
-      {message && (
-        <p role="status" className="text-sm">
-          {message}
-        </p>
-      )}
-      <TaskContent
-        task={data}
-        editable={editable}
-        pending={changeStatus.isPending}
-        onStatus={(status) => {
-          if (!changeStatus.isPending) changeStatus.mutate(status);
-        }}
-      />
-      <TaskGithubPanel
-        task={data}
-        editable={editable}
-        onAccessLost={setDenied}
-      />
-      {data.scope !== "PERSONAL" && (
-        <TaskDiscussion
-          taskId={data.id}
-          manages={user?.role === "LEAD" || !!access?.manages}
-          onAccessLost={setDenied}
-        />
-      )}
+      </div>
       <Dialog
         open={editing}
         onClose={() => {

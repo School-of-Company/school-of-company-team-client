@@ -32,14 +32,14 @@ export function ProjectNav({ project, user }: ProjectNavProps) {
   return (
     <nav
       aria-label={`${project.name} 프로젝트 메뉴`}
-      className="flex min-w-0 gap-4 overflow-x-auto border-b border-border"
+      className="project-nav flex min-w-0 overflow-x-auto border-b"
     >
       {links.map(({ href, label, active }) => (
         <Link
           key={href}
           href={href}
           aria-current={active ? "page" : undefined}
-          className={`ui-nav-link flex min-h-11 shrink-0 items-center border-b-2 px-2 text-sm font-medium ${active ? "border-brand text-brand" : "border-transparent text-muted hover:text-foreground"}`}
+          className="ui-nav-link flex shrink-0 items-center border-b-2 border-transparent font-medium"
         >
           {label}
         </Link>

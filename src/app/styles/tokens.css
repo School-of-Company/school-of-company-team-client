@@ -1,184 +1,169 @@
+/* Design tokens. Components read the semantic layer only; the scales exist to feed it.
+   Rules of use live in /design.md. */
 :root {
   color-scheme: light;
-  --space-3xs: 2px;
-  --space-2xs: 4px;
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 40px;
-  --space-2xl: 64px;
-  --space-3xl: 96px;
-  --space-4xl: 144px;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.2rem;
-  --text-xl: 1.44rem;
-  --text-2xl: 1.728rem;
-  --text-3xl: 2.074rem;
-  --text-display-s: 1.44rem;
-  --text-display: 1.728rem;
-  --text-section: 1.2rem;
-  --text-title: 1rem;
-  --text-lead: 1rem;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-micro: 120ms;
-  --dur-short: 220ms;
-  --dur-long: 420ms;
-  --color-error: oklch(52% 0.19 27);
-  --color-success: oklch(50% 0.12 150);
-  --container: 1440px;
-  --gutter: 64px;
-  --gap-columns: 32px;
-  --section-gap-s: 120px;
-  --section-gap: 144px;
-  --section-gap-l: 176px;
-  --z-base: 1;
-  --z-raised: 10;
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-sticky-nav: 300;
-  --z-modal: 400;
-  --z-toast: 500;
-  --z-tooltip: 600;
-  --color-paper: #ffffff;
-  --color-paper-2: #ffffff; /* app background: plain white (user request) */
-  --color-paper-3: #f4f5f7; /* hover / quiet fill on white */
-  --color-ink: oklch(21% 0.028 262);
-  --color-ink-2: oklch(36% 0.022 260);
-  --color-muted: oklch(50% 0.018 258);
-  --color-rule: oklch(90% 0.009 252);
-  --color-rule-2: oklch(83% 0.012 252);
-  --color-graphite: oklch(21% 0.024 262);
-  --color-graphite-2: oklch(26.5% 0.026 262);
-  --color-graphite-ink: oklch(93% 0.01 250);
-  --color-graphite-muted: oklch(69% 0.022 256);
-  /* Brand: sampled from the official logo PNG (top #ff4060 → bottom #ff6982).
-     The raw logo pink is 3.41:1 on white, so it is decoration only; actions use the derived accent. */
+
+  /* Neutral scale, 12 steps: 1-2 backgrounds, 3-5 fills, 6-8 borders, 9-10 quiet text/solid, 11-12 text. */
+  --gray-1: #ffffff;
+  --gray-2: #f8f8f9;
+  --gray-3: #f1f2f4;
+  --gray-4: #e9eaed;
+  --gray-5: #e1e3e7;
+  --gray-6: #d6d8dd;
+  --gray-7: #c4c7ce;
+  --gray-8: #a4a8b1;
+  --gray-9: #7d828c;
+  --gray-10: #6a6f79; /* 4.9:1 on gray-1 */
+  --gray-11: #4a4f58;
+  --gray-12: #1b1d21;
+
+  /* Brand pink. Logo colours are decoration only; -9 is the accessible action colour. */
+  --pink-3: #fff0f3;
+  --pink-4: #ffe1e7;
+  --pink-9: #d92a4a; /* white text 4.79:1 */
+  --pink-10: #c22342;
+  --pink-11: #b81c3c;
   --color-brand-logo: #ff4060;
   --color-brand-logo-2: #ff6982;
-  --identity-glow-1: color-mix(
+  --color-brand-tile: #ffffff;
+
+  /* Status and priority hues share one lightness so no column shouts. */
+  --hue-blue: #3b7fd9;
+  --hue-amber: #d98a1c;
+  --hue-violet: #7c5cd6;
+  --hue-green: #2f9461;
+  --hue-red: #d6453d;
+  --hue-orange: #d9722b;
+
+  /* Semantic colours */
+  --background: var(--gray-1);
+  --surface: var(--gray-1);
+  --surface-raised: var(--gray-1);
+  --surface-sunken: var(--gray-2);
+  --surface-hover: var(--gray-3);
+  --surface-active: var(--gray-4);
+  --surface-sidebar: var(--gray-2);
+  --foreground: var(--gray-12);
+  --foreground-2: var(--gray-11);
+  --muted: var(--gray-10);
+  --faint: var(--gray-8);
+  --border: var(--gray-5);
+  --border-strong: var(--gray-7);
+  --brand: var(--pink-9);
+  --brand-hover: var(--pink-10);
+  --brand-soft: var(--pink-3);
+  --on-brand: #ffffff;
+  --danger: #c93a32;
+  --success: var(--hue-green);
+  --overlay: rgb(20 22 26 / 0.45);
+  --identity-glow: color-mix(
     in oklab,
     var(--color-brand-logo) 30%,
     transparent
   );
-  --color-brand-tile: #ffffff; /* the logo PNG's own opaque ground, kept in both themes */
-  --color-accent: #d92a4a; /* white text 4.79:1, on white 4.79:1 (AA) */
-  --color-accent-2: #ff6982;
-  --color-accent-wash: #fff0f3;
-  --color-accent-ink: #ffffff;
-  --color-focus: #d92a4a;
-  --color-accent-deep: #b81c3c; /* 6.42:1 */
-  --color-accent-edge: #a3183a;
-  --color-glyph-1: oklch(89% 0.025 254);
-  --color-glyph-2: oklch(81% 0.045 255);
-  --color-glyph-3: oklch(70% 0.085 256);
-  --color-glyph-4: oklch(60% 0.13 257);
-  --color-graphite-glyph-1: oklch(33% 0.03 262);
-  --color-graphite-glyph-2: oklch(41% 0.05 260);
-  --color-graphite-glyph-3: oklch(53% 0.1 258);
-  --color-key-face: oklch(99.4% 0.003 250);
-  --color-key-edge: oklch(80% 0.016 254);
-  --font-display: var(--font-pretendard), "Pretendard", system-ui, sans-serif;
+
+  /* Type: Pretendard for everything, mono for machine values. */
   --font-body: var(--font-pretendard), "Pretendard", system-ui, sans-serif;
-  --font-outlier:
-    var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
-  --color-overlay: oklch(21% 0.028 262 / 0.52);
-  --color-transparent: transparent;
-  --background: var(--color-paper-2);
-  --foreground: var(--color-ink);
-  --surface: var(--color-paper);
-  --surface-hover: var(--color-paper-3);
-  --muted: var(--color-muted);
-  --border: var(--color-rule-2);
-  --brand: var(--color-accent);
-  --brand-soft: var(--color-accent-wash);
-  --danger: var(--color-error);
-  --success: oklch(50% 0.12 150);
-  --radius-card: 8px;
-  --radius-input: 6px;
+  --font-code: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+  --text-xs: 0.75rem; /* 12 meta */
+  --text-sm: 0.8125rem; /* 13 ui */
+  --text-md: 0.875rem; /* 14 body */
+  --text-lg: 1rem; /* 16 section */
+  --text-xl: 1.25rem; /* 20 page title */
+  --text-2xl: 1.5rem; /* 24 identity */
+  --leading-tight: 1.35;
+  --leading-body: 1.6;
+  --tracking: -0.011em;
+
+  /* Space: 4px grid. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Shape */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
   --radius-pill: 999px;
-  --cell-w: 8px;
-  --cell-h: 16px;
-  --cut: 8px;
-  --cut-l: 16px;
-  --rule-hair: 1px;
-  --shadow-card: none;
-  --shadow-card-hover: 0 4px 12px -6px oklch(21% 0.028 262 / 0.18);
-  --shadow-menu:
-    0 1px 2px oklch(21% 0.028 262 / 0.06),
-    0 12px 32px -12px oklch(21% 0.028 262 / 0.24);
-  --shadow-key:
-    0 3px 0 0 var(--color-key-edge), 0 6px 8px -4px oklch(21% 0.028 262 / 0.28),
-    inset 0 1px 0 oklch(100% 0 0 / 0.9);
-  --shadow-key-accent:
-    0 3px 0 0 var(--color-accent-edge),
-    0 6px 8px -4px oklch(30% 0.12 260 / 0.45),
-    inset 0 1px 0 oklch(100% 0 0 / 0.22);
-  --shadow-key-press: inset 0 1px 2px oklch(21% 0.028 262 / 0.14);
-  --tracking-display: -0.028em;
-  --display-weight: 600;
-  --surface-sidebar: #ffffff;
-  --surface-canvas: #ffffff;
-  --surface-panel: #ffffff;
-  --surface-column: #ffffff;
-  --surface-selected: var(--color-accent-wash);
-  --rule-subtle: var(--color-rule);
-  --rule-strong: #858995;
-  --line-body: 1.65;
-  --line-heading: 1.4;
-  --control-height: 40px;
-  --target-size: 44px;
-  --sidebar-width: 224px;
-  --page-inset: 24px;
-  --avatar-size: 24px;
-  --icon-size: 20px;
-  --column-min-height: 480px;
-  --toolbar-label-width: 112px;
-  --card-key-height: 24px;
-  --textarea-min-height: 112px;
+
+  /* Sizes */
+  --control-sm: 28px;
+  --control-md: 32px;
+  --control-touch: 44px;
+  --sidebar-width: 232px;
+  --page-inset: 28px;
+  --content-narrow: 44rem;
+
+  /* Elevation: borders separate, shadows only lift overlays. */
+  --shadow-card: 0 1px 2px rgb(20 22 26 / 0.04);
+  --shadow-card-hover: 0 2px 8px -2px rgb(20 22 26 / 0.12);
+  --shadow-overlay:
+    0 0 0 1px rgb(20 22 26 / 0.04), 0 4px 12px -2px rgb(20 22 26 / 0.1),
+    0 16px 40px -12px rgb(20 22 26 / 0.22);
+
+  /* Motion: state changes only. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+
+  --z-raised: 10;
+  --z-dropdown: 100;
 }
 
 /* Dark theme: an explicit choice (data-theme="dark") or, with no stored choice,
    the system preference applied by the pre-paint script in app/layout.tsx. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-paper: #1a1d24;
-  --color-paper-2: #111318;
-  --color-paper-3: #242833;
-  --color-ink: #eceef3;
-  --color-ink-2: #c7cbd6;
-  --color-muted: #9aa0ae; /* 6.9:1 on #111318 */
-  --color-rule: #2a2f3a;
-  --color-rule-2: #363c4a;
-  --color-accent: #ff5c78; /* 6.24:1 on #111318, 5.67:1 on #1a1d24 */
-  --color-accent-2: #ff8499;
-  --color-accent-wash: #3a1c25;
-  --color-accent-ink: #111318; /* dark text on the pink: 6.24:1 */
-  --color-focus: #ff5c78;
-  --color-accent-deep: #ff8499;
-  --color-accent-edge: #d92a4a;
-  --color-error: #ff7a6b;
-  --color-success: #5fcf8f;
-  --color-key-face: #242833;
-  --color-key-edge: #363c4a;
-  --color-overlay: oklch(0% 0 0 / 0.6);
-  --success: #5fcf8f;
-  --shadow-card: 0 1px 2px oklch(0% 0 0 / 0.4);
-  --shadow-card-hover: 0 4px 14px -6px oklch(0% 0 0 / 0.6);
-  --shadow-menu:
-    0 1px 2px oklch(0% 0 0 / 0.5), 0 12px 32px -12px oklch(0% 0 0 / 0.8);
-  --surface-sidebar: #111318;
-  --surface-canvas: #1a1d24;
-  --surface-panel: #20232b;
-  --surface-column: #1c1f27;
-  --rule-strong: #6b7282;
-  --identity-glow-1: color-mix(
+  --gray-1: #131416;
+  --gray-2: #18191c;
+  --gray-3: #1f2124;
+  --gray-4: #26282c;
+  --gray-5: #2c2f34;
+  --gray-6: #353840;
+  --gray-7: #454953;
+  --gray-8: #5d626d;
+  --gray-9: #7b808b;
+  --gray-10: #9197a3; /* 6.4:1 on gray-1 */
+  --gray-11: #c3c7cf;
+  --gray-12: #eeeff2;
+
+  --pink-3: #331a21;
+  --pink-4: #44202b;
+  --pink-9: #ff5c78; /* dark text 6.2:1 */
+  --pink-10: #ff7a91;
+  --pink-11: #ff8499;
+
+  --hue-blue: #5b9bea;
+  --hue-amber: #e5a03c;
+  --hue-violet: #9b82e8;
+  --hue-green: #55b784;
+  --hue-red: #ee6a60;
+  --hue-orange: #ea8a4a;
+
+  --background: var(--gray-1);
+  --surface: var(--gray-2);
+  --surface-raised: var(--gray-3);
+  --surface-sunken: #0f1012;
+  --surface-sidebar: #0f1012;
+  --on-brand: #131416;
+  --danger: var(--hue-red);
+  --overlay: rgb(0 0 0 / 0.6);
+  --identity-glow: color-mix(
     in oklab,
     var(--color-brand-logo) 28%,
     transparent
   );
+
+  --shadow-card: none;
+  --shadow-card-hover: 0 2px 10px -2px rgb(0 0 0 / 0.5);
+  --shadow-overlay:
+    0 0 0 1px rgb(255 255 255 / 0.06), 0 8px 24px -4px rgb(0 0 0 / 0.5),
+    0 24px 48px -12px rgb(0 0 0 / 0.6);
 }

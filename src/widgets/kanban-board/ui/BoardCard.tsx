@@ -29,12 +29,12 @@ export function BoardCard({
   const source =
     task.projectName ?? (task.scope === "PERSONAL" ? "개인 업무" : "팀 공용");
   return (
-    <article className="board-card relative min-w-0 rounded-md border border-border bg-surface p-3">
-      <div className="flex min-w-0 items-start justify-between gap-1">
-        <div className="min-w-0 pt-2 text-xs text-muted">
-          {task.key && <span className="font-mono">{task.key}</span>}
-          <span className={task.key ? "sr-only" : ""}>{source}</span>
-        </div>
+    <article className="board-card relative min-w-0 border">
+      <div className="board-card-top">
+        <span className="min-w-0 truncate">
+          {task.key ? <span className="font-mono">{task.key}</span> : source}
+          {task.key && <span className="sr-only">{source}</span>}
+        </span>
         <BoardCardMenu
           task={task}
           editable={editable}
@@ -46,7 +46,7 @@ export function BoardCard({
       </div>
       <Link
         href={`/tasks/${encodeURIComponent(task.id)}`}
-        className="block min-h-11 py-2 text-sm font-medium [overflow-wrap:anywhere] break-keep after:absolute after:inset-0"
+        className="board-card-title"
         onClick={(event) => {
           if (
             onSelect &&
@@ -73,24 +73,16 @@ export function BoardCard({
             {task.issue.repositoryFullName.split("/").pop()}
           </span>
           <span className="shrink-0">
-            {task.issue.kind === "PR" ? "PR" : ""} #{task.issue.number}
+            {task.issue.kind === "PR" ? "PR " : ""}#{task.issue.number}
           </span>
         </p>
       )}
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-wrap gap-x-2" aria-label="담당자">
-          {task.assignees.length ? (
-            task.assignees.map((person) => (
-              <span key={person.id} className="text-xs">
-                {person.name}
-              </span>
-            ))
-          ) : (
-            <span className="text-xs text-muted">미지정</span>
-          )}
-        </div>
+      <div className="board-card-meta">
+        <span className="min-w-0 truncate" aria-label="담당자">
+          {task.assignees.map((person) => person.name).join(", ") || "미지정"}
+        </span>
         <span
-          className="board-priority"
+          className="priority-label"
           data-priority={task.priority}
           title={`우선순위 ${task.priority}`}
         >
@@ -98,12 +90,10 @@ export function BoardCard({
         </span>
       </div>
       {task.deadline && (
-        <p className="mt-2 text-sm text-muted">
-          마감 {formatDate(task.deadline)}
-        </p>
+        <p className="board-card-note">마감 {formatDate(task.deadline)}</p>
       )}
       {task.blocked && (
-        <p className="mt-2 text-sm break-words text-danger">
+        <p className="board-card-note break-words text-danger">
           막힘{task.blockedReason ? ": " + task.blockedReason : ""}
         </p>
       )}

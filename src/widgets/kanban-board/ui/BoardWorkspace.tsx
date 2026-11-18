@@ -21,6 +21,7 @@ import {
   type ProjectDetail,
 } from "@/entities/project";
 import { activeUsersQueryOptions } from "@/entities/user";
+import { taskGithubQueries } from "@/features/link-github-issue";
 import { TaskError } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import { Spinner } from "@/shared/ui";
@@ -46,6 +47,10 @@ export type BoardFilterProps = {
   readonly people: readonly { readonly id: string; readonly name: string }[];
   readonly parts: readonly { readonly id: string; readonly name: string }[];
   readonly personal: boolean;
+  readonly repositories: readonly {
+    readonly id: string;
+    readonly fullName: string;
+  }[];
 };
 
 export function BoardWorkspace({
@@ -93,6 +98,10 @@ export function BoardWorkspace({
     enabled: !!projectId,
   });
   const projects = useQuery(projectQueries.list());
+  const repositories = useQuery({
+    ...taskGithubQueries.repositories(projectId ?? ""),
+    enabled: !!projectId,
+  });
   const assignees = useQuery({
     ...activeUsersQueryOptions(),
     enabled: scope === "TEAM",
@@ -201,6 +210,7 @@ export function BoardWorkspace({
             ).values(),
           ],
           personal: scope === "PERSONAL",
+          repositories: repositories.data ?? [],
         })}
         <BoardViewControls search={search} sort={sort} onChange={change} />
       </div>

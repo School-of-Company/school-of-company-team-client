@@ -19,6 +19,7 @@ export function TaskFilters({
   people,
   parts,
   personal,
+  repositories = [],
 }: {
   readonly search: string;
   readonly onChange: (search: string) => void;
@@ -26,6 +27,10 @@ export function TaskFilters({
   readonly people: readonly { readonly id: string; readonly name: string }[];
   readonly parts: readonly { readonly id: string; readonly name: string }[];
   readonly personal: boolean;
+  readonly repositories?: readonly {
+    readonly id: string;
+    readonly fullName: string;
+  }[];
 }) {
   const root = useRef<HTMLDetailsElement>(null);
   // Popover behaviour for <details>: close on outside pointer and Escape.
@@ -96,6 +101,20 @@ export function TaskFilters({
         value,
         label: priorityLabels[value],
       })),
+    },
+    {
+      key: "repository",
+      label: "저장소",
+      choices: repositories.length
+        ? [
+            ...repositories.map((repository) => ({
+              value: repository.id,
+              label:
+                repository.fullName.split("/").pop() ?? repository.fullName,
+            })),
+            { value: "none", label: "연결 없음" },
+          ]
+        : [],
     },
     {
       key: "type",
