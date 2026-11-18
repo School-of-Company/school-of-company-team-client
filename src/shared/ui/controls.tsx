@@ -17,13 +17,13 @@ export function Button({
   return (
     <button
       type={type}
-      className={`ui-button ui-button-${variant} ${className}`}
+      className={`ui-button relative ui-button-${variant} ${className}`}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       {...props}
     >
-      {loading && <span className="ui-spinner" aria-hidden="true" />}
-      {children}
+      {loading && <span className="ui-spinner absolute" aria-hidden="true" />}
+      <span className={loading ? "opacity-0" : undefined}>{children}</span>
     </button>
   );
 }
