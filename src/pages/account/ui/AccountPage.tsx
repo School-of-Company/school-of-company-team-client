@@ -6,16 +6,16 @@ import { useRouter } from "next/navigation";
 import { meQueryKey, updateProfile, type User } from "@/entities/user";
 import { AuthGuard, authErrorMessage, OAuthButton } from "@/features/auth";
 import { unlinkDiscord } from "../api/unlink-discord";
-import { Badge, Button, Dialog, Field, Input, useToast } from "@/shared/ui";
+import { Badge, Button, Dialog, Field, Input } from "@/shared/ui";
 
 function ProfileForm({ user }: { readonly user: User }) {
   const client = useQueryClient();
-  const toast = useToast();
+  const [editing, setEditing] = useState(false);
   const mutation = useMutation({
     mutationFn: updateProfile,
     onSuccess: (updated) => {
       client.setQueryData(meQueryKey, updated);
-      toast("프로필을 저장했습니다.");
+      setEditing(false);
     },
   });
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -27,6 +27,38 @@ function ProfileForm({ user }: { readonly user: User }) {
     if (typeof name === "string" && typeof major === "string")
       mutation.mutate({ name: name.trim(), major: major.trim() });
   }
+  if (!editing)
+    return (
+      <div className="grid gap-5">
+        <dl className="grid gap-4 text-sm">
+          <div>
+            <dt className="text-muted">이름</dt>
+            <dd className="mt-1 break-words">{user.name}</dd>
+          </div>
+          <div>
+            <dt className="text-muted">전공</dt>
+            <dd className="mt-1 break-words">
+              {user.major || "등록하지 않음"}
+            </dd>
+          </div>
+        </dl>
+        <Button
+          variant="secondary"
+          className="justify-self-start"
+          onClick={() => {
+            mutation.reset();
+            setEditing(true);
+          }}
+        >
+          프로필 편집
+        </Button>
+        {mutation.isSuccess && (
+          <p role="status" className="text-sm">
+            프로필을 저장했습니다.
+          </p>
+        )}
+      </div>
+    );
   return (
     <form onSubmit={submit} className="grid gap-5">
       <Field id="name" label="이름">
@@ -60,13 +92,22 @@ function ProfileForm({ user }: { readonly user: User }) {
           {authErrorMessage(mutation.error)}
         </p>
       )}
-      <Button
-        type="submit"
-        className="justify-self-start"
-        loading={mutation.isPending}
-      >
-        프로필 저장
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          type="submit"
+          className="justify-self-start"
+          loading={mutation.isPending}
+        >
+          프로필 저장
+        </Button>
+        <Button
+          variant="ghost"
+          disabled={mutation.isPending}
+          onClick={() => setEditing(false)}
+        >
+          취소
+        </Button>
+      </div>
     </form>
   );
 }
@@ -83,8 +124,13 @@ function AccountContent({ user }: { readonly user: User }) {
     },
   });
   return (
-    <div className="mx-auto grid w-full max-w-2xl gap-10">
-      <h1 className="text-2xl font-bold tracking-tight">내 계정</h1>
+    <div className="mx-auto grid w-full max-w-3xl min-w-0 gap-8 p-4 sm:p-8">
+      <header className="grid gap-2">
+        <h1 className="text-2xl font-semibold">내 계정</h1>
+        <p className="text-sm text-muted">
+          프로필과 로그인·알림 계정을 관리합니다.
+        </p>
+      </header>
       <section aria-labelledby="profile-title" className="grid gap-5">
         <h2 id="profile-title" className="text-lg font-semibold">
           프로필
@@ -98,6 +144,10 @@ function AccountContent({ user }: { readonly user: User }) {
         <h2 id="github-title" className="text-lg font-semibold">
           GitHub 계정
         </h2>
+        <p className="text-sm text-muted">
+          GitHub 계정은 로그인에 사용합니다. 프로젝트 저장소 접근은 별도의
+          GitHub App 설치와 저장소 권한이 필요합니다.
+        </p>
         <dl className="grid gap-3 text-sm">
           <div>
             <dt className="text-muted">사용자명</dt>

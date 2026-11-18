@@ -20,10 +20,29 @@ export function MemberSettings({
   const pm = useAssignPm(project.id, onSaved);
   const permissions = getSettingsPermissions(user, project);
   const [candidate, setCandidate] = useState("");
+  const [editing, setEditing] = useState(false);
   const pending = members.isPending || pm.isPending;
   return (
     <div className="grid gap-4">
-      {user.role === "LEAD" && (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted">
+          PM:{" "}
+          {candidates.find((item) => item.id === project.pmUserId)?.name ??
+            project.members.find((item) => item.userId === project.pmUserId)
+              ?.name ??
+            "미지정"}
+        </p>
+        {permissions.manage && (
+          <Button
+            variant="secondary"
+            disabled={pending}
+            onClick={() => setEditing(!editing)}
+          >
+            {editing ? "편집 마침" : "참여자·PM 편집"}
+          </Button>
+        )}
+      </div>
+      {editing && user.role === "LEAD" && (
         <div className="grid gap-2">
           <Field
             id="project-pm"
@@ -61,7 +80,7 @@ export function MemberSettings({
                 <span className="break-all">{member.name}</span>
                 {member.userId === project.pmUserId && <Badge>PM</Badge>}
               </div>
-              {permissions.manage && (
+              {editing && permissions.manage && (
                 <Button
                   variant="ghost"
                   disabled={pending || member.userId === project.pmUserId}
@@ -82,7 +101,7 @@ export function MemberSettings({
           ))}
         </ul>
       )}
-      {permissions.manage && (
+      {editing && permissions.manage && (
         <form
           className="grid gap-3"
           onSubmit={(event) => {
