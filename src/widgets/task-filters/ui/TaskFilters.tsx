@@ -2,12 +2,13 @@
 
 import {
   changeBoardFilter,
+  boardFilterKeys,
   taskStatuses,
   statusLabels,
   type BoardFilterKey,
 } from "@/entities/task";
 import type { Project } from "@/entities/project";
-import { Checkbox, Select } from "@/shared/ui";
+import { Button, Checkbox, Select } from "@/shared/ui";
 
 export function TaskFilters({
   search,
@@ -87,6 +88,18 @@ export function TaskFilters({
       <summary className="min-h-6 cursor-pointer text-sm font-semibold">
         필터 · 같은 항목은 OR, 다른 항목은 AND
       </summary>
+      <Button
+        variant="ghost"
+        className="mt-3"
+        onClick={() => {
+          const next = new URLSearchParams(search);
+          for (const key of boardFilterKeys) next.delete(key);
+          next.delete("doneLimit");
+          onChange(next.toString());
+        }}
+      >
+        필터 초기화
+      </Button>
       <div className="mt-5 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {axes
           .filter((axis) => axis.choices.length)

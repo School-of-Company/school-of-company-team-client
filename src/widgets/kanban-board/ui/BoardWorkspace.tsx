@@ -193,7 +193,13 @@ export function BoardWorkspace({
         onChange: change,
         projects: projects.data ?? [],
         people,
-        parts: project.data?.parts ?? [],
+        parts: project.data?.parts ?? [
+          ...new Map(
+            cards
+              .flatMap((card) => (card.part ? [card.part] : []))
+              .map((part) => [part.id, part]),
+          ).values(),
+        ],
         personal: scope === "PERSONAL",
       })}
       <BoardViewControls search={search} sort={sort} onChange={change} />
