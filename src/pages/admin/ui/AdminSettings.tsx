@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useAdminUsers, useAdminUserChange } from "../api/users";
 import { DiscordChannelForm } from "@/features/project-integrations";
 import { settingsErrorMessage } from "@/features/project-settings";
@@ -172,20 +171,6 @@ export function AdminSettings({
             사용자 상태를 변경했습니다.
           </p>
         )}
-      </section>
-      <section className="grid gap-5" aria-labelledby="create-project-heading">
-        <h2 id="create-project-heading" className="text-xl font-semibold">
-          프로젝트 생성
-        </h2>
-        <p className="text-sm text-muted">
-          이름과 키를 정하고 팀원·PM, 저장소를 순서대로 연결합니다.
-        </p>
-        <Link
-          href="/admin?create=project"
-          className="ui-button ui-button-secondary justify-self-start"
-        >
-          새 프로젝트 만들기
-        </Link>
       </section>
       <section className="grid gap-5" aria-labelledby="team-channel-heading">
         <h2 id="team-channel-heading" className="text-xl font-semibold">

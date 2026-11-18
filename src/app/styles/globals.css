@@ -255,7 +255,7 @@ select.ui-input {
   justify-self: start;
   padding: 2px;
   border-radius: var(--radius-md);
-  background: var(--surface-hover);
+  background: var(--surface-active);
 }
 .ui-segmented-option {
   position: relative;
@@ -281,7 +281,7 @@ select.ui-input {
 }
 .ui-segmented-option[aria-pressed="true"],
 .ui-segmented-option:has(input:checked) {
-  background: var(--surface-raised);
+  background: var(--segment-active);
   color: var(--foreground);
   box-shadow:
     var(--shadow-card),
@@ -631,7 +631,7 @@ select.ui-input {
   justify-self: start;
   padding: 2px;
   border-radius: var(--radius-md);
-  background: var(--surface-hover);
+  background: var(--surface-active);
 }
 .settings-nav a {
   display: inline-flex;
@@ -647,7 +647,7 @@ select.ui-input {
   color: var(--foreground);
 }
 .settings-nav a[aria-current="page"] {
-  background: var(--surface-raised);
+  background: var(--segment-active);
   color: var(--foreground);
   box-shadow:
     var(--shadow-card),
