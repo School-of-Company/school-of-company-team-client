@@ -14,6 +14,7 @@ import type { SettingsProps } from "../model/props";
 import { GeneralSettings } from "./GeneralSettings";
 import { MemberSettings } from "./MemberSettings";
 import { PartSettings } from "./PartSettings";
+import { BucketSettings } from "./BucketSettings";
 import { MutationFeedback } from "./MutationFeedback";
 
 export function SettingsPanels(props: SettingsProps) {
@@ -21,7 +22,9 @@ export function SettingsPanels(props: SettingsProps) {
   const search = useSearchParams();
   const selected = search?.get("tab");
   const tab =
-    selected === "members" || selected === "integrations"
+    selected === "members" ||
+    selected === "integrations" ||
+    selected === "buckets"
       ? selected
       : "general";
   const [confirmArchive, setConfirmArchive] = useState(false);
@@ -37,6 +40,7 @@ export function SettingsPanels(props: SettingsProps) {
             ["general", "기본 정보"],
             ["members", "멤버·권한"],
             ["integrations", "연동"],
+            ["buckets", "계획 버킷"],
           ] as const
         ).map(([value, label]) => {
           const params = new URLSearchParams(search?.toString());
@@ -90,6 +94,14 @@ export function SettingsPanels(props: SettingsProps) {
             <PartSettings {...props} />
           </section>
         </div>
+      )}
+      {tab === "buckets" && (
+        <section className="grid gap-5" aria-labelledby="buckets-heading">
+          <h2 id="buckets-heading" className="text-xl font-semibold">
+            계획 버킷
+          </h2>
+          <BucketSettings {...props} />
+        </section>
       )}
       {tab === "integrations" && (
         <div className="grid gap-10">

@@ -1309,3 +1309,130 @@ select.ui-input {
 .settings-page .ui-button {
   justify-self: start;
 }
+
+/* Board planning */
+/* 스윔레인: 그룹 축마다 가로 레인. 헤더는 이름·개수·접기, 본문은 기존 컬럼. */
+.board-lane[data-lanes] {
+  display: grid;
+  gap: var(--space-2);
+}
+.board-lane[data-lanes] .board-column {
+  min-height: 6rem;
+}
+.board-lane-header {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.board-lane-toggle {
+  display: inline-flex;
+  min-width: 0;
+  min-height: var(--control-sm);
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: calc(-1 * var(--space-1));
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border-radius: var(--radius-md);
+  color: var(--foreground);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.board-lane-toggle:hover {
+  background: var(--surface-hover);
+}
+.board-lane-chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.board-lane-toggle[aria-expanded="false"] .board-lane-chevron {
+  transform: rotate(-90deg);
+}
+.board-lane-count {
+  color: var(--muted);
+  font-weight: 400;
+}
+.board-lane-note {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
+/* 끌고 있는 카드를 놓을 수 없는 레인(담당자·리뷰어·파트 레인 사이, 보관 버킷). */
+.board-lane[data-locked] .board-columns {
+  opacity: 0.6;
+}
+.board-card-reviewers {
+  color: var(--foreground-2);
+  overflow-wrap: anywhere;
+}
+.task-reviewers {
+  display: grid;
+  gap: var(--space-1);
+}
+.task-reviewers li {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+/* 설정 > 계획 버킷: 한 줄 목록(순서 · 이름 · 동작). */
+.bucket-list {
+  border-top: 1px solid var(--border);
+}
+.bucket-row {
+  display: flex;
+  min-height: calc(var(--control-md) + var(--space-4));
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.bucket-order {
+  display: inline-flex;
+}
+.bucket-order .ui-icon-button {
+  width: var(--control-sm);
+  min-height: var(--control-sm);
+  color: var(--muted);
+}
+.bucket-order .ui-icon-button svg {
+  width: 16px;
+  height: 16px;
+}
+.bucket-name {
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.bucket-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+.bucket-rename {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+.bucket-create {
+  display: grid;
+  gap: var(--space-3);
+}
+@media (min-width: 40rem) {
+  .bucket-create {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+}
