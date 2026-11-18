@@ -3,10 +3,36 @@
 import { useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { meQueryKey, updateProfile, type User } from "@/entities/user";
+import {
+  meQueryKey,
+  updateProfile,
+  userAvatarUrl,
+  type User,
+} from "@/entities/user";
 import { AuthGuard, authErrorMessage, OAuthButton } from "@/features/auth";
 import { unlinkDiscord } from "../api/unlink-discord";
-import { Badge, Button, Dialog, Field, Input, ThemeSelect } from "@/shared/ui";
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  Field,
+  Input,
+  Select,
+  ThemeSelect,
+} from "@/shared/ui";
+
+// ponytail: fixed list; move to the API when majors need admin editing.
+const majors: readonly string[] = [
+  "프론트엔드",
+  "백엔드",
+  "모바일",
+  "AI",
+  "임베디드",
+  "게임",
+  "디자인",
+  "DevOps",
+];
 
 function ProfileForm({ user }: { readonly user: User }) {
   const client = useQueryClient();
@@ -31,6 +57,12 @@ function ProfileForm({ user }: { readonly user: User }) {
     return (
       <div className="grid gap-5">
         <dl className="grid gap-4 text-sm">
+          <div>
+            <dt className="text-muted">프로필 사진</dt>
+            <dd className="mt-2 flex items-center gap-3">
+              <Avatar name={user.name} src={userAvatarUrl(user)} />
+            </dd>
+          </div>
           <div>
             <dt className="text-muted">이름</dt>
             <dd className="mt-1 break-words">{user.name}</dd>
@@ -76,16 +108,26 @@ function ProfileForm({ user }: { readonly user: User }) {
       <Field
         id="major"
         label="전공 (선택)"
-        hint="전공은 권한과 관계없는 프로필 정보입니다. 비워두면 삭제됩니다."
+        hint="전공은 권한과 관계없는 프로필 정보입니다."
       >
-        <Input
+        <Select
           id="major"
           name="major"
           defaultValue={user.major ?? ""}
-          maxLength={50}
           aria-describedby="major-hint"
           disabled={mutation.isPending}
-        />
+        >
+          <option value="">선택 안 함</option>
+          {/* keep a legacy free-text major selectable so saving doesn't drop it */}
+          {user.major && !majors.includes(user.major) && (
+            <option value={user.major}>{user.major}</option>
+          )}
+          {majors.map((major) => (
+            <option key={major} value={major}>
+              {major}
+            </option>
+          ))}
+        </Select>
       </Field>
       {mutation.isError && (
         <p role="alert" className="text-sm text-danger">

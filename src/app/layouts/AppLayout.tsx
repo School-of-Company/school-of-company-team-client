@@ -2,7 +2,8 @@
 
 import type { ReactNode } from "react";
 import { AppShell } from "@/widgets/app-shell";
-import { isHeadAdmin, useMe } from "@/entities/user";
+import { isHeadAdmin, useMe, userAvatarUrl } from "@/entities/user";
+import { Avatar } from "@/shared/ui";
 import { LogoutButton } from "@/features/auth";
 
 export function AppLayout({ children }: { readonly children: ReactNode }) {
@@ -12,8 +13,13 @@ export function AppLayout({ children }: { readonly children: ReactNode }) {
       isHeadAdmin={isHeadAdmin(me.data)}
       userSlot={
         <div className="flex min-w-0 items-center justify-between gap-2">
-          <span className="min-w-0 truncate text-sm font-medium">
-            {me.data?.name}
+          <span className="flex min-w-0 items-center gap-2">
+            {me.data && (
+              <Avatar name={me.data.name} src={userAvatarUrl(me.data)} />
+            )}
+            <span className="min-w-0 truncate text-sm font-medium">
+              {me.data?.name}
+            </span>
           </span>
           <LogoutButton appearance="link" />
         </div>
