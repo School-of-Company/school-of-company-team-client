@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   forgetTask,
+  rememberTask,
   taskApi,
   taskKeys,
   taskQueries,
@@ -40,7 +41,14 @@ export function TaskDetailWorkspace({
   const [deleting, setDeleting] = useState(false);
   const [denied, setDenied] = useState<unknown>(null);
   const [message, setMessage] = useState("");
-  const task = useQuery({ ...taskQueries.detail(taskId), enabled: !denied });
+  // 404·403을 받은 상세는 다시 받지 않는다(10초 폴링·재마운트가 같은 404를 되풀이하지 않게). 다시 시도는 수동 refetch.
+  const lastError = client.getQueryState(taskKeys.detail(taskId))?.error;
+  const gone =
+    !!lastError && [403, 404].includes(normalizeApiError(lastError).status);
+  const task = useQuery({
+    ...taskQueries.detail(taskId),
+    enabled: !denied && !gone,
+  });
   const project = useQuery({
     ...projectQueries.detail(task.data?.projectId ?? ""),
     enabled: !denied && !!task.data?.projectId,
@@ -76,16 +84,16 @@ export function TaskDetailWorkspace({
     (projectProblem.status === 403 || projectProblem.status === 404)
       ? project.error
       : null);
-  // 업무 하나에 한 번만 정리한다. 정리가 다시 받게 한 쿼리가 또 404를 내도 되풀이하지 않는다.
-  const forgotten = useRef(false);
+  // 정리는 업무당 한 번이다(forgetTask가 QueryClient 단위로 기억). 다시 읽히면 표시를 지운다.
   useEffect(() => {
-    if (!taskError || forgotten.current) return;
+    if (!taskError) return;
     const problem = normalizeApiError(taskError);
-    if (problem.status === 403 || problem.status === 404) {
-      forgotten.current = true;
-      forgetTask(client);
-    }
-  }, [taskError, client]);
+    if (problem.status === 403 || problem.status === 404)
+      forgetTask(client, taskId);
+  }, [taskError, client, taskId]);
+  useEffect(() => {
+    if (task.isSuccess) rememberTask(client, taskId);
+  }, [task.isSuccess, client, taskId]);
   const changeStatus = useMutation({
     mutationFn: (status: Parameters<typeof taskApi.move>[1]["status"]) =>
       taskApi.move(taskId, { status, prevId: null, nextId: null }),
