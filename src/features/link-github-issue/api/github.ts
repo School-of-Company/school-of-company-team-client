@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
+import { refetchOnVisit } from "@/shared/lib";
 import type { PublicationRepository, TaskGithub } from "../model/types";
 
 const taskPath = (id: string) =>
@@ -53,6 +54,8 @@ export const taskGithubQueries = {
     queryOptions({
       queryKey: ["projects", projectId, "github-repositories"],
       queryFn: () => taskGithubApi.repositories(projectId),
+      // 비공개로 바뀐 저장소가 선택지에 남지 않게 들어올 때·포커스 때마다 다시 받는다.
+      ...refetchOnVisit,
       retry: false,
     }),
 };

@@ -15,6 +15,9 @@ test("화면 밖 목록은 지우고, 화면에 있는 목록은 그 업무만 �
     ["home"],
     ["me", "github", "review-requests"],
     ["members"],
+    ["projects", "p1", "github-repositories"],
+    ["settings-repositories", "p1"],
+    ["settings-installable-repositories", "p1"],
   ];
   for (const key of inactive) client.setQueryData(key, board());
   const activeKey = ["tasks", "board", true, "y"];

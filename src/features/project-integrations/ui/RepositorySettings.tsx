@@ -13,7 +13,9 @@ import {
   Select,
   Spinner,
 } from "@/shared/ui";
+import { repositoryName } from "@/shared/lib";
 import {
+  type ProjectRepository,
   useInstallableRepositories,
   useProjectRepositories,
   useRepositoryChange,
@@ -52,7 +54,7 @@ export function RepositorySettings({
         ),
     ) ?? [];
   const matches = available.filter((repo) =>
-    repo.fullName.toLowerCase().includes(search.toLowerCase()),
+    repositoryName(repo).toLowerCase().includes(search.toLowerCase()),
   );
   return (
     <div className="grid gap-4">
@@ -74,7 +76,7 @@ export function RepositorySettings({
               className="flex flex-wrap items-center justify-between gap-3 py-4"
             >
               <div className="min-w-0">
-                <p className="font-medium break-all">{repo.fullName}</p>
+                <p className="font-medium break-all">{repositoryName(repo)}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge>{repo.private ? "비공개" : "공개"}</Badge>
                   {repo.isDefault && <Badge>기본 발행</Badge>}
@@ -96,7 +98,7 @@ export function RepositorySettings({
                       projectRepositoryId: repo.id,
                     })
                   }
-                  aria-label={`${repo.fullName} 연결 해제`}
+                  aria-label={`${repositoryName(repo)} 연결 해제`}
                 >
                   연결 해제
                 </Button>
@@ -106,8 +108,7 @@ export function RepositorySettings({
         </ul>
       )}
       <p className="text-sm text-muted">
-        기본 발행 저장소:{" "}
-        {repositories.data.find((repo) => repo.isDefault)?.fullName ?? "없음"}
+        기본 발행 저장소: {defaultName(repositories.data)}
       </p>
       {!disabled && !editing && (
         <Button
@@ -143,7 +144,7 @@ export function RepositorySettings({
             <option value="">없음</option>
             {repositories.data.map((repo) => (
               <option key={repo.id} value={repo.id}>
-                {repo.fullName}
+                {repositoryName(repo)}
               </option>
             ))}
           </Select>
@@ -194,7 +195,7 @@ export function RepositorySettings({
               </option>
               {matches.map((repo) => (
                 <option key={repo.repositoryId} value={repo.repositoryId}>
-                  {repo.fullName}
+                  {repositoryName(repo)}
                   {repo.private ? " (비공개)" : " (공개)"}
                 </option>
               ))}
@@ -251,3 +252,8 @@ export function RepositorySettings({
     </div>
   );
 }
+
+const defaultName = (repositories: readonly ProjectRepository[]) => {
+  const found = repositories.find((repo) => repo.isDefault);
+  return found ? repositoryName(found) : "없음";
+};

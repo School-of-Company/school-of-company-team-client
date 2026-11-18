@@ -82,14 +82,16 @@ export const taskQueries = {
 };
 
 /**
- * 업무 목록·개수를 담는 다른 슬라이스의 쿼리. 업무가 사라지면(404·권한 회수) 함께 정리한다.
- * 프로젝트(Sprint·확인 필요 포함) · 홈 · 내 리뷰 요청 · 팀원 부하.
+ * 업무 목록·개수와 저장소 목록을 담는 다른 슬라이스의 쿼리. 업무가 사라지면(404·권한 회수) 함께 정리한다.
+ * 프로젝트(Sprint·확인 필요·발행 저장소 포함) · 홈 · 내 리뷰 요청 · 팀원 부하 · 설정의 연결·설치 저장소.
  */
 const taskListKeys: readonly QueryKey[] = [
   ["projects"],
   ["home"],
   ["me", "github", "review-requests"],
   ["members"],
+  ["settings-repositories"],
+  ["settings-installable-repositories"],
 ];
 
 const goneKey = (taskId: string) => ["gone-task", taskId] as const;
