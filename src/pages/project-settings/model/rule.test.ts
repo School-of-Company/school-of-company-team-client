@@ -1,0 +1,143 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import {
+  actionText,
+  allowedActions,
+  brokenReferences,
+  emptyRuleForm,
+  formToRequest,
+  resultMessage,
+  ruleToForm,
+  selectableEvents,
+  toggleRequest,
+  triggerText,
+  validateRuleForm,
+  type AutomationRule,
+} from "./rule";
+
+const rule: AutomationRule = {
+  id: "R1",
+  projectId: "P1",
+  name: "P0 막힘이면 PM 호출",
+  enabled: true,
+  event: "TASK_BLOCKED",
+  eventStatus: null,
+  conditions: [
+    { field: "PRIORITY", value: "P0", label: "P0" },
+    { field: "PRIORITY", value: "P1", label: "P1" },
+    { field: "PART", value: "A1", label: "백엔드" },
+  ],
+  action: "NOTIFY_DISCORD",
+  bucket: null,
+  reviewer: null,
+  mentions: { assignees: true, reviewers: false, pm: true },
+  lastRun: null,
+  createdAt: "2026-11-19T10:00:00+09:00",
+  updatedAt: "2026-11-19T10:00:00+09:00",
+};
+
+test("toggling sends the full definition back with only enabled changed", () => {
+  assert.deepEqual(toggleRequest(rule, false), {
+    name: rule.name,
+    enabled: false,
+    event: "TASK_BLOCKED",
+    eventStatus: null,
+    conditions: [
+      { field: "PRIORITY", value: "P0" },
+      { field: "PRIORITY", value: "P1" },
+      { field: "PART", value: "A1" },
+    ],
+    action: "NOTIFY_DISCORD",
+    bucketId: null,
+    reviewerId: null,
+    mentions: { assignees: true, reviewers: false, pm: true },
+  });
+});
+
+test("fields that do not apply to the chosen event or action are not sent", () => {
+  const form = {
+    ...emptyRuleForm(),
+    name: "  리뷰 진입 시 지정  ",
+    event: "TASK_BLOCKED" as const,
+    eventStatus: "REVIEW" as const,
+    action: "ASSIGN_REVIEWER" as const,
+    bucketId: "B1",
+    reviewerId: "U2",
+  };
+  const body = formToRequest(form);
+  assert.equal(body.name, "리뷰 진입 시 지정");
+  assert.equal(body.eventStatus, null);
+  assert.equal(body.bucketId, null);
+  assert.equal(body.reviewerId, "U2");
+  assert.equal(body.mentions, null);
+  assert.equal(
+    formToRequest({ ...form, event: "TASK_STATUS_CHANGED" }).eventStatus,
+    "REVIEW",
+  );
+});
+
+test("incident rules carry no conditions and can only mention the PM", () => {
+  const form = {
+    ...ruleToForm(rule),
+    event: "INCIDENT_CREATED" as const,
+  };
+  const body = formToRequest(form);
+  assert.deepEqual(body.conditions, []);
+  assert.deepEqual(body.mentions, {
+    assignees: false,
+    reviewers: false,
+    pm: true,
+  });
+  assert.deepEqual(allowedActions("INCIDENT_CREATED"), ["NOTIFY_DISCORD"]);
+});
+
+test("there is no status-changing or external write action, and incident is not offered before stage 7", () => {
+  assert.deepEqual(allowedActions("TASK_STATUS_CHANGED"), [
+    "NOTIFY_DISCORD",
+    "MARK_ATTENTION",
+    "ASSIGN_REVIEWER",
+    "MOVE_BUCKET",
+  ]);
+  assert.ok(!selectableEvents.includes("INCIDENT_CREATED"));
+});
+
+test("targets are required for move and reviewer actions", () => {
+  const base = { ...emptyRuleForm(), name: "규칙" };
+  assert.deepEqual(validateRuleForm(base), {});
+  assert.ok(validateRuleForm({ ...base, name: "  " }).name);
+  assert.ok(validateRuleForm({ ...base, action: "MOVE_BUCKET" }).bucketId);
+  assert.ok(
+    validateRuleForm({ ...base, action: "ASSIGN_REVIEWER" }).reviewerId,
+  );
+});
+
+test("deleted parts, buckets and reviewers are flagged instead of silently dropped", () => {
+  const broken: AutomationRule = {
+    ...rule,
+    conditions: [{ field: "PART", value: "A9", label: null }],
+    action: "MOVE_BUCKET",
+    bucket: null,
+    mentions: null,
+  };
+  assert.deepEqual(brokenReferences(broken), [
+    "삭제된 파트 조건",
+    "삭제된 대상 버킷",
+  ]);
+  assert.deepEqual(ruleToForm(broken).conditions.PART, ["A9"]);
+  assert.deepEqual(brokenReferences(rule), []);
+});
+
+test("summaries read as short Korean phrases", () => {
+  assert.equal(triggerText(rule), "막힘으로 표시될 때");
+  assert.equal(
+    triggerText({ event: "TASK_STATUS_CHANGED", eventStatus: "REVIEW" }),
+    "상태가 리뷰(으)로 바뀔 때",
+  );
+  assert.equal(actionText(rule), "Discord로 알림, 담당자, PM 멘션");
+  assert.equal(resultMessage(null), null);
+  assert.equal(
+    resultMessage("DISCORD_CHANNEL_MISSING"),
+    "보낼 업무 스레드나 프로젝트 채널이 없습니다.",
+  );
+  assert.equal(resultMessage("NEW_CODE"), "NEW_CODE");
+});
