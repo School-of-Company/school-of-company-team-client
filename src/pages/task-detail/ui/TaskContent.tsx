@@ -75,19 +75,25 @@ export function TaskProperties({
           <dt>담당자</dt>
           <dd>
             {task.assignees.map((person) => person.name).join(", ") || (
-              <span className="text-faint">미지정</span>
+              <span className="text-muted">미지정</span>
             )}
           </dd>
         </div>
         <div>
           <dt>파트</dt>
           <dd>
-            {task.part?.name ?? <span className="text-faint">미지정</span>}
+            {task.part?.name ?? <span className="text-muted">미지정</span>}
           </dd>
         </div>
         <div>
           <dt>마감일</dt>
-          <dd>{formatDate(task.deadline)}</dd>
+          <dd>
+            {task.deadline ? (
+              formatDate(task.deadline)
+            ) : (
+              <span className="text-muted">없음</span>
+            )}
+          </dd>
         </div>
         {task.completedAt && (
           <div>
@@ -116,7 +122,7 @@ export function TaskDescription({ task }: { readonly task: TaskDetail }) {
         {task.description ? (
           <Markdown>{task.description}</Markdown>
         ) : (
-          <p className="text-sm text-faint">설명이 없습니다.</p>
+          <p className="text-sm text-muted">설명이 없습니다.</p>
         )}
       </section>
     </>

@@ -14,7 +14,7 @@ export function LoginPage() {
   return (
     <IdentityPanel title="로그인">
       <OAuthButton provider="github" />
-      <p className="text-[0.8125rem] whitespace-nowrap text-(--color-ink-2)">
+      <p className="text-[0.8125rem] whitespace-nowrap text-foreground-2">
         처음이면 관리자 승인 후 이용할 수 있어요.
       </p>
     </IdentityPanel>

@@ -17,8 +17,8 @@
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | 배경     | `--background`(페이지), `--surface`(컨트롤), `--surface-raised`(카드·다이얼로그·메뉴), `--surface-sunken`(보드 컬럼), `--surface-sidebar` |
 | 상호작용 | `--surface-hover`, `--surface-active`(현재 선택)                                                                                          |
-| 글자     | `--foreground`, `--foreground-2`(보조), `--muted`(메타), `--faint`(비어 있음·플레이스홀더)                                                |
-| 선       | `--border`(구분), `--border-strong`(입력·버튼 테두리)                                                                                     |
+| 글자     | `--foreground`, `--foreground-2`(보조), `--muted`(메타·빈 값·플레이스홀더, 4.5:1 이상), `--faint`(아이콘·장식 전용, 글자에 쓰지 않음)     |
+| 선       | `--border`(구분), `--border-strong`(버튼 테두리), `--border-input`(입력·셀렉트 테두리, 3:1 이상)                                          |
 | 강조     | `--brand`, `--brand-hover`, `--brand-soft`, `--on-brand`                                                                                  |
 | 상태     | `--danger`, `--success`, 상태·우선순위 색은 `--hue-*`                                                                                     |
 
