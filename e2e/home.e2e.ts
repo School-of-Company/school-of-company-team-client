@@ -323,6 +323,45 @@ test("GitHub signals reach home through the stub and signed webhooks", async ({
   await expect(reviews.getByText("24시간 초과", { exact: true })).toBeVisible();
 });
 
+test("10초 폴링 동안 홈 행이 사라지거나 스켈레톤으로 바뀌지 않는다", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await open(page, seed.member.tokens, "/");
+  await expect(page.locator(".home-row").first()).toBeVisible();
+  await page.evaluate(() => {
+    const w = window as unknown as { flicker: string[] };
+    w.flicker = [];
+    new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.removedNodes)
+          if (
+            node instanceof Element &&
+            (node.matches(".home-panel") || node.querySelector(".home-panel"))
+          )
+            w.flicker.push("panel removed");
+        for (const node of record.addedNodes)
+          if (
+            node instanceof Element &&
+            node.querySelector('[aria-label="홈을 불러오는 중"]')
+          )
+            w.flicker.push("skeleton shown");
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().endsWith("/api/v1/home")) requests.push(request.url());
+  });
+  await page.waitForTimeout(21_000);
+  expect(requests.length).toBeGreaterThanOrEqual(2);
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { flicker: string[] }).flicker,
+    ),
+  ).toEqual([]);
+});
+
 test("a member without managed projects gets no scope switch", async ({
   page,
 }) => {
