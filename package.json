@@ -9,7 +9,9 @@
     "lint": "eslint",
     "lint:fsd": "steiger ./src",
     "format": "prettier --write .",
-    "type-check": "next typegen && tsc --noEmit"
+    "type-check": "next typegen && tsc --noEmit",
+    "test": "bun test src",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.107.1",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@feature-sliced/steiger-plugin": "^0.8.2",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "4.3.3",
     "@tanstack/eslint-plugin-query": "^5.107.1",
     "@types/node": "^20",

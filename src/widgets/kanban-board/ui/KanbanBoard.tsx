@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  boardTotal,
   sortTaskCards,
   statusLabels,
   taskMoveAt,
@@ -39,14 +40,17 @@ export function KanbanBoard({
   readonly onVisibleStatus: (status: TaskStatus) => void;
 }) {
   const [dragged, setDragged] = useState<TaskCard | null>(null);
-  if (board.groups.length === 0)
+  // 업무가 하나도 없으면 빈 컬럼 다섯 개 대신 무엇을 할지 알려 준다.
+  if (board.groups.length === 0 || boardTotal(board) === 0)
     return (
       <EmptyState
         title="업무가 없습니다"
         description="필터를 조정하거나 새 업무를 추가해 주세요."
         action={
           onCreate && (
-            <Button onClick={() => onCreate("BACKLOG")}>업무 추가</Button>
+            <Button variant="secondary" onClick={() => onCreate("BACKLOG")}>
+              업무 추가
+            </Button>
           )
         }
       />
@@ -118,7 +122,7 @@ export function KanbanBoard({
                         aria-hidden="true"
                       />
                       <span>{statusLabels[status]}</span>
-                      <span className="font-normal text-faint tabular-nums">
+                      <span className="font-normal text-muted tabular-nums">
                         {cards.length}
                       </span>
                     </Heading>

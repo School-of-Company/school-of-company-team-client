@@ -47,9 +47,12 @@
   --foreground: var(--gray-12);
   --foreground-2: var(--gray-11);
   --muted: var(--gray-10);
-  --faint: var(--gray-8);
+  /* faint 는 아이콘·장식 전용(3:1 이상). 읽어야 하는 글자는 muted 이상을 쓴다. */
+  --faint: var(--gray-9);
   --border: var(--gray-5);
   --border-strong: var(--gray-7);
+  /* 입력 경계는 배경 대비 3:1 이상(라이트 3.4~3.9, 다크 4.1~4.9). */
+  --border-input: var(--gray-9);
   --brand: var(--pink-9);
   --brand-hover: var(--pink-10);
   --brand-soft: var(--pink-3);
@@ -113,6 +116,18 @@
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-1: 120ms;
   --dur-2: 200ms;
+
+  /* 테마 선택 미리보기: 현재 테마와 무관하게 각 테마의 모습을 고정해 보여 준다. */
+  --preview-light-bg: #ffffff;
+  --preview-light-side: #f1f2f4;
+  --preview-light-line: #d6d8dd;
+  --preview-light-accent: #d92a4a;
+  --preview-dark-bg: #131416;
+  --preview-dark-side: #0f1012;
+  --preview-dark-line: #353840;
+  --preview-dark-accent: #ff5c78;
+  --preview-mixed-side: rgb(125 130 140 / 0.25);
+  --preview-mixed-line: rgb(125 130 140 / 0.45);
 
   --z-raised: 10;
   --z-dropdown: 100;

@@ -2,6 +2,35 @@
  {
   "scope": "app",
   "mode": "redesign",
+  "depth": "polish",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell, 60rem drawer",
+  "signature": "kanban board",
+  "sections": [
+   "login",
+   "pending",
+   "connect-discord",
+   "me",
+   "team",
+   "projects",
+   "project-board",
+   "project-settings",
+   "task",
+   "admin",
+   "account"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "prompt": "Stage 1 F1 design quality baseline across all existing screens: contrast, states, polling flicker, mobile sidebar",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
+  "mode": "redesign",
   "depth": "full",
   "theme": "cobalt",
   "axes": "light/grotesk-sans/cool",

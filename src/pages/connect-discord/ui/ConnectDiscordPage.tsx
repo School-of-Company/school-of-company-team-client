@@ -39,12 +39,12 @@ export function ConnectDiscordPage() {
           }}
         />
       ) : !me.data || !token ? (
-        <p className="min-h-12 text-sm leading-6 text-(--color-ink-2)">
+        <p className="min-h-12 text-sm leading-6 text-foreground-2">
           계정 상태를 확인하고 있어요.
         </p>
       ) : (
         <>
-          <p className="min-h-12 text-sm leading-6 text-(--color-ink-2)">
+          <p className="min-h-12 text-sm leading-6 text-foreground-2">
             승인됐어요. 업무 알림과 논의를 위해 Discord를 연결해 주세요.
           </p>
           <OAuthButton provider="discord" />

@@ -54,7 +54,7 @@ function PendingContent() {
   };
   return (
     <IdentityPanel title={checking ? "계정 상태 확인 중" : title}>
-      <p className="min-h-12 text-sm leading-6 text-(--color-ink-2)">
+      <p className="min-h-12 text-sm leading-6 text-foreground-2">
         {checking
           ? "잠시만 기다려 주세요."
           : terminal
@@ -108,7 +108,7 @@ export function PendingPage() {
     <Suspense
       fallback={
         <IdentityPanel title="계정 상태 확인 중">
-          <p className="min-h-12 text-sm leading-6 text-(--color-ink-2)">
+          <p className="min-h-12 text-sm leading-6 text-foreground-2">
             잠시만 기다려 주세요.
           </p>
         </IdentityPanel>
