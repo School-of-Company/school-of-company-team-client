@@ -1,19 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #f7f8fa;
+  --foreground: #18212f;
+  --surface: #ffffff;
+  --surface-hover: #eef1f5;
+  --muted: #566477;
+  --border: #8996a8;
+  --brand: #2454ba;
+  --brand-soft: #e9efff;
+  --danger: #b42332;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-danger: var(--danger);
+  --spacing: 0.25rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
+    --background: #11151c;
+    --foreground: #e7edf5;
+    --surface: #191f29;
+    --surface-hover: #273140;
+    --muted: #a9b5c7;
+    --border: #73839b;
+    --brand: #a9c3ff;
+    --brand-soft: #233559;
+    --danger: #ffabb3;
   }
 }
 
@@ -21,4 +48,122 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+  }
+  button:not(:disabled),
+  select {
+    cursor: pointer;
+  }
+  :disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+@layer components {
+  .ui-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .ui-button-primary {
+    background: var(--brand);
+    color: var(--surface);
+  }
+  .ui-button-secondary {
+    background: var(--surface);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+  .ui-button-ghost {
+    color: var(--foreground);
+  }
+  .ui-button-danger {
+    background: var(--danger);
+    color: var(--surface);
+  }
+  .ui-button:hover:not(:disabled) {
+    filter: brightness(0.93);
+  }
+  .ui-icon-button {
+    width: 2.75rem;
+    padding: 0.5rem;
+    flex-shrink: 0;
+  }
+  .ui-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    padding: 0.625rem 0.75rem;
+    color: var(--foreground);
+    font-size: 0.875rem;
+  }
+  .ui-input::placeholder {
+    color: var(--muted);
+  }
+  .ui-input[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+  .ui-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .ui-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(32rem, calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    background: var(--surface);
+    color: var(--foreground);
+    box-shadow: 0 20px 60px #0003;
+  }
+  .ui-dialog::backdrop {
+    background: #0008;
+  }
+  .ui-drawer {
+    margin: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    width: min(20rem, calc(100% - 3rem));
+    border-radius: 0;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-spinner {
+    animation: none;
+  }
 }
