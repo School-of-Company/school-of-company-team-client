@@ -41,6 +41,7 @@
     line-height: var(--leading-tight);
     overflow-wrap: break-word;
     min-width: 0;
+    text-wrap: balance;
   }
   p {
     margin: 0;
