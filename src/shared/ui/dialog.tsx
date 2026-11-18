@@ -58,10 +58,13 @@ export function Dialog({
         }
       }}
       onCancel={(event) => {
+        event.stopPropagation();
         event.preventDefault();
         onClose();
       }}
-      onClose={onClose}
+      onClose={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
       className={`ui-dialog ${className}`}
     >
       <div className="mb-6 flex items-center justify-between gap-4">
