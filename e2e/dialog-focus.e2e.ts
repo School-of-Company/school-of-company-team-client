@@ -4,6 +4,8 @@ import { apiUrl, readSeed, signIn, type Tokens } from "./support";
 // 대화상자를 닫으면(호출부가 조건부 렌더로 언마운트하는 경우 포함) 포커스가 연 버튼으로 돌아오고,
 // 연 요소가 사라졌으면 body 가 아니라 본문(main)으로 간다. 격리 backend 실제 API.
 const seed = readSeed();
+// `--repeat-each` 로 여러 번 돌려도 이름이 겹치지 않게(Sprint·Milestone 이름은 프로젝트 안에서 유일).
+const unique = () => `${seed.run}-${Date.now().toString(36)}`;
 
 async function api<T>(
   method: string,
@@ -50,7 +52,7 @@ test("Sprint 종료 대화상자를 닫으면 종료 버튼으로 돌아온다",
 }) => {
   const base = `/api/v1/projects/${seed.project.id}/sprints`;
   const sprint = await api<{ id: string }>("POST", base, seed.admin, {
-    name: `포커스 ${seed.run}`,
+    name: `포커스 ${unique()}`,
     startDate: "2026-11-16",
     endDate: "2026-11-27",
   });
@@ -74,7 +76,7 @@ test("Sprint 종료 대화상자를 닫으면 종료 버튼으로 돌아온다",
 test("연 요소가 사라지면(삭제한 Milestone 행) 포커스는 body 가 아니라 본문으로 간다", async ({
   page,
 }) => {
-  const name = `포커스 ${seed.run}`;
+  const name = `포커스 ${unique()}`;
   await api(
     "POST",
     `/api/v1/projects/${seed.project.id}/milestones`,
