@@ -6,6 +6,7 @@ import {
   boardFilterKeys,
   taskStatuses,
   statusLabels,
+  priorityLabels,
   type BoardFilterKey,
 } from "@/entities/task";
 import type { Project } from "@/entities/project";
@@ -91,9 +92,9 @@ export function TaskFilters({
     {
       key: "priority",
       label: "우선순위",
-      choices: ["P0", "P1", "P2", "P3"].map((value) => ({
+      choices: (["P0", "P1", "P2", "P3"] as const).map((value) => ({
         value,
-        label: value,
+        label: priorityLabels[value],
       })),
     },
     {
@@ -141,10 +142,7 @@ export function TaskFilters({
         </span>
       </summary>
       <div className="board-filters-panel">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs text-muted">
-            같은 항목은 OR, 다른 항목은 AND로 적용합니다.
-          </p>
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <Button
             variant="ghost"
             onClick={() => {

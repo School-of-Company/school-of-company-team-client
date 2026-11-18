@@ -9,7 +9,7 @@ export {
   taskMoveAt,
 } from "./model/board";
 export type { BoardFilterKey, BoardSort } from "./model/board";
-export { taskStatuses, statusLabels } from "./model/types";
+export { taskStatuses, statusLabels, priorityLabels } from "./model/types";
 export type {
   TaskStatus,
   TaskType,

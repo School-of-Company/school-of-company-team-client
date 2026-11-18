@@ -9,6 +9,12 @@ export type TaskStatus = (typeof taskStatuses)[number];
 export type TaskType = "TASK" | "DEV";
 export type TaskScope = "PROJECT" | "TEAM" | "PERSONAL";
 export type TaskPriority = "P0" | "P1" | "P2" | "P3";
+export const priorityLabels: Readonly<Record<TaskPriority, string>> = {
+  P0: "긴급",
+  P1: "높음",
+  P2: "보통",
+  P3: "낮음",
+};
 export const statusLabels: Readonly<Record<TaskStatus, string>> = {
   BACKLOG: "검토 필요",
   PLANNED: "진행 예정",
@@ -39,6 +45,12 @@ export type TaskCard = {
   readonly blockedReason: string | null;
   readonly position: number;
   readonly completedAt: string | null;
+  /** Linked GitHub issue/PR; sent by the board API from feat/board-card-issue. */
+  readonly issue?: {
+    readonly repositoryFullName: string;
+    readonly number: number;
+    readonly kind: "ISSUE" | "PR";
+  } | null;
 };
 export type TaskDetail = TaskCard & {
   readonly description: string | null;
