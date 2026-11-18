@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { type TaskCard, type TaskStatus } from "@/entities/task";
 import { formatDate } from "@/shared/lib";
-import { Avatar } from "@/shared/ui";
-
 const priorityLabels = {
   P0: "긴급",
   P1: "높음",
@@ -69,19 +67,15 @@ export function BoardCard({
         {task.title}
       </Link>
       <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-wrap gap-2" aria-label="담당자">
+        <div className="flex min-w-0 flex-wrap gap-x-2" aria-label="담당자">
           {task.assignees.length ? (
             task.assignees.map((person) => (
-              <span
-                key={person.id}
-                className="inline-flex min-w-0 items-center gap-1 text-xs"
-              >
-                <Avatar name={person.name} />
-                <span aria-hidden="true">{person.name}</span>
+              <span key={person.id} className="text-xs">
+                {person.name}
               </span>
             ))
           ) : (
-            <span className="text-sm text-muted">미지정</span>
+            <span className="text-xs text-muted">미지정</span>
           )}
         </div>
         <span
