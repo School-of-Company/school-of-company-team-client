@@ -1,5 +1,17 @@
 import type { BoardSort } from "@/entities/task";
-import { Select } from "@/shared/ui";
+import { ChipSelect } from "@/shared/ui";
+
+const groupOptions = [
+  { value: "none", label: "그룹 없음" },
+  { value: "owner", label: "담당자별" },
+  { value: "part", label: "파트별" },
+] as const;
+
+const sortOptions = [
+  { value: "manual", label: "수동 순서" },
+  { value: "priority", label: "우선순위순" },
+  { value: "deadline", label: "마감일순" },
+] as const satisfies readonly { value: BoardSort; label: string }[];
 
 export function BoardViewControls({
   search,
@@ -15,32 +27,21 @@ export function BoardViewControls({
     params.set(key, value);
     onChange(params.toString());
   }
+  const group = params.get("groupBy");
   return (
     <div className="board-view-controls flex min-w-0 flex-wrap items-center gap-2">
-      <label className="shrink-0">
-        <span className="sr-only">그룹</span>
-        <Select
-          className="ui-chip-select"
-          value={params.get("groupBy") ?? "none"}
-          onChange={(event) => change("groupBy", event.target.value)}
-        >
-          <option value="none">그룹 없음</option>
-          <option value="owner">담당자별</option>
-          <option value="part">파트별</option>
-        </Select>
-      </label>
-      <label className="shrink-0">
-        <span className="sr-only">정렬</span>
-        <Select
-          className="ui-chip-select"
-          value={sort}
-          onChange={(event) => change("sort", event.target.value)}
-        >
-          <option value="manual">수동 순서</option>
-          <option value="priority">우선순위순</option>
-          <option value="deadline">마감일순</option>
-        </Select>
-      </label>
+      <ChipSelect
+        label="그룹"
+        value={group === "owner" || group === "part" ? group : "none"}
+        options={groupOptions}
+        onChange={(value) => change("groupBy", value)}
+      />
+      <ChipSelect
+        label="정렬"
+        value={sort}
+        options={sortOptions}
+        onChange={(value) => change("sort", value)}
+      />
       {sort !== "manual" && (
         <p className="text-xs text-muted">
           순서 이동은 수동 순서에서만 가능해요.

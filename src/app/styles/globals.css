@@ -453,22 +453,65 @@ body {
   width: var(--icon-size);
   height: var(--icon-size);
 }
+.ui-chip-select-root {
+  position: relative;
+}
 .ui-chip-select {
-  width: auto;
+  display: inline-flex;
   min-height: 2rem;
-  height: 2rem;
-  padding: 0 var(--space-xl) 0 var(--space-sm);
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: 0 var(--space-xs) 0 var(--space-sm);
   border: 1px solid var(--rule-subtle);
   border-radius: var(--radius-pill);
-  background-color: var(--surface);
+  background: var(--surface);
+  color: var(--foreground);
   font-size: var(--text-sm);
   transition:
     background-color var(--dur-micro) var(--ease-out),
     border-color var(--dur-micro) var(--ease-out);
 }
-.ui-chip-select:hover {
+.ui-chip-select svg {
+  color: var(--muted);
+}
+.ui-chip-select:hover,
+.ui-chip-select[aria-expanded="true"] {
   border-color: var(--rule-strong);
-  background-color: var(--surface-hover);
+  background: var(--surface-hover);
+}
+.ui-chip-menu {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 10rem;
+  padding: var(--space-2xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+  outline: none;
+  transform-origin: top right;
+}
+.ui-chip-option {
+  display: flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border-radius: calc(var(--radius-md) - 3px);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.ui-chip-option[data-active] {
+  background: var(--surface-hover);
+}
+.ui-chip-option[aria-selected="true"] {
+  font-weight: 600;
+}
+.ui-chip-option svg {
+  color: var(--brand);
 }
 .board-filters > summary {
   display: inline-flex;
@@ -500,6 +543,12 @@ body {
   from {
     opacity: 0;
     transform: translateY(4px);
+  }
+}
+@keyframes ui-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
   }
 }
 @keyframes ui-slide-in {
@@ -537,6 +586,9 @@ body {
   }
   .ui-identity main {
     animation: ui-fade-up var(--dur-long) var(--ease-out);
+  }
+  .ui-chip-menu {
+    animation: ui-menu-in var(--dur-micro) var(--ease-out);
   }
 }
 @media (pointer: coarse) {

@@ -23,3 +23,5 @@ export type { IconName } from "./icons";
 export { ThemeToggle } from "./theme-toggle";
 export { BrandMark } from "./brand-mark";
 export { ThemeSelect } from "./theme-select";
+export { ChipSelect } from "./chip-select";
+export type { ChipOption } from "./chip-select";
