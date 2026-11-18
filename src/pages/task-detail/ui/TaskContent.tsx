@@ -19,7 +19,7 @@ export function TaskContent({
   readonly onStatus: (status: TaskStatus) => void;
 }) {
   return (
-    <section className="grid gap-6 rounded-md border border-border bg-surface p-5">
+    <section className="grid gap-5 border-t border-border pt-5">
       <div className="flex flex-wrap gap-2">
         <Badge>{task.type === "DEV" ? "개발 업무" : "일반 업무"}</Badge>
         <Badge>{task.priority}</Badge>

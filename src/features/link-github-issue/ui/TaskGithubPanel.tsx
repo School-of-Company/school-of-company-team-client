@@ -12,7 +12,7 @@ import {
   Field,
   Input,
   Select,
-  Spinner,
+  Skeleton,
 } from "@/shared/ui";
 import { taskGithubApi, taskGithubQueries } from "../api/github";
 import { publicationLabels } from "../model/types";
@@ -67,7 +67,17 @@ export function TaskGithubPanel({
       form.reset();
     });
   }
-  if (github.isPending) return <Spinner label="GitHub 연결을 불러오는 중" />;
+  if (github.isPending)
+    return (
+      <div
+        role="status"
+        aria-label="GitHub 연결을 불러오는 중"
+        className="grid gap-3"
+      >
+        <Skeleton className="w-40" />
+        <Skeleton className="h-24" />
+      </div>
+    );
   if (github.isError)
     return (
       <ErrorState

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { taskApi, type TaskScope } from "@/entities/task";
+import { taskApi, type TaskScope, type TaskStatus } from "@/entities/task";
 import type { ProjectDetail } from "@/entities/project";
 import { TaskEditor } from "@/features/edit-task";
 import { taskGithubApi, taskGithubQueries } from "@/features/link-github-issue";
@@ -13,10 +13,12 @@ export function BoardCreateDialog({
   scope,
   project,
   people,
+  initialStatus,
   onClose,
   onCreated,
 }: {
   readonly scope: TaskScope;
+  readonly initialStatus: TaskStatus;
   readonly project?: ProjectDetail;
   readonly people: readonly { readonly id: string; readonly name: string }[];
   readonly onClose: () => void;
@@ -81,6 +83,7 @@ export function BoardCreateDialog({
       )}
       <TaskEditor
         scope={scope}
+        initialStatus={initialStatus}
         project={project}
         candidates={people}
         onCancel={onClose}

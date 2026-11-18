@@ -20,6 +20,7 @@ type Props = {
   readonly scope: TaskScope;
   readonly project?: ProjectDetail;
   readonly initial?: TaskDetail;
+  readonly initialStatus?: TaskStatus;
   readonly candidates: readonly {
     readonly id: string;
     readonly name: string;
@@ -33,15 +34,18 @@ export function TaskEditor({
   scope,
   project,
   initial,
+  initialStatus,
   candidates,
   onCreate,
   onUpdate,
   onCancel,
 }: Props) {
   const prefix = useId();
-  const [type, setType] = useState<TaskType>(initial?.type ?? "TASK");
+  const [type, setType] = useState<TaskType>(
+    initial?.type ?? (initialStatus === "REVIEW" ? "DEV" : "TASK"),
+  );
   const [status, setStatus] = useState<TaskStatus>(
-    initial?.status ?? "BACKLOG",
+    initial?.status ?? initialStatus ?? "BACKLOG",
   );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");

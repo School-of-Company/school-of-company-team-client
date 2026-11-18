@@ -1,0 +1,3 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Cobalt (by request) · redesign: full · v2.0.0 */
+/* Critique: menu and creation handlers changed shape while the original APIs and routes remain. */
+/* Hallmark · dropped onChange={(event) => { const status = taskStatuses.find, onClick={() => onOrder, onClick={() => setCreating(true)}, onClose={() => setCreating(false)}, onCreate={canCreate, onCreated={async (notice), onImported={(id) · Status and order actions moved from expanded controls into the accessible card menu; creation now receives its column status; import callback moved to BoardHeader. No capability or API was removed. */
