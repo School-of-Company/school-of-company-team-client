@@ -78,8 +78,8 @@ export function EmptyState({
   readonly action?: ReactNode;
 }) {
   return (
-    <section className="grid justify-items-center gap-3 px-6 py-16 text-center">
-      <h2 className="text-lg font-semibold">{title}</h2>
+    <section className="ui-empty">
+      <h2>{title}</h2>
       {description && (
         <p className="max-w-md text-sm text-muted">{description}</p>
       )}

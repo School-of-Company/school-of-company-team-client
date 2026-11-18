@@ -492,7 +492,9 @@ select.ui-input {
   background: var(--surface-hover);
 }
 .ui-priority-option:has(input:checked) {
-  border-color: var(--priority);
+  border-color: color-mix(in oklab, var(--priority) 60%, var(--foreground));
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, var(--priority) 60%, var(--foreground));
   background: color-mix(in oklab, var(--priority) 12%, var(--surface));
   color: var(--foreground);
 }
@@ -1257,4 +1259,25 @@ select.ui-input {
 .ui-steps li[aria-current="step"]::before {
   background: var(--foreground);
   color: var(--background);
+}
+
+/* Empty and error states: quiet and sized to the region they sit in. */
+.ui-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+.ui-empty h2 {
+  color: var(--foreground-2);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+.ui-empty .ui-button {
+  margin-top: var(--space-2);
+}
+/* Form buttons keep their own width instead of stretching across the column. */
+.settings-page .ui-button {
+  justify-self: start;
 }
