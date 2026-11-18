@@ -15,9 +15,8 @@ export function IdentityPanel({
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="flex items-center justify-between gap-3 px-5 py-4 sm:px-8">
-        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold">
-          <BrandMark size={28} />
-          <span className="truncate">Engineering Hub</span>
+        <span className="min-w-0 text-sm">
+          <BrandMark size={28} label />
         </span>
         <ThemeToggle />
       </header>
@@ -29,9 +28,6 @@ export function IdentityPanel({
           <div className="mt-6 grid gap-6">{children}</div>
         </section>
       </main>
-      <footer className="px-5 py-6 text-center text-xs text-muted">
-        School of Company
-      </footer>
     </div>
   );
 }

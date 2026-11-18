@@ -44,9 +44,9 @@
   --z-modal: 400;
   --z-toast: 500;
   --z-tooltip: 600;
-  --color-paper: oklch(98.6% 0.005 250);
-  --color-paper-2: oklch(96.2% 0.008 252);
-  --color-paper-3: oklch(93% 0.011 252);
+  --color-paper: #ffffff;
+  --color-paper-2: #ffffff; /* app background: plain white (user request) */
+  --color-paper-3: #f4f5f7; /* hover / quiet fill on white */
   --color-ink: oklch(21% 0.028 262);
   --color-ink-2: oklch(36% 0.022 260);
   --color-muted: oklch(50% 0.018 258);

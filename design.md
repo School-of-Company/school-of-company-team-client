@@ -15,7 +15,7 @@ The locked system for the team workbench. Pages share these tokens and controls.
 
 `src/app/styles/tokens.css` is the source of truth, imported by `globals.css` before `base.css`.
 
-- Paper: `--color-paper`, `--color-paper-2`, `--color-paper-3`.
+- Paper: `--color-paper`, `--color-paper-2`, `--color-paper-3`. Light: plain white app background and surfaces (#ffffff), `--color-paper-3` #f4f5f7 for hover and quiet fills; separation comes from 1px rules, not tinted grounds.
 - Ink: `--color-ink`, `--color-ink-2`, `--color-muted`.
 - Rules: `--color-rule`, `--color-rule-2`; controls use muted for visible edges.
 - Accent: `--color-accent`, `--color-accent-wash`, `--color-accent-ink`, `--color-focus`. Logo pink `--color-brand-logo` (#ff4060, sampled) is decoration only (3.41:1 on white). Light accent #d92a4a (white text 4.79:1), hover/deep #b81c3c. Dark accent #ff5c78 with dark ink #111318 on it (6.24:1).
