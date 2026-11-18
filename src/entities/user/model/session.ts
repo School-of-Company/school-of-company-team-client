@@ -5,6 +5,7 @@ import type { SessionTokens } from "./types";
 
 const ACCESS_KEY = "soc.access-token";
 const REFRESH_KEY = "soc.refresh-token";
+const RESTRICTION_KEY = "soc.account-restriction";
 const listeners = new Set<() => void>();
 
 export function getAccessToken(): string | null {
@@ -14,12 +15,15 @@ export function getAccessToken(): string | null {
 }
 
 export function replaceSession(tokens: SessionTokens) {
+  sessionStorage.removeItem(RESTRICTION_KEY);
   sessionStorage.setItem(ACCESS_KEY, tokens.accessToken);
   sessionStorage.setItem(REFRESH_KEY, tokens.refreshToken);
   listeners.forEach((listener) => listener());
 }
 
-export function clearSession() {
+export function clearSession(restriction?: "REJECTED" | "SUSPENDED") {
+  if (restriction) sessionStorage.setItem(RESTRICTION_KEY, restriction);
+  else sessionStorage.removeItem(RESTRICTION_KEY);
   sessionStorage.removeItem(ACCESS_KEY);
   sessionStorage.removeItem(REFRESH_KEY);
   listeners.forEach((listener) => listener());
@@ -41,5 +45,16 @@ export function useSessionReady() {
     subscribe,
     () => true,
     () => false,
+  );
+}
+
+export function useAccountRestriction() {
+  return useSyncExternalStore(
+    subscribe,
+    () => {
+      const value = sessionStorage.getItem(RESTRICTION_KEY);
+      return value === "REJECTED" || value === "SUSPENDED" ? value : null;
+    },
+    () => null,
   );
 }

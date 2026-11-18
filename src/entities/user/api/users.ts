@@ -9,10 +9,11 @@ export interface UserSummary {
 
 export const activeUsersQueryKey = ["users", "active"] as const;
 
-export const activeUsersQueryOptions = () => queryOptions({
-  queryKey: activeUsersQueryKey,
-  queryFn: async (): Promise<readonly UserSummary[]> => {
-    const { data } = await api.get<readonly UserSummary[]>("/api/v1/users");
-    return data;
-  },
-});
+export const activeUsersQueryOptions = () =>
+  queryOptions({
+    queryKey: activeUsersQueryKey,
+    queryFn: async (): Promise<readonly UserSummary[]> => {
+      const { data } = await api.get<readonly UserSummary[]>("/api/v1/users");
+      return data;
+    },
+  });

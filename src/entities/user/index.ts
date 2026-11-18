@@ -7,6 +7,7 @@ export {
   replaceSession,
   useAccessToken,
   useSessionReady,
+  useAccountRestriction,
 } from "./model/session";
 export { isHeadAdmin, userDestination } from "./model/types";
 export type {
