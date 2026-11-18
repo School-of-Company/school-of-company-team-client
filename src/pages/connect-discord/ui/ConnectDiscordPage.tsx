@@ -49,7 +49,7 @@ export function ConnectDiscordPage() {
           </p>
           <OAuthButton provider="discord" />
           <div className="pt-2">
-            <LogoutButton appearance="link" />
+            <LogoutButton appearance="link" label="다른 계정으로 로그인" />
           </div>
         </>
       )}

@@ -11,11 +11,11 @@ export function AppLayout({ children }: { readonly children: ReactNode }) {
     <AppShell
       isHeadAdmin={isHeadAdmin(me.data)}
       userSlot={
-        <div className="flex min-w-0 items-center gap-2 min-[60rem]:grid">
-          <span className="max-w-24 truncate text-sm min-[60rem]:max-w-none">
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <span className="min-w-0 truncate text-sm font-medium">
             {me.data?.name}
           </span>
-          <LogoutButton />
+          <LogoutButton appearance="link" />
         </div>
       }
     >

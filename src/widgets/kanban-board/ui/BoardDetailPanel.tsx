@@ -33,7 +33,7 @@ export function BoardDetailPanel({
       open
       onClose={onClose}
       title="업무 상세"
-      className="inset-y-0! right-0! left-auto! m-0! h-dvh! max-h-dvh! w-full! max-w-2xl! rounded-none! border-y-0! border-r-0!"
+      className="board-detail-panel inset-y-0! right-0! left-auto! m-0! h-dvh! max-h-dvh! w-full! max-w-2xl! rounded-none! border-y-0! border-r-0!"
     >
       <Link
         href={`/tasks/${encodeURIComponent(taskId)}`}

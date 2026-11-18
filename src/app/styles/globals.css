@@ -3,6 +3,7 @@
  * axes: light+dark/grotesk-sans/cool · accent: brand pink (logo-sampled, AA-derived) · posture: restrained · contrast: accent 4.79:1 light, 6.24:1 dark · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S3 R5 V3 · weakest: S, retained project keys and task destinations as the navigation material */
 /* Hallmark · reworded "팀의 업무를 한곳에서" to "로그인" · user request: internal tool, no marketing headline on the sign-in screen */
+/* Hallmark · dropped onClick={() => { void me.refetch(); }} · pending re-check became checkNow (same refetch, minimum 600ms label, no spinner) plus the existing 10s auto check */
 /* Hallmark · dropped onChange={(event) => { const status = taskStatuses.find( · card status select moved into the card more-menu, same position API, verified on the real API */
 /* Hallmark · dropped onClick={() => onOrder("up")}, onClick={() => onOrder("down")} · order buttons moved into BoardCardMenu menu items with the same onOrder handler and manual-sort guard */
 /* Hallmark · dropped onClick={() => setCreating(true)}, onClose={() => setCreating(false)}, onCreate={canCreate ? () => setCreating(true) : undefined}, onCreated={async (notice) => { setMessage(notice); setCreating(false); await queryClient.invalidateQueries({ queryKey: taskKeys.all }); }} · board creation moved to the column add action with status prefill and a scoped task invalidation */
@@ -341,7 +342,12 @@ body {
   text-decoration: underline;
 }
 .ui-link-button:active:not(:disabled) {
-  opacity: 0.7;
+  color: var(--color-ink-2);
+}
+.ui-link-button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  text-decoration: none;
 }
 .ui-button-ghost:hover:not(:disabled) {
   background: var(--surface-hover);
@@ -446,6 +452,92 @@ body {
 .board-priority svg {
   width: var(--icon-size);
   height: var(--icon-size);
+}
+.ui-chip-select {
+  width: auto;
+  min-height: 2rem;
+  height: 2rem;
+  padding: 0 var(--space-xl) 0 var(--space-sm);
+  border: 1px solid var(--rule-subtle);
+  border-radius: var(--radius-pill);
+  background-color: var(--surface);
+  font-size: var(--text-sm);
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+.ui-chip-select:hover {
+  border-color: var(--rule-strong);
+  background-color: var(--surface-hover);
+}
+.board-filters > summary {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  padding: 0 var(--space-sm) 0 var(--space-xs);
+  border: 1px solid var(--rule-subtle);
+  border-radius: var(--radius-pill);
+  list-style: none;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+.board-filters > summary::-webkit-details-marker {
+  display: none;
+}
+.board-filters > summary:hover {
+  border-color: var(--rule-strong);
+  background-color: var(--surface-hover);
+}
+.board-empty {
+  min-height: 4.5rem;
+  border: 1px dashed var(--rule-subtle);
+  border-radius: var(--radius-input);
+}
+
+/* Motion: state only, transform/opacity, off for reduced motion. */
+@keyframes ui-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes ui-slide-in {
+  from {
+    opacity: 0.6;
+    transform: translateX(24px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  main#main-content > * {
+    animation: ui-fade-up var(--dur-short) var(--ease-out);
+  }
+  .board-card {
+    animation: ui-fade-up var(--dur-short) var(--ease-out) both;
+    transition:
+      transform var(--dur-micro) var(--ease-out),
+      border-color var(--dur-micro) var(--ease-out),
+      box-shadow var(--dur-micro) var(--ease-out);
+  }
+  .board-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-card-hover);
+  }
+  .board-detail-panel[open] {
+    animation: ui-slide-in var(--dur-short) var(--ease-out);
+  }
+  .ui-button {
+    transition:
+      transform var(--dur-micro) var(--ease-out),
+      filter var(--dur-micro) var(--ease-out),
+      background-color var(--dur-micro) var(--ease-out);
+  }
+  .ui-button:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .ui-identity main {
+    animation: ui-fade-up var(--dur-long) var(--ease-out);
+  }
 }
 @media (pointer: coarse) {
   .ui-button,

@@ -7,8 +7,10 @@ import { logout } from "../model/logout";
 
 export function LogoutButton({
   appearance = "button",
+  label = "로그아웃",
 }: {
   readonly appearance?: "button" | "link";
+  readonly label?: string;
 }) {
   const client = useQueryClient();
   const router = useRouter();
@@ -26,7 +28,7 @@ export function LogoutButton({
       disabled={mutation.isPending}
       onClick={() => mutation.mutate()}
     >
-      {mutation.isPending ? "로그아웃하는 중" : "다른 계정으로 로그인"}
+      {mutation.isPending ? "로그아웃하는 중" : label}
     </button>
   ) : (
     <Button

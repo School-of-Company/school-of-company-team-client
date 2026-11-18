@@ -52,7 +52,7 @@ export function KanbanBoard({
       />
     );
   return (
-    <div className="grid gap-8">
+    <div className="grid gap-6">
       <label className="grid gap-2 text-sm md:hidden">
         표시할 상태
         <Select
@@ -73,8 +73,10 @@ export function KanbanBoard({
       </label>
       {board.groups.map((group, lane) => (
         <section key={`${group.key ?? "none"}-${lane}`} className="min-w-0">
-          {group.label && (
-            <h2 className="mb-4 text-lg font-semibold">{group.label}</h2>
+          {group.label && board.groups.length > 1 && (
+            <h2 className="mb-3 text-sm font-semibold text-muted">
+              {group.label}
+            </h2>
           )}
           <div className="board-columns grid min-w-0 gap-3 md:grid-cols-3 xl:grid-cols-5">
             {taskStatuses.map((status) => {
@@ -194,9 +196,9 @@ export function KanbanBoard({
                     ))}
                   </div>
                   {cards.length === 0 && (
-                    <p className="py-8 text-center text-sm text-muted">
-                      업무가 없습니다
-                    </p>
+                    <div className="board-empty">
+                      <span className="sr-only">업무 없음</span>
+                    </div>
                   )}
                   {status === "DONE" && cards.length > 0 && (
                     <Button

@@ -39,9 +39,8 @@ export function BoardHeader({
               (scope === "PERSONAL" ? "내 보드" : "팀 공용 보드")}
           </h1>
           {board && (
-            <p className="mt-1 text-xs text-muted">
-              고유 업무 {boardTotal(board)}개 / 완료 전체{" "}
-              {board.counts.DONE ?? 0}개
+            <p className="mt-1 text-xs text-muted tabular-nums">
+              업무 {boardTotal(board)}개
             </p>
           )}
         </div>
