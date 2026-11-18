@@ -53,7 +53,12 @@ function Milestones({ project, manages }: PlanningContext) {
   const actions = useMilestones(project.id);
   const [creating, setCreating] = useState(false);
   const today = seoulToday();
-  const selectedId = search?.get("milestone");
+  // 패널은 이 화면(경로)에서만 연다. 떠난 뒤 숨겨진 이 화면이 보드의 `?milestone=` 필터를
+  // 패널 열림으로 읽으면 보이지 않는 모달이 남는다(V-route-focus H1).
+  const selectedId =
+    pathname === routes.projectMilestones(project.id)
+      ? search?.get("milestone")
+      : null;
   const selected = milestones.data?.find((item) => item.id === selectedId);
   function select(id: string | null) {
     const params = new URLSearchParams(search?.toString());
@@ -160,6 +165,16 @@ function Milestones({ project, manages }: PlanningContext) {
           actions={actions}
           today={today}
           onClose={() => select(null)}
+          onLeave={() => {
+            // 다른 화면으로 가기 전에 지금 기록에서 패널을 닫는다: 뒤로가기로 돌아와도 패널이 다시 뜨지 않는다.
+            const params = new URLSearchParams(search?.toString());
+            params.delete("milestone");
+            window.history.replaceState(
+              null,
+              "",
+              `${pathname}${params.size ? `?${params}` : ""}`,
+            );
+          }}
         />
       )}
     </section>
@@ -173,6 +188,7 @@ function MilestonePanel({
   actions,
   today,
   onClose,
+  onLeave,
 }: {
   readonly projectId: string;
   readonly milestone: Milestone;
@@ -180,6 +196,7 @@ function MilestonePanel({
   readonly actions: ReturnType<typeof useMilestones>;
   readonly today: string;
   readonly onClose: () => void;
+  readonly onLeave: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -275,6 +292,7 @@ function MilestonePanel({
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`${routes.project(projectId)}?milestone=${encodeURIComponent(milestone.id)}`}
+              onClick={onLeave}
               className="ui-button ui-button-secondary ui-button-sm"
             >
               보드에서 보기

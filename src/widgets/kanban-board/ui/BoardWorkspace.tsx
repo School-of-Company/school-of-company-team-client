@@ -27,6 +27,7 @@ import { milestoneQueries } from "@/entities/milestone";
 import { taskGithubQueries } from "@/features/link-github-issue";
 import { TaskError } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
+import { routes } from "@/shared/config";
 import { Spinner } from "@/shared/ui";
 import { KanbanBoard } from "./KanbanBoard";
 import { BoardViewControls } from "./BoardViewControls";
@@ -99,7 +100,15 @@ export function BoardWorkspace({
     readonly bucketId?: string;
   } | null>(null);
   const selectionTrigger = useRef<HTMLElement | null>(null);
-  const selectedTask = params.get("task");
+  // 업무 패널(`?task=`)은 이 보드의 경로에서만 연다. Next.js 가 숨겨 둔 다른 보드가 같은 쿼리를 읽어
+  // 보이지 않는 패널을 열지 않게 한다(V-route-focus H1과 같은 유형).
+  const boardPath =
+    scope === "PERSONAL"
+      ? routes.me
+      : scope === "TEAM"
+        ? routes.team
+        : routes.project(projectId ?? "");
+  const selectedTask = pathname === boardPath ? params.get("task") : null;
   useEffect(() => {
     if (selectedTask || !selectionTrigger.current) return;
     const previous = selectionTrigger.current;
