@@ -34,8 +34,27 @@ for (const [id, role, settingsVisible] of [
       settingsVisible,
     );
     assert.match(html, /href="\/projects\/project"/);
+    // Sprint·Milestone 은 조회 권한이 있으면 모두에게 보인다(관리 동작만 PM·헤드 어드민).
+    assert.match(html, /href="\/projects\/project\/sprints"/);
+    assert.match(html, /href="\/projects\/project\/milestones"/);
   });
 }
+
+test("sprint detail keeps the Sprint tab current", () => {
+  pathname = "/projects/project/sprints/01SPRINT";
+  const html = renderToStaticMarkup(
+    createElement(ProjectNav, {
+      project,
+      user: { id: "member", role: "MEMBER" },
+    }),
+  );
+  const anchors = html.match(/<a\b[^>]*>/g) ?? [];
+  const current = anchors.filter((anchor) =>
+    anchor.includes('aria-current="page"'),
+  );
+  assert.equal(current.length, 1);
+  assert.match(current[0], /href="\/projects\/project\/sprints"/);
+});
 
 test("project settings route identifies its current destination", () => {
   pathname = "/projects/project/settings";

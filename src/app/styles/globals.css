@@ -1439,3 +1439,450 @@ select.ui-input {
     align-items: end;
   }
 }
+
+/* Sprint */
+/* Sprint·Milestone(단계 4): 프로젝트 탭 안의 목록·상세·계획·리뷰·회고. 값은 모두 기존 토큰. */
+.planning-section-head,
+.plan-pane-head,
+.sprint-head-row {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+.planning-subhead {
+  color: var(--foreground-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.planning-subhead .tabular-nums {
+  margin-left: var(--space-1);
+  color: var(--muted);
+  font-weight: 400;
+}
+.planning-note {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.planning-progress {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+}
+.planning-progress-track {
+  position: relative;
+  display: block;
+  width: 10rem;
+  max-width: 40vw;
+  height: 6px;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-active);
+}
+.planning-progress-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--success);
+  transform-origin: left center;
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.planning-progress-text {
+  color: var(--foreground-2);
+  white-space: nowrap;
+}
+
+/* 상태 글자. 진행 중만 브랜드 선택색으로 강조하고 나머지는 무채색. */
+.sprint-status {
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.sprint-status[data-status="ACTIVE"] {
+  background: var(--brand-soft);
+  color: var(--foreground);
+}
+.sprint-status[data-status="CLOSED"] {
+  color: var(--muted);
+}
+.sprint-meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.sprint-current {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+}
+.sprint-current-head,
+.sprint-head-title {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.sprint-rows,
+.milestone-rows,
+.plan-list {
+  border-top: 1px solid var(--border);
+}
+.sprint-row,
+.milestone-row {
+  display: grid;
+  width: 100%;
+  min-height: calc(var(--control-md) + var(--space-4));
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.sprint-row:hover,
+.milestone-row:hover {
+  background: var(--surface-hover);
+}
+.sprint-row-name,
+.milestone-row-name {
+  min-width: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.sprint-row-dates,
+.sprint-row-count,
+.milestone-row-due {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+.milestone-row-due[data-overdue],
+.milestone-facts dd[data-overdue] {
+  color: var(--danger);
+}
+@media (min-width: 40rem) {
+  .sprint-row {
+    grid-template-columns: minmax(0, 1fr) 10rem 6rem;
+  }
+  .sprint-row-count {
+    text-align: right;
+  }
+  .milestone-row {
+    grid-template-columns: minmax(0, 1fr) 9rem auto;
+  }
+}
+@media (max-width: 39.99rem) {
+  .milestone-row .planning-progress {
+    grid-column: 1 / -1;
+  }
+}
+
+.sprint-head {
+  display: grid;
+  gap: var(--space-2);
+}
+.sprint-goal {
+  max-width: var(--content-narrow);
+  color: var(--foreground-2);
+  font-size: var(--text-md);
+}
+
+/* 계획: 넓으면 후보 | Sprint 두 칸, 좁으면 위아래. 칸 전체가 놓을 곳이다. */
+.sprint-plan {
+  display: grid;
+  gap: var(--space-5);
+}
+@media (min-width: 64rem) {
+  .sprint-plan {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .plan-message {
+    grid-column: 1 / -1;
+  }
+}
+.plan-pane {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  outline: 1px dashed transparent;
+  outline-offset: -1px;
+  transition: outline-color var(--dur-1) var(--ease-out);
+}
+.plan-pane[data-dropping] {
+  outline-color: var(--brand);
+}
+.plan-pane .plan-list {
+  border-top: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+.plan-pane .plan-task {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+.plan-drop-empty .ui-empty {
+  padding-block: var(--space-6);
+}
+.plan-task {
+  display: flex;
+  min-width: 0;
+  min-height: calc(var(--control-md) + var(--space-3));
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.plan-task[data-draggable] {
+  cursor: grab;
+}
+.plan-task .ui-checkbox {
+  flex: none;
+}
+.plan-task-body {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+.plan-task-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.plan-task-meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.plan-task-flag {
+  margin-left: var(--space-2);
+  color: var(--danger);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.plan-task-action {
+  flex: none;
+}
+
+.sprint-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+}
+.sprint-counts > div {
+  display: grid;
+  min-width: 6.5rem;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.sprint-counts dt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.sprint-counts dd {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.close-sprint-dialog {
+  width: min(40rem, calc(100% - 2rem));
+}
+.close-rows {
+  display: grid;
+  max-height: min(40vh, 22rem);
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+}
+.close-row {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.close-row-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+}
+@media (min-width: 40rem) {
+  .close-row {
+    grid-template-columns: minmax(0, 1fr) 13rem;
+    align-items: center;
+  }
+}
+
+.review-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.review-textarea {
+  min-height: 22rem;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+.review-preview,
+.review-body {
+  min-height: 12rem;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.review-body {
+  max-width: var(--content-narrow);
+}
+
+/* 회고 KPT: 넓으면 3열, 좁으면 한 줄씩. */
+.retro-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 56rem) {
+  .retro-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+.retro-column {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+}
+.retro-column-title {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.retro-empty {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.retro-list {
+  display: grid;
+  gap: var(--space-2);
+}
+.retro-entry {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+.retro-entry-body {
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.retro-entry-meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+.retro-entry-actions {
+  display: inline-flex;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+.retro-form {
+  display: grid;
+  gap: var(--space-2);
+}
+.retro-form .ui-button {
+  justify-self: end;
+}
+.retro-input {
+  min-height: 4.5rem;
+  background: var(--surface-raised);
+}
+
+.milestone-panel {
+  width: min(36rem, calc(100% - 2rem));
+}
+.milestone-facts {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+.milestone-facts > div {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+.milestone-facts dt {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.milestone-facts dd {
+  margin: 0;
+}
+.milestone-confirm {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .planning-progress-fill,
+  .plan-pane {
+    transition: none;
+  }
+}
