@@ -4,6 +4,7 @@
 /* Hallmark · pre-emit critique: P4 H4 E4 S3 R5 V3 · weakest: S, retained project keys and task destinations as the navigation material */
 /* Hallmark · reworded "팀의 업무를 한곳에서" to "로그인" · user request: internal tool, no marketing headline on the sign-in screen */
 /* Hallmark · dropped onClick={() => { void me.refetch(); }} · pending re-check became checkNow (same refetch, minimum 600ms label, no spinner) plus the existing 10s auto check */
+/* Hallmark · dropped onChange={(event) => change("groupBy", event.target.value)}, onChange={(event) => change("sort", event.target.value)} · group and sort selects became ChipSelect with onChange={(value) => change(...)}, same URL params */
 /* Hallmark · dropped onChange={(event) => { const status = taskStatuses.find( · card status select moved into the card more-menu, same position API, verified on the real API */
 /* Hallmark · dropped onClick={() => onOrder("up")}, onClick={() => onOrder("down")} · order buttons moved into BoardCardMenu menu items with the same onOrder handler and manual-sort guard */
 /* Hallmark · dropped onClick={() => setCreating(true)}, onClose={() => setCreating(false)}, onCreate={canCreate ? () => setCreating(true) : undefined}, onCreated={async (notice) => { setMessage(notice); setCreating(false); await queryClient.invalidateQueries({ queryKey: taskKeys.all }); }} · board creation moved to the column add action with status prefill and a scoped task invalidation */
