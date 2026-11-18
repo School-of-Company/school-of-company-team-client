@@ -7,6 +7,8 @@
 /* Hallmark · dropped onClick={() => setCreating(true)}, onClose={() => setCreating(false)}, onCreate={canCreate ? () => setCreating(true) : undefined}, onCreated={async (notice) => { setMessage(notice); setCreating(false); await queryClient.invalidateQueries({ queryKey: taskKeys.all }); }} · board creation moved to the column add action with status prefill and a scoped task invalidation */
 /* Hallmark · dropped onCancel={(event) => { event.preventDefault(); onClose(); }} · shared Dialog now owns cancel with the nested-Escape guard, verified two dialogs close one at a time */
 /* Hallmark · dropped onImported={(id) => router.push(`/tasks/${encodeURIComponent(id)}`) } · issue import still reports the task id and the board opens it in the side panel URL instead */
+/* Hallmark · dropped {`/projects/${encodeURIComponent(projectId)}/settings`} · duplicate header link removed; permission-gated ProjectNav settings destination retained. */
+/* Hallmark · dropped onClick={() => onCreate(status)} · bottom column action moved to named top + control with the same status-prefill handler. */
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css";
@@ -213,5 +215,167 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ui-spinner {
     animation: none;
+  }
+}
+
+.app-shell {
+  background: var(--surface-canvas);
+}
+.app-sidebar {
+  background: var(--surface-sidebar);
+  border-color: var(--rule-subtle);
+}
+.app-topbar {
+  background: var(--surface-canvas);
+  border-color: var(--rule-subtle);
+}
+.app-main {
+  line-height: var(--line-body);
+}
+.app-main h1 {
+  max-width: none;
+  font-size: var(--text-xl);
+  line-height: var(--line-heading);
+  letter-spacing: var(--tracking-display);
+}
+.app-main h2,
+.app-main h3 {
+  line-height: var(--line-heading);
+}
+.settings-page h2 {
+  font-size: var(--text-lg);
+}
+.settings-page h3 {
+  font-size: var(--text-title);
+}
+.ui-button {
+  min-height: var(--control-height);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-input);
+}
+.ui-button-ghost:hover:not(:disabled) {
+  background: var(--surface-hover);
+  filter: none;
+}
+.ui-input {
+  min-height: var(--control-height);
+  border-color: var(--rule-strong);
+  border-radius: var(--radius-input);
+}
+.ui-textarea {
+  min-height: var(--textarea-min-height);
+}
+.ui-icon-button {
+  width: var(--target-size);
+  min-height: var(--target-size);
+}
+.board-workspace {
+  gap: var(--space-md);
+}
+.board-header {
+  padding-bottom: var(--space-xs);
+}
+.board-breadcrumb {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-bottom: var(--space-xs);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.board-breadcrumb a:hover {
+  color: var(--foreground);
+}
+.board-toolbar {
+  padding-bottom: var(--space-md);
+  border-bottom: var(--rule-hair) solid var(--rule-subtle);
+}
+.board-toolbar .ui-input {
+  width: var(--toolbar-label-width);
+  min-width: 0;
+}
+.board-filters summary {
+  padding-inline: var(--space-xs);
+  font-weight: 500;
+}
+.board-filters[open] {
+  padding-bottom: var(--space-md);
+}
+.board-columns {
+  gap: var(--space-sm);
+}
+.board-column {
+  min-height: var(--column-min-height);
+  padding: var(--space-xs);
+  background: var(--surface-column);
+  border-radius: var(--radius-input);
+}
+.board-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-xs);
+  padding-left: var(--space-2xs);
+}
+.board-column-header .ui-icon-button {
+  color: var(--muted);
+}
+.board-card {
+  background: var(--surface-panel);
+  color: var(--foreground);
+  border-color: var(--rule-subtle);
+  box-shadow: var(--shadow-card);
+}
+.board-card:hover {
+  border-color: var(--rule-strong);
+}
+.board-card [role="img"] {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.board-card > div:first-child {
+  align-items: center;
+  min-height: var(--card-key-height);
+}
+.board-card > div:first-child > div:last-child {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.board-card > div:first-child > div:first-child {
+  padding-top: 0;
+  padding-right: var(--target-size);
+}
+.board-priority {
+  color: var(--color-ink-2);
+}
+.board-priority svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+@media (pointer: coarse) {
+  .ui-button,
+  .ui-input {
+    min-height: var(--target-size);
+  }
+}
+@media (max-width: 47.999rem) {
+  .board-view-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+  .board-view-controls label {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+  .board-toolbar .ui-input {
+    width: 100%;
+  }
+  .board-view-controls p {
+    grid-column: 1 / -1;
   }
 }

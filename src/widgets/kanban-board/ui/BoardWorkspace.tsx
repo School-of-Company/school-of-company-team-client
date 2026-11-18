@@ -175,20 +175,19 @@ export function BoardWorkspace({
   if (projectId && project.isPending)
     return <Spinner label="프로젝트를 불러오는 중" />;
   return (
-    <div className="grid min-w-0 gap-6 [overflow-wrap:anywhere] break-keep">
-      {project.data && renderProjectNav?.(project.data)}
+    <div className="board-workspace grid min-w-0 gap-6 [overflow-wrap:anywhere] break-keep">
       <BoardHeader
         scope={scope}
         project={project.data}
         board={board.isError ? undefined : board.data}
         canCreate={canCreate}
-        manages={!!access?.manages}
         editable={!!access?.editable}
         signedIn={!!user}
         onCreate={() => setCreating("BACKLOG")}
         onImport={(id) => router.push("/tasks/" + encodeURIComponent(id))}
       />
-      <div className="grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
+      {project.data && renderProjectNav?.(project.data)}
+      <div className="board-toolbar grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
         {renderFilters({
           search,
           onChange: change,

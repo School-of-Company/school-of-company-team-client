@@ -20,12 +20,14 @@ import {
 export type AppShellProps = {
   readonly children: ReactNode;
   readonly userSlot?: ReactNode;
+  readonly mobileUserSlot?: ReactNode;
   readonly isHeadAdmin?: boolean;
 };
 
 export function AppShell({
   children,
   userSlot,
+  mobileUserSlot,
   isHeadAdmin = false,
 }: AppShellProps) {
   const pathname = usePathname() ?? "";
@@ -120,17 +122,17 @@ export function AppShell({
     </nav>
   );
   return (
-    <div className="min-h-dvh min-[60rem]:grid min-[60rem]:grid-cols-[15rem_minmax(0,1fr)]">
+    <div className="app-shell min-h-dvh min-[60rem]:grid min-[60rem]:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-surface focus:p-3"
       >
         본문으로 건너뛰기
       </a>
-      <aside className="hidden min-w-0 border-r border-border bg-surface p-5 min-[60rem]:flex min-[60rem]:flex-col">
+      <aside className="app-sidebar hidden min-w-0 border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col">
         <Link
           href={routes.me}
-          className="mb-10 flex min-w-0 items-center gap-2 px-3 text-base font-bold tracking-tight"
+          className="mb-6 flex min-h-11 min-w-0 items-center gap-2 px-3 text-sm font-semibold"
         >
           <BrandMark size={28} />
           <span className="truncate">Engineering Hub</span>
@@ -144,7 +146,7 @@ export function AppShell({
         </div>
       </aside>
       <div className="min-w-0">
-        <header className="flex min-h-16 items-center gap-3 border-b border-border bg-surface px-4 min-[60rem]:px-8">
+        <header className="app-topbar flex min-h-16 items-center gap-3 border-b border-border px-4 min-[60rem]:hidden">
           <IconButton
             aria-label="메뉴 열기"
             aria-haspopup="dialog"
@@ -162,18 +164,13 @@ export function AppShell({
           >
             <BrandMark size={24} />
           </Link>
-          <span className="shrink-0 text-sm font-medium">
-            {links.find(
-              (link) =>
-                pathname === link.href || pathname.startsWith(`${link.href}/`),
-            )?.label ?? "Engineering Hub"}
-          </span>
-          <div className="ml-auto min-w-0 min-[60rem]:hidden">{userSlot}</div>
+          <span className="shrink-0 text-sm font-medium">Engineering Hub</span>
+          <div className="ml-auto min-w-0">{mobileUserSlot}</div>
         </header>
         <main
           id="main-content"
           tabIndex={-1}
-          className="mx-auto w-full max-w-[90rem] min-w-0 p-4 outline-none min-[60rem]:p-8"
+          className="app-main mx-auto w-full max-w-[90rem] min-w-0 p-4 outline-none min-[60rem]:p-[var(--page-inset)]"
         >
           {children}
         </main>
@@ -186,6 +183,7 @@ export function AppShell({
       >
         {navigation}
         {projectNavigation}
+        <div className="mt-6 border-t border-border pt-4">{userSlot}</div>
       </Dialog>
     </div>
   );

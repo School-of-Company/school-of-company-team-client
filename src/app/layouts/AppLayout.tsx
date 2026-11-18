@@ -11,6 +11,7 @@ export function AppLayout({ children }: { readonly children: ReactNode }) {
   return (
     <AppShell
       isHeadAdmin={isHeadAdmin(me.data)}
+      mobileUserSlot={<ThemeToggle />}
       userSlot={
         <div className="flex min-w-0 items-center gap-2 min-[60rem]:grid">
           <span className="max-w-24 truncate text-sm min-[60rem]:max-w-none">

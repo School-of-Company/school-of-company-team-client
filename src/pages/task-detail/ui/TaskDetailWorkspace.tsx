@@ -118,7 +118,7 @@ export function TaskDetailWorkspace({
       }))
     : (assignees.data ?? data.assignees);
   return (
-    <div className="mx-auto grid max-w-4xl gap-6 [overflow-wrap:anywhere] break-keep">
+    <div className="task-detail mx-auto grid max-w-4xl gap-5 [overflow-wrap:anywhere] break-keep">
       <Link
         href={
           data.projectId
@@ -127,7 +127,7 @@ export function TaskDetailWorkspace({
               ? "/team"
               : "/me"
         }
-        className="inline-flex min-h-11 items-center text-sm text-brand underline"
+        className="inline-flex min-h-11 items-center text-sm text-muted underline hover:text-foreground"
       >
         {data.projectName ??
           (data.scope === "TEAM" ? "팀 공용 보드" : "내 보드")}

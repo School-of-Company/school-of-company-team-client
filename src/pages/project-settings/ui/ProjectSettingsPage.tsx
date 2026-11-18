@@ -72,7 +72,7 @@ function ProjectSettingsContent({
     ]);
   };
   return (
-    <div className="mx-auto grid w-full max-w-3xl min-w-0 gap-8 p-4 sm:p-8">
+    <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
       <header className="grid gap-3">
         <h1 className="text-2xl font-semibold break-words">
           {project.data.name} 설정

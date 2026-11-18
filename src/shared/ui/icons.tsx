@@ -1,6 +1,10 @@
 import type { ComponentProps } from "react";
 
 const paths = {
+  plus: "M12 5v14 M5 12h14",
+  priorityHigh: "M4 20V12h3v8z M10 20V8h3v12z M16 20V4h3v16z",
+  priorityMedium: "M4 20V12h3v8z M10 20V8h3v12z M16 20h3",
+  priorityLow: "M4 20V12h3v8z M10 20h3 M16 20h3",
   board: "M3 3h18v18H3z M9 3v18 M15 3v18 M3 9h6 M9 15h6 M15 11h6",
   team: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M16 4a4 4 0 0 1 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
   project: "M3 7h18v14H3z M3 7V3h7l3 4 M3 12h18",

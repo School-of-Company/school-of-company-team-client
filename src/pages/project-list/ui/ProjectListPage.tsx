@@ -52,15 +52,15 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           description="프로젝트 관리자에게 참여를 요청해 주세요."
         />
       ) : (
-        <ul className="divide-y divide-border rounded-md border border-border bg-surface">
+        <ul className="divide-y divide-border border-y border-border">
           {projects.data.map((project) => (
             <li key={project.id}>
               <Link
                 href={`/projects/${encodeURIComponent(project.id)}`}
-                className="block p-5 hover:bg-surface-hover"
+                className="block py-4 hover:bg-surface-hover"
               >
                 <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-lg font-semibold break-words">
+                  <h2 className="text-base font-medium break-words">
                     {project.name}
                   </h2>
                   <Badge>

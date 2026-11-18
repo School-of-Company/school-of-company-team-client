@@ -16,7 +16,7 @@ export function BoardViewControls({
     onChange(params.toString());
   }
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+    <div className="board-view-controls flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
       <label className="flex shrink-0 items-center gap-2 text-sm whitespace-nowrap">
         그룹
         <Select
