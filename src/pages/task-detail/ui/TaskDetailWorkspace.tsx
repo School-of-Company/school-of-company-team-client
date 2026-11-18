@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { taskApi, taskKeys, taskQueries, TaskError } from "@/entities/task";
 import { projectAccess, projectQueries } from "@/entities/project";
+import { milestoneQueries } from "@/entities/milestone";
 import { TaskEditor } from "@/features/edit-task";
 import { activeUsersQueryOptions } from "@/entities/user";
 import { TaskGithubPanel } from "@/features/link-github-issue";
@@ -43,12 +44,35 @@ export function TaskDetailWorkspace({
     ...projectQueries.buckets(task.data?.projectId ?? ""),
     enabled: !denied && task.data?.scope === "PROJECT" && !!task.data.projectId,
   });
+  const milestones = useQuery({
+    ...milestoneQueries.list(task.data?.projectId ?? ""),
+    enabled: !denied && task.data?.scope === "PROJECT" && !!task.data.projectId,
+  });
   const changeBucket = useMutation({
     mutationFn: (planningBucketId: string) =>
       taskApi.update(taskId, { planningBucketId }),
     onSuccess: async () => {
       setMessage("계획 버킷을 변경했습니다.");
       await client.invalidateQueries({ queryKey: taskKeys.all });
+    },
+    onError: (cause) => {
+      const problem = normalizeApiError(cause);
+      setMessage(problem.message);
+      if (problem.status === 403 || problem.status === 404) setDenied(cause);
+    },
+  });
+  const changeMilestone = useMutation({
+    mutationFn: (milestoneId: string) =>
+      taskApi.update(taskId, { milestoneId }),
+    onSuccess: async () => {
+      setMessage("Milestone을 변경했습니다.");
+      await Promise.all([
+        client.invalidateQueries({ queryKey: taskKeys.all }),
+        // 진행률이 바뀐다.
+        client.invalidateQueries({
+          queryKey: milestoneQueries.list(task.data?.projectId ?? "").queryKey,
+        }),
+      ]);
     },
     onError: (cause) => {
       const problem = normalizeApiError(cause);
@@ -226,6 +250,11 @@ export function TaskDetailWorkspace({
           onBucket={(bucketId) => {
             if (!changeBucket.isPending) changeBucket.mutate(bucketId);
           }}
+          milestones={milestones.data}
+          milestonePending={changeMilestone.isPending}
+          onMilestone={(milestoneId) => {
+            if (!changeMilestone.isPending) changeMilestone.mutate(milestoneId);
+          }}
         />
       </div>
       <Dialog
@@ -241,6 +270,7 @@ export function TaskDetailWorkspace({
             initial={data}
             project={project.data}
             buckets={buckets.data ?? []}
+            milestones={milestones.data ?? []}
             candidates={candidates}
             onCancel={() => setEditing(false)}
             onUpdate={async (body) => {
