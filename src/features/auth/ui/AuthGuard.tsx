@@ -8,11 +8,17 @@ import {
   useSessionReady,
   useMe,
   userDestination,
+  type User,
 } from "@/entities/user";
 import { ErrorState, Spinner } from "@/shared/ui";
 import { authErrorCode, authErrorMessage } from "../model/error-message";
 
-export function AuthGuard({ children }: { readonly children: ReactNode }) {
+export function AuthGuard({
+  children,
+}: {
+  readonly require?: "work";
+  readonly children: ReactNode | ((user: User) => ReactNode);
+}) {
   const router = useRouter();
   const ready = useSessionReady();
   const token = useAccessToken();
@@ -39,5 +45,5 @@ export function AuthGuard({ children }: { readonly children: ReactNode }) {
     );
   if (!ready || !token || !me.data || destination !== "/me")
     return <Spinner label="계정 상태 확인 중" />;
-  return children;
+  return typeof children === "function" ? children(me.data) : children;
 }

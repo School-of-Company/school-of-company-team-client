@@ -3,18 +3,10 @@
 import { useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { meQueryKey, updateProfile, useMe, type User } from "@/entities/user";
-import { authErrorMessage, OAuthButton } from "@/features/auth";
+import { meQueryKey, updateProfile, type User } from "@/entities/user";
+import { AuthGuard, authErrorMessage, OAuthButton } from "@/features/auth";
 import { unlinkDiscord } from "../api/unlink-discord";
-import {
-  Badge,
-  Button,
-  Dialog,
-  Field,
-  Input,
-  Spinner,
-  useToast,
-} from "@/shared/ui";
+import { Badge, Button, Dialog, Field, Input, useToast } from "@/shared/ui";
 
 function ProfileForm({ user }: { readonly user: User }) {
   const client = useQueryClient();
@@ -79,8 +71,7 @@ function ProfileForm({ user }: { readonly user: User }) {
   );
 }
 
-export function AccountPage() {
-  const me = useMe();
+function AccountContent({ user }: { readonly user: User }) {
   const client = useQueryClient();
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
@@ -91,8 +82,6 @@ export function AccountPage() {
       router.replace("/connect-discord");
     },
   });
-  const user = me.data;
-  if (!user) return <Spinner label="내 계정 불러오는 중" />;
   return (
     <div className="mx-auto grid w-full max-w-2xl gap-10">
       <h1 className="text-2xl font-bold tracking-tight">내 계정</h1>
@@ -185,5 +174,13 @@ export function AccountPage() {
         </div>
       </Dialog>
     </div>
+  );
+}
+
+export function AccountPage() {
+  return (
+    <AuthGuard require="work">
+      {(user) => <AccountContent user={user} />}
+    </AuthGuard>
   );
 }
