@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { taskApi, type TaskScope, type TaskStatus } from "@/entities/task";
 import type { PlanningBucket, ProjectDetail } from "@/entities/project";
+import type { Milestone } from "@/entities/milestone";
 import { TaskEditor } from "@/features/edit-task";
 import { taskGithubApi, taskGithubQueries } from "@/features/link-github-issue";
 import { normalizeApiError } from "@/shared/api";
@@ -16,6 +17,7 @@ export function BoardCreateDialog({
   initialStatus,
   initialBucketId,
   buckets,
+  milestones = [],
   onClose,
   onCreated,
 }: {
@@ -23,6 +25,7 @@ export function BoardCreateDialog({
   readonly initialStatus: TaskStatus;
   readonly initialBucketId?: string;
   readonly buckets: readonly PlanningBucket[];
+  readonly milestones?: readonly Milestone[];
   readonly project?: ProjectDetail;
   readonly people: readonly { readonly id: string; readonly name: string }[];
   readonly onClose: () => void;
@@ -84,6 +87,7 @@ export function BoardCreateDialog({
         initialStatus={initialStatus}
         initialBucketId={initialBucketId}
         buckets={buckets}
+        milestones={milestones}
         project={project}
         candidates={people}
         onCancel={onClose}

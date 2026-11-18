@@ -22,6 +22,8 @@ import {
   type ProjectDetail,
 } from "@/entities/project";
 import { activeUsersQueryOptions } from "@/entities/user";
+import { sprintQueries } from "@/entities/sprint";
+import { milestoneQueries } from "@/entities/milestone";
 import { taskGithubQueries } from "@/features/link-github-issue";
 import { TaskError } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
@@ -56,6 +58,16 @@ export type BoardFilterProps = {
   readonly repositories: readonly {
     readonly id: string;
     readonly fullName: string;
+  }[];
+  /** 프로젝트 보드에서만: Sprint·Milestone 필터 선택지(단계 4). */
+  readonly sprints?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly status: "PLANNED" | "ACTIVE" | "CLOSED";
+  }[];
+  readonly milestones?: readonly {
+    readonly id: string;
+    readonly name: string;
   }[];
 };
 
@@ -118,6 +130,14 @@ export function BoardWorkspace({
     ...taskGithubQueries.repositories(projectId ?? ""),
     enabled: !!projectId,
   });
+  const sprints = useQuery({
+    ...sprintQueries.list(projectId ?? ""),
+    enabled: !!projectId,
+  });
+  const milestones = useQuery({
+    ...milestoneQueries.list(projectId ?? ""),
+    enabled: !!projectId,
+  });
   const assignees = useQuery({
     ...activeUsersQueryOptions(),
     enabled: scope === "TEAM",
@@ -130,6 +150,11 @@ export function BoardWorkspace({
   // 버킷 그룹은 프로젝트 보드 전용(계약 S-a). 공유 링크로 들어와도 400 대신 그룹 없이 보인다.
   if (scope !== "PROJECT" && boardParams.get("groupBy") === "bucket")
     boardParams.delete("groupBy");
+  // `sprint=current`는 프로젝트가 하나일 때만 서버가 받는다(계약 3.7). 다른 보드는 Sprint 축이 없다.
+  if (scope !== "PROJECT") {
+    boardParams.delete("sprint");
+    boardParams.delete("milestone");
+  }
   const board = useQuery({
     ...taskQueries.board(boardParams.toString(), scope === "PERSONAL"),
     enabled: !projectId || !!project.data,
@@ -252,6 +277,8 @@ export function BoardWorkspace({
           ],
           personal: scope === "PERSONAL",
           repositories: repositories.data ?? [],
+          sprints: sprints.data ?? [],
+          milestones: milestones.data ?? [],
         })}
         <BoardViewControls
           search={search}
@@ -339,6 +366,7 @@ export function BoardWorkspace({
           initialStatus={creating.status}
           initialBucketId={creating.bucketId}
           buckets={buckets.data ?? []}
+          milestones={milestones.data ?? []}
           project={project.data}
           people={people}
           onClose={() => setCreating(null)}

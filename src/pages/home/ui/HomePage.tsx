@@ -206,7 +206,10 @@ function SprintRow({ sprint }: { readonly sprint: ActiveSprint }) {
   const done = sprint.counts.DONE;
   return (
     <li className="home-sprint">
-      <Link href={routes.project(sprint.projectId)} className="home-row-title">
+      <Link
+        href={routes.projectSprint(sprint.projectId, sprint.id)}
+        className="home-row-title"
+      >
         <span className="home-row-key" title={sprint.projectName}>
           {sprint.projectKey}
         </span>

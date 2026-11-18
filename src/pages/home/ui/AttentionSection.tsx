@@ -191,7 +191,7 @@ function AttentionRow({
       <li className="home-row">
         <Icon name="clock" className="home-row-icon" />
         <Link
-          href={routes.project(sprint.projectId)}
+          href={routes.projectSprint(sprint.projectId, sprint.id)}
           className="home-row-title"
         >
           <span className="home-row-key">{sprint.projectKey}</span>
