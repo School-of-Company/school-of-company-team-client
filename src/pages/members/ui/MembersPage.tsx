@@ -170,8 +170,10 @@ function MemberRow({
         <span className="min-w-0">
           <span className="members-name">
             {member.name}
-            {self && <Badge>나</Badge>}
-            {member.role === "LEAD" && <Badge>헤드 어드민</Badge>}
+            {self && <Badge className="members-badge">나</Badge>}
+            {member.role === "LEAD" && (
+              <Badge className="members-badge">헤드 어드민</Badge>
+            )}
           </span>
           <span className="members-username">{member.username}</span>
           {self && !connectionColumn && member.connections && (
