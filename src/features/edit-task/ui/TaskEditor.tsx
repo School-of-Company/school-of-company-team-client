@@ -184,7 +184,28 @@ export function TaskEditor({
           마크다운을 지원합니다. (## 제목, - 목록, `코드`, [링크](url))
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <fieldset className="min-w-0">
+        <legend className="mb-2 text-sm font-medium">우선순위</legend>
+        <div className="ui-priority-picker">
+          {priorityOptions.map((option) => (
+            <label
+              key={option.value}
+              className="ui-priority-option"
+              data-priority={option.value}
+              title={option.value}
+            >
+              <input
+                type="radio"
+                name="priority"
+                value={option.value}
+                defaultChecked={(initial?.priority ?? "P2") === option.value}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <Field id={`${prefix}-type`} label="업무 타입">
           <Select
             id={`${prefix}-type`}
@@ -200,27 +221,6 @@ export function TaskEditor({
             <option value="DEV">개발 업무</option>
           </Select>
         </Field>
-        <fieldset className="min-w-0">
-          <legend className="mb-2 text-sm font-medium">우선순위</legend>
-          <div className="ui-priority-picker">
-            {priorityOptions.map((option) => (
-              <label
-                key={option.value}
-                className="ui-priority-option"
-                data-priority={option.value}
-                title={option.value}
-              >
-                <input
-                  type="radio"
-                  name="priority"
-                  value={option.value}
-                  defaultChecked={(initial?.priority ?? "P2") === option.value}
-                />
-                {option.label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
         {!initial && (
           <Field id={`${prefix}-status`} label="시작 상태">
             <Select

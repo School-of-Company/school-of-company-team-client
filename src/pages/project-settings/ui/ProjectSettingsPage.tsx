@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectAccess, projectKeys, projectQueries } from "@/entities/project";
@@ -72,10 +73,13 @@ function ProjectSettingsContent({
   };
   return (
     <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
-      <header className="grid gap-3">
-        <h1 className="text-2xl font-semibold break-words">
-          {project.data.name} 설정
-        </h1>
+      <header>
+        <p className="board-breadcrumb">
+          <Link href="/projects">프로젝트</Link>
+          <span aria-hidden="true">/</span>
+          <span>{project.data.key}</span>
+        </p>
+        <h1 className="break-words">{project.data.name}</h1>
       </header>
       <ProjectNav project={project.data} user={user} />
       <Suspense fallback={<Spinner label="설정 불러오는 중" />}>
