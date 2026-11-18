@@ -1,12 +1,12 @@
 import { ProjectSettingsPage } from "@/pages/project-settings";
-import { Spinner } from "@/shared/ui";
 import { Suspense } from "react";
+import Loading from "../loading";
 
 type Props = { readonly params: Promise<{ projectId: string }> };
 
 export default function Page(props: Props) {
   return (
-    <Suspense fallback={<Spinner label="프로젝트 설정 불러오는 중" />}>
+    <Suspense fallback={<Loading />}>
       <SettingsRoute {...props} />
     </Suspense>
   );

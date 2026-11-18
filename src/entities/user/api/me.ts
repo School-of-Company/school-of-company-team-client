@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/shared/api";
+import { BOARD_POLL_INTERVAL } from "@/shared/config";
 import { useAccessToken } from "../model/session";
 import type { UpdateProfile, User } from "../model/types";
 
@@ -24,7 +25,7 @@ export function useMe() {
     queryFn: getMe,
     enabled: Boolean(token),
     retry: false,
-    staleTime: 0,
-    refetchInterval: 10_000,
+    staleTime: BOARD_POLL_INTERVAL,
+    refetchInterval: BOARD_POLL_INTERVAL,
   });
 }

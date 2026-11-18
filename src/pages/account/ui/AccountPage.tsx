@@ -229,7 +229,7 @@ function AccountContent({ user }: { readonly user: User }) {
 
 export function AccountPage() {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="account">
       {(user) => <AccountContent user={user} />}
     </AuthGuard>
   );

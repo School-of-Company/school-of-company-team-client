@@ -1,5 +1,7 @@
 "use client";
 
+/* Hallmark · dropped onRetry={onRetry} · Requested 404 retries are removed; transient failure retries remain available. */
+
 import Link from "next/link";
 import { normalizeApiError } from "@/shared/api";
 import { ErrorState } from "@/shared/ui";
@@ -7,9 +9,11 @@ import { ErrorState } from "@/shared/ui";
 export function TaskError({
   error,
   onRetry,
+  imported = false,
 }: {
   readonly error: unknown;
   readonly onRetry: () => void;
+  readonly imported?: boolean;
 }) {
   const problem = normalizeApiError(error);
   const titles: Readonly<Record<string, string>> = {
@@ -26,11 +30,11 @@ export function TaskError({
       <ErrorState
         title={titles[problem.code]}
         description={
-          problem.code === "TASK_NOT_FOUND"
+          problem.code === "TASK_NOT_FOUND" && imported
             ? "GitHub에서 가져온 업무라면 원본 접근 권한을 확인하거나 다시 로그인해 주세요."
             : problem.message
         }
-        onRetry={onRetry}
+        onRetry={problem.status === 404 ? undefined : onRetry}
       />
       {problem.code === "ONBOARDING_REQUIRED" && (
         <Link href="/pending" className="text-brand underline">
