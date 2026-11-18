@@ -5,6 +5,34 @@
   "depth": "polish",
   "theme": "project design.md (locked)",
   "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell (unchanged); project tabs 보드 · Sprint · Milestone · 설정 per docs/ia.md",
+  "signature": "sprint planning two panes (candidates to sprint drag) and KPT retro columns",
+  "sections": [
+   "project-sprints",
+   "sprint-detail(plan,progress,review,retro)",
+   "close-carry-over-dialog",
+   "project-milestones",
+   "milestone-panel",
+   "project-board(sprint/milestone filter)",
+   "task(sprint/milestone properties)"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "fixed": [
+   "15: plan drop target used a transitioned outline; now an instant inset box-shadow"
+  ],
+  "prompt": "Stage 4 F4: Sprint list/detail tabs, planning drag from buckets/backlog, close and carry-over dialog, deterministic review draft edit/publish, KPT retro, milestone list with progress and panel, board sprint=current and milestone filters, task detail sprint/milestone",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
+  "mode": "redesign",
+  "depth": "polish",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
   "nav": "existing app shell, 60rem drawer (unchanged)",
   "signature": "kanban board swimlanes",
   "sections": [
