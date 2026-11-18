@@ -24,28 +24,25 @@ export function LoginPage() {
     if (me.data) router.replace(userDestination(me.data));
   }, [me.data, router]);
   return (
-    <IdentityPanel title="팀의 업무를 한곳에서">
-      <p className="text-sm leading-6 text-muted">
-        GitHub 계정으로 시작하세요.
-      </p>
-      <OAuthButton provider="github" />
+    <IdentityPanel
+      title="팀의 업무를 한곳에서"
+      lead="GitHub 계정으로 시작하세요."
+    >
+      <div className="max-w-xs">
+        <OAuthButton provider="github" />
+      </div>
       <ol
         aria-label="이용 절차"
-        className="grid gap-4 border-t border-border pt-6"
+        className="mt-10 grid gap-6 border-t border-border pt-8 sm:grid-cols-3 sm:gap-8"
       >
         {steps.map((step, index) => (
-          <li key={step.title} className="grid grid-cols-[1.75rem_1fr] gap-3">
-            <span
-              aria-hidden="true"
-              className="grid size-7 place-items-center rounded-md border border-border font-mono text-xs text-muted"
-            >
-              {index + 1}
+          <li key={step.title} className="grid content-start gap-1.5">
+            <span className="font-mono text-xs text-muted">
+              {String(index + 1).padStart(2, "0")}
             </span>
-            <span className="grid gap-0.5">
-              <span className="text-sm font-medium">{step.title}</span>
-              <span className="text-xs leading-5 text-muted">
-                {step.detail}
-              </span>
+            <span className="text-[0.9375rem] font-semibold">{step.title}</span>
+            <span className="text-sm leading-6 text-(--color-ink-2)">
+              {step.detail}
             </span>
           </li>
         ))}

@@ -60,6 +60,11 @@
      The raw logo pink is 3.41:1 on white, so it is decoration only; actions use the derived accent. */
   --color-brand-logo: #ff4060;
   --color-brand-logo-2: #ff6982;
+  --identity-glow-1: color-mix(
+    in oklab,
+    var(--color-brand-logo) 30%,
+    transparent
+  );
   --color-brand-tile: #ffffff; /* the logo PNG's own opaque ground, kept in both themes */
   --color-accent: #d92a4a; /* white text 4.79:1, on white 4.79:1 (AA) */
   --color-accent-2: #ff6982;
@@ -165,4 +170,9 @@
   --surface-panel: #20232b;
   --surface-column: #1c1f27;
   --rule-strong: #6b7282;
+  --identity-glow-1: color-mix(
+    in oklab,
+    var(--color-brand-logo) 28%,
+    transparent
+  );
 }
