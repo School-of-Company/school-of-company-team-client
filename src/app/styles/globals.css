@@ -4,6 +4,7 @@
  * built: the project · redesign: polish · v2.0.0 */
 /* Hallmark · dismissed 41 · board card and filter panel inherit --foreground on a raised surface in both themes */
 /* Hallmark · dismissed F5 · status-icon is the status glyph itself (filled by stage), not an icon set in a coin */
+/* Hallmark · dropped { onCreate && ( <Button onClick={() => onCreate("BACKLOG")}>업무 추가</Button> ) } · the same 업무 추가 action and handler stay; only the variant became secondary so the board header keeps the one primary button */
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css";

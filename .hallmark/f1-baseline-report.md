@@ -6,7 +6,7 @@ Branch `feat/s1-fe-quality`, base `origin/main` `8548fd7`. Scope: app, every exi
 | --- | --- |
 | Before (`sloplint src app --scope app --before`) | 18 FAIL (24a ×4, 34, 39a, 48 ×12) · 8 REFLEX (24b) · 4 WARN (41 ×2, F3, F5) |
 | After (`--kept`) | 0 FAIL · 0 REFLEX · 0 WARN · 3 dismissed (41 ×2, F5) on the record in the `globals.css` stamp |
-| Kept | links 20/20 · fields 22/22 · handlers 156/156 |
+| Kept | links 19/20 + 1 rewritten on record (empty-board 업무 추가 became secondary, same handler) · fields 22/22 · handlers 156/156 |
 | Render tier | not run: no `puppeteer-core` on this machine. Screens were captured instead by `e2e/screens.e2e.ts` (Playwright) against the isolated real API: light/dark × 1440/390, 16 screen states, plus the mobile drawer |
 | Finish review | in-thread (the dispatch forbids subagents) · 2 findings: inconsistent empty values on task detail (resolved: deadline shows 없음) · server error text repeats the error title (owner: server copy) |
 
