@@ -189,3 +189,109 @@ test("참여하지 않은 사용자는 비공개 프로젝트와 관리자 화�
   await page.goto("/admin");
   await expect(page.getByText("관리자 권한이 필요합니다")).toBeVisible();
 });
+
+test("10초 폴링과 탭 재조회 동안 카드가 사라지거나 스켈레톤으로 바뀌지 않는다", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await signIn(page, seed.member.tokens);
+  await page.goto(`/projects/${seed.project.id}`);
+  await expect(card(page, edited)).toBeVisible();
+  await page.evaluate(() => {
+    const w = window as unknown as { flicker: string[] };
+    w.flicker = [];
+    new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.removedNodes)
+          if (
+            node instanceof Element &&
+            (node.matches("article.board-card") ||
+              node.querySelector("article.board-card"))
+          )
+            w.flicker.push("card removed");
+        for (const node of record.addedNodes)
+          if (
+            node instanceof Element &&
+            node.querySelector('[aria-label="보드를 불러오는 중"]')
+          )
+            w.flicker.push("skeleton shown");
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+  const boardRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/api/v1/board"))
+      boardRequests.push(request.url());
+  });
+  // 두 번의 폴링 주기 + 탭 전환 후 복귀(visibilitychange·focus 재조회).
+  await page.waitForTimeout(21_000);
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      value: "hidden",
+      configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+    Object.defineProperty(document, "visibilityState", {
+      value: "visible",
+      configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+    window.dispatchEvent(new Event("focus"));
+  });
+  await page.waitForTimeout(2_000);
+  expect(boardRequests.length).toBeGreaterThanOrEqual(2);
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { flicker: string[] }).flicker,
+    ),
+  ).toEqual([]);
+  await expect(card(page, edited)).toBeVisible();
+});
+
+test("모바일 메뉴는 키보드로 열고 닫히며 포커스가 메뉴 버튼으로 돌아온다", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await signIn(page, seed.member.tokens);
+  await page.goto("/me");
+  const trigger = page.getByRole("button", { name: "메뉴 열기" });
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const drawer = page.getByRole("dialog", { name: "School of Company" });
+  await expect(drawer).toBeVisible();
+  await expect(
+    drawer.getByRole("link", { name: seed.project.name }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await drawer.getByRole("link", { name: "팀 공용" }).click();
+  await expect(page).toHaveURL(/\/team$/);
+  await expect(drawer).toBeHidden();
+});
+
+test("드래그 없이 키보드만으로 카드 메뉴를 열어 상태를 바꿀 수 있다", async ({
+  page,
+}) => {
+  await signIn(page, seed.member.tokens);
+  await page.goto(`/projects/${seed.project.id}`);
+  const menuButton = page.getByRole("button", { name: `${edited} 더보기` });
+  await menuButton.focus();
+  await page.keyboard.press("ArrowDown");
+  const menu = page.getByRole("menu", { name: `${edited} 작업` });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole("menuitem").first()).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
+  await expect(menuButton).toBeFocused();
+  await menuButton.press("Enter");
+  await menu
+    .getByRole("menuitem", { name: "상태 변경: 진행 중" })
+    .press("Enter");
+  await expect(card(column(page, "IN_PROGRESS"), edited)).toBeVisible();
+  expect(
+    (await apiGet<TaskDetail>(`/api/v1/tasks/${taskId}`, seed.member.tokens))
+      .status,
+  ).toBe("IN_PROGRESS");
+});
