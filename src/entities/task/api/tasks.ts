@@ -1,11 +1,13 @@
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
+import { keepPreviousKey } from "@/shared/lib";
 import {
-  keepPreviousData,
   queryOptions,
+  type QueryClient,
   type QueryKey,
 } from "@tanstack/react-query";
 import { boardRequestParams } from "../model/board";
+import { withoutTask } from "../model/without-task";
 import type {
   Board,
   CreateTask,
@@ -60,11 +62,12 @@ export const taskQueries = {
     params.forEach((value, key) => {
       params.set(key, value.split(",").sort().join(","));
     });
+    const queryKey = [...taskKeys.all, "board", personal, params.toString()];
     return queryOptions({
-      queryKey: [...taskKeys.all, "board", personal, params.toString()],
+      queryKey,
       queryFn: () => taskApi.board(params, personal),
       refetchInterval: BOARD_POLL_INTERVAL,
-      placeholderData: keepPreviousData,
+      placeholderData: keepPreviousKey(queryKey),
       retry: false,
     });
   },
@@ -77,3 +80,60 @@ export const taskQueries = {
       retry: false,
     }),
 };
+
+/**
+ * 업무 목록·개수와 저장소 목록을 담는 다른 슬라이스의 쿼리. 업무가 사라지면(404·권한 회수) 함께 정리한다.
+ * 프로젝트(Sprint·확인 필요·발행 저장소 포함) · 홈 · 내 리뷰 요청 · 팀원 부하 · 설정의 연결·설치 저장소.
+ */
+const taskListKeys: readonly QueryKey[] = [
+  ["projects"],
+  ["home"],
+  ["me", "github", "review-requests"],
+  ["members"],
+  ["settings-repositories"],
+  ["settings-installable-repositories"],
+];
+
+const goneKey = (taskId: string) => ["gone-task", taskId] as const;
+
+/**
+ * 업무 단건이 404·403이면 그 업무가 남아 있을 수 있는 캐시를 정리한다.
+ * - **목록 제외는 매번 한다**: 화면에 있는 목록은 그 업무를 바로 빼고(`withoutTask`), 화면에 없는 목록은 지운다
+ *   (돌아왔을 때 옛 목록을 그리지 않는다). 네트워크를 쓰지 않으니 몇 번 불려도 된다.
+ * - **다시 받기는 404 응답 하나에 한 번**: `responseAt`(그 404를 받은 시각)이 이미 처리한 것과 같으면 건너뛴다.
+ *   재마운트·effect 재실행이 같은 응답으로 다시 불러도 재조회를 되풀이하지 않고, 새 404(공개였다가 다시 비공개 등)는
+ *   다시 정리한다. 표시는 한 폴링 주기 뒤 사라진다.
+ * - 404가 난 그 업무의 상세·GitHub 패널 쿼리는 건드리지 않는다(오류 상태 그대로, 다시 받지 않는다).
+ * - 목록을 비우지(reset) 않으므로 보드·프로젝트 화면이 로딩으로 바뀌어 상세 패널이 언마운트되는 일이 없다.
+ * 다시 받기까지 했으면 true.
+ */
+export function forgetTask(
+  client: QueryClient,
+  taskId: string,
+  responseAt: number,
+) {
+  const others = ({ queryKey }: { readonly queryKey: QueryKey }) =>
+    !(
+      queryKey[0] === "tasks" &&
+      (queryKey[1] === "detail" || queryKey[1] === "github") &&
+      queryKey[2] === taskId
+    );
+  const keys = [taskKeys.all, ...taskListKeys];
+  for (const queryKey of keys) {
+    client.removeQueries({ queryKey, type: "inactive", predicate: others });
+    client.setQueriesData(
+      { queryKey, type: "active", predicate: others },
+      (data: unknown) => withoutTask(data, taskId),
+    );
+  }
+  if (client.getQueryData(goneKey(taskId)) === responseAt) return false;
+  client.setQueryDefaults(["gone-task"], { gcTime: BOARD_POLL_INTERVAL });
+  client.setQueryData(goneKey(taskId), responseAt);
+  for (const queryKey of keys)
+    void client.invalidateQueries({
+      queryKey,
+      type: "active",
+      predicate: others,
+    });
+  return true;
+}

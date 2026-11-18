@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SignalChip, statusLabels } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
+import { useLastData } from "@/shared/lib";
 import { Button, Skeleton } from "@/shared/ui";
 import { reviewRequestQueries } from "../api/review-requests";
 
@@ -28,8 +29,10 @@ export function ReviewRequests({
     ...reviewRequestQueries.mine(),
     enabled: githubLinked,
   });
-  const count = requests.data?.length ?? 0;
-  const overdue = requests.data?.filter((item) => item.overdue).length ?? 0;
+  // 일시 장애면 60초까지만 마지막 목록을 두고, 권한·존재 오류(4xx)면 바로 비운다.
+  const { data, stale } = useLastData(requests);
+  const count = data?.length ?? 0;
+  const overdue = data?.filter((item) => item.overdue).length ?? 0;
   const now = requests.dataUpdatedAt;
   return (
     <section
@@ -38,14 +41,14 @@ export function ReviewRequests({
     >
       <div className="review-requests-header">
         <h2 id="review-requests-heading">리뷰 요청</h2>
-        {requests.data && (
+        {data && (
           <span className="text-xs text-muted tabular-nums">
             {count}건{overdue > 0 && `, 24시간 초과 ${overdue}건`}
           </span>
         )}
       </div>
-      {/* 재조회만 실패하면 TanStack이 마지막 data를 유지한다: 목록은 두고 비차단 안내만 보인다. */}
-      {requests.isError && requests.data && (
+      {/* 일시 장애로 재조회만 실패하면(60초 안) 목록은 두고 비차단 안내만 보인다. */}
+      {stale && (
         <RetryNote
           role="status"
           message="최신 목록을 불러오지 못해 마지막으로 받은 목록을 보여 줍니다."
@@ -65,17 +68,17 @@ export function ReviewRequests({
           <Skeleton className="w-2/3" />
           <Skeleton className="w-1/2" />
         </div>
-      ) : requests.isError && !requests.data ? (
+      ) : requests.isError && !data ? (
         <RetryNote
           role="alert"
-          message={`리뷰 요청을 불러오지 못했습니다. ${normalizeApiError(requests.error).message}`}
+          message={`최신 정보를 불러오지 못했습니다. ${normalizeApiError(requests.error).message}`}
           onRetry={() => void requests.refetch()}
         />
       ) : count === 0 ? (
         <p className="review-requests-note">내게 요청된 리뷰가 없습니다.</p>
       ) : (
         <ul className="divide-y divide-border">
-          {requests.data.map((item) => (
+          {(data ?? []).map((item) => (
             <li
               key={`${item.repositoryFullName}#${item.number}`}
               className="review-request-row"

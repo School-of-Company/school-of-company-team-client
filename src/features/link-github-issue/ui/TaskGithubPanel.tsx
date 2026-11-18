@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { TaskDetail } from "@/entities/task";
 import { suggestsDone, taskKeys } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
+import { repositoryName, useLastData } from "@/shared/lib";
 import {
   Badge,
   Button,
@@ -16,6 +17,7 @@ import {
   Skeleton,
 } from "@/shared/ui";
 import { taskGithubApi, taskGithubQueries } from "../api/github";
+import { publicationName } from "../model/publication";
 import { linkStateLabels, publicationLabels } from "../model/types";
 import { PullRequestSignals } from "./PullRequestSignals";
 
@@ -43,8 +45,12 @@ export function TaskGithubPanel({
   }, [github.error, onAccessLost]);
   const repositories = useQuery({
     ...taskGithubQueries.repositories(task.projectId ?? ""),
-    enabled: editable && task.scope === "PROJECT" && !!task.projectId,
+    // 읽기 전용 열람자도 받는다: 서버가 조회자 원본 권한으로 거른 목록이라, 권한 있는 열람자에게는
+    // 비공개 발행 대상 이름을 보여 주고 권한 없는 열람자에게는 숨긴다(선택 상자는 편집자만).
+    enabled: task.scope === "PROJECT" && !!task.projectId,
   });
+  // 일시 장애면 60초까지만 마지막 선택지를 두고, 권한·존재 오류(4xx)면 바로 비운다.
+  const { data: repositoryOptions } = useLastData(repositories);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   async function run(action: () => Promise<unknown>) {
@@ -107,7 +113,7 @@ export function TaskGithubPanel({
         {publication && (
           <Badge>
             {publicationLabels[publication.state]} ·{" "}
-            {publication.repositoryFullName}
+            {publicationName(publication, repositoryOptions)}
           </Badge>
         )}
       </div>
@@ -115,7 +121,10 @@ export function TaskGithubPanel({
         <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
           {github.data.source.private && <Badge>비공개 원본</Badge>}
           <span>
-            {github.data.source.repositoryFullName}#{github.data.source.number}
+            {repositoryName({
+              fullName: github.data.source.repositoryFullName,
+            })}
+            #{github.data.source.number}
             에서 가져온 업무
             {github.data.source.private &&
               " · 원본 저장소 권한이 있는 참여자에게만 보여요"}
@@ -174,9 +183,19 @@ export function TaskGithubPanel({
             }
           >
             <option value="">발행하지 않음</option>
-            {repositories.data?.map((repository) => (
+            {publication &&
+              !repositoryOptions?.some(
+                (repository) =>
+                  repository.id === publication.projectRepositoryId,
+              ) && (
+                // 지금 발행 대상이 목록에서 빠졌으면(비공개 전환·권한 없음) 이름 없이 자리만 둔다.
+                <option value={publication.projectRepositoryId} disabled>
+                  {publicationName(publication, repositoryOptions)}
+                </option>
+              )}
+            {repositoryOptions?.map((repository) => (
               <option key={repository.id} value={repository.id}>
-                {repository.fullName}
+                {repositoryName(repository)}
                 {repository.private ? "" : " · 공개"}
               </option>
             ))}
