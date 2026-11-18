@@ -1,5 +1,6 @@
 /* Hallmark · checked: 2026-11-19 · genre: modern-minimal (inferred) · scope: app
  * floor: 0 FAIL · fixed: 24a, 34, 39a, 48, 24b, F3 · contrast: input border 3:1, readable text 4.5:1
+ * finish-review: in-thread (dispatch forbids subagents) · 2 findings · 1 resolved 1 owner (server error text repeats the title)
  * built: the project · redesign: polish · v2.0.0 */
 /* Hallmark · dismissed 41 · board card and filter panel inherit --foreground on a raised surface in both themes */
 /* Hallmark · dismissed F5 · status-icon is the status glyph itself (filled by stage), not an icon set in a coin */

@@ -87,7 +87,13 @@ export function TaskProperties({
         </div>
         <div>
           <dt>마감일</dt>
-          <dd>{formatDate(task.deadline)}</dd>
+          <dd>
+            {task.deadline ? (
+              formatDate(task.deadline)
+            ) : (
+              <span className="text-muted">없음</span>
+            )}
+          </dd>
         </div>
         {task.completedAt && (
           <div>
