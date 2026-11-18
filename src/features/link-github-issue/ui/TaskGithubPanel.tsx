@@ -145,9 +145,7 @@ export function TaskGithubPanel({
           id="publication-target"
           label="Issue 발행 저장소"
           hint={
-            task.status === "BACKLOG"
-              ? "진행 예정으로 옮기면 발행됩니다."
-              : undefined
+            publication ? undefined : "저장소를 고르면 바로 Issue로 발행됩니다."
           }
         >
           <Select

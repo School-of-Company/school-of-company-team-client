@@ -32,9 +32,7 @@ export function BoardCreateDialog({
   });
   const selected =
     target ??
-    repositories.data?.find(
-      (repository) => repository.isDefault && repository.publishable,
-    )?.id ??
+    repositories.data?.find((repository) => repository.isDefault)?.id ??
     "";
   return (
     <Dialog
@@ -49,7 +47,7 @@ export function BoardCreateDialog({
           <Field
             id="new-task-repository"
             label="발행 저장소"
-            hint="검토 필요는 발행 대기, 진행 예정 이상은 저장소 지정 후 발행합니다. 공개 저장소를 선택하면 업무 내용이 공개됩니다."
+            hint="저장소를 지정하면 등록 즉시 Issue로 발행합니다. 공개 저장소를 선택하면 업무 내용이 공개됩니다."
           >
             <Select
               id="new-task-repository"
@@ -61,11 +59,7 @@ export function BoardCreateDialog({
             >
               <option value="">발행하지 않음</option>
               {repositories.data?.map((repository) => (
-                <option
-                  key={repository.id}
-                  value={repository.id}
-                  disabled={!repository.publishable}
-                >
+                <option key={repository.id} value={repository.id}>
                   {repository.fullName}
                   {repository.private ? " (비공개)" : " (공개)"}
                 </option>

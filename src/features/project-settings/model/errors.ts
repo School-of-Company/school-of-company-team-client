@@ -23,8 +23,6 @@ const messages: Readonly<Record<string, string>> = {
     "발행에 사용 중인 저장소는 연결을 해제할 수 없습니다.",
   GITHUB_REPOSITORY_NOT_INSTALLED:
     "GitHub App 설치에서 허용한 저장소만 연결할 수 있습니다.",
-  GITHUB_PUBLIC_REPOSITORY_NOT_ALLOWED:
-    "참여자만 공개 프로젝트는 공개 저장소에 발행할 수 없습니다.",
   GITHUB_NOT_CONFIGURED:
     "GitHub App이 설정되지 않았습니다. 운영자에게 문의하세요.",
   DISCORD_NOT_CONFIGURED:

@@ -77,7 +77,6 @@ export function RepositorySettings({
                 <p className="font-medium break-all">{repo.fullName}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge>{repo.private ? "비공개" : "공개"}</Badge>
-                  {!repo.publishable && <Badge>링크 연결만 가능</Badge>}
                   {repo.isDefault && <Badge>기본 발행</Badge>}
                 </div>
                 <ImportStatus
@@ -142,13 +141,11 @@ export function RepositorySettings({
             }
           >
             <option value="">없음</option>
-            {repositories.data
-              .filter((repo) => repo.publishable)
-              .map((repo) => (
-                <option key={repo.id} value={repo.id}>
-                  {repo.fullName}
-                </option>
-              ))}
+            {repositories.data.map((repo) => (
+              <option key={repo.id} value={repo.id}>
+                {repo.fullName}
+              </option>
+            ))}
           </Select>
         </Field>
       )}
