@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { themeBootScript, THEME_STORAGE_KEY } from "./theme";
 
-function boot(stored: string | null, systemDark: boolean, storageThrows = false) {
+function boot(
+  stored: string | null,
+  systemDark: boolean,
+  storageThrows = false,
+) {
   const root = { dataset: {} as Record<string, string> };
   const env = {
     document: { documentElement: root },
@@ -32,6 +36,7 @@ test("without a valid stored choice the system preference applies", () => {
   assert.equal(boot("garbage", false), "light");
 });
 
-test("blocked storage falls back to light instead of throwing", () => {
-  assert.equal(boot(null, true, true), "light");
+test("blocked storage follows the system preference instead of throwing", () => {
+  assert.equal(boot(null, true, true), "dark");
+  assert.equal(boot(null, false, true), "light");
 });

@@ -49,14 +49,14 @@ export function AppShell({
     { href: routes.projects, label: "프로젝트", icon: "project" },
     ...(isHeadAdmin
       ? [
-          { href: routes.admin, label: "관리자", icon: "settings" } satisfies {
+          { href: routes.admin, label: "관리자", icon: "shield" } satisfies {
             href: string;
             label: string;
             icon: IconName;
           },
         ]
       : []),
-    { href: routes.account, label: "내 계정", icon: "user" },
+    { href: routes.account, label: "설정", icon: "settings" },
   ];
   const navigation = (
     <nav aria-label="주 메뉴" className="grid gap-1">

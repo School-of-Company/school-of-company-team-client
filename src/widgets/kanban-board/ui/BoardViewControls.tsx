@@ -1,5 +1,17 @@
 import type { BoardSort } from "@/entities/task";
-import { Select } from "@/shared/ui";
+import { ChipSelect } from "@/shared/ui";
+
+const groupOptions = [
+  { value: "none", label: "그룹 없음" },
+  { value: "owner", label: "담당자별" },
+  { value: "part", label: "파트별" },
+] as const;
+
+const sortOptions = [
+  { value: "manual", label: "수동 순서" },
+  { value: "priority", label: "우선순위순" },
+  { value: "deadline", label: "마감일순" },
+] as const satisfies readonly { value: BoardSort; label: string }[];
 
 export function BoardViewControls({
   search,
@@ -15,35 +27,24 @@ export function BoardViewControls({
     params.set(key, value);
     onChange(params.toString());
   }
+  const group = params.get("groupBy");
   return (
-    <div className="board-view-controls flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
-      <label className="flex shrink-0 items-center gap-2 text-sm whitespace-nowrap">
-        그룹
-        <Select
-          className="w-auto min-w-28"
-          value={params.get("groupBy") ?? "none"}
-          onChange={(event) => change("groupBy", event.target.value)}
-        >
-          <option value="none">그룹 없음</option>
-          <option value="owner">담당자</option>
-          <option value="part">파트</option>
-        </Select>
-      </label>
-      <label className="flex shrink-0 items-center gap-2 text-sm whitespace-nowrap">
-        정렬
-        <Select
-          className="w-auto min-w-28"
-          value={sort}
-          onChange={(event) => change("sort", event.target.value)}
-        >
-          <option value="manual">수동 순서</option>
-          <option value="priority">우선순위</option>
-          <option value="deadline">마감일</option>
-        </Select>
-      </label>
+    <div className="board-view-controls flex min-w-0 flex-wrap items-center gap-2">
+      <ChipSelect
+        label="그룹"
+        value={group === "owner" || group === "part" ? group : "none"}
+        options={groupOptions}
+        onChange={(value) => change("groupBy", value)}
+      />
+      <ChipSelect
+        label="정렬"
+        value={sort}
+        options={sortOptions}
+        onChange={(value) => change("sort", value)}
+      />
       {sort !== "manual" && (
-        <p className="self-end text-sm text-muted">
-          수동 순서에서 드래그와 순서 이동을 사용할 수 있습니다.
+        <p className="text-xs text-muted">
+          순서 이동은 수동 순서에서만 가능해요.
         </p>
       )}
     </div>

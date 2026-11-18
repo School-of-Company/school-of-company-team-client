@@ -3,6 +3,8 @@
  * axes: light+dark/grotesk-sans/cool · accent: brand pink (logo-sampled, AA-derived) · posture: restrained · contrast: accent 4.79:1 light, 6.24:1 dark · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S3 R5 V3 · weakest: S, retained project keys and task destinations as the navigation material */
 /* Hallmark · reworded "팀의 업무를 한곳에서" to "로그인" · user request: internal tool, no marketing headline on the sign-in screen */
+/* Hallmark · dropped onClick={() => { void me.refetch(); }} · pending re-check became checkNow (same refetch, minimum 600ms label, no spinner) plus the existing 10s auto check */
+/* Hallmark · dropped onChange={(event) => change("groupBy", event.target.value)}, onChange={(event) => change("sort", event.target.value)} · group and sort selects became ChipSelect with onChange={(value) => change(...)}, same URL params */
 /* Hallmark · dropped onChange={(event) => { const status = taskStatuses.find( · card status select moved into the card more-menu, same position API, verified on the real API */
 /* Hallmark · dropped onClick={() => onOrder("up")}, onClick={() => onOrder("down")} · order buttons moved into BoardCardMenu menu items with the same onOrder handler and manual-sort guard */
 /* Hallmark · dropped onClick={() => setCreating(true)}, onClose={() => setCreating(false)}, onCreate={canCreate ? () => setCreating(true) : undefined}, onCreated={async (notice) => { setMessage(notice); setCreating(false); await queryClient.invalidateQueries({ queryKey: taskKeys.all }); }} · board creation moved to the column add action with status prefill and a scoped task invalidation */
@@ -275,6 +277,76 @@ body {
   font-size: var(--text-sm);
   border-radius: var(--radius-input);
 }
+.ui-identity .ui-button-secondary,
+.ui-identity .ui-button-ghost {
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  background: color-mix(in oklab, var(--surface) 55%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.ui-identity .ui-button-secondary:hover:not(:disabled),
+.ui-identity .ui-button-ghost:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
+  filter: none;
+}
+.ui-segmented {
+  display: inline-grid;
+  grid-auto-flow: column;
+  gap: var(--space-3xs);
+  justify-self: start;
+  padding: var(--space-3xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+}
+.ui-segmented-option {
+  position: relative;
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  border-radius: calc(var(--radius-md) - 2px);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+.ui-segmented-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ui-segmented-option:hover {
+  color: var(--foreground);
+}
+.ui-segmented-option:has(input:checked) {
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--border);
+}
+.ui-segmented-option:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.ui-identity-status {
+  min-height: 3rem;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.5rem;
+  text-align: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-identity-status {
+    animation: ui-breathe 1.6s var(--ease-in-out) infinite;
+  }
+}
+@keyframes ui-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
 .ui-link-button {
   justify-self: center;
   padding: var(--space-2xs) var(--space-xs);
@@ -288,7 +360,12 @@ body {
   text-decoration: underline;
 }
 .ui-link-button:active:not(:disabled) {
-  opacity: 0.7;
+  color: var(--color-ink-2);
+}
+.ui-link-button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  text-decoration: none;
 }
 .ui-button-ghost:hover:not(:disabled) {
   background: var(--surface-hover);
@@ -334,9 +411,6 @@ body {
 .board-filters summary {
   padding-inline: var(--space-xs);
   font-weight: 500;
-}
-.board-filters[open] {
-  padding-bottom: var(--space-md);
 }
 .board-columns {
   gap: var(--space-sm);
@@ -394,6 +468,321 @@ body {
   width: var(--icon-size);
   height: var(--icon-size);
 }
+.ui-chip-select-root {
+  position: relative;
+}
+.ui-chip-select {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: 0 var(--space-xs) 0 var(--space-sm);
+  border: 1px solid var(--rule-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+.ui-chip-select svg {
+  color: var(--muted);
+}
+.ui-chip-select:hover,
+.ui-chip-select[aria-expanded="true"] {
+  border-color: var(--rule-strong);
+  background: var(--surface-hover);
+}
+.ui-chip-menu {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 10rem;
+  padding: var(--space-2xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+  outline: none;
+  transform-origin: top right;
+}
+.ui-chip-option {
+  display: flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border-radius: calc(var(--radius-md) - 3px);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.ui-chip-option[data-active] {
+  background: var(--surface-hover);
+}
+.ui-chip-option[aria-selected="true"] {
+  font-weight: 600;
+}
+.ui-chip-option svg {
+  color: var(--brand);
+}
+.board-filters > summary {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  padding: 0 var(--space-sm) 0 var(--space-xs);
+  border: 1px solid var(--rule-subtle);
+  border-radius: var(--radius-pill);
+  list-style: none;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+.board-filters > summary::-webkit-details-marker {
+  display: none;
+}
+.board-filters > summary:hover {
+  border-color: var(--rule-strong);
+  background-color: var(--surface-hover);
+}
+.board-empty {
+  min-height: 4.5rem;
+  border: 1px dashed var(--rule-subtle);
+  border-radius: var(--radius-input);
+}
+
+/* Filters: popover panel instead of pushing the board down. */
+.board-filters {
+  position: relative;
+}
+.board-filters-panel {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + 6px);
+  left: 0;
+  width: min(52rem, calc(100vw - 32px));
+  max-height: min(70vh, 36rem);
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+}
+.board-filters-grid {
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+/* Sort hint sits under the controls without taking layout space. */
+.board-view-controls {
+  position: relative;
+}
+.board-view-hint {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  white-space: nowrap;
+}
+/* Columns read as stages: step number and coloured top rule. */
+.board-column {
+  --stage: var(--rule-strong);
+  position: relative;
+  border-top: 3px solid var(--stage);
+}
+.board-column[data-status="PLANNED"] {
+  --stage: oklch(62% 0.13 250);
+}
+.board-column[data-status="IN_PROGRESS"] {
+  --stage: oklch(72% 0.15 70);
+}
+.board-column[data-status="REVIEW"] {
+  --stage: oklch(58% 0.17 300);
+}
+.board-column[data-status="DONE"] {
+  --stage: var(--success);
+}
+.board-step {
+  display: inline-grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--stage);
+  color: var(--color-paper);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* Priority: colour per level on cards and in the editor picker. */
+[data-priority="P0"] {
+  --priority: var(--danger);
+}
+[data-priority="P1"] {
+  --priority: oklch(65% 0.16 50);
+}
+[data-priority="P2"] {
+  --priority: oklch(62% 0.13 250);
+}
+[data-priority="P3"] {
+  --priority: var(--muted);
+}
+.board-priority[data-priority] {
+  color: var(--priority);
+}
+.ui-priority-picker {
+  display: grid;
+  grid-auto-flow: initial;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  justify-self: stretch;
+}
+.ui-priority-picker .ui-segmented-option {
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding-inline: var(--space-xs);
+}
+.ui-priority-picker .ui-segmented-option > .font-semibold {
+  color: var(--priority);
+}
+.ui-priority-picker .ui-segmented-option:has(input:checked) {
+  background: color-mix(in oklab, var(--priority) 14%, var(--surface));
+  box-shadow: 0 0 0 1.5px var(--priority);
+}
+/* Theme picker with a mini screen preview per option. */
+.ui-theme-select {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 9rem));
+  gap: var(--space-sm);
+}
+.ui-theme-option {
+  position: relative;
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+.ui-theme-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ui-theme-option:hover {
+  color: var(--foreground);
+  border-color: var(--rule-strong);
+}
+.ui-theme-option:has(input:checked) {
+  color: var(--foreground);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+.ui-theme-option:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.ui-theme-preview {
+  --p-bg: #ffffff;
+  --p-side: #f4f5f7;
+  --p-line: #d9dce3;
+  --p-accent: #d92a4a;
+  display: grid;
+  grid-template-columns: 28% 1fr;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--rule-subtle);
+  border-radius: var(--radius-input);
+  background: var(--p-bg);
+}
+.ui-theme-preview[data-preview="dark"] {
+  --p-bg: #111318;
+  --p-side: #1a1d24;
+  --p-line: #363c4a;
+  --p-accent: #ff5c78;
+}
+.ui-theme-preview[data-preview="system"] {
+  --p-side: oklch(60% 0.01 258 / 0.25);
+  --p-line: oklch(60% 0.01 258 / 0.45);
+  background: linear-gradient(135deg, #ffffff 50%, #111318 50%);
+}
+.ui-theme-preview-side {
+  background: var(--p-side);
+}
+.ui-theme-preview-main {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  padding: 8px;
+}
+.ui-theme-preview-main > span {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--p-line);
+}
+.ui-theme-preview-main > span:first-child {
+  width: 45%;
+  background: var(--p-accent);
+}
+.ui-theme-preview-main > span:last-child {
+  width: 70%;
+}
+
+/* Motion: state only, transform/opacity, off for reduced motion. */
+@keyframes ui-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes ui-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+@keyframes ui-slide-in {
+  from {
+    opacity: 0.6;
+    transform: translateX(24px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  main#main-content > * {
+    animation: ui-fade-up var(--dur-short) var(--ease-out);
+  }
+  .board-card {
+    transition:
+      transform var(--dur-micro) var(--ease-out),
+      border-color var(--dur-micro) var(--ease-out),
+      box-shadow var(--dur-micro) var(--ease-out);
+  }
+  .board-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-card-hover);
+  }
+  .board-detail-panel[open] {
+    animation: ui-slide-in var(--dur-short) var(--ease-out);
+  }
+  .ui-button {
+    transition:
+      transform var(--dur-micro) var(--ease-out),
+      filter var(--dur-micro) var(--ease-out),
+      background-color var(--dur-micro) var(--ease-out);
+  }
+  .ui-button:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .ui-identity main {
+    animation: ui-fade-up var(--dur-long) var(--ease-out);
+  }
+  .ui-chip-menu {
+    animation: ui-menu-in var(--dur-micro) var(--ease-out);
+  }
+}
 @media (pointer: coarse) {
   .ui-button,
   .ui-input {
@@ -412,8 +801,5 @@ body {
   }
   .board-toolbar .ui-input {
     width: 100%;
-  }
-  .board-view-controls p {
-    grid-column: 1 / -1;
   }
 }

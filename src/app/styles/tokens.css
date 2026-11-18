@@ -107,6 +107,10 @@
   --cut-l: 16px;
   --rule-hair: 1px;
   --shadow-card: none;
+  --shadow-card-hover: 0 4px 12px -6px oklch(21% 0.028 262 / 0.18);
+  --shadow-menu:
+    0 1px 2px oklch(21% 0.028 262 / 0.06),
+    0 12px 32px -12px oklch(21% 0.028 262 / 0.24);
   --shadow-key:
     0 3px 0 0 var(--color-key-edge), 0 6px 8px -4px oklch(21% 0.028 262 / 0.28),
     inset 0 1px 0 oklch(100% 0 0 / 0.9);
@@ -164,6 +168,9 @@
   --color-overlay: oklch(0% 0 0 / 0.6);
   --success: #5fcf8f;
   --shadow-card: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-card-hover: 0 4px 14px -6px oklch(0% 0 0 / 0.6);
+  --shadow-menu:
+    0 1px 2px oklch(0% 0 0 / 0.5), 0 12px 32px -12px oklch(0% 0 0 / 0.8);
   --surface-sidebar: #111318;
   --surface-canvas: #1a1d24;
   --surface-panel: #20232b;

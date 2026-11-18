@@ -15,7 +15,7 @@ import {
   LogoutButton,
   OAuthButton,
 } from "@/features/auth";
-import { ErrorState, Spinner } from "@/shared/ui";
+import { ErrorState } from "@/shared/ui";
 
 export function ConnectDiscordPage() {
   const me = useMe();
@@ -39,15 +39,18 @@ export function ConnectDiscordPage() {
           }}
         />
       ) : !me.data || !token ? (
-        <Spinner label="계정 상태 확인 중" />
+        <p className="min-h-12 text-sm leading-6 text-(--color-ink-2)">
+          계정 상태를 확인하고 있어요.
+        </p>
       ) : (
         <>
-          <p className="text-sm leading-6 text-muted">
-            가입이 승인되었습니다. 업무 알림과 논의를 위해 Discord 연결이
-            필요합니다. 연결을 해제해도 기존 업무와 기록은 보존됩니다.
+          <p className="min-h-12 text-sm leading-6 text-(--color-ink-2)">
+            승인됐어요. 업무 알림과 논의를 위해 Discord를 연결해 주세요.
           </p>
           <OAuthButton provider="discord" />
-          <LogoutButton />
+          <div className="pt-2">
+            <LogoutButton appearance="link" label="다른 계정으로 로그인" />
+          </div>
         </>
       )}
     </IdentityPanel>
