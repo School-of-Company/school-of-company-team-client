@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import type { Project } from "@/entities/project";
+import { suggestProjectKey } from "../model/project-key";
+import { ProjectSetup } from "./ProjectSetup";
 import { useCreateProject } from "../api/projects";
 import {
   settingsErrorMessage,
@@ -16,6 +19,11 @@ export function CreateProjectForm({
 }) {
   const create = useCreateProject(onSaved);
   const [validation, setValidation] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [key, setKey] = useState("");
+  const [keyEdited, setKeyEdited] = useState(false);
+  const [created, setCreated] = useState<Project | null>(null);
+  if (created) return <ProjectSetup project={created} onSaved={onSaved} />;
   return (
     <form
       className="grid gap-4"
@@ -36,11 +44,31 @@ export function CreateProjectForm({
             description: String(data.get("description") ?? ""),
             visibility: data.get("visibility") === "TEAM" ? "TEAM" : "MEMBERS",
           },
-          { onSuccess: () => form.reset() },
+          { onSuccess: setCreated },
         );
       }}
     >
       <fieldset disabled={create.isPending} className="grid min-w-0 gap-4">
+        <p className="text-sm text-muted">
+          1. 기본 정보 / 2. 팀원·PM / 3. 저장소 연결
+        </p>
+        <p className="text-sm">
+          기본 정보를 저장하면 프로젝트가 생성됩니다. 이후 팀원과 저장소를
+          설정하세요.
+        </p>
+        <Field id="create-project-name" label="프로젝트 이름 (필수)">
+          <Input
+            id="create-project-name"
+            name="name"
+            maxLength={100}
+            required
+            value={name}
+            onChange={(event) => {
+              setName(event.target.value);
+              if (!keyEdited) setKey(suggestProjectKey(event.target.value));
+            }}
+          />
+        </Field>
         <Field
           id="create-project-key"
           label="프로젝트 키"
@@ -49,19 +77,16 @@ export function CreateProjectForm({
           <Input
             id="create-project-key"
             name="key"
+            value={key}
+            onChange={(event) => {
+              setKeyEdited(true);
+              setKey(event.target.value.toUpperCase());
+            }}
             pattern="[A-Z][A-Z0-9]{1,9}"
             minLength={2}
             maxLength={10}
             required
             aria-describedby="create-project-key-hint"
-          />
-        </Field>
-        <Field id="create-project-name" label="프로젝트 이름">
-          <Input
-            id="create-project-name"
-            name="name"
-            maxLength={100}
-            required
           />
         </Field>
         <Field id="create-project-description" label="설명">
@@ -78,7 +103,7 @@ export function CreateProjectForm({
           </Select>
         </Field>
         <Button type="submit" loading={create.isPending}>
-          프로젝트 생성
+          프로젝트 만들고 계속
         </Button>
       </fieldset>
       {validation && (
@@ -89,11 +114,6 @@ export function CreateProjectForm({
       {create.isError && (
         <p role="alert" className="text-sm text-danger">
           {settingsErrorMessage(normalizeApiError(create.error))}
-        </p>
-      )}
-      {create.isSuccess && (
-        <p role="status" className="text-sm">
-          프로젝트를 생성했습니다. 프로젝트 목록에서 참여자와 PM을 설정하세요.
         </p>
       )}
     </form>

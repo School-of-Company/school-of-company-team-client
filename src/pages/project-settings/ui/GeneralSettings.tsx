@@ -14,6 +14,47 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
   const update = useUpdateProject(project.id, onSaved);
   const permissions = getSettingsPermissions(user, project);
   const [validation, setValidation] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  if (!editing)
+    return (
+      <div className="grid gap-5">
+        <dl className="grid gap-5 text-sm">
+          <div>
+            <dt className="text-muted">프로젝트 키</dt>
+            <dd className="mt-1 font-mono">{project.key}</dd>
+          </div>
+          <div>
+            <dt className="text-muted">이름</dt>
+            <dd className="mt-1 break-words">{project.name}</dd>
+          </div>
+          <div>
+            <dt className="text-muted">설명</dt>
+            <dd className="mt-1 break-words whitespace-pre-wrap">
+              {project.description || "설명이 없습니다."}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted">공개 범위</dt>
+            <dd className="mt-1">
+              {project.visibility === "TEAM" ? "팀 전체 공개" : "참여자만 공개"}
+            </dd>
+          </div>
+        </dl>
+        {permissions.manage && (
+          <Button
+            variant="secondary"
+            className="justify-self-start"
+            onClick={() => {
+              update.reset();
+              setEditing(true);
+            }}
+          >
+            기본 정보 편집
+          </Button>
+        )}
+        <MutationFeedback error={update.error} success={update.isSuccess} />
+      </div>
+    );
   return (
     <form
       className="grid gap-4"
@@ -27,11 +68,14 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
         const error = validateProjectForm({ name });
         setValidation(error);
         if (!error)
-          update.mutate({
-            name,
-            description: String(data.get("description") ?? ""),
-            visibility,
-          });
+          update.mutate(
+            {
+              name,
+              description: String(data.get("description") ?? ""),
+              visibility,
+            },
+            { onSuccess: () => setEditing(false) },
+          );
       }}
     >
       <fieldset
@@ -70,9 +114,18 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
           </Select>
         </Field>
         {permissions.manage && (
-          <Button type="submit" loading={update.isPending}>
-            설정 저장
-          </Button>
+          <div className="flex gap-2">
+            <Button type="submit" loading={update.isPending}>
+              설정 저장
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={update.isPending}
+              onClick={() => setEditing(false)}
+            >
+              취소
+            </Button>
+          </div>
         )}
       </fieldset>
       {validation && (

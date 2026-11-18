@@ -11,7 +11,7 @@ import { activeUsersQueryOptions } from "@/entities/user";
 import { TaskGithubPanel } from "@/features/link-github-issue";
 import { TaskDiscussion } from "./TaskDiscussion";
 import { normalizeApiError } from "@/shared/api";
-import { Button, Dialog, Spinner } from "@/shared/ui";
+import { Button, Dialog, Skeleton } from "@/shared/ui";
 import { TaskContent } from "./TaskContent";
 
 export function TaskDetailWorkspace({
@@ -94,7 +94,14 @@ export function TaskDetailWorkspace({
         }}
       />
     );
-  if (task.isPending) return <Spinner label="업무를 불러오는 중" />;
+  if (task.isPending)
+    return (
+      <div role="status" aria-label="업무를 불러오는 중" className="grid gap-5">
+        <Skeleton className="w-24" />
+        <Skeleton className="h-8 w-3/4" />
+        <Skeleton className="h-64" />
+      </div>
+    );
   if (!task.data) return null;
   const data = task.data;
   const access =
@@ -111,7 +118,7 @@ export function TaskDetailWorkspace({
       }))
     : (assignees.data ?? data.assignees);
   return (
-    <div className="mx-auto grid max-w-4xl gap-6">
+    <div className="mx-auto grid max-w-4xl gap-6 [overflow-wrap:anywhere] break-keep">
       <Link
         href={
           data.projectId
@@ -131,7 +138,9 @@ export function TaskDetailWorkspace({
           {data.key ??
             (data.scope === "PERSONAL" ? "개인 업무" : "팀 공용 업무")}
         </p>
-        <h1 className="text-2xl font-bold break-words">{data.title}</h1>
+        <h1 className="max-w-none text-2xl font-semibold [overflow-wrap:anywhere] break-keep">
+          {data.title}
+        </h1>
         <div className="flex flex-wrap gap-2">
           {editable && (
             <Button onClick={() => setEditing(true)}>업무 수정</Button>

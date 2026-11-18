@@ -5,23 +5,42 @@ import { useQuery } from "@tanstack/react-query";
 import { projectQueries } from "@/entities/project";
 import { TaskError } from "@/entities/task";
 import { AuthGuard } from "@/features/auth";
-import { Badge, EmptyState, Spinner } from "@/shared/ui";
+import { isHeadAdmin } from "@/entities/user";
+import { Badge, EmptyState, Skeleton } from "@/shared/ui";
 
 export function ProjectListPage() {
   return (
     <AuthGuard require="work">
-      <ProjectListContent />
+      {(user) => <ProjectListContent canCreate={isHeadAdmin(user)} />}
     </AuthGuard>
   );
 }
 
-function ProjectListContent() {
+function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
   const projects = useQuery(projectQueries.list());
   return (
     <div className="grid gap-6">
-      <h1 className="text-2xl font-bold tracking-tight">프로젝트</h1>
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold tracking-tight">프로젝트</h1>
+        {canCreate && (
+          <Link
+            href="/admin?create=project"
+            className="ui-button ui-button-primary"
+          >
+            새 프로젝트
+          </Link>
+        )}
+      </header>
       {projects.isPending ? (
-        <Spinner label="프로젝트를 불러오는 중" />
+        <div
+          role="status"
+          aria-label="프로젝트를 불러오는 중"
+          className="grid gap-3"
+        >
+          {Array.from({ length: 3 }, (_, index) => (
+            <Skeleton key={index} className="h-24" />
+          ))}
+        </div>
       ) : projects.isError ? (
         <TaskError
           error={projects.error}
@@ -52,7 +71,9 @@ function ProjectListContent() {
                 </div>
                 <p className="mt-2 text-sm break-words text-muted">
                   {project.key}
-                  {project.description ? ` · ${project.description}` : ""}
+                  {project.description && (
+                    <span className="ml-3">{project.description}</span>
+                  )}
                 </p>
               </Link>
             </li>

@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { clearSession, getAccessToken } from "@/entities/user";
+import { clearCacheOnSessionChange } from "../model/session-cache";
 import { api, subscribeApiErrors } from "@/shared/api";
 
 api.interceptors.request.use((config) => {
@@ -19,15 +20,14 @@ export function IdentityProvider({
 }) {
   const client = useQueryClient();
   const router = useRouter();
+  useEffect(() => clearCacheOnSessionChange(client), [client]);
   useEffect(() => {
     const unsubscribe = subscribeApiErrors((error) => {
       if (error.status === 401) {
         clearSession();
-        client.clear();
         router.replace("/login");
       } else if (error.code === "SUSPENDED" || error.code === "REJECTED") {
         clearSession(error.code);
-        client.clear();
         router.replace(`/pending?status=${error.code}`);
       } else if (
         error.code === "ONBOARDING_REQUIRED" ||

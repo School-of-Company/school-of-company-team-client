@@ -7,6 +7,14 @@ const ACCESS_KEY = "soc.access-token";
 const REFRESH_KEY = "soc.refresh-token";
 const RESTRICTION_KEY = "soc.account-restriction";
 const listeners = new Set<() => void>();
+const sessionChangeListeners = new Set<() => void>();
+
+export function subscribeSessionChanges(listener: () => void) {
+  sessionChangeListeners.add(listener);
+  return () => {
+    sessionChangeListeners.delete(listener);
+  };
+}
 
 export function getAccessToken(): string | null {
   return typeof window === "undefined"
@@ -15,6 +23,7 @@ export function getAccessToken(): string | null {
 }
 
 export function replaceSession(tokens: SessionTokens) {
+  sessionChangeListeners.forEach((listener) => listener());
   sessionStorage.removeItem(RESTRICTION_KEY);
   sessionStorage.setItem(ACCESS_KEY, tokens.accessToken);
   sessionStorage.setItem(REFRESH_KEY, tokens.refreshToken);
@@ -22,6 +31,7 @@ export function replaceSession(tokens: SessionTokens) {
 }
 
 export function clearSession(restriction?: "REJECTED" | "SUSPENDED") {
+  sessionChangeListeners.forEach((listener) => listener());
   if (restriction) sessionStorage.setItem(RESTRICTION_KEY, restriction);
   else sessionStorage.removeItem(RESTRICTION_KEY);
   sessionStorage.removeItem(ACCESS_KEY);

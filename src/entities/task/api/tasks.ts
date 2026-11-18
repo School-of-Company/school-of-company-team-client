@@ -43,11 +43,13 @@ export const taskApi = {
 export const taskQueries = {
   board: (search: string, personal: boolean) => {
     const params = boardRequestParams(search);
+    params.forEach((value, key) => {
+      params.set(key, value.split(",").sort().join(","));
+    });
     return queryOptions({
       queryKey: [...taskKeys.all, "board", personal, params.toString()],
       queryFn: () => taskApi.board(params, personal),
       refetchInterval: BOARD_POLL_INTERVAL,
-      gcTime: 0,
       retry: false,
     });
   },

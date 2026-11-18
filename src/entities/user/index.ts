@@ -5,6 +5,7 @@ export {
   clearSession,
   getAccessToken,
   replaceSession,
+  subscribeSessionChanges,
   useAccessToken,
   useSessionReady,
   useAccountRestriction,
