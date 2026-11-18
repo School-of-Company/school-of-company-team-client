@@ -4,7 +4,7 @@
 
 ## API / 인증 / 캐시
 
-`api`는 axios 인스턴스이며 `NEXT_PUBLIC_API_URL`, credentials, 15초 timeout을 사용합니다. 성공 응답은 서버 DTO 자체입니다(공통 data 래퍼 없음). 오류는 `ApiError { status, code, message }`로 정규화합니다. `status=0`은 네트워크/알 수 없는 오류입니다. 서버 오류 계약은 mvp-discord의 `global/exception/ErrorResponse.kt`를 확인했습니다.
+`api`는 axios 인스턴스이며 `NEXT_PUBLIC_API_URL`, 15초 timeout(쿠키 미사용 — 인증은 Bearer 토큰, 서버 CORS allowCredentials=false)을 사용합니다. 성공 응답은 서버 DTO 자체입니다(공통 data 래퍼 없음). 오류는 `ApiError { status, code, message }`로 정규화합니다. `status=0`은 네트워크/알 수 없는 오류입니다. 서버 오류 계약은 서버 main의 `global/exception/ErrorResponse.kt`를 확인했습니다.
 
 W2는 client effect에서 `api.interceptors.request.use`로 토큰을 주입하고 cleanup에서 eject합니다. shared는 토큰을 저장하지 않습니다. `subscribeApiErrors(callback)`은 정규화된 오류를 구독하며 반환 함수를 effect cleanup으로 사용합니다. callback은 401 또는 403 `SUSPENDED`, `ACCESS_DENIED`, `ONBOARDING_REQUIRED`를 구분해 가드 정책을 적용합니다. `PROJECT_FORBIDDEN`(403), `PROJECT_ARCHIVED`(409)는 각 화면에서 안내합니다. 404는 리소스 존재를 드러내지 않는 일반 안내를 사용합니다.
 
