@@ -2,10 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  reviewRequestQueries,
-  type MyReviewRequest,
-} from "../api/review-requests";
+import type { MyReviewRequest } from "@/entities/task";
+import { reviewRequestQueries } from "../api/review-requests";
 import { ReviewRequests } from "./ReviewRequests";
 
 const item: MyReviewRequest = {

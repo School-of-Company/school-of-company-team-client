@@ -52,7 +52,7 @@ export const discordRequired = (user: User) => user.githubId !== null;
 
 export function userDestination(
   user: User,
-): "/pending" | "/connect-discord" | "/me" {
+): "/pending" | "/connect-discord" | "/" {
   switch (user.status) {
     case "PENDING":
     case "REJECTED":
@@ -60,7 +60,7 @@ export function userDestination(
       return "/pending";
     case "ACTIVE":
       return user.discordLinked || !discordRequired(user)
-        ? "/me"
+        ? "/"
         : "/connect-discord";
   }
 }
