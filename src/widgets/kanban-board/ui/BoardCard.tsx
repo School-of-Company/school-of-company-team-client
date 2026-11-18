@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { type TaskCard, type TaskStatus } from "@/entities/task";
+import {
+  priorityLabels,
+  type TaskCard,
+  type TaskStatus,
+} from "@/entities/task";
 import { formatDate } from "@/shared/lib";
-const priorityLabels = {
-  P0: "긴급",
-  P1: "높음",
-  P2: "보통",
-  P3: "낮음",
-} as const;
 import { BoardCardMenu } from "./BoardCardMenu";
 
 export function BoardCard({
@@ -66,6 +64,19 @@ export function BoardCard({
       >
         {task.title}
       </Link>
+      {task.issue && (
+        <p
+          className="board-card-issue"
+          title={`${task.issue.repositoryFullName} #${task.issue.number}`}
+        >
+          <span className="truncate">
+            {task.issue.repositoryFullName.split("/").pop()}
+          </span>
+          <span className="shrink-0">
+            {task.issue.kind === "PR" ? "PR" : ""} #{task.issue.number}
+          </span>
+        </p>
+      )}
       <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap gap-x-2" aria-label="담당자">
           {task.assignees.length ? (

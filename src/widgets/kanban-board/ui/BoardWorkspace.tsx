@@ -191,7 +191,7 @@ export function BoardWorkspace({
         {renderFilters({
           search,
           onChange: change,
-          projects: projects.data ?? [],
+          projects: scope === "PROJECT" ? [] : (projects.data ?? []),
           people,
           parts: project.data?.parts ?? [
             ...new Map(

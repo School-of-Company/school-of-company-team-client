@@ -321,6 +321,7 @@ body {
 .ui-segmented-option:hover {
   color: var(--foreground);
 }
+.ui-segmented-option[aria-pressed="true"],
 .ui-segmented-option:has(input:checked) {
   background: var(--surface);
   color: var(--foreground);
@@ -900,4 +901,120 @@ select.ui-input {
   min-height: 2rem;
   padding: 0 var(--space-sm);
   font-size: var(--text-xs);
+}
+
+/* Markdown (task descriptions, imported issue bodies). */
+.ui-markdown {
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.ui-markdown > * + * {
+  margin-top: 0.75em;
+}
+.ui-markdown h1,
+.ui-markdown h2,
+.ui-markdown h3,
+.ui-markdown h4 {
+  margin-top: 1.25em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.ui-markdown > :first-child {
+  margin-top: 0;
+}
+.ui-markdown h1 {
+  font-size: var(--text-lg);
+}
+.ui-markdown h2 {
+  font-size: var(--text-md);
+}
+.ui-markdown h3,
+.ui-markdown h4 {
+  font-size: var(--text-sm);
+}
+.ui-markdown ul,
+.ui-markdown ol {
+  padding-left: 1.4em;
+}
+.ui-markdown ul {
+  list-style: disc;
+}
+.ui-markdown ol {
+  list-style: decimal;
+}
+.ui-markdown li + li {
+  margin-top: 0.25em;
+}
+.ui-markdown li > input[type="checkbox"] {
+  margin-right: 0.4em;
+  accent-color: var(--brand);
+}
+.ui-markdown ul:has(> li > input[type="checkbox"]) {
+  list-style: none;
+  padding-left: 0.2em;
+}
+.ui-markdown a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ui-markdown code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  font-family: var(--font-outlier);
+  font-size: 0.85em;
+}
+.ui-markdown pre {
+  overflow-x: auto;
+  padding: var(--space-sm);
+  border: 1px solid var(--rule-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+}
+.ui-markdown pre code {
+  padding: 0;
+  background: none;
+}
+.ui-markdown blockquote {
+  padding-left: var(--space-sm);
+  border-left: 3px solid var(--rule-strong);
+  color: var(--muted);
+}
+.ui-markdown table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.ui-markdown th,
+.ui-markdown td {
+  padding: 0.35em 0.75em;
+  border: 1px solid var(--rule-subtle);
+  text-align: left;
+}
+.ui-markdown hr {
+  border: 0;
+  border-top: 1px solid var(--rule-subtle);
+}
+.ui-markdown img {
+  max-width: 100%;
+}
+
+.board-card-issue {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-2xs);
+  padding: 0.125rem var(--space-xs);
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  color: var(--color-ink-2);
+  font-family: var(--font-outlier);
+  font-size: var(--text-xs);
+}
+/* A card with its menu open sits above later cards, so the menu isn't painted under them. */
+.board-card:has([aria-expanded="true"]) {
+  z-index: var(--z-dropdown);
 }
