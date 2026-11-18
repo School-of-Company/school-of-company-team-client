@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import Link from "next/link";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  boardTotal,
   taskApi,
   taskKeys,
   taskQueries,
@@ -13,20 +11,28 @@ import {
   type TaskCard,
   type TaskScope,
   type MoveTask,
+  type TaskStatus,
+  taskStatuses,
 } from "@/entities/task";
 import {
   projectAccess,
   projectQueries,
   type Project,
+  type ProjectDetail,
 } from "@/entities/project";
-import { ImportIssue } from "@/features/link-github-issue";
 import { activeUsersQueryOptions } from "@/entities/user";
 import { TaskError } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
-import { Button, Spinner } from "@/shared/ui";
+import { Spinner } from "@/shared/ui";
 import { KanbanBoard } from "./KanbanBoard";
 import { BoardViewControls } from "./BoardViewControls";
 import { BoardCreateDialog } from "./BoardCreateDialog";
+import {
+  BoardDetailPanel,
+  type BoardDetailComponent,
+} from "./BoardDetailPanel";
+import { BoardSkeleton } from "./BoardSkeleton";
+import { BoardHeader } from "./BoardHeader";
 
 export type BoardActor = {
   readonly id: string;
@@ -47,18 +53,40 @@ export function BoardWorkspace({
   projectId,
   user,
   renderFilters,
+  Detail,
+  renderProjectNav,
 }: {
   readonly scope: TaskScope;
   readonly projectId?: string;
   readonly user?: BoardActor;
   readonly renderFilters: (props: BoardFilterProps) => ReactNode;
+  readonly Detail?: BoardDetailComponent;
+  readonly renderProjectNav?: (project: ProjectDetail) => ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams()?.toString() ?? "";
   const params = new URLSearchParams(search);
   const queryClient = useQueryClient();
-  const [creating, setCreating] = useState(false);
+  const [creating, setCreating] = useState<TaskStatus | null>(null);
+  const selectionTrigger = useRef<HTMLElement | null>(null);
+  const selectedTask = params.get("task");
+  useEffect(() => {
+    if (selectedTask || !selectionTrigger.current) return;
+    const previous = selectionTrigger.current;
+    const frame = requestAnimationFrame(() => {
+      const target = previous.isConnected
+        ? previous
+        : Array.from(
+            document.querySelectorAll<HTMLAnchorElement>("a[href]"),
+          ).find(
+            (link) =>
+              link.getAttribute("href") === previous.getAttribute("href"),
+          );
+      target?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [selectedTask]);
   const [message, setMessage] = useState("");
   const project = useQuery({
     ...projectQueries.detail(projectId ?? ""),
@@ -70,6 +98,8 @@ export function BoardWorkspace({
     enabled: scope === "TEAM",
   });
   const boardParams = new URLSearchParams(search);
+  boardParams.delete("task");
+  boardParams.delete("column");
   if (scope !== "PERSONAL") boardParams.set("scope", scope);
   if (project.data) boardParams.set("project", project.data.key);
   const board = useQuery({
@@ -118,6 +148,16 @@ export function BoardWorkspace({
   function change(next: string) {
     router.replace(`${pathname}${next ? `?${next}` : ""}`, { scroll: false });
   }
+  function selectTask(id: string | null) {
+    const next = new URLSearchParams(search);
+    if (id) next.set("task", id);
+    else next.delete("task");
+    window.history.replaceState(
+      null,
+      "",
+      `${pathname}${next.size ? `?${next}` : ""}`,
+    );
+  }
   function editable(task: TaskCard) {
     if (!user) return false;
     if (task.scope === "PERSONAL" || task.scope === "TEAM") return true;
@@ -135,89 +175,71 @@ export function BoardWorkspace({
   if (projectId && project.isPending)
     return <Spinner label="프로젝트를 불러오는 중" />;
   return (
-    <div className="grid min-w-0 gap-6">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {project.data?.name ??
-              (scope === "PERSONAL" ? "내 보드" : "팀 공용 보드")}
-          </h1>
-          {board.data && !board.isError && (
-            <p className="mt-2 text-sm text-muted">
-              고유 업무 {boardTotal(board.data)}개 · 완료 전체{" "}
-              {board.data.counts.DONE ?? 0}개
-            </p>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {projectId && access?.manages && (
-            <Link
-              href={`/projects/${encodeURIComponent(projectId)}/settings`}
-              className="ui-button ui-button-secondary"
-            >
-              프로젝트 설정
-            </Link>
-          )}
-          {canCreate && (
-            <>
-              {scope !== "TEAM" && (
-                <ImportIssue
-                  projectId={projectId}
-                  onImported={(id) =>
-                    router.push(`/tasks/${encodeURIComponent(id)}`)
-                  }
-                />
-              )}
-              <Button onClick={() => setCreating(true)}>
-                {scope === "PERSONAL" ? "개인 업무 등록" : "업무 등록"}
-              </Button>
-            </>
-          )}
-        </div>
-      </header>
-      {project.data?.archived && (
-        <p role="status" className="text-sm text-muted">
-          아카이브된 프로젝트입니다. 조회만 가능합니다.
-        </p>
-      )}
-      {scope === "PROJECT" &&
-        user &&
-        !access?.editable &&
-        !project.data?.archived && (
-          <p className="text-sm text-muted">
-            참여자만 업무를 등록·수정할 수 있습니다.
-          </p>
-        )}
-      {renderFilters({
-        search,
-        onChange: change,
-        projects: projects.data ?? [],
-        people,
-        parts: project.data?.parts ?? [
-          ...new Map(
-            cards
-              .flatMap((card) => (card.part ? [card.part] : []))
-              .map((part) => [part.id, part]),
-          ).values(),
-        ],
-        personal: scope === "PERSONAL",
-      })}
-      <BoardViewControls search={search} sort={sort} onChange={change} />
+    <div className="grid min-w-0 gap-6 [overflow-wrap:anywhere] break-keep">
+      {project.data && renderProjectNav?.(project.data)}
+      <BoardHeader
+        scope={scope}
+        project={project.data}
+        board={board.isError ? undefined : board.data}
+        canCreate={canCreate}
+        manages={!!access?.manages}
+        editable={!!access?.editable}
+        signedIn={!!user}
+        onCreate={() => setCreating("BACKLOG")}
+        onImport={(id) => router.push("/tasks/" + encodeURIComponent(id))}
+      />
+      <div className="grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
+        {renderFilters({
+          search,
+          onChange: change,
+          projects: projects.data ?? [],
+          people,
+          parts: project.data?.parts ?? [
+            ...new Map(
+              cards
+                .flatMap((card) => (card.part ? [card.part] : []))
+                .map((part) => [part.id, part]),
+            ).values(),
+          ],
+          personal: scope === "PERSONAL",
+        })}
+        <BoardViewControls search={search} sort={sort} onChange={change} />
+      </div>
       {message && (
         <p role="status" aria-live="polite" className="text-sm">
           {message}
         </p>
       )}
       {board.isPending ? (
-        <Spinner label="보드를 불러오는 중" />
+        <BoardSkeleton />
       ) : board.isError ? (
         <TaskError error={board.error} onRetry={() => void board.refetch()} />
       ) : (
         <KanbanBoard
           board={board.data}
           sort={sort}
+          visibleStatus={
+            taskStatuses.find((status) => status === params.get("column")) ??
+            "BACKLOG"
+          }
+          onVisibleStatus={(status) => {
+            const next = new URLSearchParams(search);
+            next.set("column", status);
+            change(next.toString());
+          }}
           editable={editable}
           pending={mutation.isPending}
+          onSelect={
+            Detail
+              ? (id) => {
+                  selectionTrigger.current =
+                    document.activeElement instanceof HTMLElement
+                      ? document.activeElement
+                      : null;
+                  selectTask(id);
+                }
+              : undefined
+          }
           onMove={(id, move) => {
             if (!mutation.isPending) mutation.mutate({ id, move });
           }}
@@ -229,20 +251,29 @@ export function BoardWorkspace({
             );
             change(next.toString());
           }}
-          onCreate={canCreate ? () => setCreating(true) : undefined}
+          onCreate={canCreate ? setCreating : undefined}
         />
       )}
       {creating && (
         <BoardCreateDialog
           scope={scope}
+          initialStatus={creating}
           project={project.data}
           people={people}
-          onClose={() => setCreating(false)}
+          onClose={() => setCreating(null)}
           onCreated={async (notice) => {
             setMessage(notice);
-            setCreating(false);
+            setCreating(null);
             await queryClient.invalidateQueries({ queryKey: taskKeys.all });
           }}
+        />
+      )}
+      {Detail && selectedTask && (
+        <BoardDetailPanel
+          taskId={selectedTask}
+          user={user}
+          Detail={Detail}
+          onClose={() => selectTask(null)}
         />
       )}
     </div>
