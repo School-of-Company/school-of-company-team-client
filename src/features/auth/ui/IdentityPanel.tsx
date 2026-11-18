@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { BrandMark, ThemeToggle } from "@/shared/ui";
 
 export function IdentityPanel({
   title,
@@ -10,7 +11,13 @@ export function IdentityPanel({
   return (
     <main className="grid min-h-dvh place-items-center bg-background px-5 py-12">
       <section className="w-full max-w-md rounded-lg border border-border bg-surface p-6 sm:p-8">
-        <p className="mb-8 text-sm font-semibold text-muted">Engineering Hub</p>
+        <div className="mb-8 flex items-center justify-between gap-3">
+          <p className="flex items-center gap-2 text-sm font-semibold text-muted">
+            <BrandMark size={28} />
+            Engineering Hub
+          </p>
+          <ThemeToggle />
+        </div>
         <h1 className="mb-4 text-2xl font-bold tracking-tight">{title}</h1>
         <div className="grid gap-6">{children}</div>
       </section>

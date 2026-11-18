@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { AppShell } from "@/widgets/app-shell";
 import { isHeadAdmin, useMe } from "@/entities/user";
+import { ThemeToggle } from "@/shared/ui";
 import { LogoutButton } from "@/features/auth";
 
 export function AppLayout({ children }: { readonly children: ReactNode }) {
@@ -15,6 +16,7 @@ export function AppLayout({ children }: { readonly children: ReactNode }) {
           <span className="max-w-24 truncate text-sm min-[60rem]:max-w-none">
             {me.data?.name}
           </span>
+          <ThemeToggle />
           <LogoutButton />
         </div>
       }

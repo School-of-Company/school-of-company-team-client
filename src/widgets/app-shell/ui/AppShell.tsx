@@ -8,6 +8,7 @@ import { projectQueries } from "@/entities/project";
 import { useMe } from "@/entities/user";
 import { routes } from "@/shared/config";
 import {
+  BrandMark,
   Button,
   Dialog,
   IconButton,
@@ -129,9 +130,10 @@ export function AppShell({
       <aside className="hidden min-w-0 border-r border-border bg-surface p-5 min-[60rem]:flex min-[60rem]:flex-col">
         <Link
           href={routes.me}
-          className="mb-10 px-3 text-lg font-bold tracking-tight"
+          className="mb-10 flex min-w-0 items-center gap-2 px-3 text-base font-bold tracking-tight"
         >
-          Engineering Hub
+          <BrandMark size={28} />
+          <span className="truncate">Engineering Hub</span>
         </Link>
         {navigation}
         {projectNavigation}
@@ -153,6 +155,13 @@ export function AppShell({
           >
             <Icon name="menu" />
           </IconButton>
+          <Link
+            href={routes.me}
+            className="shrink-0 min-[60rem]:hidden"
+            aria-label="Engineering Hub 내 보드"
+          >
+            <BrandMark size={24} />
+          </Link>
           <span className="shrink-0 text-sm font-medium">
             {links.find(
               (link) =>

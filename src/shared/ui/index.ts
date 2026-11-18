@@ -20,3 +20,5 @@ export { Dialog } from "./dialog";
 export { ToastProvider, useToast } from "./toast";
 export { Icon } from "./icons";
 export type { IconName } from "./icons";
+export { ThemeToggle } from "./theme-toggle";
+export { BrandMark } from "./brand-mark";
