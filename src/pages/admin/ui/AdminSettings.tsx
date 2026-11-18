@@ -2,6 +2,7 @@
 
 import { useAdminUsers, useAdminUserChange } from "../api/users";
 import { DiscordChannelForm } from "@/features/project-integrations";
+import { NotificationSettingsForm } from "@/features/notification-settings";
 import { settingsErrorMessage } from "@/features/project-settings";
 import { normalizeApiError } from "@/shared/api";
 import { Badge, Button, EmptyState, ErrorState, Spinner } from "@/shared/ui";
@@ -177,6 +178,12 @@ export function AdminSettings({
           팀 공용 Discord 채널
         </h2>
         <DiscordChannelForm projectId={null} />
+      </section>
+      <section className="grid gap-5" aria-labelledby="team-notify-heading">
+        <h2 id="team-notify-heading" className="text-xl font-semibold">
+          팀 공용 업무 알림
+        </h2>
+        <NotificationSettingsForm projectId={null} editable />
       </section>
     </div>
   );

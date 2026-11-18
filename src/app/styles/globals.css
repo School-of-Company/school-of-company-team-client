@@ -1309,3 +1309,216 @@ select.ui-input {
 .settings-page .ui-button {
   justify-self: start;
 }
+
+/* Dev signals */
+/* PR·CI·리뷰 신호 칩: 색은 아이콘에만, 글자는 보조색(대비 유지). */
+.signal-chip {
+  --tone: var(--muted);
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  min-height: var(--chip-height);
+  gap: var(--space-1);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  line-height: 1;
+  white-space: nowrap;
+}
+.signal-chip svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  flex: none;
+  color: var(--tone);
+  stroke-width: 2.2;
+}
+.signal-chip[data-tone="danger"] {
+  --tone: var(--danger);
+}
+.signal-chip[data-tone="success"] {
+  --tone: var(--success);
+}
+.signal-chip[data-tone="warning"] {
+  --tone: var(--hue-orange);
+}
+.signal-chip[data-tone="merged"] {
+  --tone: var(--hue-violet);
+}
+.signal-link {
+  display: inline-flex;
+  border-radius: var(--radius-sm);
+}
+.signal-link:hover .signal-chip {
+  border-color: var(--border-strong);
+  color: var(--foreground);
+}
+.board-card-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+/* Task detail: PR 행은 두 줄(링크, 신호), merge 제안은 패널 안 한 줄. */
+.github-link-row {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+.github-link-signals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+.signal-suggest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--hue-violet);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+/* My board: review requests above the toolbar. */
+.review-requests {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+}
+.review-requests-header {
+  display: flex;
+  min-height: var(--control-md);
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.review-requests-header h2 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.review-requests-note {
+  padding: var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.review-request-row {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+.review-request-title {
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.review-request-title:hover {
+  text-decoration: underline;
+}
+.review-request-meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.review-request-task {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--chip-height);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+}
+.review-request-task:hover {
+  background: var(--surface-hover);
+  color: var(--foreground);
+}
+/* Notification settings: three switches in one list. */
+.notify-list {
+  display: grid;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.notify-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+}
+.notify-row + .notify-row {
+  border-top: 1px solid var(--border);
+}
+/* Track fill is the 3:1 input line colour, so the switch needs no border. */
+.notify-switch {
+  --switch-knob: calc(var(--switch-height) - var(--space-1));
+  position: relative;
+  width: var(--switch-width);
+  height: var(--switch-height);
+  flex: none;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--border-input);
+  appearance: none;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.notify-switch::after {
+  content: "";
+  position: absolute;
+  top: calc((var(--switch-height) - var(--switch-knob)) / 2);
+  left: calc((var(--switch-height) - var(--switch-knob)) / 2);
+  width: var(--switch-knob);
+  height: var(--switch-knob);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.notify-switch:checked {
+  background: var(--brand);
+}
+.notify-switch:checked::after {
+  background: var(--on-brand);
+  transform: translateX(calc(var(--switch-width) - var(--switch-height)));
+}
+.notify-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .notify-switch,
+  .notify-switch::after {
+    transition: none;
+  }
+}
+.notify-channel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+  font-size: var(--text-sm);
+}
+@media (pointer: coarse) {
+  .notify-switch {
+    --switch-width: var(--control-touch);
+    --switch-height: var(--control-sm);
+  }
+}
