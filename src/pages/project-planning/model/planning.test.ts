@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "bun:test";
+import { test } from "node:test";
 import type { TaskCard } from "@/entities/task";
 import { daysLeft, remainingLabel } from "./dates";
 import { applyScopeOverlay, sourceParams } from "./sprint-tasks";
