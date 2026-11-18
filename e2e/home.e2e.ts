@@ -1,11 +1,23 @@
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
+import type { Server } from "node:http";
+import {
+  insertOAuthRows,
+  pullJson,
+  sendWebhook,
+  startGithubStub,
+  type StubState,
+} from "./github-stub";
 import { apiGet, apiUrl, readSeed, signIn, type Tokens } from "./support";
 
 // 홈·확인 필요·팀원(단계 5). 데이터는 격리 backend 실제 API로만 만든다(fixture 아님).
-// 막힘 2일·GitHub 신호(CI 실패·리뷰 24시간·merge)는 API로 시각을 되돌릴 수 없어 여기서 만들지 않는다.
+// 막힘 2일은 API로 막힌 시각을 되돌릴 수 없어 만들지 않는다(서버 통합 테스트가 경계값을 본다).
+// GitHub 신호(CI 실패·리뷰 24시간·merge)는 E2E_GITHUB_STUB_PORT·E2E_GITHUB_WEBHOOK_SECRET·E2E_PG_CONTAINER 가
+// 있을 때만 로컬 GitHub 스텁 + 서명 웹훅으로 재현한다(실제 GitHub 아님, github-stub.ts).
 // E2E_SCREENSHOT_DIR 가 있으면 라이트·다크 × 1440·390 스크린샷도 남긴다.
 const dir = process.env.E2E_SCREENSHOT_DIR;
+const stubPort = Number(process.env.E2E_GITHUB_STUB_PORT) || 0;
+let stub: Server | undefined;
 test.describe.configure({ mode: "serial" });
 
 const seed = readSeed();
@@ -67,16 +79,21 @@ test.beforeAll(async () => {
   });
 
   const task = (row: Record<string, unknown>) =>
-    call<{ id: string }>("POST", "/api/v1/tasks", seed.member.tokens, {
-      scope: "PROJECT",
-      projectId: seed.project.id,
-      assigneeIds: [seed.member.id],
-      type: "DEV",
-      priority: "P2",
-      status: "PLANNED",
-      ...row,
-    });
-  const ids = [
+    call<{ id: string; key: string }>(
+      "POST",
+      "/api/v1/tasks",
+      seed.member.tokens,
+      {
+        scope: "PROJECT",
+        projectId: seed.project.id,
+        assigneeIds: [seed.member.id],
+        type: "DEV",
+        priority: "P2",
+        status: "PLANNED",
+        ...row,
+      },
+    );
+  const created = [
     await task({ title: titles.overdue, deadline: seoul(-2), priority: "P1" }),
     await task({ title: titles.dueToday, deadline: seoul(0) }),
     await task({ title: titles.dueTomorrow, deadline: seoul(1), type: "TASK" }),
@@ -88,7 +105,8 @@ test.beforeAll(async () => {
     await task({ title: titles.review, status: "REVIEW", priority: "P1" }),
     await task({ title: titles.blocked, status: "IN_PROGRESS" }),
     await task({ title: titles.unassigned, assigneeIds: [], priority: "P0" }),
-  ].map((created) => created.id);
+  ];
+  const ids = created.map((item) => item.id);
   await call("PATCH", `/api/v1/tasks/${ids[5]}`, seed.member.tokens, {
     blocked: true,
     blockedReason: "운영 서버 SSH 키 발급 대기",
@@ -117,7 +135,117 @@ test.beforeAll(async () => {
     taskIds: ids.slice(0, 6),
   });
   await call("POST", `${project}/sprints/${sprint.id}/start`, seed.admin);
+  if (stubPort) await githubSignals(created);
 });
+
+test.afterAll(() => {
+  stub?.close();
+});
+
+/** CI 실패(진행 중 업무), 24시간 넘은 리뷰 요청(리뷰 업무), merge됐지만 미완료(내일 마감 업무). */
+async function githubSignals(created: readonly { key: string }[]) {
+  const githubId = 2_000_000 + parseInt(seed.run, 16);
+  const hours = (n: number) =>
+    new Date(Date.now() - n * 3_600_000).toISOString();
+  const state: StubState = {
+    installationId: 77,
+    repo: { id: githubId, fullName: `acme/hub-${seed.run}` },
+    logins: { [githubId]: `member-${seed.run}` },
+    pulls: {
+      11: {
+        title: `${created[3].key} 홈 API 응답 연결`,
+        sha: "a".repeat(40),
+        ref: "feat/home-api",
+        state: "open",
+        draft: false,
+        merged: false,
+        updatedAt: hours(1),
+        requested: [],
+      },
+      12: {
+        title: `${created[4].key} 팀원 부하 집계`,
+        sha: "b".repeat(40),
+        ref: "feat/members-load",
+        state: "open",
+        draft: false,
+        merged: false,
+        updatedAt: hours(30),
+        requested: [githubId],
+      },
+      13: {
+        title: `${created[2].key} 세션 만료 안내 문구`,
+        sha: "c".repeat(40),
+        ref: "fix/session-copy",
+        state: "open",
+        draft: false,
+        merged: false,
+        updatedAt: hours(3),
+        requested: [],
+      },
+    },
+    suites: [],
+  };
+  stub = await startGithubStub(state, stubPort);
+  insertOAuthRows(process.env.E2E_PG_CONTAINER!, [
+    { userId: seed.member.id, githubId, login: `member-${seed.run}` },
+  ]);
+  await call(
+    "POST",
+    `/api/v1/projects/${seed.project.id}/github/repositories`,
+    seed.admin,
+    {
+      installationId: state.installationId,
+      repositoryId: state.repo.id,
+    },
+  );
+  const repository = {
+    id: state.repo.id,
+    name: state.repo.fullName.split("/")[1],
+    full_name: state.repo.fullName,
+    private: false,
+    owner: { login: "acme" },
+    html_url: `https://github.com/${state.repo.fullName}`,
+  };
+  const event = (number: number, action: string, extra = {}) =>
+    sendWebhook("pull_request", {
+      action,
+      number,
+      pull_request: pullJson(state, number, githubId),
+      repository,
+      installation: { id: state.installationId },
+      sender: { id: githubId, login: state.logins[githubId] },
+      ...extra,
+    });
+  for (const number of [11, 12, 13]) await event(number, "opened");
+  await event(12, "review_requested", {
+    requested_reviewer: { id: githubId, login: state.logins[githubId] },
+  });
+  const suite = {
+    id: 501,
+    head_sha: state.pulls[11].sha,
+    conclusion: "failure",
+  };
+  state.suites.push(suite);
+  await sendWebhook("check_suite", {
+    action: "completed",
+    check_suite: {
+      ...suite,
+      head_branch: state.pulls[11].ref,
+      status: "completed",
+      updated_at: hours(0.5),
+      app: { slug: "github-actions" },
+    },
+    repository,
+    installation: { id: state.installationId },
+    sender: { id: githubId, login: state.logins[githubId] },
+  });
+  Object.assign(state.pulls[13], {
+    state: "closed",
+    merged: true,
+    updatedAt: hours(2),
+  });
+  await event(13, "closed");
+}
 
 async function open(page: Page, tokens: Tokens, path: string) {
   await signIn(page, tokens);
@@ -170,6 +298,28 @@ test("project scope lists unassigned high priority work and hides personal tasks
   ).toBe(false);
 });
 
+test("GitHub signals reach home through the stub and signed webhooks", async ({
+  page,
+}) => {
+  test.skip(
+    !stubPort,
+    "E2E_GITHUB_STUB_PORT 가 없으면 GitHub 신호를 만들지 않는다",
+  );
+  await open(page, seed.member.tokens, "/");
+  const attention = page.getByRole("region", { name: "확인 필요" });
+  await expect(
+    attention.getByRole("heading", { name: /CI 실패/ }),
+  ).toBeVisible();
+  await expect(
+    attention.getByRole("heading", { name: /리뷰 24시간 초과/ }),
+  ).toBeVisible();
+  await expect(
+    attention.getByRole("heading", { name: /merge됐지만 미완료/ }),
+  ).toBeVisible();
+  const reviews = page.getByRole("region", { name: "리뷰 요청" });
+  await expect(reviews.getByText("24시간 초과")).toBeVisible();
+});
+
 test("a member without managed projects gets no scope switch", async ({
   page,
 }) => {
@@ -187,7 +337,9 @@ test("members list shows roles and load, and hides projects the viewer cannot re
   await open(page, seed.member.tokens, "/members");
   const row = page.getByRole("row", { name: new RegExp(seed.member.name) });
   await expect(row.getByText("PM, 서버 리더")).toBeVisible();
-  await expect(row.getByText("GitHub 미연결")).toBeVisible();
+  await expect(
+    row.getByText(stubPort ? `GitHub member-${seed.run}` : "GitHub 미연결"),
+  ).toBeVisible();
   // 참여자 공개 프로젝트는 비참여자의 목록에 나오지 않는다.
   const outsider = await page.context().newPage();
   await open(outsider, seed.outsider.tokens, "/members");
@@ -196,7 +348,7 @@ test("members list shows roles and load, and hides projects the viewer cannot re
   });
   await expect(seen).toBeVisible();
   await expect(seen.getByText(seed.project.key)).toHaveCount(0);
-  await expect(seen.getByText("GitHub 미연결")).toHaveCount(0);
+  await expect(seen.getByText(/GitHub/)).toHaveCount(0);
   await outsider.close();
 });
 
