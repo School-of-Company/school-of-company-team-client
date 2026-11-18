@@ -143,7 +143,11 @@ export function SettingsPanels(props: SettingsProps) {
           )}
           <div className="flex flex-wrap gap-2">
             <Button
-              variant="secondary"
+              variant={
+                confirmArchive && !props.project.archived
+                  ? "danger"
+                  : "secondary"
+              }
               loading={archive.isPending}
               onClick={() => {
                 if (!props.project.archived && !confirmArchive) {
@@ -155,7 +159,11 @@ export function SettingsPanels(props: SettingsProps) {
                 });
               }}
             >
-              {props.project.archived ? "프로젝트 복원" : "프로젝트 아카이브"}
+              {props.project.archived
+                ? "프로젝트 복원"
+                : confirmArchive
+                  ? "아카이브"
+                  : "프로젝트 아카이브"}
             </Button>
             {confirmArchive && (
               <Button
