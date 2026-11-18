@@ -123,6 +123,9 @@ export function BoardWorkspace({
   boardParams.delete("column");
   if (scope !== "PERSONAL") boardParams.set("scope", scope);
   if (project.data) boardParams.set("project", project.data.key);
+  // 버킷 그룹은 프로젝트 보드 전용(계약 S-a). 공유 링크로 들어와도 400 대신 그룹 없이 보인다.
+  if (scope !== "PROJECT" && boardParams.get("groupBy") === "bucket")
+    boardParams.delete("groupBy");
   const board = useQuery({
     ...taskQueries.board(boardParams.toString(), scope === "PERSONAL"),
     enabled: !projectId || !!project.data,
