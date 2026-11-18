@@ -28,6 +28,8 @@ export type StubState = {
   permissions?: Record<string, string>;
   logins: Record<number, string>;
   pulls: Record<number, StubPull>;
+  /** PR 이 아닌 Issue(단건 가져오기용). */
+  issues?: Record<number, { title: string; updatedAt: string }>;
   suites: { id: number; head_sha: string; conclusion: string }[];
 };
 
@@ -109,6 +111,27 @@ function route(state: StubState, path: string): [number, unknown] {
       : [200, { permission: level, role_name: level, user: { login } }];
   }
   if (/^\/assignees\/[^/]+$/.test(rest)) return [204, undefined];
+  const issue = rest.match(/^\/issues\/(\d+)$/);
+  if (issue && state.issues?.[Number(issue[1])]) {
+    const number = Number(issue[1]);
+    const item = state.issues[number];
+    return [
+      200,
+      {
+        id: 80_000 + number,
+        number,
+        title: item.title,
+        body: "",
+        state: "open",
+        html_url: `https://github.com/${state.repo.fullName}/issues/${number}`,
+        created_at: item.updatedAt,
+        updated_at: item.updatedAt,
+        user: user(state, Number(Object.keys(state.logins)[0])),
+        labels: [],
+        assignees: [],
+      },
+    ];
+  }
   const pr = rest.match(/^\/(issues|pulls)\/(\d+)(\/.*)?$/);
   if (pr) {
     const number = Number(pr[2]);
