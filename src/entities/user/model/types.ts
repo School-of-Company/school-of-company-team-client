@@ -12,7 +12,7 @@ export interface User {
   readonly githubLogin: string | null;
   readonly discordLinked: boolean;
   readonly discordUsername: string | null;
-  /** Uploaded photo or GitHub fallback, resolved by the API (feat/profile-avatar). */
+  /** Uploaded photo (API-relative path) or GitHub photo, resolved by the API. */
   readonly avatarUrl?: string | null;
 }
 
@@ -27,11 +27,18 @@ export interface UpdateProfile {
   readonly major?: string;
 }
 
-// ponytail: client-side GitHub fallback until every API ships avatarUrl.
+/** The API sends its own uploads as a path relative to the API server. */
+export const avatarSrc = (url: string | null | undefined) =>
+  url
+    ? url.startsWith("/")
+      ? `${process.env.NEXT_PUBLIC_API_URL ?? ""}${url}`
+      : url
+    : undefined;
+
 export const userAvatarUrl = (user: User | undefined) =>
-  user?.avatarUrl ??
+  avatarSrc(user?.avatarUrl) ??
   (user?.githubId
-    ? `https://avatars.githubusercontent.com/u/${user.githubId}?s=72`
+    ? `https://avatars.githubusercontent.com/u/${user.githubId}?s=112`
     : undefined);
 
 export const isHeadAdmin = (user: User | undefined) =>

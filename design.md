@@ -1,67 +1,55 @@
 # Design: School of Company
 
-The locked system for the team workbench. Pages share these tokens and controls.
+팀 업무 도구의 디자인 규칙입니다. 화면을 고칠 때 값을 새로 만들지 말고 여기 있는 토큰과 컴포넌트를 씁니다.
 
-## System
+## 기준
 
-- Genre: modern-minimal. Shape: app screen. Tone: utilitarian.
-- Theme: Cobalt, dealt 3/3, seed github-discord-utilitarian-modern-minimal-3d53·1fca0681·2026-11-18·r0. Surfaces and type from Cobalt; the accent is the School of Company brand pink (user request 2026-11-18), replacing cobalt blue.
-- Brand: the official logo `public/brand/school-of-company-logo.png` (also `app/icon.png`), unedited, via `BrandMark`. Its PNG has an opaque white ground, so it always sits on `--color-brand-tile` (white) with a hairline; a transparent official export would let the tile go.
-- Axes: light/grotesk-sans/cool. Posture: restrained.
-- Material: real tasks, project keys, team members and integration state.
-- No ASCII field, keycaps, cut corners, graphite bands, hero, photography or invented metrics.
+- 화면 구조는 Linear를 기준으로 합니다: 조용한 사이드바, 한 줄 툴바, 높은 정보 밀도, 본문 옆 속성 열.
+- Issue·PR 표기는 GitHub 방식(`저장소 #번호`)을 따릅니다.
+- 문구는 짧은 한국어 평서문으로 씁니다. 설명이 필요 없는 곳에는 안내 문구를 두지 않습니다.
+- 브랜드 핑크는 주요 버튼, 포커스, 선택 표시에만 씁니다. 나머지는 무채색입니다.
 
-## Tokens
+## 토큰 (`src/app/styles/tokens.css`)
 
-`src/app/styles/tokens.css` is the source of truth, imported by `globals.css` before `base.css`.
+컴포넌트는 의미 토큰만 읽습니다. 척도(`--gray-*`, `--pink-*`, `--hue-*`)를 컴포넌트에서 직접 쓰지 않습니다.
 
-- Paper: `--color-paper`, `--color-paper-2`, `--color-paper-3`. Light: plain white app background and surfaces (#ffffff), `--color-paper-3` #f4f5f7 for hover and quiet fills; separation comes from 1px rules, not tinted grounds.
-- Ink: `--color-ink`, `--color-ink-2`, `--color-muted`.
-- Rules: `--rule-subtle` for region/card separation, `--rule-strong` for input edges, both 1px via `--rule-hair`. Input boundaries contrast 3.36:1 light and 3.50:1 dark.
-- Accent: `--color-accent`, `--color-accent-wash`, `--color-accent-ink`, `--color-focus`. Logo pink `--color-brand-logo` (#ff4060, sampled) is decoration only (3.41:1 on white). Light accent #d92a4a (white text 4.79:1), hover/deep #b81c3c. Dark accent #ff5c78 with dark ink #111318 on it (6.24:1).
-- Themes: light (default paper) and dark (`:root[data-theme="dark"]` in tokens.css). `themeBootScript` in `<head>` applies the stored choice (`localStorage` `soc.theme`) or, without one, the system preference before first paint. `ThemeToggle` (aria-pressed, keyboard) lives in the shell user area (sidebar and mobile header) and on identity screens.
-- Feedback: `--color-error`, `--color-success`. Text and an accessible message accompany colour.
-- Existing aliases remain: background, foreground, surface, surface-hover, muted, border, brand, brand-soft, danger.
-- Typography: IBM Plex Sans KR via next/font/google for headings, body and labels; JetBrains Mono for machine values only.
-- Body 16px; compact labels 14px; fixed type ratio 1.2. Korean body line-height `--line-body` 1.65, heading `--line-heading` 1.4. No tracked labels.
-- Spacing: scaffold 4/8/12/16/24/40/64px steps. Hairline 1px.
-- Radius: input 6px, surface 8px. Dialog uses a hairline without a shadow.
+| 용도     | 토큰                                                                                                                                      |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 배경     | `--background`(페이지), `--surface`(컨트롤), `--surface-raised`(카드·다이얼로그·메뉴), `--surface-sunken`(보드 컬럼), `--surface-sidebar` |
+| 상호작용 | `--surface-hover`, `--surface-active`(현재 선택)                                                                                          |
+| 글자     | `--foreground`, `--foreground-2`(보조), `--muted`(메타), `--faint`(비어 있음·플레이스홀더)                                                |
+| 선       | `--border`(구분), `--border-strong`(입력·버튼 테두리)                                                                                     |
+| 강조     | `--brand`, `--brand-hover`, `--brand-soft`, `--on-brand`                                                                                  |
+| 상태     | `--danger`, `--success`, 상태·우선순위 색은 `--hue-*`                                                                                     |
 
-## Controls
+- 무채색은 12단계입니다: 1–2 배경, 3–5 채움, 6–8 선, 9–10 흐린 글자, 11–12 글자. 다크 모드는 같은 단계의 값만 바꿉니다.
+- 글자 크기: 12(메타) · 13(UI 기본) · 14(본문) · 16(섹션 제목) · 20(페이지 제목). Tailwind `text-xs/sm/base/lg/xl`이 같은 값입니다.
+- 간격은 4px 격자(`--space-1`~`--space-10`), 반경은 4 · 6 · 8 · 12(`--radius-sm/md/lg/xl`)입니다.
+- 컨트롤 높이는 32px(`--control-md`), 작은 것은 28px(`--control-sm`)입니다. 터치 기기에서는 44px로 커집니다.
+- 그림자는 떠 있는 것(메뉴, 다이얼로그)에만 씁니다(`--shadow-overlay`). 평면 구분은 선으로 합니다.
+- 모션은 상태 변화에만 씁니다(120ms, 200ms). 목록이 다시 그려질 때 재생되는 등장 애니메이션은 넣지 않습니다.
 
-- Reuse shared/ui Button, IconButton, Input, Textarea, Select, Checkbox, Dialog and feedback components.
-- Primary: brand pink fill with accent ink. Secondary: paper and hairline. Ghost: text.
-- Controls are 40px on fine pointers and 44px on coarse pointers; icon controls keep a 44px hit target. Compact text is 14px, input text 16px on phones.
-- Default, hover, focus-visible, active, disabled, loading, error and success use shared CSS.
-- Native disabled plus opacity and cursor; aria-busy for requests; aria-invalid for errors; data-state="success" only after a real result.
-- Button loading retains the label; fields keep their native semantics and caller-owned descriptions.
-- Icons: shared/ui Icon and IconName, inline SVG with accessible names on the enclosing control.
+## 컴포넌트 (`src/shared/ui`, 스타일은 `globals.css`)
 
-## Shell and navigation
+- 버튼: `primary`(화면당 하나), `secondary`, `ghost`, `danger`(테두리형). 작은 버튼은 `ui-button-sm`.
+- 입력: `Input`, `Textarea`, `Select`, `Checkbox`. 드롭다운은 전부 `Select` 또는 `ChipSelect`를 씁니다.
+- 선택 전환: `ui-segmented`(라디오 또는 `aria-pressed` 버튼).
+- 상태: `<span className="status-icon" data-status>` — 단계가 진행될수록 원이 채워집니다.
+- 우선순위: `<span className="priority-label" data-priority>` — 색 점과 이름(긴급·높음·보통·낮음). 이름은 `priorityLabels`에서만 가져옵니다.
+- 아바타: `Avatar`(22px, `size="lg"`는 56px). 주소는 `userAvatarUrl`/`avatarSrc`로 만듭니다.
+- 겹쳐 뜨는 것: `Dialog`, 필터 패널, 칩 메뉴. 본문을 밀어내는 펼침은 쓰지 않습니다.
+- 마크다운: `Markdown`. 원문 HTML은 렌더링하지 않습니다.
 
-- Sidebar for global destinations and joined projects, menu below 60rem.
-- Main container capped at 1440px and centred; project tabs scroll horizontally.
-- Keep routes, API, permissions and task actions. Project settings visibility uses projectAccess.manages.
-- Linear is the sole hierarchy reference: dim sidebar, one page header, consistent tabs, one toolbar, quiet neutral surfaces. No product marks or proprietary icons are copied; the shared SVG set is original path geometry.
-- Surface levels: `--surface-sidebar` (navigation), `--surface-canvas` (app background), `--surface-panel` (content/card), `--surface-column` (board lane), `--surface-hover` and `--surface-selected` (interaction). Light uses pure white for all four surfaces, separated by 1px rules with no card shadow; quiet hover uses #f4f5f7. Dark keeps the dim sidebar and existing surfaces. Pink only identifies primary actions, current selection and focus.
-- Desktop page header owns title and actions; the global top bar is mobile navigation only. Mobile shows menu, brand, destination and theme toggle; logout remains in its drawer. Settings, account and admin share the same 768px measure and outer page inset without nested padding.
-- Board header: project breadcrumb, title, counts, one primary create action and ghost import; ProjectNav preserves board/settings permissions. Toolbar holds filter summary, group and sort. Columns follow status order with name, count and named top add action. Cards show mono key, title, avatars and priority shape; deadline/blocking appear only when present. Details retain the right panel and full-page route.
-- Priority: 20px neutral SVG with distinct filled-outline bar counts for P1/P2/P3 and alert triangle for P0; `aria-label` and `title` retain the exact P value.
-- Data regions expose loading, empty, error and full states. No fabricated success.
+## 화면 구조
 
-## U5 visual evidence
+- 셸: 왼쪽 사이드바(232px, 화면 높이에 고정) + 본문. 본문 여백은 `--page-inset`입니다.
+- 모든 페이지 제목은 같은 왼쪽 선에서 시작합니다. 설정류 페이지는 `settings-page`(최대 44rem)로 폭만 줄입니다.
+- 보드: 헤더(제목·개수·주요 동작) → 툴바(필터, 그룹, 정렬) → 컬럼. 컬럼은 `--surface-sunken`, 카드는 `--surface-raised`입니다.
+- 카드: 키 → 제목 → 저장소 #번호(있을 때) → 담당자 이름 · 우선순위 → 마감·막힘(있을 때).
+- 업무 상세: 왼쪽 본문(제목, 설명, GitHub, Discord), 오른쪽 속성 열. 폭이 좁으면 속성이 아래로 내려갑니다.
 
-- `~/orca/fe-mvp-qa-logs/after/u5/`: light/dark at 1280/375 for project/my/team boards, project list, detail panel, settings tabs, admin/create and account.
-- All authenticated captures are **mock fixture 시각 검토용(실 API 아님)**, served by a repository-external standard Node HTTP fixture on localhost:43205 with dev localhost:3205. No fixture server, tokens or screenshots belong in the repository.
-- Measured token contrast: muted/canvas 5.73:1 light, 6.44:1 dark; ink/panel 17.78:1 light, 13.53:1 dark; primary action text 4.79:1 light, 6.24:1 dark. Priority icons remain neutral with accessible P0-P3 names.
+## 지킬 것
 
-## Motion
-
-- Still by default; state feedback only, durations 120/220ms. No load reveal.
-- Focus is instant. Reduced motion ends animations immediately.
-
-## Exports
-
-- Global CSS: `src/app/styles/globals.css`, `tokens.css`, `base.css`.
-- Controls and icons: `@/shared/ui`; shell: `@/widgets/app-shell`.
-- Project navigation: `@/widgets/project-nav` (ProjectNav; project and user props).
+- 색·간격·크기를 컴포넌트에 직접 적지 않습니다. 필요한 값이 없으면 토큰을 먼저 추가합니다.
+- 새 클래스는 `globals.css`의 해당 구역(Controls, Shell, Board, Task detail, Account, Identity)에 둡니다.
+- 대비: 본문 글자 4.5:1 이상, 입력 테두리 3:1 이상을 유지합니다.

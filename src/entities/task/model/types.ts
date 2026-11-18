@@ -50,6 +50,8 @@ export type TaskCard = {
     readonly repositoryFullName: string;
     readonly number: number;
     readonly kind: "ISSUE" | "PR";
+    readonly url?: string;
+    readonly private?: boolean;
   } | null;
 };
 export type TaskDetail = TaskCard & {

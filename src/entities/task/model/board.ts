@@ -11,6 +11,7 @@ export const boardFilterKeys = [
   "dueWithin",
   "groupBy",
   "source",
+  "repository",
 ] as const;
 export type BoardFilterKey = (typeof boardFilterKeys)[number];
 export type BoardSort = "manual" | "priority" | "deadline";

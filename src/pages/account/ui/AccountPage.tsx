@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
+  deleteAvatar,
   meQueryKey,
   updateProfile,
+  uploadAvatar,
   userAvatarUrl,
   type User,
 } from "@/entities/user";
 import { AuthGuard, authErrorMessage, OAuthButton } from "@/features/auth";
 import { unlinkDiscord } from "../api/unlink-discord";
+import { normalizeApiError } from "@/shared/api";
 import {
   Avatar,
   Badge,
@@ -33,6 +36,74 @@ const majors: readonly string[] = [
   "디자인",
   "DevOps",
 ];
+
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+
+function AvatarSetting({ user }: { readonly user: User }) {
+  const client = useQueryClient();
+  const input = useRef<HTMLInputElement>(null);
+  const [tooLarge, setTooLarge] = useState(false);
+  const saved = (updated: User) => client.setQueryData(meQueryKey, updated);
+  const upload = useMutation({ mutationFn: uploadAvatar, onSuccess: saved });
+  const remove = useMutation({ mutationFn: deleteAvatar, onSuccess: saved });
+  const pending = upload.isPending || remove.isPending;
+  const failure = upload.error ?? remove.error;
+  // The API serves its own uploads from a relative path; GitHub photos are absolute.
+  const uploaded = !!user.avatarUrl?.startsWith("/");
+  return (
+    <div className="grid gap-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <Avatar size="lg" name={user.name} src={userAvatarUrl(user)} />
+        <input
+          ref={input}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          hidden
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (!file) return;
+            remove.reset();
+            setTooLarge(file.size > AVATAR_MAX_BYTES);
+            if (file.size <= AVATAR_MAX_BYTES) upload.mutate(file);
+          }}
+        />
+        <Button
+          variant="secondary"
+          loading={upload.isPending}
+          disabled={pending}
+          onClick={() => input.current?.click()}
+        >
+          사진 변경
+        </Button>
+        {uploaded && (
+          <Button
+            variant="ghost"
+            loading={remove.isPending}
+            disabled={pending}
+            onClick={() => {
+              upload.reset();
+              setTooLarge(false);
+              remove.mutate();
+            }}
+          >
+            GitHub 사진으로 되돌리기
+          </Button>
+        )}
+      </div>
+      <p className="text-xs text-muted">
+        PNG·JPEG·WebP, 2MB 이하. 올리지 않으면 GitHub 프로필 사진을 씁니다.
+      </p>
+      {(tooLarge || failure) && (
+        <p role="alert" className="text-sm text-danger">
+          {tooLarge
+            ? "2MB 이하 사진만 올릴 수 있습니다."
+            : normalizeApiError(failure).message}
+        </p>
+      )}
+    </div>
+  );
+}
 
 function ProfileForm({ user }: { readonly user: User }) {
   const client = useQueryClient();
@@ -59,8 +130,8 @@ function ProfileForm({ user }: { readonly user: User }) {
         <dl className="grid gap-4 text-sm">
           <div>
             <dt className="text-muted">프로필 사진</dt>
-            <dd className="mt-2 flex items-center gap-3">
-              <Avatar name={user.name} src={userAvatarUrl(user)} />
+            <dd className="mt-2">
+              <AvatarSetting user={user} />
             </dd>
           </div>
           <div>

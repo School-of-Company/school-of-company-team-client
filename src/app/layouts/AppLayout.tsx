@@ -12,7 +12,7 @@ export function AppLayout({ children }: { readonly children: ReactNode }) {
     <AppShell
       isHeadAdmin={isHeadAdmin(me.data)}
       userSlot={
-        <div className="flex min-w-0 items-center justify-between gap-2">
+        <div className="app-user">
           <span className="flex min-w-0 items-center gap-2">
             {me.data && (
               <Avatar name={me.data.name} src={userAvatarUrl(me.data)} />

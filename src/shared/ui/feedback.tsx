@@ -20,26 +20,26 @@ export function Badge({
 export function Avatar({
   name,
   src,
+  size = "sm",
 }: {
   readonly name: string;
   readonly src?: string;
+  readonly size?: "sm" | "lg";
 }) {
+  const className = `ui-avatar ${size === "lg" ? "ui-avatar-lg" : ""}`;
+  const pixels = size === "lg" ? 56 : 22;
   return src ? (
     <Image
       unoptimized
-      width={36}
-      height={36}
+      width={pixels}
+      height={pixels}
       src={src}
       alt={name}
-      className="size-9 rounded-full object-cover"
+      className={className}
       referrerPolicy="no-referrer"
     />
   ) : (
-    <span
-      role="img"
-      aria-label={name}
-      className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-hover text-sm font-semibold"
-    >
+    <span role="img" aria-label={name} className={className}>
       {name.slice(0, 1)}
     </span>
   );

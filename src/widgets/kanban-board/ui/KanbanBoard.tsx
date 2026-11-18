@@ -79,7 +79,7 @@ export function KanbanBoard({
             </h2>
           )}
           <div className="board-columns grid min-w-0 gap-3 md:grid-cols-3 xl:grid-cols-5">
-            {taskStatuses.map((status, step) => {
+            {taskStatuses.map((status) => {
               const cards = sortTaskCards(group.columns[status] ?? [], sort);
               const Heading = group.label ? "h3" : "h2";
               function drop(beforeId: string | null) {
@@ -112,11 +112,13 @@ export function KanbanBoard({
                 >
                   <div className="board-column-header">
                     <Heading className="flex min-w-0 items-center gap-2 text-sm font-medium">
-                      <span className="board-step" aria-hidden="true">
-                        {step + 1}
-                      </span>
+                      <span
+                        className="status-icon"
+                        data-status={status}
+                        aria-hidden="true"
+                      />
                       <span>{statusLabels[status]}</span>
-                      <span className="font-normal text-muted tabular-nums">
+                      <span className="font-normal text-faint tabular-nums">
                         {cards.length}
                       </span>
                     </Heading>
@@ -130,7 +132,7 @@ export function KanbanBoard({
                       </IconButton>
                     )}
                   </div>
-                  <div className="grid gap-3">
+                  <div className="grid gap-2">
                     {cards.map((task) => (
                       <div
                         key={task.id}

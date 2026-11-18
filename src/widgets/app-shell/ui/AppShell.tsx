@@ -59,7 +59,7 @@ export function AppShell({
     { href: routes.account, label: "설정", icon: "settings" },
   ];
   const navigation = (
-    <nav aria-label="주 메뉴" className="grid gap-1">
+    <nav aria-label="주 메뉴" className="grid">
       {links.map(({ href, label, icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
@@ -68,7 +68,7 @@ export function AppShell({
             href={href}
             aria-current={active ? "page" : undefined}
             onClick={() => setMenuOpen(false)}
-            className={`ui-nav-link flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium ${active ? "bg-brand-soft text-brand" : "text-muted hover:bg-surface-hover hover:text-foreground"}`}
+            className="ui-nav-link flex items-center"
           >
             <Icon name={icon} className="shrink-0" />
             {label}
@@ -78,11 +78,8 @@ export function AppShell({
     </nav>
   );
   const projectNavigation = (
-    <nav
-      aria-label="프로젝트 바로가기"
-      className="mt-6 grid gap-1 border-t border-border pt-5"
-    >
-      <h2 className="px-3 pb-2 text-sm font-medium text-muted">프로젝트</h2>
+    <nav aria-label="프로젝트 바로가기" className="grid">
+      <h2>프로젝트</h2>
       {projects.isPending ? (
         <div
           role="status"
@@ -111,7 +108,7 @@ export function AppShell({
               href={href}
               aria-current={active ? "page" : undefined}
               onClick={() => setMenuOpen(false)}
-              className={`ui-nav-link flex min-h-11 min-w-0 items-center gap-2 rounded-md px-3 text-sm ${active ? "bg-brand-soft text-brand" : "text-muted hover:bg-surface-hover hover:text-foreground"}`}
+              className="ui-nav-link flex min-w-0 items-center"
             >
               <span className="truncate" title={project.key}>
                 {project.name}
@@ -133,7 +130,7 @@ export function AppShell({
       <aside className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col">
         <Link
           href={routes.me}
-          className="mb-6 flex min-h-11 min-w-0 items-center gap-2 px-3 text-sm font-semibold"
+          className="flex min-w-0 items-center gap-2 text-sm font-semibold"
         >
           <BrandMark size={28} label />
         </Link>
