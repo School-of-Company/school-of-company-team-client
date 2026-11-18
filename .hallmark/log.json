@@ -5,6 +5,28 @@
   "depth": "polish",
   "theme": "project design.md (locked)",
   "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell, 60rem drawer (unchanged)",
+  "signature": "kanban board swimlanes",
+  "sections": [
+   "project-board",
+   "me",
+   "task",
+   "project-settings"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "prompt": "Stage 3 F3 board planning: swimlane headers (name, unique count, collapse), bucket lane drag, bucket/reviewer group and filters, my-board reviewer scope, detail bucket/reviewers, settings planning buckets tab",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
+  "mode": "redesign",
+  "depth": "polish",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
   "nav": "existing app shell, 60rem drawer",
   "signature": "kanban board",
   "sections": [
