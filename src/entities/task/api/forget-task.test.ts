@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
+import { ApiError } from "@/shared/api";
 import { forgetTask } from "./tasks";
 
 const board = () => ({
@@ -82,4 +83,27 @@ test("404가 난 그 업무의 상세·GitHub 쿼리는 건드리지 않는다(�
   forgetTask(client, "t1", 1_000);
   assert.deepEqual(client.getQueryData(detail), { id: "t1" });
   assert.deepEqual(client.getQueryData(github), { links: [] });
+});
+
+test("지금 404·403 오류인 쿼리(업무는 200, 프로젝트만 404)는 다시 받지도 지우지도 않는다", async () => {
+  const client = new QueryClient();
+  const project = ["projects", "p1"];
+  const calls = { fetches: 0 };
+  const notFound = async () => {
+    calls.fetches += 1;
+    throw new ApiError(404, "PROJECT_NOT_FOUND", "없음");
+  };
+  const observer = new QueryObserver(client, {
+    queryKey: project,
+    queryFn: notFound,
+    retry: false,
+  });
+  observer.subscribe(() => undefined);
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.equal(calls.fetches, 1);
+  forgetTask(client, "t1", 1_000);
+  forgetTask(client, "t1", 2_000);
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  assert.equal(calls.fetches, 1);
+  assert.equal(client.getQueryState(project)?.status, "error");
 });
