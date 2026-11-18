@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import {
   changeBoardFilter,
   boardFilterKeys,
@@ -25,6 +26,27 @@ export function TaskFilters({
   readonly parts: readonly { readonly id: string; readonly name: string }[];
   readonly personal: boolean;
 }) {
+  const root = useRef<HTMLDetailsElement>(null);
+  // Popover behaviour for <details>: close on outside pointer and Escape.
+  useEffect(() => {
+    const onPointer = (event: PointerEvent) => {
+      const details = root.current;
+      if (details?.open && !details.contains(event.target as Node))
+        details.open = false;
+    };
+    const onKey = (event: KeyboardEvent) => {
+      const details = root.current;
+      if (event.key !== "Escape" || !details?.open) return;
+      details.open = false;
+      details.querySelector("summary")?.focus();
+    };
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
   const params = new URLSearchParams(search);
   const selected = (key: BoardFilterKey) =>
     params.getAll(key).flatMap((value) => value.split(","));
@@ -84,7 +106,7 @@ export function TaskFilters({
     },
   ];
   return (
-    <details className="board-filters min-w-0">
+    <details ref={root} className="board-filters min-w-0">
       <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">
         <span className="ml-2 inline-flex max-w-full flex-wrap items-center gap-2 align-middle">
           필터
@@ -118,104 +140,107 @@ export function TaskFilters({
           )}
         </span>
       </summary>
-      <p className="mt-3 text-sm text-muted">
-        같은 항목은 OR, 다른 항목은 AND로 적용합니다.
-      </p>
-      <Button
-        variant="ghost"
-        className="mt-3"
-        onClick={() => {
-          const next = new URLSearchParams(search);
-          for (const key of boardFilterKeys) next.delete(key);
-          next.delete("doneLimit");
-          onChange(next.toString());
-        }}
-      >
-        필터 초기화
-      </Button>
-      <div className="mt-5 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {axes
-          .filter((axis) => axis.choices.length)
-          .map((axis) => (
-            <fieldset key={axis.key} className="min-w-0">
-              <legend className="mb-2 text-sm font-semibold">
-                {axis.label}
-              </legend>
-              {axis.choices.map((choice) => (
-                <label
-                  key={choice.value}
-                  className="flex min-h-11 items-center gap-3 text-sm"
-                >
-                  <Checkbox
-                    checked={selected(axis.key).includes(choice.value)}
-                    onChange={(event) =>
-                      onChange(
-                        changeBoardFilter(
-                          search,
-                          axis.key,
-                          event.target.checked
-                            ? [...selected(axis.key), choice.value]
-                            : selected(axis.key).filter(
-                                (value) => value !== choice.value,
-                              ),
-                        ),
-                      )
-                    }
-                  />
-                  <span className="break-words">{choice.label}</span>
-                </label>
-              ))}
-            </fieldset>
-          ))}
-        <label className="grid content-start gap-2 text-sm font-semibold">
-          마감일
-          <Select
-            value={params.get("dueWithin") ?? ""}
-            onChange={(event) =>
-              onChange(
-                changeBoardFilter(search, "dueWithin", [event.target.value]),
-              )
-            }
+      <div className="board-filters-panel">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs text-muted">
+            같은 항목은 OR, 다른 항목은 AND로 적용합니다.
+          </p>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const next = new URLSearchParams(search);
+              for (const key of boardFilterKeys) next.delete(key);
+              next.delete("doneLimit");
+              onChange(next.toString());
+            }}
           >
-            <option value="">전체</option>
-            <option value="0">오늘까지</option>
-            <option value="3">3일 이내</option>
-            <option value="7">7일 이내</option>
-            <option value="30">30일 이내</option>
-          </Select>
-        </label>
-        <label className="grid content-start gap-2 text-sm font-semibold">
-          막힘
-          <Select
-            value={params.get("blocked") ?? ""}
-            onChange={(event) =>
-              onChange(
-                changeBoardFilter(search, "blocked", [event.target.value]),
-              )
-            }
-          >
-            <option value="">전체</option>
-            <option value="true">막힌 업무만</option>
-            <option value="false">막히지 않은 업무만</option>
-          </Select>
-        </label>
-        {personal && (
-          <label className="flex min-h-11 items-center gap-3 text-sm">
-            <Checkbox
-              checked={selected("source").includes("PERSONAL")}
+            필터 초기화
+          </Button>
+        </div>
+        <div className="board-filters-grid mt-3 grid gap-5">
+          {axes
+            .filter((axis) => axis.choices.length)
+            .map((axis) => (
+              <fieldset key={axis.key} className="min-w-0">
+                <legend className="mb-2 text-sm font-semibold">
+                  {axis.label}
+                </legend>
+                {axis.choices.map((choice) => (
+                  <label
+                    key={choice.value}
+                    className="flex min-h-9 items-center gap-3 text-sm"
+                  >
+                    <Checkbox
+                      checked={selected(axis.key).includes(choice.value)}
+                      onChange={(event) =>
+                        onChange(
+                          changeBoardFilter(
+                            search,
+                            axis.key,
+                            event.target.checked
+                              ? [...selected(axis.key), choice.value]
+                              : selected(axis.key).filter(
+                                  (value) => value !== choice.value,
+                                ),
+                          ),
+                        )
+                      }
+                    />
+                    <span className="break-words">{choice.label}</span>
+                  </label>
+                ))}
+              </fieldset>
+            ))}
+          <label className="grid content-start gap-2 text-sm font-semibold">
+            마감일
+            <Select
+              value={params.get("dueWithin") ?? ""}
               onChange={(event) =>
                 onChange(
-                  changeBoardFilter(
-                    search,
-                    "source",
-                    event.target.checked ? ["PERSONAL"] : [],
-                  ),
+                  changeBoardFilter(search, "dueWithin", [event.target.value]),
                 )
               }
-            />
-            개인 업무만
+            >
+              <option value="">전체</option>
+              <option value="0">오늘까지</option>
+              <option value="3">3일 이내</option>
+              <option value="7">7일 이내</option>
+              <option value="30">30일 이내</option>
+            </Select>
           </label>
-        )}
+          <label className="grid content-start gap-2 text-sm font-semibold">
+            막힘
+            <Select
+              value={params.get("blocked") ?? ""}
+              onChange={(event) =>
+                onChange(
+                  changeBoardFilter(search, "blocked", [event.target.value]),
+                )
+              }
+            >
+              <option value="">전체</option>
+              <option value="true">막힌 업무만</option>
+              <option value="false">막히지 않은 업무만</option>
+            </Select>
+          </label>
+          {personal && (
+            <label className="flex min-h-9 items-center gap-3 text-sm">
+              <Checkbox
+                checked={selected("source").includes("PERSONAL")}
+                onChange={(event) =>
+                  onChange(
+                    changeBoardFilter(
+                      search,
+                      "source",
+                      event.target.checked ? ["PERSONAL"] : [],
+                    ),
+                  )
+                }
+              />
+              개인 업무만
+            </label>
+          )}
+        </div>
       </div>
     </details>
   );

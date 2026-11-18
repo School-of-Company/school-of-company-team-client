@@ -187,7 +187,7 @@ export function BoardWorkspace({
         onImport={(id) => router.push("/tasks/" + encodeURIComponent(id))}
       />
       {project.data && renderProjectNav?.(project.data)}
-      <div className="board-toolbar grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="board-toolbar flex min-w-0 flex-wrap items-start justify-between gap-3">
         {renderFilters({
           search,
           onChange: change,

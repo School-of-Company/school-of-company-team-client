@@ -16,6 +16,13 @@ import { normalizeApiError } from "@/shared/api";
 import { TaskAssignees } from "./TaskAssignees";
 import { Button, Checkbox, Field, Input, Select, Textarea } from "@/shared/ui";
 
+const priorityOptions = [
+  { value: "P0", label: "긴급" },
+  { value: "P1", label: "높음" },
+  { value: "P2", label: "보통" },
+  { value: "P3", label: "낮음" },
+] as const;
+
 type Props = {
   readonly scope: TaskScope;
   readonly project?: ProjectDetail;
@@ -150,17 +157,27 @@ export function TaskEditor({
             <option value="DEV">개발 업무</option>
           </Select>
         </Field>
-        <Field id={`${prefix}-priority`} label="우선순위">
-          <Select
-            id={`${prefix}-priority`}
-            name="priority"
-            defaultValue={initial?.priority ?? "P2"}
-          >
-            {["P0", "P1", "P2", "P3"].map((value) => (
-              <option key={value}>{value}</option>
+        <fieldset className="min-w-0">
+          <legend className="mb-2 text-sm font-medium">우선순위</legend>
+          <div className="ui-priority-picker">
+            {priorityOptions.map((option) => (
+              <label
+                key={option.value}
+                className="ui-priority-option"
+                data-priority={option.value}
+                title={option.value}
+              >
+                <input
+                  type="radio"
+                  name="priority"
+                  value={option.value}
+                  defaultChecked={(initial?.priority ?? "P2") === option.value}
+                />
+                {option.label}
+              </label>
             ))}
-          </Select>
-        </Field>
+          </div>
+        </fieldset>
         {!initial && (
           <Field id={`${prefix}-status`} label="시작 상태">
             <Select

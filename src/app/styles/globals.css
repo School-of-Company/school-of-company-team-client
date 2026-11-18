@@ -462,11 +462,18 @@ body {
   padding-right: var(--target-size);
 }
 .board-priority {
-  color: var(--color-ink-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
-.board-priority svg {
-  width: var(--icon-size);
-  height: var(--icon-size);
+.board-priority::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
 }
 .ui-chip-select-root {
   position: relative;
@@ -631,22 +638,47 @@ body {
   color: var(--priority);
 }
 .ui-priority-picker {
-  display: grid;
-  grid-auto-flow: initial;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  justify-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
 }
-.ui-priority-picker .ui-segmented-option {
-  justify-content: center;
-  gap: var(--space-2xs);
-  padding-inline: var(--space-xs);
-}
-.ui-priority-picker .ui-segmented-option > .font-semibold {
+.ui-priority-option {
+  position: relative;
+  display: inline-flex;
+  min-height: var(--control-height);
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-md) 0 var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
   color: var(--priority);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
 }
-.ui-priority-picker .ui-segmented-option:has(input:checked) {
+.ui-priority-option::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--priority);
+}
+.ui-priority-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ui-priority-option:hover {
+  border-color: var(--priority);
+}
+.ui-priority-option:has(input:checked) {
+  border-color: var(--priority);
   background: color-mix(in oklab, var(--priority) 14%, var(--surface));
-  box-shadow: 0 0 0 1.5px var(--priority);
+}
+.ui-priority-option:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 /* Theme picker with a mini screen preview per option. */
 .ui-theme-select {
@@ -744,12 +776,6 @@ body {
     transform: translateY(-4px) scale(0.98);
   }
 }
-@keyframes ui-slide-in {
-  from {
-    opacity: 0.6;
-    transform: translateX(24px);
-  }
-}
 @media (prefers-reduced-motion: no-preference) {
   main#main-content > * {
     animation: ui-fade-up var(--dur-short) var(--ease-out);
@@ -765,7 +791,7 @@ body {
     box-shadow: var(--shadow-card-hover);
   }
   .board-detail-panel[open] {
-    animation: ui-slide-in var(--dur-short) var(--ease-out);
+    animation: ui-fade-up var(--dur-short) var(--ease-out);
   }
   .ui-button {
     transition:
@@ -802,4 +828,76 @@ body {
   .board-toolbar .ui-input {
     width: 100%;
   }
+}
+
+/* Dropdowns: every <Select> shares the chip-menu look.
+   Chromium 135+ styles the picker itself (appearance: base-select);
+   other browsers keep the native list with a matching closed control. */
+select.ui-input {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23858995' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 14px;
+}
+@supports (appearance: base-select) {
+  select.ui-input,
+  select.ui-input::picker(select) {
+    appearance: base-select;
+  }
+  select.ui-input {
+    display: flex;
+    align-items: center;
+    padding-right: var(--space-sm);
+    background-image: none;
+  }
+  select.ui-input::picker-icon {
+    margin-left: auto;
+    color: var(--muted);
+    transition: rotate var(--dur-micro) var(--ease-out);
+  }
+  select.ui-input:open::picker-icon {
+    rotate: 180deg;
+  }
+  select.ui-input::picker(select) {
+    margin-top: 6px;
+    padding: var(--space-2xs);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--foreground);
+    box-shadow: var(--shadow-menu);
+  }
+  select.ui-input option {
+    display: flex;
+    min-height: 2.25rem;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0 var(--space-sm);
+    border-radius: calc(var(--radius-md) - 3px);
+    font-size: var(--text-sm);
+  }
+  select.ui-input option:hover,
+  select.ui-input option:focus-visible {
+    background: var(--surface-hover);
+    outline: none;
+  }
+  select.ui-input option:checked {
+    font-weight: 600;
+  }
+  select.ui-input option::checkmark {
+    order: 1;
+    margin-left: auto;
+    color: var(--brand);
+  }
+  select.ui-input option:disabled {
+    opacity: 0.45;
+  }
+}
+
+.ui-button-sm {
+  min-height: 2rem;
+  padding: 0 var(--space-sm);
+  font-size: var(--text-xs);
 }

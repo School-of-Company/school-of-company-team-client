@@ -28,10 +28,10 @@ export function ThemeSelect() {
     serverPreference,
   );
   return (
-    <fieldset className="ui-segmented">
+    <fieldset className="ui-theme-select">
       <legend className="sr-only">화면 테마</legend>
       {options.map((option) => (
-        <label key={option.value} className="ui-segmented-option">
+        <label key={option.value} className="ui-theme-option">
           <input
             type="radio"
             name="theme-preference"
@@ -39,8 +39,22 @@ export function ThemeSelect() {
             checked={current === option.value}
             onChange={() => applyThemePreference(option.value)}
           />
-          <Icon name={option.icon} width={16} height={16} />
-          <span>{option.label}</span>
+          <span
+            className="ui-theme-preview"
+            data-preview={option.value}
+            aria-hidden="true"
+          >
+            <span className="ui-theme-preview-side" />
+            <span className="ui-theme-preview-main">
+              <span />
+              <span />
+              <span />
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Icon name={option.icon} width={16} height={16} />
+            {option.label}
+          </span>
         </label>
       ))}
     </fieldset>

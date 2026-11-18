@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { type TaskCard, type TaskStatus } from "@/entities/task";
 import { formatDate } from "@/shared/lib";
-import { Avatar, Icon } from "@/shared/ui";
+const priorityLabels = {
+  P0: "긴급",
+  P1: "높음",
+  P2: "보통",
+  P3: "낮음",
+} as const;
 import { BoardCardMenu } from "./BoardCardMenu";
 
 export function BoardCard({
@@ -62,33 +67,23 @@ export function BoardCard({
         {task.title}
       </Link>
       <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-1" aria-label="담당자">
+        <div className="flex min-w-0 flex-wrap gap-x-2" aria-label="담당자">
           {task.assignees.length ? (
             task.assignees.map((person) => (
-              <Avatar key={person.id} name={person.name} />
+              <span key={person.id} className="text-xs">
+                {person.name}
+              </span>
             ))
           ) : (
-            <span className="text-sm text-muted">미지정</span>
+            <span className="text-xs text-muted">미지정</span>
           )}
         </div>
         <span
           className="board-priority"
-          role="img"
-          aria-label={`우선순위 ${task.priority}`}
+          data-priority={task.priority}
           title={`우선순위 ${task.priority}`}
         >
-          <Icon
-            name={
-              task.priority === "P0"
-                ? "alert"
-                : task.priority === "P1"
-                  ? "priorityHigh"
-                  : task.priority === "P2"
-                    ? "priorityMedium"
-                    : "priorityLow"
-            }
-          />
-          <span className="sr-only">{task.priority}</span>
+          {priorityLabels[task.priority]}
         </span>
       </div>
       {task.deadline && (

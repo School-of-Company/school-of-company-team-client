@@ -12,6 +12,8 @@ export interface User {
   readonly githubLogin: string | null;
   readonly discordLinked: boolean;
   readonly discordUsername: string | null;
+  /** Uploaded photo or GitHub fallback, resolved by the API (feat/profile-avatar). */
+  readonly avatarUrl?: string | null;
 }
 
 export interface SessionTokens {
@@ -24,6 +26,13 @@ export interface UpdateProfile {
   readonly name: string;
   readonly major?: string;
 }
+
+// ponytail: client-side GitHub fallback until every API ships avatarUrl.
+export const userAvatarUrl = (user: User | undefined) =>
+  user?.avatarUrl ??
+  (user?.githubId
+    ? `https://avatars.githubusercontent.com/u/${user.githubId}?s=72`
+    : undefined);
 
 export const isHeadAdmin = (user: User | undefined) =>
   user?.status === "ACTIVE" && user.role === "LEAD";
