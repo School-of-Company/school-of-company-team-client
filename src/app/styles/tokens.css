@@ -82,9 +82,8 @@
   --color-graphite-glyph-3: oklch(53% 0.1 258);
   --color-key-face: oklch(99.4% 0.003 250);
   --color-key-edge: oklch(80% 0.016 254);
-  --font-display:
-    var(--font-plex-kr), "IBM Plex Sans KR", system-ui, sans-serif;
-  --font-body: var(--font-plex-kr), "IBM Plex Sans KR", system-ui, sans-serif;
+  --font-display: var(--font-pretendard), "Pretendard", system-ui, sans-serif;
+  --font-body: var(--font-pretendard), "Pretendard", system-ui, sans-serif;
   --font-outlier:
     var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
   --color-overlay: oklch(21% 0.028 262 / 0.52);
