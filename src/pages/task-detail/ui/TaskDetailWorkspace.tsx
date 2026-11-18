@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   forgetTask,
-  rememberTask,
   taskApi,
   taskKeys,
   taskQueries,
@@ -84,16 +83,14 @@ export function TaskDetailWorkspace({
     (projectProblem.status === 403 || projectProblem.status === 404)
       ? project.error
       : null);
-  // 정리는 업무당 한 번이다(forgetTask가 QueryClient 단위로 기억). 다시 읽히면 표시를 지운다.
+  // 404 응답 하나에 정리 한 번(forgetTask가 QueryClient 단위로 응답 시각을 기억). 목록 제외는 매번 한다.
+  const errorAt = task.errorUpdatedAt;
   useEffect(() => {
     if (!taskError) return;
     const problem = normalizeApiError(taskError);
     if (problem.status === 403 || problem.status === 404)
-      forgetTask(client, taskId);
-  }, [taskError, client, taskId]);
-  useEffect(() => {
-    if (task.isSuccess) rememberTask(client, taskId);
-  }, [task.isSuccess, client, taskId]);
+      forgetTask(client, taskId, errorAt || Date.now());
+  }, [taskError, errorAt, client, taskId]);
   const changeStatus = useMutation({
     mutationFn: (status: Parameters<typeof taskApi.move>[1]["status"]) =>
       taskApi.move(taskId, { status, prevId: null, nextId: null }),
