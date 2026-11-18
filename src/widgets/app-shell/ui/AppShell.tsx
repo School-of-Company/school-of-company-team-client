@@ -2,10 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { useQuery } from "@tanstack/react-query";
 import { projectQueries } from "@/entities/project";
 import { useMe, userDestination } from "@/entities/user";
+import { isSearchShortcut, SearchPalette } from "@/features/global-search";
 import { routes } from "@/shared/config";
 import {
   BrandMark,
@@ -17,6 +24,16 @@ import {
   type IconName,
 } from "@/shared/ui";
 import { headingAnnouncement, shouldFocusMain } from "../model/route-focus";
+
+const noSubscribe = () => () => {};
+/** 단축키 표시. 서버 렌더에서는 비워 두고(수화 불일치 방지) 브라우저에서 플랫폼에 맞춘다. */
+function useShortcutLabel() {
+  return useSyncExternalStore(
+    noSubscribe,
+    () => (/Mac|iPhone|iPad/.test(navigator.platform) ? "⌘K" : "Ctrl K"),
+    () => "",
+  );
+}
 
 export type AppShellProps = {
   readonly children: ReactNode;
@@ -73,10 +90,41 @@ export function AppShell({
     };
   }, [pathname]);
   const me = useMe();
+  // 검색·프로젝트 목록은 업무를 쓸 수 있는 사용자(승인·Discord 연결 완료)에게만.
+  const working = me.data !== undefined && userDestination(me.data) === "/me";
   const projects = useQuery({
     ...projectQueries.list(),
-    enabled: me.data !== undefined && userDestination(me.data) === "/me",
+    enabled: working,
   });
+  const [searchOpen, setSearchOpen] = useState(false);
+  const shortcut = useShortcutLabel();
+  useEffect(() => {
+    if (!working) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (!isSearchShortcut(event)) return;
+      event.preventDefault();
+      setMenuOpen(false);
+      setSearchOpen(true);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [working]);
+  const searchButton = working && (
+    <button
+      type="button"
+      className="app-search-button"
+      aria-haspopup="dialog"
+      aria-keyshortcuts="Meta+K Control+K"
+      onClick={() => {
+        setMenuOpen(false);
+        setSearchOpen(true);
+      }}
+    >
+      <Icon name="search" className="shrink-0" />
+      <span>검색</span>
+      {shortcut && <kbd>{shortcut}</kbd>}
+    </button>
+  );
   const activeProjects =
     projects.data?.filter((project) => !project.archived) ?? [];
   type NavLink = {
@@ -189,6 +237,7 @@ export function AppShell({
         >
           <BrandMark size={28} label />
         </Link>
+        {searchButton}
         {navigation}
         {projectNavigation}
         <div className="mt-auto pt-5">{accountNavigation}</div>
@@ -217,7 +266,19 @@ export function AppShell({
           >
             <BrandMark size={24} label />
           </Link>
-          <div className="ml-auto min-w-0">{mobileUserSlot}</div>
+          <div className="ml-auto flex min-w-0 items-center gap-2">
+            {working && (
+              <IconButton
+                aria-label="검색"
+                aria-haspopup="dialog"
+                variant="ghost"
+                onClick={() => setSearchOpen(true)}
+              >
+                <Icon name="search" />
+              </IconButton>
+            )}
+            {mobileUserSlot}
+          </div>
         </header>
         <main
           ref={main}
@@ -237,11 +298,15 @@ export function AppShell({
         title="School of Company"
         className="ui-drawer"
       >
+        {searchButton}
         {navigation}
         {projectNavigation}
         {accountNavigation}
         <div className="mt-6 border-t border-border pt-4">{userSlot}</div>
       </Dialog>
+      {working && (
+        <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
+      )}
     </div>
   );
 }
