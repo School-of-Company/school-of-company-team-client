@@ -8,6 +8,7 @@ import {
   EmptyState,
   ErrorState,
   Field,
+  Input,
   Select,
   Spinner,
 } from "@/shared/ui";
@@ -46,6 +47,9 @@ export function RepositorySettings({
           (linked) => linked.repositoryId === repo.repositoryId,
         ),
     ) ?? [];
+  const matches = available.filter((repo) =>
+    repo.fullName.toLowerCase().includes(search.toLowerCase()),
+  );
   return (
     <div className="grid gap-4">
       <p className="text-sm text-muted">
@@ -159,10 +163,9 @@ export function RepositorySettings({
           }}
         >
           <Field id="repository-search" label="허용된 저장소 검색">
-            <input
+            <Input
               id="repository-search"
               type="search"
-              className="ui-input"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
@@ -178,22 +181,23 @@ export function RepositorySettings({
               <option value="" disabled>
                 저장소 선택
               </option>
-              {available
-                .filter((repo) =>
-                  repo.fullName.toLowerCase().includes(search.toLowerCase()),
-                )
-                .map((repo) => (
-                  <option key={repo.repositoryId} value={repo.repositoryId}>
-                    {repo.fullName}
-                    {repo.private ? " (비공개)" : " (공개)"}
-                  </option>
-                ))}
+              {matches.map((repo) => (
+                <option key={repo.repositoryId} value={repo.repositoryId}>
+                  {repo.fullName}
+                  {repo.private ? " (비공개)" : " (공개)"}
+                </option>
+              ))}
             </Select>
           </Field>
           {available.length === 0 && (
             <p className="text-sm text-muted">
               새로 연결할 수 있는 저장소가 없습니다. 설치에 허용된 저장소와 보관
               여부를 확인하세요.
+            </p>
+          )}
+          {available.length > 0 && matches.length === 0 && (
+            <p className="text-sm text-muted">
+              검색 결과가 없습니다. 검색어를 바꿔보세요.
             </p>
           )}
           <Button

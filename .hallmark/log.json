@@ -1,5 +1,24 @@
 [
  {
+  "scope": "app",
+  "mode": "redesign",
+  "depth": "full",
+  "theme": "cobalt",
+  "axes": "light/grotesk-sans/cool",
+  "nav": "shared project navigation and URL settings tabs",
+  "signature": "project settings read view",
+  "sections": [
+   "general",
+   "members",
+   "integrations",
+   "creation",
+   "account"
+  ],
+  "waived": [],
+  "prompt": "Korean internal project settings and head-admin creation workflow",
+  "date": "2026-11-18"
+ },
+ {
   "mode": "redesign",
   "depth": "full",
   "scope": "app",

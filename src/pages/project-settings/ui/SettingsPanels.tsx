@@ -31,10 +31,7 @@ export function SettingsPanels(props: SettingsProps) {
     props.user.role === "LEAD" || props.project.pmUserId === props.user.id;
   return (
     <div className="grid gap-10">
-      <nav
-        aria-label="설정 영역"
-        className="flex flex-wrap gap-1 border-b border-border"
-      >
+      <nav aria-label="설정 영역" className="settings-nav">
         {(
           [
             ["general", "기본 정보"],
@@ -50,7 +47,7 @@ export function SettingsPanels(props: SettingsProps) {
               href={`${pathname}?${params}`}
               scroll={false}
               aria-current={tab === value ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center border-b-2 px-4 text-sm ${tab === value ? "border-brand font-semibold text-brand" : "border-transparent text-muted hover:text-foreground"}`}
+              className="ui-nav-link"
             >
               {label}
             </Link>
