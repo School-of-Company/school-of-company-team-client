@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_KR, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Providers } from "@/app/providers";
 import { themeBootScript } from "@/shared/lib";
 import "@/app/styles/globals.css";
 
-const bodyFont = IBM_Plex_Sans_KR({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-plex-kr",
+const bodyFont = localFont({
+  src: "../node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2",
+  weight: "45 920",
+  variable: "--font-pretendard",
   display: "swap",
 });
 const monoFont = JetBrains_Mono({

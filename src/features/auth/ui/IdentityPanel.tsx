@@ -1,32 +1,31 @@
 import type { ReactNode } from "react";
 import { BrandMark, ThemeToggle } from "@/shared/ui";
+import { PointerGlow } from "./PointerGlow";
 
 /**
- * Shared frame for the sign-in flow screens (login, pending, Discord link, OAuth callback):
- * plain ground with one broad brand-pink glow at the top, a large left-aligned headline,
- * and the content in a readable column below it. No card.
+ * Shared frame for the sign-in flow screens (login, pending, Discord link, OAuth callback).
+ * Internal tool: no marketing copy — the brand, a short task title and the action, compact and centred.
  */
 export function IdentityPanel({
   title,
-  lead,
   children,
 }: {
   readonly title: string;
-  readonly lead?: string;
   readonly children: ReactNode;
 }) {
   return (
-    <div className="ui-identity flex min-h-dvh flex-col">
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-5 py-5 sm:px-10">
-        <span className="min-w-0 text-[0.9375rem]">
-          <BrandMark size={32} label />
-        </span>
+    <div className="ui-identity relative grid min-h-dvh place-items-center px-5 py-10">
+      <PointerGlow />
+      <div className="absolute top-4 right-4 z-10 sm:top-5 sm:right-6">
         <ThemeToggle />
-      </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-5 pt-[min(18vh,10rem)] pb-20 sm:px-10">
-        <h1 className="ui-identity-title">{title}</h1>
-        {lead ? <p className="ui-identity-lead">{lead}</p> : null}
-        <div className="mt-10 grid max-w-3xl gap-6">{children}</div>
+      </div>
+      <main className="relative z-10 grid w-full max-w-[22rem] justify-items-center text-center">
+        <BrandMark size={44} />
+        <p className="mt-5 text-sm font-medium text-muted">School of Company</p>
+        <h1 className="mt-1 text-[1.625rem] leading-tight font-bold tracking-[-0.02em]">
+          {title}
+        </h1>
+        <div className="mt-7 grid w-full gap-4">{children}</div>
       </main>
     </div>
   );
