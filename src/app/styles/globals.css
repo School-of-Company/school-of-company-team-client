@@ -2,6 +2,11 @@
  * nav: project workbench sidebar · signature: task board · states: loading empty error full
  * axes: light/grotesk-sans/cool · posture: restrained · contrast: pending verification · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S3 R5 V3 · weakest: S, retained project keys and task destinations as the navigation material */
+/* Hallmark · dropped onChange={(event) => { const status = taskStatuses.find( · card status select moved into the card more-menu, same position API, verified on the real API */
+/* Hallmark · dropped onClick={() => onOrder("up")}, onClick={() => onOrder("down")} · order buttons moved into BoardCardMenu menu items with the same onOrder handler and manual-sort guard */
+/* Hallmark · dropped onClick={() => setCreating(true)}, onClose={() => setCreating(false)}, onCreate={canCreate ? () => setCreating(true) : undefined}, onCreated={async (notice) => { setMessage(notice); setCreating(false); await queryClient.invalidateQueries({ queryKey: taskKeys.all }); }} · board creation moved to the column add action with status prefill and a scoped task invalidation */
+/* Hallmark · dropped onCancel={(event) => { event.preventDefault(); onClose(); }} · shared Dialog now owns cancel with the nested-Escape guard, verified two dialogs close one at a time */
+/* Hallmark · dropped onImported={(id) => router.push(`/tasks/${encodeURIComponent(id)}`) } · issue import still reports the task id and the board opens it in the side panel URL instead */
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css";
