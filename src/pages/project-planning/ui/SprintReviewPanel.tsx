@@ -119,7 +119,10 @@ function ReviewEditor({
   const id = useId();
   const { save, publish } = useSaveReview(project.id, sprint.id);
   const [body, setBody] = useState(saved?.body ?? "");
-  const [mode, setMode] = useState<"write" | "preview">("write");
+  // 이미 게시한 리뷰는 읽는 모습부터 보여 준다.
+  const [mode, setMode] = useState<"write" | "preview">(
+    saved?.publishedAt ? "preview" : "write",
+  );
   const [loadingDraft, setLoadingDraft] = useState(false);
   const [confirmDraft, setConfirmDraft] = useState(false);
   const [notice, setNotice] = useState<{

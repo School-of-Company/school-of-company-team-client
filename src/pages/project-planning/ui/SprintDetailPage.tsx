@@ -189,13 +189,14 @@ function SprintScreen({
         )}
         {manages && otherActive && sprint.status === "PLANNED" && (
           <p id="start-blocked" className="text-sm text-muted">
+            진행 중인 Sprint(
             <Link
               href={routes.projectSprint(project.id, otherActive.id)}
               className="underline"
             >
               {otherActive.name}
             </Link>
-            이 진행 중입니다. 그 Sprint를 종료한 뒤 시작할 수 있습니다.
+            )를 종료한 뒤 시작할 수 있습니다.
           </p>
         )}
         {!manages && sprint.status !== "CLOSED" && !project.archived && (

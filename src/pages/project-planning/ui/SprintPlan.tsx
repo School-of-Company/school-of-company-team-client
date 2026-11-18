@@ -248,7 +248,9 @@ export function SprintPlan({
                   disabled={!checked.length || busy}
                   onClick={() => add(checked)}
                 >
-                  선택한 {checked.length}개 넣기
+                  {checked.length
+                    ? `선택한 ${checked.length}개 넣기`
+                    : "선택한 업무 넣기"}
                 </Button>
               </div>
             </>
@@ -265,11 +267,6 @@ export function SprintPlan({
             이 Sprint <span className="tabular-nums">{view.scoped.length}</span>
           </h3>
         </div>
-        {!manages && (
-          <p className="planning-note">
-            Sprint 범위는 PM 또는 헤드 어드민이 정합니다.
-          </p>
-        )}
         {scoped.isPending ? (
           <PlanSkeleton label="Sprint 업무 불러오는 중" />
         ) : scoped.isError ? (

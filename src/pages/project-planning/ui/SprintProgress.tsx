@@ -187,18 +187,19 @@ function CarryOvers({
 function carryOverTarget(projectId: string, record: CarryOver) {
   if (record.target === "SPRINT")
     return record.toSprint ? (
-      <Link
-        href={routes.projectSprint(projectId, record.toSprint.id)}
-        className="underline"
-      >
-        {record.toSprint.name}(으)로 이월
-      </Link>
+      <span>
+        이월:{" "}
+        <Link
+          href={routes.projectSprint(projectId, record.toSprint.id)}
+          className="underline"
+        >
+          Sprint {record.toSprint.name}
+        </Link>
+      </span>
     ) : (
-      "다음 Sprint로 이월(삭제됨)"
+      "이월: 삭제된 Sprint"
     );
   if (record.target === "BUCKET")
-    return record.toBucket
-      ? `버킷 ${record.toBucket.name}(으)로 이동`
-      : "버킷으로 이동(삭제됨)";
+    return `이동: 버킷 ${record.toBucket?.name ?? "(삭제됨)"}`;
   return "Sprint에서만 뺌";
 }
