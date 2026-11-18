@@ -23,9 +23,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${bodyFont.variable} ${monoFont.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${monoFont.variable} h-full overflow-x-clip antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col overflow-x-clip">
         <Providers>{children}</Providers>
       </body>
     </html>

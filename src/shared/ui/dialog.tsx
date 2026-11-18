@@ -28,7 +28,7 @@ export function Dialog({
   useEffect(() => {
     if (!open) return;
     const overflow = document.body.style.overflowY;
-    document.body.style.overflowY = "hidden";
+    document.body.style.overflowY = "clip";
     return () => {
       document.body.style.overflowY = overflow;
     };

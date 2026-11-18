@@ -57,9 +57,9 @@ body {
     min-height: 2.75rem;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: var(--space-xs);
     border-radius: var(--radius-md);
-    padding: 0.625rem 1rem;
+    padding: 0.625rem var(--space-md);
     font-size: 0.875rem;
     font-weight: 600;
     border: 1px solid var(--color-transparent);
@@ -87,6 +87,9 @@ body {
   .ui-button:active:not(:disabled) {
     transform: translateY(1px);
   }
+  .ui-nav-link:active {
+    background: var(--color-paper-3);
+  }
   .ui-button[aria-busy="true"],
   .ui-input[aria-busy="true"],
   .ui-checkbox[aria-busy="true"] {
@@ -104,7 +107,7 @@ body {
   }
   .ui-icon-button {
     width: 2.75rem;
-    padding: 0.5rem;
+    padding: var(--space-xs);
     flex-shrink: 0;
   }
   .ui-input {
@@ -114,7 +117,7 @@ body {
     border: 1px solid var(--muted);
     border-radius: var(--radius-md);
     background: var(--surface);
-    padding: 0.625rem 0.75rem;
+    padding: 0.625rem var(--space-sm);
     color: var(--foreground);
     font-size: 0.875rem;
   }
@@ -146,6 +149,11 @@ body {
   .ui-input[aria-invalid="true"] {
     border-color: var(--danger);
   }
+  @media (max-width: 59.999rem) {
+    .ui-input {
+      font-size: var(--text-md);
+    }
+  }
   .ui-spinner {
     display: inline-block;
     width: 1rem;
@@ -164,7 +172,7 @@ body {
     overflow-y: auto;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 1.5rem;
+    padding: var(--space-lg);
     background: var(--surface);
     color: var(--foreground);
   }
