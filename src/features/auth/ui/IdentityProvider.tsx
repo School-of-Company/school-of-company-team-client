@@ -3,9 +3,40 @@
 import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { clearSession, getAccessToken } from "@/entities/user";
+import axios from "axios";
+import {
+  clearSession,
+  getAccessToken,
+  getRefreshToken,
+  rotateSession,
+  type SessionTokens,
+} from "@/entities/user";
 import { clearCacheOnSessionChange } from "../model/session-cache";
-import { api, subscribeApiErrors } from "@/shared/api";
+import { api, setAccessRefresher, subscribeApiErrors } from "@/shared/api";
+
+// One refresh at a time: parallel 401s share the same request.
+let refreshing: Promise<boolean> | null = null;
+setAccessRefresher(() => {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return Promise.resolve(false);
+  refreshing ??= axios
+    .post<SessionTokens>(
+      "/api/v1/auth/refresh",
+      { refreshToken },
+      { baseURL: api.defaults.baseURL, timeout: 15_000 },
+    )
+    .then(
+      ({ data }) => {
+        rotateSession(data);
+        return true;
+      },
+      () => false,
+    )
+    .finally(() => {
+      refreshing = null;
+    });
+  return refreshing;
+});
 
 api.interceptors.request.use((config) => {
   const token = getAccessToken();

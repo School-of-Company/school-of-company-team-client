@@ -130,7 +130,7 @@ export function AppShell({
       >
         본문으로 건너뛰기
       </a>
-      <aside className="app-sidebar hidden min-w-0 border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col">
+      <aside className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col">
         <Link
           href={routes.me}
           className="mb-6 flex min-h-11 min-w-0 items-center gap-2 px-3 text-sm font-semibold"

@@ -4,6 +4,8 @@ export type { UserSummary } from "./api/users";
 export {
   clearSession,
   getAccessToken,
+  getRefreshToken,
+  rotateSession,
   replaceSession,
   subscribeSessionChanges,
   useAccessToken,
