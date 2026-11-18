@@ -84,7 +84,7 @@ export function TaskFilters({
     },
   ];
   return (
-    <details className="min-w-0 border-y border-border bg-surface px-3 py-1">
+    <details className="board-filters min-w-0">
       <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">
         <span className="ml-2 inline-flex max-w-full flex-wrap items-center gap-2 align-middle">
           필터

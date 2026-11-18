@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { type TaskCard, type TaskStatus } from "@/entities/task";
 import { formatDate } from "@/shared/lib";
-import { Avatar, Badge } from "@/shared/ui";
+import { Avatar, Icon } from "@/shared/ui";
 import { BoardCardMenu } from "./BoardCardMenu";
 
 export function BoardCard({
@@ -26,11 +26,11 @@ export function BoardCard({
   const source =
     task.projectName ?? (task.scope === "PERSONAL" ? "개인 업무" : "팀 공용");
   return (
-    <article className="relative min-w-0 rounded-md border border-border bg-surface p-3 hover:border-brand">
+    <article className="board-card relative min-w-0 rounded-md border border-border bg-surface p-3">
       <div className="flex min-w-0 items-start justify-between gap-1">
-        <div className="min-w-0 pt-2 text-sm text-muted">
+        <div className="min-w-0 pt-2 text-xs text-muted">
           {task.key && <span className="font-mono">{task.key}</span>}
-          <span className={task.key ? "ml-2" : ""}>{source}</span>
+          <span className={task.key ? "sr-only" : ""}>{source}</span>
         </div>
         <BoardCardMenu
           task={task}
@@ -43,7 +43,7 @@ export function BoardCard({
       </div>
       <Link
         href={`/tasks/${encodeURIComponent(task.id)}`}
-        className="block min-h-11 py-2 text-sm font-semibold [overflow-wrap:anywhere] break-keep after:absolute after:inset-0 hover:text-brand"
+        className="block min-h-11 py-2 text-sm font-medium [overflow-wrap:anywhere] break-keep after:absolute after:inset-0"
         onClick={(event) => {
           if (
             onSelect &&
@@ -71,7 +71,25 @@ export function BoardCard({
             <span className="text-sm text-muted">미지정</span>
           )}
         </div>
-        <Badge>{task.priority}</Badge>
+        <span
+          className="board-priority"
+          role="img"
+          aria-label={`우선순위 ${task.priority}`}
+          title={`우선순위 ${task.priority}`}
+        >
+          <Icon
+            name={
+              task.priority === "P0"
+                ? "alert"
+                : task.priority === "P1"
+                  ? "priorityHigh"
+                  : task.priority === "P2"
+                    ? "priorityMedium"
+                    : "priorityLow"
+            }
+          />
+          <span className="sr-only">{task.priority}</span>
+        </span>
       </div>
       {task.deadline && (
         <p className="mt-2 text-sm text-muted">

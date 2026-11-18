@@ -60,6 +60,11 @@
      The raw logo pink is 3.41:1 on white, so it is decoration only; actions use the derived accent. */
   --color-brand-logo: #ff4060;
   --color-brand-logo-2: #ff6982;
+  --identity-glow-1: color-mix(
+    in oklab,
+    var(--color-brand-logo) 30%,
+    transparent
+  );
   --color-brand-tile: #ffffff; /* the logo PNG's own opaque ground, kept in both themes */
   --color-accent: #d92a4a; /* white text 4.79:1, on white 4.79:1 (AA) */
   --color-accent-2: #ff6982;
@@ -102,7 +107,7 @@
   --cut: 8px;
   --cut-l: 16px;
   --rule-hair: 1px;
-  --shadow-card: 0 1px 2px oklch(21% 0.028 262 / 0.06);
+  --shadow-card: none;
   --shadow-key:
     0 3px 0 0 var(--color-key-edge), 0 6px 8px -4px oklch(21% 0.028 262 / 0.28),
     inset 0 1px 0 oklch(100% 0 0 / 0.9);
@@ -113,6 +118,25 @@
   --shadow-key-press: inset 0 1px 2px oklch(21% 0.028 262 / 0.14);
   --tracking-display: -0.028em;
   --display-weight: 600;
+  --surface-sidebar: #ffffff;
+  --surface-canvas: #ffffff;
+  --surface-panel: #ffffff;
+  --surface-column: #ffffff;
+  --surface-selected: var(--color-accent-wash);
+  --rule-subtle: var(--color-rule);
+  --rule-strong: #858995;
+  --line-body: 1.65;
+  --line-heading: 1.4;
+  --control-height: 40px;
+  --target-size: 44px;
+  --sidebar-width: 224px;
+  --page-inset: 24px;
+  --avatar-size: 24px;
+  --icon-size: 20px;
+  --column-min-height: 480px;
+  --toolbar-label-width: 112px;
+  --card-key-height: 24px;
+  --textarea-min-height: 112px;
 }
 
 /* Dark theme: an explicit choice (data-theme="dark") or, with no stored choice,
@@ -141,4 +165,14 @@
   --color-overlay: oklch(0% 0 0 / 0.6);
   --success: #5fcf8f;
   --shadow-card: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --surface-sidebar: #111318;
+  --surface-canvas: #1a1d24;
+  --surface-panel: #20232b;
+  --surface-column: #1c1f27;
+  --rule-strong: #6b7282;
+  --identity-glow-1: color-mix(
+    in oklab,
+    var(--color-brand-logo) 28%,
+    transparent
+  );
 }
