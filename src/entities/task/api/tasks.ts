@@ -7,6 +7,7 @@ import {
   type QueryKey,
 } from "@tanstack/react-query";
 import { boardRequestParams } from "../model/board";
+import { withoutTask } from "../model/without-task";
 import type {
   Board,
   CreateTask,
@@ -91,20 +92,43 @@ const taskListKeys: readonly QueryKey[] = [
   ["members"],
 ];
 
+const goneKey = (taskId: string) => ["gone-task", taskId] as const;
+
 /**
- * 업무 단건이 404·403이면 그 업무가 남아 있을 수 있는 캐시를 모두 정리한다.
- * - 404가 난 상세·GitHub 패널은 지운다(다시 받아도 같은 404를 되풀이할 뿐이다).
- * - 보드와 업무를 담는 목록은 화면에 없으면 지우고, 화면에 있으면(숨겨진 이전 화면 포함) 비운 뒤 다시 받는다.
- *   지우기만 하면 화면에 붙어 있는 구독자가 옛 결과를 다시 그린다.
+ * 업무 단건이 404·403이면 그 업무가 남아 있을 수 있는 캐시를 정리한다. **업무당 한 번**(QueryClient 단위 표시라
+ * 컴포넌트가 다시 마운트돼도 되풀이하지 않고, 세션이 바뀌어 캐시가 비면 표시도 사라진다).
+ * - 404가 난 그 업무의 상세·GitHub 패널 쿼리는 건드리지 않는다(오류 상태 그대로, 다시 받지 않는다).
+ * - 화면에 없는 목록은 지운다(돌아왔을 때 옛 목록을 그리지 않는다).
+ * - 화면에 있는 목록은 그 업무를 바로 빼고 이전 데이터를 둔 채 다시 받는다. 비우지(reset) 않으므로 보드·프로젝트
+ *   화면이 로딩으로 바뀌어 상세 패널이 언마운트되는 일이 없다.
+ * 정리했으면 true.
  */
-export function forgetTask(client: QueryClient) {
-  client.removeQueries({
-    queryKey: taskKeys.all,
-    predicate: ({ queryKey }) =>
-      queryKey[1] === "detail" || queryKey[1] === "github",
-  });
+export function forgetTask(client: QueryClient, taskId: string) {
+  if (client.getQueryData(goneKey(taskId))) return false;
+  client.setQueryDefaults(["gone-task"], { gcTime: Infinity });
+  client.setQueryData(goneKey(taskId), true);
+  const others = ({ queryKey }: { readonly queryKey: QueryKey }) =>
+    !(
+      queryKey[0] === "tasks" &&
+      (queryKey[1] === "detail" || queryKey[1] === "github") &&
+      queryKey[2] === taskId
+    );
   for (const queryKey of [taskKeys.all, ...taskListKeys]) {
-    client.removeQueries({ queryKey, type: "inactive" });
-    void client.resetQueries({ queryKey, type: "active" });
+    client.removeQueries({ queryKey, type: "inactive", predicate: others });
+    client.setQueriesData(
+      { queryKey, type: "active", predicate: others },
+      (data: unknown) => withoutTask(data, taskId),
+    );
+    void client.invalidateQueries({
+      queryKey,
+      type: "active",
+      predicate: others,
+    });
   }
+  return true;
+}
+
+/** 그 업무를 다시 읽을 수 있게 되면(다시 시도 성공) 정리 표시를 지운다. 다음에 사라지면 다시 정리한다. */
+export function rememberTask(client: QueryClient, taskId: string) {
+  client.removeQueries({ queryKey: goneKey(taskId), exact: true });
 }
