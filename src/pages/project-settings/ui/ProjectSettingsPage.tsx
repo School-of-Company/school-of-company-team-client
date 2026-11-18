@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectAccess, projectKeys, projectQueries } from "@/entities/project";
-import { activeUsersQueryOptions, useMe } from "@/entities/user";
+import { activeUsersQueryOptions, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { settingsErrorMessage } from "@/features/project-settings";
 import { SettingsPanels } from "./SettingsPanels";
@@ -17,35 +17,31 @@ export function ProjectSettingsPage({
   readonly projectId: string;
 }) {
   return (
-    <AuthGuard>
-      <ProjectSettingsContent projectId={projectId} />
+    <AuthGuard require="work">
+      {(user) => <ProjectSettingsContent projectId={projectId} user={user} />}
     </AuthGuard>
   );
 }
 
-function ProjectSettingsContent({ projectId }: { readonly projectId: string }) {
-  const me = useMe();
+function ProjectSettingsContent({
+  projectId,
+  user,
+}: {
+  readonly projectId: string;
+  readonly user: User;
+}) {
   const client = useQueryClient();
   const project = useQuery({
     ...projectQueries.detail(projectId),
-    enabled: Boolean(me.data) && !me.isError,
   });
   const manages = Boolean(
-    project.data && me.data && projectAccess(project.data, me.data).manages,
+    project.data && projectAccess(project.data, user).manages,
   );
   const users = useQuery({
     ...activeUsersQueryOptions(),
     enabled: manages && !project.isError,
   });
-  if (me.isError)
-    return (
-      <ErrorState
-        description={settingsErrorMessage(normalizeApiError(me.error))}
-        onRetry={() => void me.refetch()}
-      />
-    );
-  if (me.isPending || project.isPending)
-    return <Spinner label="프로젝트 설정 불러오는 중" />;
+  if (project.isPending) return <Spinner label="프로젝트 설정 불러오는 중" />;
   if (project.isError)
     return (
       <ErrorState
@@ -90,7 +86,7 @@ function ProjectSettingsContent({ projectId }: { readonly projectId: string }) {
       <SettingsPanels
         key={projectId}
         project={project.data}
-        user={me.data}
+        user={user}
         candidates={users.data ?? []}
         onSaved={refresh}
       />
