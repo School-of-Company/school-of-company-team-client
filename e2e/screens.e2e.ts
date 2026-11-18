@@ -5,6 +5,8 @@ import { apiUrl, readSeed, signIn, type Tokens } from "./support";
 // 화면 회귀 스크린샷: 전 화면 × 라이트·다크 × 1440·390. E2E_SCREENSHOT_DIR 가 있을 때만 돈다.
 // 데이터는 격리 backend 실제 API 로 만든다(fixture 아님).
 const dir = process.env.E2E_SCREENSHOT_DIR;
+// 쉼표로 화면 이름을 주면 그 화면만 찍는다(예: E2E_SCREENS=me-empty,account).
+const only = process.env.E2E_SCREENS?.split(",");
 test.skip(!dir, "E2E_SCREENSHOT_DIR 가 없으면 스크린샷을 찍지 않는다");
 test.describe.configure({ mode: "serial" });
 
@@ -119,6 +121,15 @@ const screens: readonly {
     ready: (p) => expect(p.getByText("업무 0개")).toBeVisible(),
   },
   {
+    name: "me-empty-filtered",
+    who: "outsider",
+    path: () => "/me?priority=P0",
+    ready: (p) =>
+      expect(
+        p.getByRole("heading", { name: "조건에 맞는 업무가 없습니다" }),
+      ).toBeVisible(),
+  },
+  {
     name: "team",
     who: "member",
     path: () => "/team",
@@ -217,7 +228,9 @@ for (const scheme of ["light", "dark"] as const)
     test(`${scheme} ${width}`, async ({ browser }) => {
       test.setTimeout(240_000);
       mkdirSync(dir!, { recursive: true });
-      for (const screen of screens) {
+      for (const screen of screens.filter(
+        (item) => !only || only.includes(item.name),
+      )) {
         const context = await browser.newContext({
           colorScheme: scheme,
           reducedMotion: "reduce",

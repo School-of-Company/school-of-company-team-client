@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
   deleteAvatar,
+  discordRequired,
   meQueryKey,
   updateProfile,
   uploadAvatar,
@@ -277,7 +278,13 @@ function AccountContent({ user }: { readonly user: User }) {
           Discord 계정
         </h2>
         <div>
-          <Badge>{user.discordLinked ? "연결됨" : "연결 필요"}</Badge>
+          <Badge>
+            {user.discordLinked
+              ? "연결됨"
+              : discordRequired(user)
+                ? "연결 필요"
+                : "연결 안 됨"}
+          </Badge>
         </div>
         <p className="text-sm break-all">
           {user.discordUsername ?? "연결된 계정 없음"}

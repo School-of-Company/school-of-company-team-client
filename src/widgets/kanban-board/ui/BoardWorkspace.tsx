@@ -7,6 +7,7 @@ import {
   taskApi,
   taskKeys,
   taskQueries,
+  boardFilterKeys,
   type BoardSort,
   type TaskCard,
   type TaskScope,
@@ -251,6 +252,13 @@ export function BoardWorkspace({
           }
           onMove={(id, move) => {
             if (!mutation.isPending) mutation.mutate({ id, move });
+          }}
+          filtered={boardFilterKeys.some((key) => params.has(key))}
+          onClearFilters={() => {
+            const next = new URLSearchParams(search);
+            for (const key of boardFilterKeys) next.delete(key);
+            next.delete("doneLimit");
+            change(next.toString());
           }}
           onMore={() => {
             const next = new URLSearchParams(search);

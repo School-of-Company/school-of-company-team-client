@@ -19,7 +19,12 @@ export {
   useSessionReady,
   useAccountRestriction,
 } from "./model/session";
-export { isHeadAdmin, userAvatarUrl, userDestination } from "./model/types";
+export {
+  discordRequired,
+  isHeadAdmin,
+  userAvatarUrl,
+  userDestination,
+} from "./model/types";
 export type {
   User,
   UserStatus,
