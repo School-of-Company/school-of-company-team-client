@@ -134,8 +134,7 @@ export function AppShell({
           href={routes.me}
           className="mb-6 flex min-h-11 min-w-0 items-center gap-2 px-3 text-sm font-semibold"
         >
-          <BrandMark size={28} />
-          <span className="truncate">Engineering Hub</span>
+          <BrandMark size={28} label />
         </Link>
         {navigation}
         {projectNavigation}
@@ -160,11 +159,10 @@ export function AppShell({
           <Link
             href={routes.me}
             className="shrink-0 min-[60rem]:hidden"
-            aria-label="Engineering Hub 내 보드"
+            aria-label="School of Company 내 보드"
           >
-            <BrandMark size={24} />
+            <BrandMark size={24} label />
           </Link>
-          <span className="shrink-0 text-sm font-medium">Engineering Hub</span>
           <div className="ml-auto min-w-0">{mobileUserSlot}</div>
         </header>
         <main
@@ -178,7 +176,7 @@ export function AppShell({
       <Dialog
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        title="Engineering Hub"
+        title="School of Company"
         className="ui-drawer"
       >
         {navigation}

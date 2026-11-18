@@ -305,6 +305,7 @@ body {
   gap: var(--space-sm);
 }
 .board-column {
+  border-top: var(--rule-hair) solid var(--rule-subtle);
   min-height: var(--column-min-height);
   padding: var(--space-xs);
   background: var(--surface-column);

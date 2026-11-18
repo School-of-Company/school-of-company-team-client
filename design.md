@@ -15,7 +15,7 @@ The locked system for the team workbench. Pages share these tokens and controls.
 
 `src/app/styles/tokens.css` is the source of truth, imported by `globals.css` before `base.css`.
 
-- Paper: `--color-paper`, `--color-paper-2`, `--color-paper-3`.
+- Paper: `--color-paper`, `--color-paper-2`, `--color-paper-3`. Light: plain white app background and surfaces (#ffffff), `--color-paper-3` #f4f5f7 for hover and quiet fills; separation comes from 1px rules, not tinted grounds.
 - Ink: `--color-ink`, `--color-ink-2`, `--color-muted`.
 - Rules: `--rule-subtle` for region/card separation, `--rule-strong` for input edges, both 1px via `--rule-hair`. Input boundaries contrast 3.36:1 light and 3.50:1 dark.
 - Accent: `--color-accent`, `--color-accent-wash`, `--color-accent-ink`, `--color-focus`. Logo pink `--color-brand-logo` (#ff4060, sampled) is decoration only (3.41:1 on white). Light accent #d92a4a (white text 4.79:1), hover/deep #b81c3c. Dark accent #ff5c78 with dark ink #111318 on it (6.24:1).
@@ -43,7 +43,7 @@ The locked system for the team workbench. Pages share these tokens and controls.
 - Main container capped at 1440px and centred; project tabs scroll horizontally.
 - Keep routes, API, permissions and task actions. Project settings visibility uses projectAccess.manages.
 - Linear is the sole hierarchy reference: dim sidebar, one page header, consistent tabs, one toolbar, quiet neutral surfaces. No product marks or proprietary icons are copied; the shared SVG set is original path geometry.
-- Surface levels: `--surface-sidebar` (dim navigation), `--surface-canvas` (app background), `--surface-panel` (content/card), `--surface-column` (board lane), `--surface-hover` and `--surface-selected` (interaction). Light and dark define the same roles. Pink only identifies primary actions, current selection and focus.
+- Surface levels: `--surface-sidebar` (navigation), `--surface-canvas` (app background), `--surface-panel` (content/card), `--surface-column` (board lane), `--surface-hover` and `--surface-selected` (interaction). Light uses pure white for all four surfaces, separated by 1px rules with no card shadow; quiet hover uses #f4f5f7. Dark keeps the dim sidebar and existing surfaces. Pink only identifies primary actions, current selection and focus.
 - Desktop page header owns title and actions; the global top bar is mobile navigation only. Mobile shows menu, brand, destination and theme toggle; logout remains in its drawer. Settings, account and admin share the same 768px measure and outer page inset without nested padding.
 - Board header: project breadcrumb, title, counts, one primary create action and ghost import; ProjectNav preserves board/settings permissions. Toolbar holds filter summary, group and sort. Columns follow status order with name, count and named top add action. Cards show mono key, title, avatars and priority shape; deadline/blocking appear only when present. Details retain the right panel and full-page route.
 - Priority: 20px neutral SVG with distinct filled-outline bar counts for P1/P2/P3 and alert triangle for P0; `aria-label` and `title` retain the exact P value.
