@@ -2003,3 +2003,405 @@ select.ui-input {
 .task-props dl > div.service-prop-owners {
   align-items: start;
 }
+
+/* Incidents */
+/* 사고·사후 검토·지식 문서(ADR·RFC·Runbook). 값은 토큰만 쓴다. 상태·심각도는 모양과 이름으로 읽힌다(색만으로 구분하지 않는다). */
+[data-severity="SEV1"] {
+  --severity: var(--hue-red);
+}
+[data-severity="SEV2"] {
+  --severity: var(--hue-orange);
+}
+[data-severity="SEV3"] {
+  --severity: var(--hue-blue);
+}
+/* 심각도: 우선순위 라벨과 같은 계열. 높을수록 표시가 굵다(SEV1 꽉 찬 사각, SEV2 반, SEV3 테두리). */
+.incident-severity {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.incident-severity::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--severity);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    to top,
+    var(--severity) var(--severity-fill, 0%),
+    transparent 0
+  );
+}
+.incident-severity[data-severity="SEV1"] {
+  --severity-fill: 100%;
+}
+.incident-severity[data-severity="SEV2"] {
+  --severity-fill: 50%;
+}
+/* 사고 상태: 업무 상태 아이콘과 같은 원. 대응 중 빈 원(빨강), 완화 반(주황), 해결 꽉 참(초록). */
+.incident-status {
+  --status: var(--danger);
+  --fill: 0%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.incident-status::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  padding: 2px;
+  border: 1.5px solid var(--status);
+  border-radius: 50%;
+  background: conic-gradient(var(--status) var(--fill), transparent 0)
+    content-box;
+}
+.incident-status[data-status="MITIGATED"] {
+  --status: var(--hue-amber);
+  --fill: 50%;
+}
+.incident-status[data-status="RESOLVED"] {
+  --status: var(--hue-green);
+  --fill: 100%;
+}
+.incident-status[data-status="RESOLVED"]::before {
+  padding: 0;
+}
+.incident-dialog {
+  width: min(36rem, calc(100% - 2rem));
+}
+.incident-form-row {
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 36rem) {
+  .incident-form-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* 심각도·문서 종류 고르기: 이름과 뜻을 함께 보이는 선택 칸. */
+.incident-severity-options,
+.knowledge-kind-options {
+  display: grid;
+  gap: var(--space-2);
+}
+@media (min-width: 36rem) {
+  .incident-severity-options,
+  .knowledge-kind-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.incident-severity-option {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-height: var(--control-md);
+  padding: var(--space-3);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+.incident-severity-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.incident-severity-option:hover {
+  background: var(--surface-hover);
+}
+.incident-severity-option:has(input:checked) {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+  background: var(--brand-soft);
+}
+.incident-severity-option:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.incident-checklist {
+  display: grid;
+  max-height: 12rem;
+  gap: var(--space-2);
+  overflow-y: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+}
+.incident-filter-select {
+  width: auto;
+  min-width: 8rem;
+  max-width: 14rem;
+}
+/* 목록: 서비스 목록과 같은 줄 표. 좁으면 두 줄로 접는다. */
+.incident-table {
+  border-top: 1px solid var(--border);
+}
+.incident-table ul {
+  border-bottom: 1px solid var(--border);
+}
+.incident-table li + li {
+  border-top: 1px solid var(--border);
+}
+.incident-table-head,
+.incident-table-row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 2.4fr) 4.5rem 5.5rem minmax(0, 1fr) 9.5rem
+    6.5rem;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-2);
+}
+.knowledge-table .incident-table-head,
+.knowledge-table .incident-table-row {
+  grid-template-columns: minmax(0, 2.4fr) 5rem 4.5rem minmax(0, 1fr) 7rem;
+}
+.incident-table-head {
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.incident-table-row {
+  border-radius: var(--radius-md);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.incident-table-row:hover {
+  background: var(--surface-hover);
+}
+.incident-table-label {
+  display: none;
+}
+@media (max-width: 47.999rem) {
+  .incident-table-head {
+    display: none;
+  }
+  .incident-table-row,
+  .knowledge-table .incident-table-row {
+    grid-template-columns: auto auto minmax(0, 1fr);
+    gap: var(--space-2) var(--space-3);
+  }
+  /* 1줄 제목, 2줄 심각도·상태·커맨더(작성자), 3줄 시각. */
+  .incident-table-row > :first-child {
+    grid-column: 1 / -1;
+  }
+  .incident-table-row > :nth-child(5) {
+    grid-column: 1 / 3;
+  }
+  .incident-table-label {
+    display: inline;
+    color: var(--muted);
+  }
+}
+/* 타임라인: 배포 타임라인과 같은 세로선. 서버 기록은 작은 속 빈 점, 사람이 쓴 메모는 채운 점. */
+.incident-timeline {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.incident-entry {
+  --entry: var(--border-strong);
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+}
+.incident-entry::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  bottom: 0;
+  left: 9px;
+  width: 1px;
+  background: var(--border);
+}
+.incident-entry:last-child::before {
+  display: none;
+}
+.incident-entry-marker {
+  width: 12px;
+  height: 12px;
+  margin: var(--space-1);
+  border: 2px solid var(--entry);
+  border-radius: 50%;
+  background: var(--background);
+}
+.incident-entry[data-kind="NOTE"] {
+  --entry: var(--foreground-2);
+}
+.incident-entry[data-kind="NOTE"] .incident-entry-marker {
+  background: var(--entry);
+}
+.incident-entry[data-kind="CREATED"] .incident-entry-marker {
+  border-radius: var(--radius-sm);
+}
+.incident-entry-kind {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.incident-note-form {
+  display: grid;
+  gap: var(--space-2);
+}
+.incident-note-time {
+  width: auto;
+}
+/* 속성 열의 칸(Discord·Runbook·관련 문서·관계). 속성 목록 아래 구분선으로 나눈다. */
+.incident-prop-section,
+.task-props > section {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+.task-props dl > div.incident-prop-list {
+  align-items: start;
+}
+.doc-links {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.doc-links > li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-1);
+}
+.doc-link-main {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  padding: var(--space-1) var(--space-2);
+  margin-inline: calc(var(--space-2) * -1);
+  border-radius: var(--radius-md);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.doc-link-main:hover {
+  background: var(--surface-hover);
+}
+.task-main .doc-link-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  margin-inline: 0;
+  padding: var(--space-2);
+}
+/* 사후 검토: 네 섹션은 제목 + 마크다운. 미리보기는 입력 칸과 같은 테두리. */
+.postmortem-sections {
+  display: grid;
+  gap: var(--space-6);
+}
+.postmortem-sections h3 {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+.postmortem-preview {
+  min-height: 7rem;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.action-items {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border-block: 1px solid var(--border);
+  list-style: none;
+}
+.action-items > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) 0;
+}
+.action-items > li + li {
+  border-top: 1px solid var(--border);
+}
+.action-item-task {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+}
+.action-item-task:hover {
+  background: var(--surface-hover);
+}
+/* 문서 종류는 테두리 글자, 상태는 업무 상태처럼 원: 초안 점선, 게시 채움, 폐기 취소선. */
+.knowledge-kind {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding-inline: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.knowledge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.knowledge-status::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 1.5px dashed var(--muted);
+  border-radius: 50%;
+}
+.knowledge-status[data-status="PUBLISHED"]::before {
+  border: 0;
+  background: var(--hue-green);
+}
+.knowledge-status[data-status="DEPRECATED"] {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.knowledge-status[data-status="DEPRECATED"]::before {
+  border-style: solid;
+  border-color: var(--faint);
+}
+.knowledge-body-input {
+  min-height: 24rem;
+  font-family: var(--font-code);
+  font-size: var(--text-sm);
+}
+.incident-detail .task-main > section h2,
+.knowledge-detail .task-main > section h2 {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
