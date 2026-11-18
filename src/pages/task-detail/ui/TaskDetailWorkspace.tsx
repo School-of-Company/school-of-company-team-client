@@ -39,6 +39,23 @@ export function TaskDetailWorkspace({
     ...projectQueries.detail(task.data?.projectId ?? ""),
     enabled: !denied && !!task.data?.projectId,
   });
+  const buckets = useQuery({
+    ...projectQueries.buckets(task.data?.projectId ?? ""),
+    enabled: !denied && task.data?.scope === "PROJECT" && !!task.data.projectId,
+  });
+  const changeBucket = useMutation({
+    mutationFn: (planningBucketId: string) =>
+      taskApi.update(taskId, { planningBucketId }),
+    onSuccess: async () => {
+      setMessage("계획 버킷을 변경했습니다.");
+      await client.invalidateQueries({ queryKey: taskKeys.all });
+    },
+    onError: (cause) => {
+      const problem = normalizeApiError(cause);
+      setMessage(problem.message);
+      if (problem.status === 403 || problem.status === 404) setDenied(cause);
+    },
+  });
   const assignees = useQuery({
     ...activeUsersQueryOptions(),
     enabled: task.data?.scope === "TEAM" && !denied,
@@ -208,6 +225,11 @@ export function TaskDetailWorkspace({
           onStatus={(status) => {
             if (!changeStatus.isPending) changeStatus.mutate(status);
           }}
+          buckets={buckets.data}
+          bucketPending={changeBucket.isPending}
+          onBucket={(bucketId) => {
+            if (!changeBucket.isPending) changeBucket.mutate(bucketId);
+          }}
         />
       </div>
       <Dialog
@@ -222,6 +244,7 @@ export function TaskDetailWorkspace({
             scope={data.scope}
             initial={data}
             project={project.data}
+            buckets={buckets.data ?? []}
             candidates={candidates}
             onCancel={() => setEditing(false)}
             onUpdate={async (body) => {

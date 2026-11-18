@@ -18,6 +18,7 @@ export function TaskFilters({
   projects,
   people,
   parts,
+  buckets = [],
   personal,
   repositories = [],
 }: {
@@ -26,6 +27,11 @@ export function TaskFilters({
   readonly projects: readonly Project[];
   readonly people: readonly { readonly id: string; readonly name: string }[];
   readonly parts: readonly { readonly id: string; readonly name: string }[];
+  readonly buckets?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly archived: boolean;
+  }[];
   readonly personal: boolean;
   readonly repositories?: readonly {
     readonly id: string;
@@ -85,6 +91,28 @@ export function TaskFilters({
       key: "part",
       label: "파트",
       choices: parts.map((part) => ({ value: part.id, label: part.name })),
+    },
+    {
+      key: "bucket",
+      label: "버킷",
+      choices: buckets.length
+        ? [
+            ...buckets.map((bucket) => ({
+              value: bucket.id,
+              label: bucket.archived ? `${bucket.name} (보관)` : bucket.name,
+            })),
+            { value: "none", label: "버킷 없음" },
+          ]
+        : [],
+    },
+    {
+      key: "reviewer",
+      label: "리뷰어",
+      choices: [
+        { value: "me", label: "나" },
+        { value: "none", label: "없음" },
+        ...people.map((person) => ({ value: person.id, label: person.name })),
+      ],
     },
     {
       key: "status",

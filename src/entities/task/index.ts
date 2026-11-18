@@ -7,6 +7,8 @@ export {
   sortTaskCards,
   boardTotal,
   taskMoveAt,
+  laneDrop,
+  laneTotal,
 } from "./model/board";
 export type { BoardFilterKey, BoardSort } from "./model/board";
 export { taskStatuses, statusLabels, priorityLabels } from "./model/types";
@@ -17,6 +19,8 @@ export type {
   TaskPriority,
   TaskCard,
   TaskDetail,
+  TaskPerson,
+  TaskBucket,
   Board,
   CreateTask,
   UpdateTask,
