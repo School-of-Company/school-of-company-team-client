@@ -9,6 +9,7 @@ import {
   RepositorySettings,
 } from "@/features/project-integrations";
 import { getSettingsPermissions } from "@/features/project-settings";
+import { NotificationSettingsForm } from "@/features/notification-settings";
 import { Button } from "@/shared/ui";
 import type { SettingsProps } from "../model/props";
 import { GeneralSettings } from "./GeneralSettings";
@@ -24,7 +25,8 @@ export function SettingsPanels(props: SettingsProps) {
   const tab =
     selected === "members" ||
     selected === "integrations" ||
-    selected === "buckets"
+    selected === "buckets" ||
+    selected === "notifications"
       ? selected
       : "general";
   const [confirmArchive, setConfirmArchive] = useState(false);
@@ -41,6 +43,7 @@ export function SettingsPanels(props: SettingsProps) {
             ["members", "멤버·권한"],
             ["integrations", "연동"],
             ["buckets", "계획 버킷"],
+            ["notifications", "알림"],
           ] as const
         ).map(([value, label]) => {
           const params = new URLSearchParams(search?.toString());
@@ -134,6 +137,20 @@ export function SettingsPanels(props: SettingsProps) {
             </p>
           )}
         </div>
+      )}
+      {tab === "notifications" && (
+        <section className="grid gap-5" aria-labelledby="notify-heading">
+          <h2 id="notify-heading" className="text-xl font-semibold">
+            Discord 알림
+          </h2>
+          <NotificationSettingsForm
+            projectId={props.project.id}
+            editable={permissions.manage}
+            channelHref={
+              manager ? `${pathname}?tab=integrations` : undefined
+            }
+          />
+        </section>
       )}
       {tab === "general" && permissions.archive && (
         <section

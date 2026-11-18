@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { TaskDetail } from "@/entities/task";
-import { taskKeys } from "@/entities/task";
+import { suggestsDone, taskKeys } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import {
   Badge,
@@ -16,16 +16,22 @@ import {
   Skeleton,
 } from "@/shared/ui";
 import { taskGithubApi, taskGithubQueries } from "../api/github";
-import { publicationLabels } from "../model/types";
+import { linkStateLabels, publicationLabels } from "../model/types";
+import { PullRequestSignals } from "./PullRequestSignals";
 
 export function TaskGithubPanel({
   task,
   editable,
   onAccessLost,
+  onComplete,
+  completing = false,
 }: {
   readonly task: TaskDetail;
   readonly editable: boolean;
   readonly onAccessLost: (error: unknown) => void;
+  /** merge 제안에서 사람이 누르는 완료 이동. 없으면 버튼 대신 안내만 보인다. */
+  readonly onComplete?: () => void;
+  readonly completing?: boolean;
 }) {
   const client = useQueryClient();
   const github = useQuery(taskGithubQueries.detail(task.id));
@@ -90,6 +96,10 @@ export function TaskGithubPanel({
   const publication = github.data.publication;
   const targetLocked = publication && publication.state !== "WAITING";
   const linkedPrimary = github.data.links.some((item) => item.primary);
+  const mergedPr = github.data.links.some(
+    (item) =>
+      item.kind === "PULL_REQUEST" && item.accessible && item.state === "MERGED",
+  );
   return (
     <section className="grid gap-4 border-t border-border pt-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -184,6 +194,27 @@ export function TaskGithubPanel({
           팀 공용·개인 업무는 자동 발행하지 않습니다.
         </p>
       )}
+      {suggestsDone(mergedPr, task.status) && (
+        <div className="signal-suggest" role="status">
+          <p className="min-w-0 text-sm">
+            연결된 PR이 merge됐습니다. 업무 상태는 자동으로 바뀌지 않습니다.
+          </p>
+          {editable && onComplete ? (
+            <Button
+              variant="secondary"
+              className="ui-button-sm shrink-0"
+              loading={completing}
+              onClick={onComplete}
+            >
+              완료로 옮기기
+            </Button>
+          ) : (
+            <p className="text-xs text-muted">
+              수정 권한이 있는 참여자가 완료로 옮길 수 있습니다.
+            </p>
+          )}
+        </div>
+      )}
       <div className="grid gap-2">
         <h3 className="text-sm font-medium">연결된 Issue · PR</h3>
         {github.data.links.length === 0 ? (
@@ -191,10 +222,8 @@ export function TaskGithubPanel({
         ) : (
           <ul className="divide-y divide-border rounded-md border border-border">
             {github.data.links.map((item) => (
-              <li
-                key={item.id}
-                className="flex min-w-0 items-center justify-between gap-2 px-3 py-2"
-              >
+              <li key={item.id} className="github-link-row">
+                <div className="flex min-w-0 items-center justify-between gap-2">
                 {item.accessible && item.url ? (
                   <a
                     className="min-w-0 truncate text-sm hover:underline"
@@ -217,7 +246,7 @@ export function TaskGithubPanel({
                     )}
                     {item.state && (
                       <span className="ml-2 text-xs text-muted">
-                        {item.state}
+                        {linkStateLabels[item.state]}
                       </span>
                     )}
                   </a>
@@ -231,12 +260,20 @@ export function TaskGithubPanel({
                     variant="ghost"
                     className="shrink-0"
                     disabled={pending}
+                    aria-label={`${item.kind === "ISSUE" ? "Issue" : "PR"} #${item.number ?? ""} 연결 해제`}
                     onClick={() =>
                       void run(() => taskGithubApi.unlink(task.id, item.id))
                     }
                   >
                     해제
                   </Button>
+                )}
+                </div>
+                {item.kind === "PULL_REQUEST" && item.accessible && (
+                  <PullRequestSignals
+                    signal={item.pullRequest}
+                    merged={item.state === "MERGED"}
+                  />
                 )}
               </li>
             ))}

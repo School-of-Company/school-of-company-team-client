@@ -89,5 +89,26 @@
   "prompt": "Korean internal team task workbench, utilitarian modern-minimal",
   "finishReview": "in-thread, no open scope findings; real API and consumer integration remain coordinator-owned",
   "date": "2026-11-18"
+ },
+ {
+  "mode": "audit",
+  "depth": "component",
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "cobalt",
+  "axes": "light/grotesk-sans/cool",
+  "signature": "dev signals (PR CI·review chips, merge suggestion, review requests, notification switches)",
+  "sections": [
+   "task detail GitHub panel",
+   "board card signals",
+   "my board review requests",
+   "project settings notifications tab",
+   "admin team notifications"
+  ],
+  "entry": "src/app/styles/globals.css (/* Dev signals */ block)",
+  "waived": [],
+  "sweep": "sloplint static: 0 FAIL, 0 WARN, 3 DISMISSED — identical to origin/main baseline; render tier not used (no signed-in session); authenticated screens verified with real-API Playwright captures in .omo/evidence/T2-F",
+  "prompt": "Stage 2 F2 dev signals in the existing design system (design.md), no new tokens",
+  "date": "2026-11-19"
  }
 ]

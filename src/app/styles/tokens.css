@@ -100,6 +100,10 @@
   --control-sm: 28px;
   --control-md: 32px;
   --control-touch: 44px;
+  --icon-sm: 12px; /* 칩 안 아이콘 */
+  --chip-height: 20px; /* 신호·상태 칩 */
+  --switch-width: 36px;
+  --switch-height: 20px;
   --sidebar-width: 232px;
   --page-inset: 28px;
   --content-narrow: 44rem;
