@@ -137,5 +137,27 @@
   "sweep": "sloplint static: 0 FAIL, 0 WARN, 3 DISMISSED — identical to origin/main baseline; render tier not used (no signed-in session); authenticated screens verified with real-API Playwright captures in .omo/evidence/T2-F",
   "prompt": "Stage 2 F2 dev signals in the existing design system (design.md), no new tokens",
   "date": "2026-11-19"
+ },
+ {
+  "mode": "audit",
+  "depth": "component",
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "cobalt",
+  "axes": "light/grotesk-sans/cool",
+  "signature": "automation rules (settings tab: rule list with switches, condition chips editor, run history) and ⌘K search palette",
+  "sections": [
+   "project settings automation tab",
+   "rule editor dialog",
+   "rule run history",
+   "sidebar search button",
+   "search palette",
+   "search results page"
+  ],
+  "entry": "src/app/styles/globals.css (/* Automation·Search */ block)",
+  "waived": [],
+  "sweep": "sloplint static: 0 FAIL, 0 WARN, 3 DISMISSED — identical to origin/main baseline; authenticated screens verified with real-API Playwright captures in .omo/evidence/T8-F",
+  "prompt": "Stage 8 F8 automation rules and unified search in the existing design system (design.md), no new tokens",
+  "date": "2026-11-19"
  }
 ]
