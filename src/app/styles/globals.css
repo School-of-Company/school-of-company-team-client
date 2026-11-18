@@ -275,6 +275,21 @@ body {
   font-size: var(--text-sm);
   border-radius: var(--radius-input);
 }
+.ui-link-button {
+  justify-self: center;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-input);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-underline-offset: 3px;
+}
+.ui-link-button:hover:not(:disabled) {
+  color: var(--foreground);
+  text-decoration: underline;
+}
+.ui-link-button:active:not(:disabled) {
+  opacity: 0.7;
+}
 .ui-button-ghost:hover:not(:disabled) {
   background: var(--surface-hover);
   filter: none;
