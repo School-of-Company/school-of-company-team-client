@@ -1617,20 +1617,6 @@ select.ui-input {
   border-left: 2px solid var(--hue-violet);
   border-radius: var(--radius-xl);
 }
-/* My board: review requests above the toolbar. */
-.review-requests-header {
-  display: flex;
-  min-height: var(--control-md);
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0 var(--space-3);
-  border-bottom: 1px solid var(--border);
-}
-.review-requests-note {
-  padding: var(--space-3);
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
 .review-request-row {
   display: grid;
   min-width: 0;
