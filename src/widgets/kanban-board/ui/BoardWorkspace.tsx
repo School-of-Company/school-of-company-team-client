@@ -22,9 +22,12 @@ import {
   type ProjectDetail,
 } from "@/entities/project";
 import { activeUsersQueryOptions } from "@/entities/user";
+import { sprintQueries } from "@/entities/sprint";
+import { milestoneQueries } from "@/entities/milestone";
 import { taskGithubQueries } from "@/features/link-github-issue";
 import { TaskError } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
+import { routes } from "@/shared/config";
 import { Spinner } from "@/shared/ui";
 import { KanbanBoard } from "./KanbanBoard";
 import { BoardViewControls } from "./BoardViewControls";
@@ -57,6 +60,16 @@ export type BoardFilterProps = {
     readonly id: string;
     readonly fullName: string;
   }[];
+  /** 프로젝트 보드에서만: Sprint·Milestone 필터 선택지(단계 4). */
+  readonly sprints?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly status: "PLANNED" | "ACTIVE" | "CLOSED";
+  }[];
+  readonly milestones?: readonly {
+    readonly id: string;
+    readonly name: string;
+  }[];
 };
 
 export function BoardWorkspace({
@@ -87,7 +100,15 @@ export function BoardWorkspace({
     readonly bucketId?: string;
   } | null>(null);
   const selectionTrigger = useRef<HTMLElement | null>(null);
-  const selectedTask = params.get("task");
+  // 업무 패널(`?task=`)은 이 보드의 경로에서만 연다. Next.js 가 숨겨 둔 다른 보드가 같은 쿼리를 읽어
+  // 보이지 않는 패널을 열지 않게 한다(V-route-focus H1과 같은 유형).
+  const boardPath =
+    scope === "PERSONAL"
+      ? routes.me
+      : scope === "TEAM"
+        ? routes.team
+        : routes.project(projectId ?? "");
+  const selectedTask = pathname === boardPath ? params.get("task") : null;
   useEffect(() => {
     if (selectedTask || !selectionTrigger.current) return;
     const previous = selectionTrigger.current;
@@ -118,6 +139,14 @@ export function BoardWorkspace({
     ...taskGithubQueries.repositories(projectId ?? ""),
     enabled: !!projectId,
   });
+  const sprints = useQuery({
+    ...sprintQueries.list(projectId ?? ""),
+    enabled: !!projectId,
+  });
+  const milestones = useQuery({
+    ...milestoneQueries.list(projectId ?? ""),
+    enabled: !!projectId,
+  });
   const assignees = useQuery({
     ...activeUsersQueryOptions(),
     enabled: scope === "TEAM",
@@ -130,6 +159,11 @@ export function BoardWorkspace({
   // 버킷 그룹은 프로젝트 보드 전용(계약 S-a). 공유 링크로 들어와도 400 대신 그룹 없이 보인다.
   if (scope !== "PROJECT" && boardParams.get("groupBy") === "bucket")
     boardParams.delete("groupBy");
+  // `sprint=current`는 프로젝트가 하나일 때만 서버가 받는다(계약 3.7). 다른 보드는 Sprint 축이 없다.
+  if (scope !== "PROJECT") {
+    boardParams.delete("sprint");
+    boardParams.delete("milestone");
+  }
   const board = useQuery({
     ...taskQueries.board(boardParams.toString(), scope === "PERSONAL"),
     enabled: !projectId || !!project.data,
@@ -252,6 +286,8 @@ export function BoardWorkspace({
           ],
           personal: scope === "PERSONAL",
           repositories: repositories.data ?? [],
+          sprints: sprints.data ?? [],
+          milestones: milestones.data ?? [],
         })}
         <BoardViewControls
           search={search}
@@ -339,6 +375,7 @@ export function BoardWorkspace({
           initialStatus={creating.status}
           initialBucketId={creating.bucketId}
           buckets={buckets.data ?? []}
+          milestones={milestones.data ?? []}
           project={project.data}
           people={people}
           onClose={() => setCreating(null)}

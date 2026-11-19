@@ -23,6 +23,7 @@ export {
   avatarSrc,
   discordRequired,
   isHeadAdmin,
+  avatarSrc,
   userAvatarUrl,
   userDestination,
 } from "./model/types";
