@@ -20,7 +20,6 @@ export {
   useAccountRestriction,
 } from "./model/session";
 export {
-  avatarSrc,
   discordRequired,
   isHeadAdmin,
   avatarSrc,
