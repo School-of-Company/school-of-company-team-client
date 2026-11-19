@@ -63,11 +63,11 @@ function KnowledgeListContent() {
   };
   return (
     <div className="grid gap-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="page-header">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold">문서</h1>
+          <h1>문서</h1>
           {documents.data && (
-            <p className="mt-1 text-xs text-muted tabular-nums">
+            <p className="page-subtitle tabular-nums">
               {kind ? kindLabels[kind] : "전체"} {documents.data.length}개
             </p>
           )}
@@ -135,11 +135,6 @@ function KnowledgeListContent() {
           <EmptyState
             title="아직 문서가 없습니다"
             description="결정은 ADR, 제안은 RFC, 장애·운영 대응 절차는 Runbook으로 남기세요."
-            action={
-              <Button variant="secondary" onClick={() => setCreating(true)}>
-                문서 만들기
-              </Button>
-            }
           />
         ) : (
           <EmptyState title="조건에 맞는 문서가 없습니다" />

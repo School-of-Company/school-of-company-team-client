@@ -5,7 +5,7 @@ export function BoardSkeleton() {
     <div
       role="status"
       aria-label="보드를 불러오는 중"
-      className="grid gap-3 md:grid-cols-3 xl:grid-cols-5"
+      className="board-columns"
     >
       {Array.from({ length: 5 }, (_, column) => (
         <div

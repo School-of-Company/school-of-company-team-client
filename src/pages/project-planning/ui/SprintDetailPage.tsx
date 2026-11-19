@@ -38,7 +38,7 @@ export function SprintDetailPage({
   return (
     <ProjectFrame
       projectId={projectId}
-      trail={[{ label: "Sprint", href: routes.projectSprints(projectId) }]}
+      trail={[{ label: "스프린트", href: routes.projectSprints(projectId) }]}
     >
       {(context) => <SprintDetail {...context} sprintId={sprintId} />}
     </ProjectFrame>
@@ -50,7 +50,11 @@ function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
   const sprint = useQuery(sprintQueries.detail(project.id, sprintId));
   if (sprint.isPending)
     return (
-      <div role="status" aria-label="Sprint 불러오는 중" className="grid gap-3">
+      <div
+        role="status"
+        aria-label="스프린트 불러오는 중"
+        className="grid gap-3"
+      >
         <Skeleton className="h-8 w-56" />
         <Skeleton className="h-4 w-72 max-w-full" />
         <Skeleton className="h-40" />
@@ -63,8 +67,8 @@ function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
         <ErrorState
           title={
             problem.status === 404
-              ? "Sprint를 찾을 수 없습니다"
-              : "Sprint를 불러오지 못했습니다"
+              ? "스프린트를 찾을 수 없습니다"
+              : "스프린트를 불러오지 못했습니다"
           }
           description={sprintErrorMessage(problem)}
           onRetry={
@@ -75,7 +79,7 @@ function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
           href={routes.projectSprints(project.id)}
           className="text-sm underline"
         >
-          Sprint 목록으로
+          스프린트 목록으로
         </Link>
       </div>
     );
@@ -142,7 +146,7 @@ function SprintScreen({
                       onSuccess: () => {
                         setMessage({
                           tone: "ok",
-                          text: "Sprint를 시작했습니다.",
+                          text: "스프린트를 시작했습니다.",
                         });
                         goTab("progress");
                       },
@@ -189,7 +193,7 @@ function SprintScreen({
         )}
         {manages && otherActive && sprint.status === "PLANNED" && (
           <p id="start-blocked" className="text-sm text-muted">
-            진행 중인 Sprint(
+            진행 중인 스프린트(
             <Link
               href={routes.projectSprint(project.id, otherActive.id)}
               className="underline"
@@ -201,7 +205,7 @@ function SprintScreen({
         )}
         {!manages && sprint.status !== "CLOSED" && !project.archived && (
           <p className="text-sm text-muted">
-            Sprint 범위와 시작·종료는 PM 또는 헤드 어드민이 정합니다.
+            스프린트 범위와 시작·종료는 PM 또는 헤드 어드민이 정합니다.
           </p>
         )}
       </section>
@@ -213,7 +217,7 @@ function SprintScreen({
           {message.text}
         </p>
       )}
-      <nav aria-label="Sprint 화면" className="settings-nav">
+      <nav aria-label="스프린트 화면" className="settings-nav">
         {sprintTabs(sprint.status).map((value) => {
           const params = new URLSearchParams(search?.toString());
           params.set("tab", value);
@@ -259,7 +263,7 @@ function SprintScreen({
         onClose={() => setEditing(false)}
         onSubmit={async (input) => {
           await update.mutateAsync(input);
-          setMessage({ tone: "ok", text: "Sprint를 수정했습니다." });
+          setMessage({ tone: "ok", text: "스프린트를 수정했습니다." });
         }}
       />
       {closing && (
@@ -277,7 +281,7 @@ function SprintScreen({
                 setClosing(false);
                 setMessage({
                   tone: "ok",
-                  text: `Sprint를 종료했습니다. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했습니다.`,
+                  text: `스프린트를 종료했습니다. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했습니다.`,
                 });
                 goTab("review");
               },
@@ -291,11 +295,11 @@ function SprintScreen({
         onClose={() => {
           if (!remove.isPending) setDeleting(false);
         }}
-        title="Sprint를 삭제할까요?"
+        title="스프린트를 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          {sprint.name}을(를) 삭제하면 넣어 둔 업무는 Sprint에서만 빠지고 그대로
-          남습니다.
+          {sprint.name}을(를) 삭제하면 넣어 둔 업무는 스프린트에서만 빠지고
+          그대로 남습니다.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

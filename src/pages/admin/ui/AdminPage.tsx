@@ -36,11 +36,9 @@ function AdminContent({ user }: { readonly user: User }) {
   const refresh = () => client.invalidateQueries({ queryKey: projectKeys.all });
   return (
     <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className="page-header">
         <div className="grid gap-2">
-          <h1 className="text-2xl font-semibold">
-            {creating ? "새 프로젝트" : "관리자 설정"}
-          </h1>
+          <h1>{creating ? "새 프로젝트" : "관리자 설정"}</h1>
           <p className="text-sm text-muted">
             {creating
               ? "기본 정보를 만든 뒤 팀원과 저장소를 연결합니다."

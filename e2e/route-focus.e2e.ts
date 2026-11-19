@@ -13,7 +13,7 @@ test("사이드바 링크로 이동하면 본문으로 포커스가 가고 새 �
   await signIn(page, seed.member.tokens);
   await page.goto("/me");
   await expect(
-    page.getByRole("heading", { level: 1, name: "내 보드" }),
+    page.getByRole("heading", { level: 1, name: "내 업무" }),
   ).toBeVisible();
   const link = page.getByRole("link", { name: "팀 공용", exact: true }).first();
   await link.focus();
@@ -112,7 +112,7 @@ test("사이드바 서비스 링크로 이동하면 본문으로 포커스가 �
   await signIn(page, seed.member.tokens);
   await page.goto("/me");
   await expect(
-    page.getByRole("heading", { level: 1, name: "내 보드" }),
+    page.getByRole("heading", { level: 1, name: "내 업무" }),
   ).toBeVisible();
   // 알림 영역에 들어간 비어 있지 않은 문구를 모두 모은다.
   await page.evaluate((selector) => {

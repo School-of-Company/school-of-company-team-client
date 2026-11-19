@@ -12,7 +12,11 @@ export type KnowledgeKind = "ADR" | "RFC" | "RUNBOOK";
 export type KnowledgeStatus = "DRAFT" | "PUBLISHED" | "DEPRECATED";
 export type KnowledgeRelation = "REFERENCES" | "SUPERSEDES";
 
-export const knowledgeKinds: readonly KnowledgeKind[] = ["ADR", "RFC", "RUNBOOK"];
+export const knowledgeKinds: readonly KnowledgeKind[] = [
+  "ADR",
+  "RFC",
+  "RUNBOOK",
+];
 export const knowledgeStatuses: readonly KnowledgeStatus[] = [
   "DRAFT",
   "PUBLISHED",

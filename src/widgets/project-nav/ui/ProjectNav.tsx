@@ -21,12 +21,12 @@ export function ProjectNav({ project, user }: ProjectNavProps) {
     { href: board, label: "보드", active: pathname === board },
     {
       href: routes.projectSprints(project.id),
-      label: "Sprint",
+      label: "스프린트",
       active: within(routes.projectSprints(project.id)),
     },
     {
       href: routes.projectMilestones(project.id),
-      label: "Milestone",
+      label: "마일스톤",
       active: within(routes.projectMilestones(project.id)),
     },
     ...(projectAccess(project, user).manages

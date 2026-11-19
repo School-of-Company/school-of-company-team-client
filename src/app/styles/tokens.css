@@ -1,25 +1,28 @@
-/* Design tokens. Components read the semantic layer only; the scales exist to feed it.
+/* Design tokens, modelled on TDS (Toss Design System): Toss grey scale, t1–t7 type,
+   rounded surfaces, fills instead of borders. Components read the semantic layer only.
    Rules of use live in /design.md. */
 :root {
   color-scheme: light;
 
-  /* Neutral scale, 12 steps: 1-2 backgrounds, 3-5 fills, 6-8 borders, 9-10 quiet text/solid, 11-12 text. */
+  /* Neutral scale (TDS grey). 1 white, 2 grey50, 3 grey100, 5 grey200, 6 grey300,
+     8 grey400, 9 grey500 (icons, 3:1), 10 grey600 (muted text, 4.6:1), 11 grey700, 12 grey900. */
   --gray-1: #ffffff;
-  --gray-2: #f8f8f9;
-  --gray-3: #f1f2f4;
-  --gray-4: #e9eaed;
-  --gray-5: #e1e3e7;
-  --gray-6: #d6d8dd;
-  --gray-7: #c4c7ce;
-  --gray-8: #a4a8b1;
-  --gray-9: #7d828c;
-  --gray-10: #6a6f79; /* 4.9:1 on gray-1 */
-  --gray-11: #4a4f58;
-  --gray-12: #1b1d21;
+  --gray-2: #f9fafb;
+  --gray-3: #f2f4f6;
+  --gray-4: #eaedf0;
+  --gray-5: #e5e8eb;
+  --gray-6: #d1d6db;
+  --gray-7: #c1c8cf;
+  --gray-8: #b0b8c1;
+  --gray-9: #8b95a1;
+  --gray-10: #6b7684;
+  --gray-11: #4e5968;
+  --gray-12: #191f28;
+  --gray-800: #333d4b;
 
   /* Brand pink. Logo colours are decoration only; -9 is the accessible action colour. */
   --pink-3: #fff0f3;
-  --pink-4: #ffe1e7;
+  --pink-4: #ffe0e6;
   --pink-9: #d92a4a; /* white text 4.79:1 */
   --pink-10: #c22342;
   --pink-11: #b81c3c;
@@ -27,39 +30,46 @@
   --color-brand-logo-2: #ff6982;
   --color-brand-tile: #ffffff;
 
-  /* Status and priority hues share one lightness so no column shouts. */
-  --hue-blue: #3b7fd9;
-  --hue-amber: #d98a1c;
-  --hue-violet: #7c5cd6;
-  --hue-green: #2f9461;
-  --hue-red: #d6453d;
-  --hue-orange: #d9722b;
+  /* TDS hues (500) for status, priority and badges. */
+  --hue-blue: #3182f6;
+  --hue-amber: #f59f00;
+  --hue-violet: #8b5cf6;
+  --hue-green: #03b26c;
+  --hue-red: #f04452;
+  --hue-orange: #fb8800;
+  --hue-blue-soft: #e8f3ff;
+  --hue-green-soft: #e5f8ef;
+  --hue-red-soft: #ffeeee;
+  --hue-orange-soft: #fff3e0;
+  --hue-violet-soft: #f3efff;
 
-  /* Semantic colours */
+  /* Semantic colours. White page, grey50 boxes, grey100 fills (TDS). */
   --background: var(--gray-1);
   --surface: var(--gray-1);
   --surface-raised: var(--gray-1);
   --surface-sunken: var(--gray-2);
+  --surface-box: var(--gray-2);
+  --surface-fill: var(--gray-3);
   --surface-hover: var(--gray-3);
-  --surface-active: var(--gray-4);
-  --surface-sidebar: var(--gray-2);
+  --surface-active: var(--gray-5);
+  --surface-sidebar: var(--gray-1);
   --segment-active: var(--gray-1);
   --foreground: var(--gray-12);
   --foreground-2: var(--gray-11);
   --muted: var(--gray-10);
   /* faint 는 아이콘·장식 전용(3:1 이상). 읽어야 하는 글자는 muted 이상을 쓴다. */
   --faint: var(--gray-9);
-  --border: var(--gray-5);
-  --border-strong: var(--gray-7);
-  /* 입력 경계는 배경 대비 3:1 이상(라이트 3.4~3.9, 다크 4.1~4.9). */
+  --border: var(--gray-3);
+  --border-strong: var(--gray-5);
+  /* 입력 경계는 배경 대비 3:1 이상. */
   --border-input: var(--gray-9);
   --brand: var(--pink-9);
   --brand-hover: var(--pink-10);
   --brand-soft: var(--pink-3);
   --on-brand: #ffffff;
-  --danger: #c93a32;
+  --danger: #e42939;
   --success: var(--hue-green);
-  --overlay: rgb(20 22 26 / 0.45);
+  --overlay: rgb(0 23 51 / 0.35);
   --identity-glow: color-mix(
     in oklab,
     var(--color-brand-logo) 30%,
@@ -69,15 +79,16 @@
   /* Type: Pretendard for everything, mono for machine values. */
   --font-body: var(--font-pretendard), "Pretendard", system-ui, sans-serif;
   --font-code: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
-  --text-xs: 0.75rem; /* 12 meta */
-  --text-sm: 0.8125rem; /* 13 ui */
-  --text-md: 0.875rem; /* 14 body */
-  --text-lg: 1rem; /* 16 section */
-  --text-xl: 1.25rem; /* 20 page title */
-  --text-2xl: 1.5rem; /* 24 identity */
-  --leading-tight: 1.35;
-  --leading-body: 1.6;
-  --tracking: -0.011em;
+  --text-xs: 0.8125rem; /* 13 t7 meta */
+  --text-sm: 0.875rem; /* 14 ui */
+  --text-md: 0.9375rem; /* 15 t6 body */
+  --text-lg: 1.0625rem; /* 17 t5 section */
+  --text-xl: 1.375rem; /* 22 t3 page title */
+  --text-2xl: 1.625rem; /* 26 t2 identity */
+  --text-caption: 0.75rem; /* 12 */
+  --leading-tight: 1.4;
+  --leading-body: 1.55;
+  --tracking: -0.01em;
 
   /* Space: 4px grid. */
   --space-1: 4px;
@@ -90,30 +101,30 @@
   --space-10: 40px;
 
   /* Shape */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
   --radius-pill: 999px;
 
   /* Sizes */
-  --control-sm: 28px;
-  --control-md: 32px;
+  --control-sm: 32px;
+  --control-md: 38px;
+  --control-lg: 48px;
   --control-touch: 44px;
   --icon-sm: 12px; /* 칩 안 아이콘 */
-  --chip-height: 20px; /* 신호·상태 칩 */
+  --chip-height: 22px; /* 신호·상태 칩 */
   --switch-width: 36px;
   --switch-height: 20px;
-  --sidebar-width: 232px;
-  --page-inset: 28px;
+  --sidebar-width: 240px;
+  --page-inset: 32px;
   --content-narrow: 44rem;
 
   /* Elevation: borders separate, shadows only lift overlays. */
-  --shadow-card: 0 1px 2px rgb(20 22 26 / 0.04);
-  --shadow-card-hover: 0 2px 8px -2px rgb(20 22 26 / 0.12);
-  --shadow-overlay:
-    0 0 0 1px rgb(20 22 26 / 0.04), 0 4px 12px -2px rgb(20 22 26 / 0.1),
-    0 16px 40px -12px rgb(20 22 26 / 0.22);
+  --shadow-card: 0 1px 3px rgb(0 27 55 / 0.06);
+  --shadow-card-hover: 0 4px 16px rgb(0 27 55 / 0.1);
+  --shadow-overlay: 0 8px 32px rgb(0 27 55 / 0.16), 0 0 1px rgb(0 27 55 / 0.2);
 
   /* Motion: state changes only. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -123,12 +134,12 @@
 
   /* 테마 선택 미리보기: 현재 테마와 무관하게 각 테마의 모습을 고정해 보여 준다. */
   --preview-light-bg: #ffffff;
-  --preview-light-side: #f1f2f4;
-  --preview-light-line: #d6d8dd;
+  --preview-light-side: #f2f4f6;
+  --preview-light-line: #d1d6db;
   --preview-light-accent: #d92a4a;
-  --preview-dark-bg: #131416;
-  --preview-dark-side: #0f1012;
-  --preview-dark-line: #353840;
+  --preview-dark-bg: #17171c;
+  --preview-dark-side: #202027;
+  --preview-dark-line: #3c3c47;
   --preview-dark-accent: #ff5c78;
   --preview-mixed-side: rgb(125 130 140 / 0.25);
   --preview-mixed-line: rgb(125 130 140 / 0.45);
@@ -141,18 +152,19 @@
    the system preference applied by the pre-paint script in app/layout.tsx. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --gray-1: #131416;
-  --gray-2: #18191c;
-  --gray-3: #1f2124;
-  --gray-4: #26282c;
-  --gray-5: #2c2f34;
-  --gray-6: #353840;
-  --gray-7: #454953;
-  --gray-8: #5d626d;
-  --gray-9: #7b808b;
-  --gray-10: #9197a3; /* 6.4:1 on gray-1 */
-  --gray-11: #c3c7cf;
-  --gray-12: #eeeff2;
+  --gray-1: #17171c;
+  --gray-2: #202027;
+  --gray-3: #2c2c35;
+  --gray-4: #33333d;
+  --gray-5: #3c3c47;
+  --gray-6: #4d4d59;
+  --gray-7: #55555f;
+  --gray-8: #62626d;
+  --gray-9: #7e7e87;
+  --gray-10: #9e9ea4; /* 6.6:1 on gray-1 */
+  --gray-11: #c3c3c6;
+  --gray-12: #ffffff;
+  --gray-800: #e4e4e5;
 
   --pink-3: #331a21;
   --pink-4: #44202b;
@@ -160,20 +172,32 @@
   --pink-10: #ff7a91;
   --pink-11: #ff8499;
 
-  --hue-blue: #5b9bea;
-  --hue-amber: #e5a03c;
-  --hue-violet: #9b82e8;
-  --hue-green: #55b784;
-  --hue-red: #ee6a60;
-  --hue-orange: #ea8a4a;
+  --hue-blue: #449bff;
+  --hue-amber: #ffb331;
+  --hue-violet: #a78bfa;
+  --hue-green: #1ec97d;
+  --hue-red: #fa616d;
+  --hue-orange: #ff9f33;
+  --hue-blue-soft: #1e2a3d;
+  --hue-green-soft: #17302a;
+  --hue-red-soft: #3a1f25;
+  --hue-orange-soft: #3a2a17;
+  --hue-violet-soft: #2a2440;
 
   --background: var(--gray-1);
-  --surface: var(--gray-2);
+  --surface: var(--gray-1);
+  /* Dark lifts one step per layer: page < box/column < card < fill (chips on cards). */
   --surface-raised: var(--gray-3);
-  --surface-sunken: #0f1012;
-  --surface-sidebar: #0f1012;
+  --surface-sunken: var(--gray-2);
+  --surface-box: var(--gray-2);
+  --surface-fill: var(--gray-4);
+  --surface-hover: var(--gray-4);
+  --surface-active: var(--gray-5);
+  --surface-sidebar: var(--gray-1);
   --segment-active: var(--gray-5);
-  --on-brand: #131416;
+  --border: var(--gray-3);
+  --border-strong: var(--gray-5);
+  --on-brand: #17171c;
   --danger: var(--hue-red);
   --overlay: rgb(0 0 0 / 0.6);
   --identity-glow: color-mix(

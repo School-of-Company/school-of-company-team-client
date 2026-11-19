@@ -54,7 +54,7 @@ export function CloseSprintDialog({
   const choices = [
     ...planned.map((item) => ({
       value: `SPRINT:${item.id}`,
-      label: `Sprint ${item.name}`,
+      label: `스프린트 ${item.name}`,
     })),
     ...(buckets.data ?? [])
       .filter((bucket) => !bucket.archived)
@@ -63,7 +63,7 @@ export function CloseSprintDialog({
         value: `BUCKET:${bucket.id}`,
         label: `버킷 ${bucket.name}`,
       })),
-    { value: "NONE", label: "Sprint에서 빼기만" },
+    { value: "NONE", label: "스프린트에서 빼기만" },
   ];
   const [fallback, setFallback] = useState(choices[0]?.value ?? "NONE");
   const [rows, setRows] = useState<Readonly<Record<string, string>>>({});
@@ -114,9 +114,9 @@ export function CloseSprintDialog({
           </Select>
           <p id={`${id}-hint`} className="text-xs text-muted">
             목록에 없는 업무(볼 수 없는 업무)도 기본 대상으로 옮깁니다. 완료
-            업무는 이 Sprint에 남습니다.
+            업무는 이 스프린트에 남습니다.
             {planned.length === 0 &&
-              " 다음 Sprint로 옮기려면 먼저 예정 Sprint를 만드세요."}
+              " 다음 스프린트로 옮기려면 먼저 예정 스프린트를 만드세요."}
           </p>
         </div>
         <section className="grid gap-2" aria-labelledby={`${id}-rows`}>

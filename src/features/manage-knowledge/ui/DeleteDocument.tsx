@@ -13,7 +13,11 @@ import { routes } from "@/shared/config";
 import { Button, Dialog } from "@/shared/ui";
 
 /** 작성자·헤드 어드민만. 관계는 함께 사라지고 연결됐던 서비스·업무·사고·문서는 그대로 남는다. */
-export function DeleteDocument({ documentId }: { readonly documentId: string }) {
+export function DeleteDocument({
+  documentId,
+}: {
+  readonly documentId: string;
+}) {
   const router = useRouter();
   const client = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -54,7 +58,11 @@ export function DeleteDocument({ documentId }: { readonly documentId: string }) 
             </p>
           ) : null}
           <div className="flex flex-wrap justify-end gap-2">
-            <Button variant="secondary" disabled={remove.isPending} onClick={close}>
+            <Button
+              variant="secondary"
+              disabled={remove.isPending}
+              onClick={close}
+            >
               취소
             </Button>
             <Button

@@ -1,7 +1,8 @@
 import { normalizeApiError } from "@/shared/api";
 
 const messages: Readonly<Record<string, string>> = {
-  INCIDENT_NOT_FOUND: "사고가 없습니다. 삭제되었을 수 있으니 목록에서 다시 고르세요.",
+  INCIDENT_NOT_FOUND:
+    "사고가 없습니다. 삭제되었을 수 있으니 목록에서 다시 고르세요.",
   INCIDENT_FORBIDDEN:
     "사고 작성자·커맨더·영향 서비스 소유자·헤드 어드민만 변경할 수 있습니다.",
   INCIDENT_COMMANDER_NOT_ACTIVE:

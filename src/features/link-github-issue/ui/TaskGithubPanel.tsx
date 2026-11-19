@@ -104,7 +104,9 @@ export function TaskGithubPanel({
   const linkedPrimary = github.data.links.some((item) => item.primary);
   const mergedPr = github.data.links.some(
     (item) =>
-      item.kind === "PULL_REQUEST" && item.accessible && item.state === "MERGED",
+      item.kind === "PULL_REQUEST" &&
+      item.accessible &&
+      item.state === "MERGED",
   );
   return (
     <section className="grid gap-4 border-t border-border pt-6">
@@ -243,50 +245,50 @@ export function TaskGithubPanel({
             {github.data.links.map((item) => (
               <li key={item.id} className="github-link-row">
                 <div className="flex min-w-0 items-center justify-between gap-2">
-                {item.accessible && item.url ? (
-                  <a
-                    className="min-w-0 truncate text-sm hover:underline"
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={item.title ?? undefined}
-                  >
-                    <span className="text-muted">
-                      {item.kind === "ISSUE" ? "Issue" : "PR"} #{item.number}
-                    </span>{" "}
-                    {item.title}
-                    {item.primary && (
-                      <span
-                        className="ml-2"
-                        title="이 업무를 대표하는 Issue입니다. 업무당 하나만 지정할 수 있습니다."
-                      >
-                        <Badge>대표 Issue</Badge>
-                      </span>
-                    )}
-                    {item.state && (
-                      <span className="ml-2 text-xs text-muted">
-                        {linkStateLabels[item.state]}
-                      </span>
-                    )}
-                  </a>
-                ) : (
-                  <span className="text-sm text-muted">
-                    접근 권한 없음 · GitHub 권한을 확인해 주세요
-                  </span>
-                )}
-                {editable && (
-                  <Button
-                    variant="ghost"
-                    className="shrink-0"
-                    disabled={pending}
-                    aria-label={`${item.kind === "ISSUE" ? "Issue" : "PR"} #${item.number ?? ""} 연결 해제`}
-                    onClick={() =>
-                      void run(() => taskGithubApi.unlink(task.id, item.id))
-                    }
-                  >
-                    해제
-                  </Button>
-                )}
+                  {item.accessible && item.url ? (
+                    <a
+                      className="min-w-0 truncate text-sm hover:underline"
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={item.title ?? undefined}
+                    >
+                      <span className="text-muted">
+                        {item.kind === "ISSUE" ? "Issue" : "PR"} #{item.number}
+                      </span>{" "}
+                      {item.title}
+                      {item.primary && (
+                        <span
+                          className="ml-2"
+                          title="이 업무를 대표하는 Issue입니다. 업무당 하나만 지정할 수 있습니다."
+                        >
+                          <Badge>대표 Issue</Badge>
+                        </span>
+                      )}
+                      {item.state && (
+                        <span className="ml-2 text-xs text-muted">
+                          {linkStateLabels[item.state]}
+                        </span>
+                      )}
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted">
+                      접근 권한 없음 · GitHub 권한을 확인해 주세요
+                    </span>
+                  )}
+                  {editable && (
+                    <Button
+                      variant="ghost"
+                      className="shrink-0"
+                      disabled={pending}
+                      aria-label={`${item.kind === "ISSUE" ? "Issue" : "PR"} #${item.number ?? ""} 연결 해제`}
+                      onClick={() =>
+                        void run(() => taskGithubApi.unlink(task.id, item.id))
+                      }
+                    >
+                      해제
+                    </Button>
+                  )}
                 </div>
                 {item.kind === "PULL_REQUEST" && item.accessible && (
                   <PullRequestSignals

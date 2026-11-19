@@ -27,4 +27,3 @@ export const reviewLabels: Readonly<Record<ReviewSignal, string>> = {
 /** merge된 PR이 있는데 업무가 아직 완료가 아니면 "완료로 옮기기"를 제안한다(자동 이동 아님). */
 export const suggestsDone = (merged: boolean, status: string) =>
   merged && status !== "DONE";
-

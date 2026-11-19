@@ -100,7 +100,7 @@ export function SprintPlan({
     change(
       Object.fromEntries(ids.map((id) => [id, "add" as const])),
       { action: "add", taskIds: ids },
-      `${ids.length}개를 Sprint에 넣었습니다.`,
+      `${ids.length}개를 스프린트에 넣었습니다.`,
     );
     setChecked([]);
   }
@@ -108,7 +108,7 @@ export function SprintPlan({
     change(
       { [task.id]: "remove" },
       { action: "remove", taskId: task.id },
-      `${task.key}을(를) Sprint에서 뺐습니다.`,
+      `${task.key}을(를) 스프린트에서 뺐습니다.`,
     );
   }
   function onDrop(target: "in" | "out", event: DragEvent) {
@@ -189,7 +189,8 @@ export function SprintPlan({
             />
           </div>
           <p className="planning-note">
-            어느 Sprint에도 없는 업무입니다. 오른쪽으로 끌거나 넣기를 누르세요.
+            어느 스프린트에도 없는 업무입니다. 오른쪽으로 끌거나 넣기를
+            누르세요.
           </p>
           {candidates.isPending ? (
             <PlanSkeleton label="후보 업무 불러오는 중" />
@@ -232,7 +233,7 @@ export function SprintPlan({
                         variant="ghost"
                         className="ui-button-sm"
                         disabled={busy}
-                        aria-label={`${task.key} Sprint에 넣기`}
+                        aria-label={`${task.key} 스프린트에 넣기`}
                         onClick={() => add([task.id])}
                       >
                         넣기
@@ -264,11 +265,12 @@ export function SprintPlan({
       >
         <div className="plan-pane-head">
           <h3 id="plan-scope" className="planning-subhead">
-            이 Sprint <span className="tabular-nums">{view.scoped.length}</span>
+            이 스프린트{" "}
+            <span className="tabular-nums">{view.scoped.length}</span>
           </h3>
         </div>
         {scoped.isPending ? (
-          <PlanSkeleton label="Sprint 업무 불러오는 중" />
+          <PlanSkeleton label="스프린트 업무 불러오는 중" />
         ) : scoped.isError ? (
           <ErrorState
             description={sprintErrorMessage(normalizeApiError(scoped.error))}
@@ -284,7 +286,7 @@ export function SprintPlan({
             />
           </div>
         ) : (
-          <ul className="plan-list" aria-label="Sprint 업무">
+          <ul className="plan-list" aria-label="스프린트 업무">
             {view.scoped.map((task) => (
               <TaskRow
                 key={task.id}
@@ -296,7 +298,7 @@ export function SprintPlan({
                       variant="ghost"
                       className="ui-button-sm"
                       disabled={busy}
-                      aria-label={`${task.key} Sprint에서 빼기`}
+                      aria-label={`${task.key} 스프린트에서 빼기`}
                       onClick={() => remove(task)}
                     >
                       빼기

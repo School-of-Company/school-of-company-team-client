@@ -120,7 +120,7 @@ function ServiceWorkspace({
   const [editing, setEditing] = useState(false);
   return (
     <div className="service-detail grid gap-5">
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
             <Link href={routes.services}>서비스</Link>

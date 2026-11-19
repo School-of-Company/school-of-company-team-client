@@ -205,11 +205,7 @@ export function KanbanBoard({
                 )}
               </h2>
             )}
-            <div
-              id={bodyId}
-              hidden={folded}
-              className="board-columns grid min-w-0 gap-3 md:grid-cols-3 xl:grid-cols-5"
-            >
+            <div id={bodyId} hidden={folded} className="board-columns">
               {taskStatuses.map((status) => {
                 const cards = sortTaskCards(group.columns[status] ?? [], sort);
                 const Heading = lanes ? "h3" : "h2";

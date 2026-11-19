@@ -9,13 +9,7 @@ export function Badge({
   readonly children: ReactNode;
   readonly className?: string;
 }) {
-  return (
-    <span
-      className={`inline-flex rounded-sm bg-surface-hover px-2 py-1 text-xs font-medium ${className}`}
-    >
-      {children}
-    </span>
-  );
+  return <span className={`ui-badge ${className}`}>{children}</span>;
 }
 export function Avatar({
   name,

@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 
 export type NotificationKind = "ciFailed" | "reviewOverdue" | "deadlineDue";
-export type NotificationSettings = Readonly<Record<NotificationKind, boolean>> & {
+export type NotificationSettings = Readonly<
+  Record<NotificationKind, boolean>
+> & {
   readonly scope: "TEAM" | "PROJECT";
   readonly projectId: string | null;
   /** 같은 범위의 Discord 채널 상태. ACTIVE가 아니면 켜져 있어도 보내지 않는다. */

@@ -5,17 +5,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ServiceDetail } from "@/entities/service";
-import {
-  knowledgeErrorMessage,
-  knowledgeQueries,
-} from "@/entities/knowledge";
+import { knowledgeErrorMessage, knowledgeQueries } from "@/entities/knowledge";
 import { CreateDocumentDialog } from "@/features/manage-knowledge";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
 import { Button, EmptyState, ErrorState, Skeleton } from "@/shared/ui";
 
 /** 게시된 Runbook만(D7-12). 초안은 문서 화면에서 다듬은 뒤 게시하면 여기에 나온다. 사고 상세에도 같은 Runbook이 뜬다. */
-export function ServiceRunbooks({ service }: { readonly service: ServiceDetail }) {
+export function ServiceRunbooks({
+  service,
+}: {
+  readonly service: ServiceDetail;
+}) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
   const runbooks = useQuery(
@@ -26,7 +27,11 @@ export function ServiceRunbooks({ service }: { readonly service: ServiceDetail }
     }),
   );
   const create = !service.archived && (
-    <Button variant="secondary" className="ui-button-sm" onClick={() => setCreating(true)}>
+    <Button
+      variant="secondary"
+      className="ui-button-sm"
+      onClick={() => setCreating(true)}
+    >
       Runbook 만들기
     </Button>
   );
@@ -44,7 +49,11 @@ export function ServiceRunbooks({ service }: { readonly service: ServiceDetail }
         {runbooks.data && runbooks.data.length > 0 && create}
       </div>
       {runbooks.isPending ? (
-        <div role="status" aria-label="Runbook을 불러오는 중" className="grid gap-2">
+        <div
+          role="status"
+          aria-label="Runbook을 불러오는 중"
+          className="grid gap-2"
+        >
           <Skeleton className="h-10" />
           <Skeleton className="h-10" />
         </div>
@@ -65,10 +74,13 @@ export function ServiceRunbooks({ service }: { readonly service: ServiceDetail }
             <li key={runbook.id}>
               <div className="service-list-row">
                 <Link href={routes.doc(runbook.id)} className="min-w-0">
-                  <span className="block truncate font-medium">{runbook.title}</span>
+                  <span className="block truncate font-medium">
+                    {runbook.title}
+                  </span>
                 </Link>
                 <span className="text-xs text-muted tabular-nums">
-                  {runbook.author?.name ?? "알 수 없음"}, {formatDate(runbook.updatedAt)} 수정
+                  {runbook.author?.name ?? "알 수 없음"},{" "}
+                  {formatDate(runbook.updatedAt)} 수정
                 </span>
               </div>
             </li>

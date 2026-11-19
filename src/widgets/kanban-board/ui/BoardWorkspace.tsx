@@ -95,11 +95,23 @@ export function BoardWorkspace({
   const search = useSearchParams()?.toString() ?? "";
   const params = new URLSearchParams(search);
   const queryClient = useQueryClient();
+  // `?create=1` (from the 내 업무 list) opens the create dialog once on arrival.
   const [creating, setCreating] = useState<{
     readonly status: TaskStatus;
     readonly bucketId?: string;
-  } | null>(null);
+  } | null>(() =>
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("create") === "1"
+      ? { status: "BACKLOG" }
+      : null,
+  );
   const selectionTrigger = useRef<HTMLElement | null>(null);
+  function dropCreateParam() {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("create")) return;
+    url.searchParams.delete("create");
+    window.history.replaceState(null, "", url.pathname + url.search);
+  }
   // 업무 패널(`?task=`)은 이 보드의 경로에서만 연다. Next.js 가 숨겨 둔 다른 보드가 같은 쿼리를 읽어
   // 보이지 않는 패널을 열지 않게 한다(V-route-focus H1과 같은 유형).
   const boardPath =
@@ -378,10 +390,14 @@ export function BoardWorkspace({
           milestones={milestones.data ?? []}
           project={project.data}
           people={people}
-          onClose={() => setCreating(null)}
+          onClose={() => {
+            setCreating(null);
+            dropCreateParam();
+          }}
           onCreated={async (notice) => {
             setMessage(notice);
             setCreating(null);
+            dropCreateParam();
             await queryClient.invalidateQueries({ queryKey: taskKeys.all });
           }}
         />

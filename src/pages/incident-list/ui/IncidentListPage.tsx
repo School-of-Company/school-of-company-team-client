@@ -76,11 +76,11 @@ function IncidentListContent() {
   };
   return (
     <div className="grid gap-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="page-header">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold">사고</h1>
+          <h1>사고</h1>
           {incidents.data && (
-            <p className="mt-1 text-xs text-muted tabular-nums">
+            <p className="page-subtitle tabular-nums">
               {view.label} {incidents.data.length}건
             </p>
           )}
@@ -146,11 +146,6 @@ function IncidentListContent() {
           <EmptyState
             title="진행 중인 사고가 없습니다"
             description="장애나 이상을 발견하면 바로 등록하고 대응 기록을 남기세요."
-            action={
-              <Button variant="secondary" onClick={() => setCreating(true)}>
-                사고 등록
-              </Button>
-            }
           />
         ) : (
           <EmptyState title="조건에 맞는 사고가 없습니다" />

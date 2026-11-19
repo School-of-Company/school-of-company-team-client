@@ -60,7 +60,7 @@ export function SprintFormDialog({
       onClose={() => {
         if (!pending) onClose();
       }}
-      title={initial ? "Sprint 수정" : "새 Sprint"}
+      title={initial ? "스프린트 수정" : "새 스프린트"}
     >
       {open && (
         <form onSubmit={submit} className="grid gap-5" noValidate>
@@ -122,7 +122,7 @@ export function SprintFormDialog({
               취소
             </Button>
             <Button type="submit" loading={pending}>
-              {initial ? "변경 저장" : "Sprint 만들기"}
+              {initial ? "변경 저장" : "스프린트 만들기"}
             </Button>
           </div>
         </form>

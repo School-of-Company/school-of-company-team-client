@@ -119,7 +119,11 @@ function LinkForm({
         <Button variant="secondary" disabled={add.isPending} onClick={onClose}>
           취소
         </Button>
-        <Button type="submit" loading={add.isPending} disabled={options.length === 0}>
+        <Button
+          type="submit"
+          loading={add.isPending}
+          disabled={options.length === 0}
+        >
           연결
         </Button>
       </div>

@@ -85,7 +85,7 @@ function ScopedTasks({
       {board.isPending ? (
         <div
           role="status"
-          aria-label="Sprint 업무 불러오는 중"
+          aria-label="스프린트 업무 불러오는 중"
           className="grid gap-2"
         >
           <Skeleton className="h-11" />
@@ -98,7 +98,7 @@ function ScopedTasks({
         />
       ) : tasks.length === 0 ? (
         <EmptyState
-          title="Sprint에 업무가 없습니다"
+          title="스프린트에 업무가 없습니다"
           description="계획 탭에서 업무를 넣으면 여기서 진행을 봅니다."
         />
       ) : (
@@ -108,7 +108,7 @@ function ScopedTasks({
               막힌 업무 {blocked.length}개가 있습니다.
             </p>
           )}
-          <ul className="plan-list" aria-label="Sprint 업무">
+          <ul className="plan-list" aria-label="스프린트 업무">
             {tasks.map((task) => (
               <TaskRow key={task.id} task={task} />
             ))}
@@ -193,13 +193,13 @@ function carryOverTarget(projectId: string, record: CarryOver) {
           href={routes.projectSprint(projectId, record.toSprint.id)}
           className="underline"
         >
-          Sprint {record.toSprint.name}
+          스프린트 {record.toSprint.name}
         </Link>
       </span>
     ) : (
-      "이월: 삭제된 Sprint"
+      "이월: 삭제된 스프린트"
     );
   if (record.target === "BUCKET")
     return `이동: 버킷 ${record.toBucket?.name ?? "(삭제됨)"}`;
-  return "Sprint에서만 뺌";
+  return "스프린트에서만 뺌";
 }

@@ -47,7 +47,7 @@ test("보드 업무 등록 대화상자를 Esc·취소로 닫으면 업무 등�
   await expect(trigger).toBeFocused();
 });
 
-test("Sprint 종료 대화상자를 닫으면 종료 버튼으로 돌아온다", async ({
+test("스프린트 종료 대화상자를 닫으면 종료 버튼으로 돌아온다", async ({
   page,
 }) => {
   const base = `/api/v1/projects/${seed.project.id}/sprints`;
@@ -73,7 +73,7 @@ test("Sprint 종료 대화상자를 닫으면 종료 버튼으로 돌아온다",
   });
 });
 
-test("연 요소가 사라지면(삭제한 Milestone 행) 포커스는 body 가 아니라 본문으로 간다", async ({
+test("연 요소가 사라지면(삭제한 마일스톤 행) 포커스는 body 가 아니라 본문으로 간다", async ({
   page,
 }) => {
   const name = `포커스 ${unique()}`;

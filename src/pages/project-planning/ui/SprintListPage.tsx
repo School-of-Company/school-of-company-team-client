@@ -45,18 +45,18 @@ function SprintList({ project, manages }: PlanningContext) {
     <section className="grid gap-5" aria-labelledby="sprints-heading">
       <div className="planning-section-head">
         <h2 id="sprints-heading" className="text-lg font-semibold">
-          Sprint
+          스프린트
         </h2>
         {manages && (
           <Button onClick={() => setCreating(true)}>
-            <Icon name="plus" className="inline-block" /> 새 Sprint
+            <Icon name="plus" className="inline-block" /> 새 스프린트
           </Button>
         )}
       </div>
       {sprints.isPending ? (
         <div
           role="status"
-          aria-label="Sprint 불러오는 중"
+          aria-label="스프린트 불러오는 중"
           className="grid gap-3"
         >
           <Skeleton className="h-32" />
@@ -65,24 +65,17 @@ function SprintList({ project, manages }: PlanningContext) {
         </div>
       ) : sprints.isError ? (
         <ErrorState
-          title="Sprint를 불러오지 못했습니다"
+          title="스프린트를 불러오지 못했습니다"
           description={sprintErrorMessage(normalizeApiError(sprints.error))}
           onRetry={() => void sprints.refetch()}
         />
       ) : list.length === 0 ? (
         <EmptyState
-          title="아직 Sprint가 없습니다"
+          title="아직 스프린트가 없습니다"
           description={
             manages
-              ? "기간과 목표를 정해 첫 Sprint를 만들고, 버킷이나 검토 필요 업무를 넣으세요."
-              : "PM 또는 헤드 어드민이 Sprint를 만들면 여기에 보입니다."
-          }
-          action={
-            manages && (
-              <Button variant="secondary" onClick={() => setCreating(true)}>
-                새 Sprint
-              </Button>
-            )
+              ? "기간과 목표를 정해 첫 스프린트를 만들고, 버킷이나 검토 필요 업무를 넣으세요."
+              : "PM 또는 헤드 어드민이 스프린트를 만들면 여기에 보입니다."
           }
         />
       ) : (
@@ -95,10 +88,10 @@ function SprintList({ project, manages }: PlanningContext) {
             />
           ) : (
             <p className="planning-note">
-              진행 중인 Sprint가 없습니다.
+              진행 중인 스프린트가 없습니다.
               {manages &&
                 planned.length > 0 &&
-                " 예정 Sprint를 열어 시작하세요."}
+                " 예정 스프린트를 열어 시작하세요."}
             </p>
           )}
           <SprintRows projectId={project.id} title="예정" sprints={planned} />
@@ -164,7 +157,7 @@ function CurrentSprint({
           href={`${routes.project(projectId)}?sprint=current`}
           className="ui-button ui-button-ghost ui-button-sm"
         >
-          현재 Sprint 보드
+          현재 스프린트 보드
         </Link>
       </div>
     </article>
@@ -182,7 +175,7 @@ function SprintRows({
 }) {
   if (!sprints.length) return null;
   return (
-    <section className="grid gap-2" aria-label={`${title} Sprint`}>
+    <section className="grid gap-2" aria-label={`${title} 스프린트`}>
       <h3 className="planning-subhead">
         {title} <span className="tabular-nums">{sprints.length}</span>
       </h3>

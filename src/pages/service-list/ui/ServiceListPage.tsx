@@ -61,11 +61,11 @@ function ServiceListContent({ canCreate }: { readonly canCreate: boolean }) {
   };
   return (
     <div className="grid gap-5">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="page-header">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold">서비스</h1>
+          <h1>서비스</h1>
           {view === "list" && services.data && (
-            <p className="mt-1 text-xs text-muted tabular-nums">
+            <p className="page-subtitle tabular-nums">
               {archived ? "아카이브" : "운영 중"} {services.data.length}개
             </p>
           )}
@@ -135,11 +135,6 @@ function ServiceListContent({ canCreate }: { readonly canCreate: boolean }) {
               canCreate
                 ? "운영하는 배포 단위를 서비스로 등록하고 소유자와 저장소를 정하세요."
                 : "헤드 어드민이 서비스를 등록하면 여기에 나타납니다."
-            }
-            action={
-              canCreate && (
-                <Button onClick={() => setCreating(true)}>새 서비스</Button>
-              )
             }
           />
         )

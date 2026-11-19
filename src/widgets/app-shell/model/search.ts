@@ -47,7 +47,7 @@ export const searchTypeLabels: Readonly<Record<SupportedSearchType, string>> = {
   DOCUMENT: "문서",
   INCIDENT: "사고",
   SERVICE: "서비스",
-  SPRINT: "Sprint",
+  SPRINT: "스프린트",
 };
 export const SEARCH_MAX_LENGTH = 100;
 

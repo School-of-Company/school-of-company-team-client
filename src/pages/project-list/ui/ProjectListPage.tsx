@@ -20,8 +20,8 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
   const projects = useQuery(projectQueries.list());
   return (
     <div className="grid gap-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold tracking-tight">프로젝트</h1>
+      <header className="page-header">
+        <h1>프로젝트</h1>
         {canCreate && (
           <Link
             href="/admin?create=project"

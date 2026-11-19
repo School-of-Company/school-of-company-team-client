@@ -53,6 +53,8 @@ test("due labels around today", () => {
   const today = "2026-11-19";
   assert.equal(dueLabel(today, "2026-11-17"), "2일 지남");
   assert.equal(dueLabel(today, "2026-11-19"), "오늘 마감");
+  // 2주가 넘게 남으면 남은 날 대신 날짜로 읽는다.
+  assert.equal(dueLabel(today, "2027-07-28"), "7월 28일");
   assert.equal(dueLabel(today, "2026-11-20"), "내일 마감");
   assert.equal(dueLabel(today, "2026-11-22"), "3일 남음");
 });
