@@ -20,9 +20,9 @@ export {
   useAccountRestriction,
 } from "./model/session";
 export {
+  avatarSrc,
   discordRequired,
   isHeadAdmin,
-  avatarSrc,
   userAvatarUrl,
   userDestination,
 } from "./model/types";
