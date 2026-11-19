@@ -79,7 +79,7 @@ function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
           href={routes.projectSprints(project.id)}
           className="text-sm underline"
         >
-          Sprint 목록으로
+          스프린트 목록으로
         </Link>
       </div>
     );
@@ -193,7 +193,7 @@ function SprintScreen({
         )}
         {manages && otherActive && sprint.status === "PLANNED" && (
           <p id="start-blocked" className="text-sm text-muted">
-            진행 중인 Sprint(
+            진행 중인 스프린트(
             <Link
               href={routes.projectSprint(project.id, otherActive.id)}
               className="underline"
@@ -205,7 +205,7 @@ function SprintScreen({
         )}
         {!manages && sprint.status !== "CLOSED" && !project.archived && (
           <p className="text-sm text-muted">
-            Sprint 범위와 시작·종료는 PM 또는 헤드 어드민이 정합니다.
+            스프린트 범위와 시작·종료는 PM 또는 헤드 어드민이 정합니다.
           </p>
         )}
       </section>
@@ -298,8 +298,8 @@ function SprintScreen({
         title="스프린트를 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          {sprint.name}을(를) 삭제하면 넣어 둔 업무는 Sprint에서만 빠지고 그대로
-          남습니다.
+          {sprint.name}을(를) 삭제하면 넣어 둔 업무는 스프린트에서만 빠지고
+          그대로 남습니다.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

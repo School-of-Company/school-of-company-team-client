@@ -189,7 +189,8 @@ export function SprintPlan({
             />
           </div>
           <p className="planning-note">
-            어느 Sprint에도 없는 업무입니다. 오른쪽으로 끌거나 넣기를 누르세요.
+            어느 스프린트에도 없는 업무입니다. 오른쪽으로 끌거나 넣기를
+            누르세요.
           </p>
           {candidates.isPending ? (
             <PlanSkeleton label="후보 업무 불러오는 중" />
@@ -264,7 +265,8 @@ export function SprintPlan({
       >
         <div className="plan-pane-head">
           <h3 id="plan-scope" className="planning-subhead">
-            이 Sprint <span className="tabular-nums">{view.scoped.length}</span>
+            이 스프린트{" "}
+            <span className="tabular-nums">{view.scoped.length}</span>
           </h3>
         </div>
         {scoped.isPending ? (

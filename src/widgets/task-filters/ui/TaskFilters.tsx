@@ -79,7 +79,7 @@ export function TaskFilters({
       ? "현재 스프린트"
       : value === "none"
         ? "스프린트 없음"
-        : `Sprint ${sprints.find((sprint) => sprint.id === value)?.name ?? ""}`.trim();
+        : `스프린트 ${sprints.find((sprint) => sprint.id === value)?.name ?? ""}`.trim();
   const selected = (key: BoardFilterKey) =>
     params.getAll(key).flatMap((value) => value.split(","));
   const axes: readonly {
@@ -274,7 +274,7 @@ export function TaskFilters({
             ))}
           {sprints.length > 0 && (
             <label className="grid content-start gap-2 text-sm font-semibold">
-              Sprint
+              스프린트
               <Select
                 value={params.get("sprint") ?? ""}
                 onChange={(event) =>

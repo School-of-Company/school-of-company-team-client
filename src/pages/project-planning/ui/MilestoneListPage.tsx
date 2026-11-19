@@ -72,11 +72,11 @@ function Milestones({ project, manages }: PlanningContext) {
     <section className="grid gap-5" aria-labelledby="milestones-heading">
       <div className="planning-section-head">
         <h2 id="milestones-heading" className="text-lg font-semibold">
-          Milestone
+          마일스톤
         </h2>
         {manages && (
           <Button onClick={() => setCreating(true)}>
-            <Icon name="plus" className="inline-block" /> 새 Milestone
+            <Icon name="plus" className="inline-block" /> 새 마일스톤
           </Button>
         )}
       </div>
@@ -140,7 +140,7 @@ function Milestones({ project, manages }: PlanningContext) {
       )}
       {milestones.data && selectedId && !selected && !milestones.isPending && (
         <p role="status" className="text-sm text-muted">
-          찾는 Milestone이 없습니다. 삭제됐을 수 있습니다.
+          찾는 마일스톤이 없습니다. 삭제됐을 수 있습니다.
         </p>
       )}
       <MilestoneFormDialog
@@ -254,7 +254,7 @@ function MilestonePanel({
             aria-label="삭제 확인"
           >
             <p className="text-sm">
-              삭제하면 업무는 그대로 두고 Milestone 지정만 풉니다.
+              삭제하면 업무는 그대로 두고 마일스톤 지정만 풉니다.
             </p>
             <div className="flex flex-wrap justify-end gap-2">
               <Button

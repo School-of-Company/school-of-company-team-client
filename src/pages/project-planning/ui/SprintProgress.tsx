@@ -193,7 +193,7 @@ function carryOverTarget(projectId: string, record: CarryOver) {
           href={routes.projectSprint(projectId, record.toSprint.id)}
           className="underline"
         >
-          Sprint {record.toSprint.name}
+          스프린트 {record.toSprint.name}
         </Link>
       </span>
     ) : (

@@ -45,11 +45,11 @@ function SprintList({ project, manages }: PlanningContext) {
     <section className="grid gap-5" aria-labelledby="sprints-heading">
       <div className="planning-section-head">
         <h2 id="sprints-heading" className="text-lg font-semibold">
-          Sprint
+          스프린트
         </h2>
         {manages && (
           <Button onClick={() => setCreating(true)}>
-            <Icon name="plus" className="inline-block" /> 새 Sprint
+            <Icon name="plus" className="inline-block" /> 새 스프린트
           </Button>
         )}
       </div>
@@ -88,7 +88,7 @@ function SprintList({ project, manages }: PlanningContext) {
             />
           ) : (
             <p className="planning-note">
-              진행 중인 Sprint가 없습니다.
+              진행 중인 스프린트가 없습니다.
               {manages &&
                 planned.length > 0 &&
                 " 예정 스프린트를 열어 시작하세요."}
@@ -157,7 +157,7 @@ function CurrentSprint({
           href={`${routes.project(projectId)}?sprint=current`}
           className="ui-button ui-button-ghost ui-button-sm"
         >
-          현재 Sprint 보드
+          현재 스프린트 보드
         </Link>
       </div>
     </article>
@@ -175,7 +175,7 @@ function SprintRows({
 }) {
   if (!sprints.length) return null;
   return (
-    <section className="grid gap-2" aria-label={`${title} Sprint`}>
+    <section className="grid gap-2" aria-label={`${title} 스프린트`}>
       <h3 className="planning-subhead">
         {title} <span className="tabular-nums">{sprints.length}</span>
       </h3>
