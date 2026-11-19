@@ -114,3 +114,35 @@ test("상세 페이지: 사라진 업무를 열면 404 안내를 보이고 20초
   console.log(`[상세 페이지] 20초 상세 요청 ${hits.length}회`);
   expect(hits.length).toBeLessThanOrEqual(2);
 });
+
+test("권한이 돌아오면 같은 화면의 404 안내에서 다시 시도로 그 상세를 다시 연다", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  const project = `/api/v1/projects/${seed.project.id}`;
+  const visibility = (value: "TEAM" | "MEMBERS") =>
+    call("PATCH", project, seed.admin, { visibility: value });
+  const title = `권한 회복 점검 ${Date.now()}`;
+  const task = await createTask(title, "PROJECT");
+  // 비참여자(outsider)는 팀 전체 공개일 때만 읽는다.
+  await visibility("TEAM");
+  try {
+    await signIn(page, seed.outsider.tokens);
+    await page.goto(`/tasks/${task.id}`);
+    await expect(
+      page.getByRole("heading", { level: 1, name: title }),
+    ).toBeVisible();
+    await visibility("MEMBERS");
+    // 다음 폴링(10초)에 404 안내로 바뀐다.
+    const notice = page.getByText(/찾을 수 없거나 접근할 수 없습니다/);
+    await expect(notice).toBeVisible({ timeout: 20_000 });
+    await visibility("TEAM");
+    await page.getByRole("button", { name: "다시 시도" }).click();
+    await expect(
+      page.getByRole("heading", { level: 1, name: title }),
+    ).toBeVisible();
+    await expect(notice).toHaveCount(0);
+  } finally {
+    await visibility("MEMBERS");
+  }
+});

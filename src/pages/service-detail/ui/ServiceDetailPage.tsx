@@ -21,11 +21,13 @@ import { Badge, Button, ErrorState, Skeleton, Spinner } from "@/shared/ui";
 import { ServiceOverview } from "./ServiceOverview";
 import { ServiceReleases } from "./ServiceReleases";
 import { ServiceDeployments } from "./ServiceDeployments";
+import { ServiceRunbooks } from "./ServiceRunbooks";
 
 const tabs = [
   { value: "overview", label: "개요" },
   { value: "releases", label: "릴리스" },
   { value: "deployments", label: "배포" },
+  { value: "runbooks", label: "Runbook" },
 ] as const;
 export type ServiceTab = (typeof tabs)[number]["value"];
 
@@ -166,6 +168,7 @@ function ServiceWorkspace({
       {tab === "overview" && <ServiceOverview service={service} />}
       {tab === "releases" && <ServiceReleases service={service} />}
       {tab === "deployments" && <ServiceDeployments service={service} />}
+      {tab === "runbooks" && <ServiceRunbooks service={service} />}
       {editing && (
         <EditServiceDialog
           service={service}
