@@ -1,6 +1,7 @@
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
+import { keepPreviousKey } from "@/shared/lib";
 import type {
   ActionItem,
   ChangeIncidentStatus,
@@ -103,24 +104,22 @@ export const incidentApi = {
     ).data,
 };
 
-// 사고 목록·상세는 10초 폴링(계약 6절). 재조회 중에는 이전 데이터를 그대로 둔다(깜빡임 없음).
-const polled = {
-  refetchInterval: BOARD_POLL_INTERVAL,
-  placeholderData: keepPreviousData,
-} as const;
-
+// 사고 목록·상세는 10초 폴링(계약 6절). 필터를 바꿀 때만 이전 데이터를 빌려 깜빡임을 없애고,
+// 삭제로 지운 캐시는 다시 그리지 않는다(keepPreviousKey, 업무·Sprint 쿼리와 같은 규칙).
 export const incidentQueries = {
   list: (filter: IncidentFilter) =>
     queryOptions({
       queryKey: incidentKeys.list(filter),
       queryFn: () => incidentApi.list(filter),
-      ...polled,
+      refetchInterval: BOARD_POLL_INTERVAL,
+      placeholderData: keepPreviousKey(incidentKeys.list(filter)),
     }),
   detail: (id: string) =>
     queryOptions({
       queryKey: incidentKeys.detail(id),
       queryFn: () => incidentApi.detail(id),
-      ...polled,
+      refetchInterval: BOARD_POLL_INTERVAL,
+      placeholderData: keepPreviousKey(incidentKeys.detail(id)),
     }),
   /** 편집 중인 글이 폴링으로 덮이지 않게 사후 검토는 열 때와 저장 뒤에만 받는다. */
   postmortem: (id: string) =>
