@@ -72,7 +72,7 @@ function ProjectSettingsContent({
     ]);
   };
   return (
-    <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
+    <div className="grid w-full min-w-0 gap-6">
       <header>
         <p className="board-breadcrumb">
           <Link href="/projects">프로젝트</Link>
@@ -82,15 +82,18 @@ function ProjectSettingsContent({
         <h1 className="break-words">{project.data.name}</h1>
       </header>
       <ProjectNav project={project.data} user={user} />
-      <Suspense fallback={<Spinner label="설정 불러오는 중" />}>
-        <SettingsPanels
-          key={projectId}
-          project={project.data}
-          user={user}
-          candidates={users.data ?? []}
-          onSaved={refresh}
-        />
-      </Suspense>
+      {/* 머리글·프로젝트 탭은 다른 탭과 같은 폭, 설정 본문만 읽기 좋은 폭으로 줄인다. */}
+      <div className="settings-page grid w-full min-w-0">
+        <Suspense fallback={<Spinner label="설정 불러오는 중" />}>
+          <SettingsPanels
+            key={projectId}
+            project={project.data}
+            user={user}
+            candidates={users.data ?? []}
+            onSaved={refresh}
+          />
+        </Suspense>
+      </div>
     </div>
   );
 }

@@ -81,7 +81,8 @@ export function SettingsPanels(props: SettingsProps) {
       {tab === "general" && (
         <div className="grid gap-10">
           <section className="grid gap-5" aria-labelledby="general-heading">
-            <h2 id="general-heading" className="text-xl font-semibold">
+            {/* 탭 이름과 같아 화면에는 숨기고 구역 이름으로만 쓴다. */}
+            <h2 id="general-heading" className="sr-only">
               기본 정보
             </h2>
             <GeneralSettings {...props} />
@@ -106,7 +107,8 @@ export function SettingsPanels(props: SettingsProps) {
       )}
       {tab === "buckets" && (
         <section className="grid gap-5" aria-labelledby="buckets-heading">
-          <h2 id="buckets-heading" className="text-xl font-semibold">
+          {/* 탭 이름과 같아 화면에는 숨기고 구역 이름으로만 쓴다. */}
+          <h2 id="buckets-heading" className="sr-only">
             계획 버킷
           </h2>
           <BucketSettings {...props} />
@@ -177,8 +179,8 @@ export function SettingsPanels(props: SettingsProps) {
             위험 영역
           </h2>
           <p className="text-sm text-muted">
-            아카이브하면 조회만 가능하며 보드와 내 업무에서 빠집니다.
-            기록은 보존됩니다.
+            아카이브하면 조회만 가능하며 보드와 내 업무에서 빠집니다. 기록은
+            보존됩니다.
           </p>
           {confirmArchive && (
             <p role="alert" className="text-sm">
