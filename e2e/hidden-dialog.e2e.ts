@@ -100,7 +100,7 @@ test("업무 패널(?task=)이 열린 보드에서 다른 보드로 갔다가 �
   await expect(panel).toBeVisible();
   await expect(page).toHaveURL(new RegExp(`task=${task.id}`));
   // 패널 안 링크로 프로젝트 보드로 → 뒤로가기(내 보드 ?task= 로 복귀) → 패널 닫기
-  await panel.getByRole("link", { name: /로 이동$/ }).click();
+  await panel.getByRole("link", { name: /보드로 돌아가기$/ }).click();
   await expect(page).toHaveURL(new RegExp(`/projects/${seed.project.id}$`));
   await expectBoardUsable(page);
   await page.goBack();

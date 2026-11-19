@@ -44,7 +44,7 @@ export function ToastProvider({ children }: { readonly children: ReactNode }) {
           <div
             key={toast.id}
             role={toast.tone === "error" ? "alert" : "status"}
-            className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface p-4"
+            className="flex items-center justify-between gap-3 rounded-xl bg-surface-raised p-4 shadow-[var(--shadow-overlay)]"
           >
             <p
               className={
