@@ -186,11 +186,12 @@
 
   --background: var(--gray-1);
   --surface: var(--gray-1);
-  --surface-raised: var(--gray-2);
+  /* Dark lifts one step per layer: page < box/column < card < fill (chips on cards). */
+  --surface-raised: var(--gray-3);
   --surface-sunken: var(--gray-2);
   --surface-box: var(--gray-2);
-  --surface-fill: var(--gray-3);
-  --surface-hover: var(--gray-3);
+  --surface-fill: var(--gray-4);
+  --surface-hover: var(--gray-4);
   --surface-active: var(--gray-5);
   --surface-sidebar: var(--gray-1);
   --segment-active: var(--gray-5);
