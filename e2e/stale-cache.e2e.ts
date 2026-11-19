@@ -120,16 +120,17 @@ test.afterAll(() => {
   stub?.close();
 });
 
+// 리뷰 요청은 내 업무(목록) 화면에 있다. 데이터는 홈 응답에 실려 온다.
 async function openMyBoard(page: Page) {
   await signIn(page, seed.member.tokens);
-  await page.goto("/me");
+  await page.goto("/");
   const reviews = page.getByRole("region", { name: "리뷰 요청" });
   await expect(reviews.getByText(prTitle)).toBeVisible();
   return reviews;
 }
 
 const failWith = (page: Page, status: number, code: string) =>
-  page.route("**/api/v1/me/github/review-requests", (route) =>
+  page.route("**/api/v1/home", (route) =>
     route.fulfill({
       status,
       contentType: "application/json",

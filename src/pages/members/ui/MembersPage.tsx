@@ -65,11 +65,11 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
 
   return (
     <div className="grid gap-5">
-      <header className="board-header flex flex-wrap items-end justify-between gap-3">
+      <header className="page-header">
         <div>
-          <h1 className="text-xl font-semibold">팀원</h1>
+          <h1>팀원</h1>
           {data && (
-            <p className="mt-1 text-xs text-muted tabular-nums">
+            <p className="page-subtitle tabular-nums">
               활성 팀원 {data.length}명
             </p>
           )}

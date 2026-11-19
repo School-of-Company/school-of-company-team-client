@@ -331,7 +331,7 @@ export function TaskEditor({
           </Field>
         )}
         {project && milestones.length > 0 && (
-          <Field id={`${prefix}-milestone`} label="Milestone">
+          <Field id={`${prefix}-milestone`} label="마일스톤">
             <Select
               id={`${prefix}-milestone`}
               name="milestoneId"

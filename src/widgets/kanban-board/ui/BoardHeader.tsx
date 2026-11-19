@@ -25,7 +25,7 @@ export function BoardHeader({
 }) {
   return (
     <>
-      <header className="board-header flex flex-wrap items-center justify-between gap-4">
+      <header className="page-header">
         <div className="min-w-0">
           {project && (
             <p className="board-breadcrumb">
@@ -34,12 +34,12 @@ export function BoardHeader({
               <span>{project.key}</span>
             </p>
           )}
-          <h1 className="text-xl font-semibold break-words">
+          <h1 className="break-words">
             {project?.name ??
               (scope === "PERSONAL" ? "내 업무" : "팀 공용 보드")}
           </h1>
           {board && (
-            <p className="mt-1 text-xs text-muted tabular-nums">
+            <p className="page-subtitle tabular-nums">
               업무 {boardTotal(board)}개
             </p>
           )}

@@ -83,7 +83,7 @@ export function AttentionSection({
   return (
     <Panel
       id="home-attention"
-      title="지금 확인할 것"
+      title="확인 필요"
       meta={
         total === undefined ? undefined : total === 0 ? "없음" : `${total}건`
       }

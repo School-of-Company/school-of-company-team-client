@@ -83,7 +83,7 @@ function Milestones({ project, manages }: PlanningContext) {
       {milestones.isPending ? (
         <div
           role="status"
-          aria-label="Milestone 불러오는 중"
+          aria-label="마일스톤 불러오는 중"
           className="grid gap-2"
         >
           <Skeleton className="h-16" />
@@ -91,7 +91,7 @@ function Milestones({ project, manages }: PlanningContext) {
         </div>
       ) : milestones.isError ? (
         <ErrorState
-          title="Milestone을 불러오지 못했습니다"
+          title="마일스톤을 불러오지 못했습니다"
           description={milestoneErrorMessage(
             normalizeApiError(milestones.error),
           )}
@@ -99,18 +99,11 @@ function Milestones({ project, manages }: PlanningContext) {
         />
       ) : milestones.data.length === 0 ? (
         <EmptyState
-          title="아직 Milestone이 없습니다"
+          title="아직 마일스톤이 없습니다"
           description={
             manages
               ? "출시나 마감처럼 여러 업무가 함께 닿을 목표를 만들고, 업무 상세에서 지정하세요."
-              : "PM 또는 헤드 어드민이 Milestone을 만들면 여기에 보입니다."
-          }
-          action={
-            manages && (
-              <Button variant="secondary" onClick={() => setCreating(true)}>
-                새 Milestone
-              </Button>
-            )
+              : "PM 또는 헤드 어드민이 마일스톤을 만들면 여기에 보입니다."
           }
         />
       ) : (
@@ -152,8 +145,8 @@ function Milestones({ project, manages }: PlanningContext) {
       )}
       <MilestoneFormDialog
         open={creating}
-        title="새 Milestone"
-        submitLabel="Milestone 만들기"
+        title="새 마일스톤"
+        submitLabel="마일스톤 만들기"
         onClose={() => setCreating(false)}
         onSubmit={(input) => actions.create.mutateAsync(input)}
       />
@@ -205,7 +198,7 @@ function MilestonePanel({
     return (
       <MilestoneFormDialog
         open
-        title="Milestone 수정"
+        title="마일스톤 수정"
         submitLabel="변경 저장"
         initial={milestone}
         onClose={() => setEditing(false)}

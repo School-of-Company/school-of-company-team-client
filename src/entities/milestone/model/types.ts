@@ -39,11 +39,11 @@ export function milestoneOverdue(milestone: Milestone, today: string) {
 }
 
 const errors: Readonly<Record<string, string>> = {
-  MILESTONE_NOT_FOUND: "Milestone을 찾을 수 없습니다. 목록을 다시 확인하세요.",
+  MILESTONE_NOT_FOUND: "마일스톤을 찾을 수 없습니다. 목록을 다시 확인하세요.",
   DUPLICATE_MILESTONE_NAME:
-    "같은 이름의 Milestone이 있습니다. 다른 이름을 쓰세요.",
-  MILESTONE_NOT_IN_PROJECT: "이 프로젝트의 Milestone만 고를 수 있습니다.",
-  INVALID_SCOPE: "프로젝트 업무만 Milestone에 넣을 수 있습니다.",
+    "같은 이름의 마일스톤이 있습니다. 다른 이름을 쓰세요.",
+  MILESTONE_NOT_IN_PROJECT: "이 프로젝트의 마일스톤만 고를 수 있습니다.",
+  INVALID_SCOPE: "프로젝트 업무만 마일스톤에 넣을 수 있습니다.",
   PROJECT_FORBIDDEN: "이 작업을 할 권한이 없습니다.",
   PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능합니다.",
   PROJECT_NOT_FOUND: "프로젝트가 없거나 볼 수 없습니다.",

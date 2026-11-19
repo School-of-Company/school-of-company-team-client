@@ -274,7 +274,7 @@ test("home shows today, attention, and the active sprint from the real API", asy
   await expect(today.getByText(titles.progress)).toBeVisible();
   // 내 개인 업무는 내 홈에만 나온다.
   await expect(today.getByText(titles.personal).first()).toBeVisible();
-  const sprints = page.getByRole("region", { name: "진행 중 Sprint" });
+  const sprints = page.getByRole("region", { name: "진행 중 스프린트" });
   await expect(sprints.getByText("11월 3주차")).toBeVisible();
   await expect(sprints.getByText("내일 종료")).toBeVisible();
   await expect(

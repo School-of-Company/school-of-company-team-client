@@ -57,8 +57,7 @@ export function PullRequestSignals({
         <ReviewChip signal="REQUESTED">리뷰 대기: {waiting}</ReviewChip>
       )}
       <span className="text-xs text-muted tabular-nums">
-        {formatDate(signal.syncedAt, { year: undefined, ...time })}{" "}
-        반영
+        {formatDate(signal.syncedAt, { year: undefined, ...time })} 반영
       </span>
     </div>
   );

@@ -50,7 +50,7 @@ async function expectBoardUsable(page: Page) {
   ).toBe(false);
 }
 
-test("Milestone 패널의 '보드에서 보기'로 가도 보드를 클릭·키보드로 조작할 수 있다", async ({
+test("마일스톤 패널의 '보드에서 보기'로 가도 보드를 클릭·키보드로 조작할 수 있다", async ({
   page,
 }) => {
   const name = `숨김 ${unique()}`;

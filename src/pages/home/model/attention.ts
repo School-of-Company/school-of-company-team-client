@@ -10,7 +10,7 @@ export const ruleLabels: Readonly<Record<AttentionRule, string>> = {
   DUE_SOON: "오늘·내일 마감",
   MERGED_NOT_DONE: "merge됐지만 미완료",
   RULE_MARKED: "자동화 규칙이 표시함",
-  SPRINT_ENDING: "Sprint 종료 임박",
+  SPRINT_ENDING: "스프린트 종료 임박",
 };
 
 /** 서버 정렬(규칙 순 → 날짜 → id)을 유지한 채 규칙별로 묶는다. 빈 규칙은 뺀다. */

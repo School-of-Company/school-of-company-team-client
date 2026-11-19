@@ -100,7 +100,7 @@ export function SprintPlan({
     change(
       Object.fromEntries(ids.map((id) => [id, "add" as const])),
       { action: "add", taskIds: ids },
-      `${ids.length}개를 Sprint에 넣었습니다.`,
+      `${ids.length}개를 스프린트에 넣었습니다.`,
     );
     setChecked([]);
   }
@@ -108,7 +108,7 @@ export function SprintPlan({
     change(
       { [task.id]: "remove" },
       { action: "remove", taskId: task.id },
-      `${task.key}을(를) Sprint에서 뺐습니다.`,
+      `${task.key}을(를) 스프린트에서 뺐습니다.`,
     );
   }
   function onDrop(target: "in" | "out", event: DragEvent) {
@@ -232,7 +232,7 @@ export function SprintPlan({
                         variant="ghost"
                         className="ui-button-sm"
                         disabled={busy}
-                        aria-label={`${task.key} Sprint에 넣기`}
+                        aria-label={`${task.key} 스프린트에 넣기`}
                         onClick={() => add([task.id])}
                       >
                         넣기
@@ -268,7 +268,7 @@ export function SprintPlan({
           </h3>
         </div>
         {scoped.isPending ? (
-          <PlanSkeleton label="Sprint 업무 불러오는 중" />
+          <PlanSkeleton label="스프린트 업무 불러오는 중" />
         ) : scoped.isError ? (
           <ErrorState
             description={sprintErrorMessage(normalizeApiError(scoped.error))}
@@ -284,7 +284,7 @@ export function SprintPlan({
             />
           </div>
         ) : (
-          <ul className="plan-list" aria-label="Sprint 업무">
+          <ul className="plan-list" aria-label="스프린트 업무">
             {view.scoped.map((task) => (
               <TaskRow
                 key={task.id}
@@ -296,7 +296,7 @@ export function SprintPlan({
                       variant="ghost"
                       className="ui-button-sm"
                       disabled={busy}
-                      aria-label={`${task.key} Sprint에서 빼기`}
+                      aria-label={`${task.key} 스프린트에서 빼기`}
                       onClick={() => remove(task)}
                     >
                       빼기

@@ -107,7 +107,7 @@ function IncidentWorkspace({
   const [status, setStatus] = useState<IncidentDetail["status"] | null>(null);
   return (
     <div className="incident-detail grid gap-5">
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
             <Link href={routes.incidents}>사고</Link>

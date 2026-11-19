@@ -52,7 +52,7 @@ test.describe.configure({ mode: "serial", timeout: 180_000 });
 let taskId = "";
 let bucketId = "";
 let sprintId = "";
-const sprintName = `로그인 개선 Sprint ${seed.run}`;
+const sprintName = `로그인 개선 스프린트 ${seed.run}`;
 const settings = `/projects/${seed.project.id}/settings?tab=automation`;
 
 test.beforeAll(async () => {
@@ -262,7 +262,7 @@ test("⌘K로 검색하고 키보드로 결과를 연다", async ({ page }) => {
   await capture(page, "search-results-390");
 });
 
-test("Sprint 결과는 Sprint 상세로 연다", async ({ page }) => {
+test("스프린트 결과는 스프린트 상세로 연다", async ({ page }) => {
   await signIn(page, seed.admin);
   await page.goto("/me");
   await expect(
@@ -271,7 +271,7 @@ test("Sprint 결과는 Sprint 상세로 연다", async ({ page }) => {
   await page.keyboard.press("ControlOrMeta+k");
   const palette = page.getByRole("dialog", { name: "검색" });
   await palette.getByRole("combobox", { name: "검색어" }).fill(sprintName);
-  const group = palette.getByRole("group", { name: "Sprint" });
+  const group = palette.getByRole("group", { name: "스프린트" });
   await expect(group.getByRole("option").first()).toContainText(sprintName);
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(

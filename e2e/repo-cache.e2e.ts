@@ -144,7 +144,11 @@ test("발행 저장소 목록을 본 뒤 비공개로 바뀌면 다른 화면에
   // 같은 문서 안에서 다른 화면으로 갔다가(클라이언트 이동) 돌아온다.
   await page
     .getByRole("navigation", { name: "주 메뉴" })
-    .getByRole("link", { name: "내 보드" })
+    .getByRole("link", { name: "내 업무" })
+    .click();
+  await page
+    .getByRole("navigation", { name: "보기" })
+    .getByRole("link", { name: "보드" })
     .click();
   await expect(page).toHaveURL(/\/me$/);
   await setPrivate(true);

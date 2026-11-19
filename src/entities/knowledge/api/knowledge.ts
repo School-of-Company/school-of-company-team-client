@@ -33,8 +33,7 @@ export const knowledgeApi = {
         params: { ...filter, limit: 200 },
       })
     ).data,
-  detail: async (id: string) =>
-    (await api.get<KnowledgeDetail>(path(id))).data,
+  detail: async (id: string) => (await api.get<KnowledgeDetail>(path(id))).data,
   create: async (body: CreateKnowledge) =>
     (await api.post<KnowledgeDetail>("/api/v1/knowledge", body)).data,
   update: async (id: string, body: UpdateKnowledge) =>

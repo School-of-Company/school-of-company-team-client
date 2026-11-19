@@ -26,12 +26,12 @@ const column = (page: Page, status: string) =>
 const card = (page: Page | Locator, text: string) =>
   page.locator("article.board-card", { hasText: text });
 
-test("토큰을 주입하면 홈으로 들어간다", async ({ page }) => {
+test("토큰을 주입하면 내 업무(목록)로 들어간다", async ({ page }) => {
   await signIn(page, seed.member.tokens);
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/);
   await expect(
-    page.getByRole("heading", { level: 1, name: "홈" }),
+    page.getByRole("heading", { level: 1, name: "내 업무" }),
   ).toBeVisible();
   await expect(page.getByText(seed.member.name).first()).toBeVisible();
 });
@@ -164,7 +164,7 @@ test("참여하지 않은 사용자는 비공개 프로젝트와 관리자 화�
   await signIn(page, seed.outsider.tokens);
   await page.goto("/me");
   await expect(
-    page.getByRole("heading", { level: 1, name: "내 보드" }),
+    page.getByRole("heading", { level: 1, name: "내 업무" }),
   ).toBeVisible();
   await expect(
     page

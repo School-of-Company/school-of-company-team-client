@@ -76,9 +76,9 @@ export function TaskFilters({
   const openSprints = sprints.filter((sprint) => sprint.status !== "CLOSED");
   const sprintLabel = (value: string | null) =>
     value === "current"
-      ? "현재 Sprint"
+      ? "현재 스프린트"
       : value === "none"
-        ? "Sprint 없음"
+        ? "스프린트 없음"
         : `Sprint ${sprints.find((sprint) => sprint.id === value)?.name ?? ""}`.trim();
   const selected = (key: BoardFilterKey) =>
     params.getAll(key).flatMap((value) => value.split(","));
@@ -136,14 +136,14 @@ export function TaskFilters({
     },
     {
       key: "milestone",
-      label: "Milestone",
+      label: "마일스톤",
       choices: milestones.length
         ? [
             ...milestones.map((milestone) => ({
               value: milestone.id,
               label: milestone.name,
             })),
-            { value: "none", label: "Milestone 없음" },
+            { value: "none", label: "마일스톤 없음" },
           ]
         : [],
     },
@@ -284,8 +284,8 @@ export function TaskFilters({
                 }
               >
                 <option value="">전체</option>
-                <option value="current">현재 Sprint</option>
-                <option value="none">Sprint 없음</option>
+                <option value="current">현재 스프린트</option>
+                <option value="none">스프린트 없음</option>
                 {openSprints.map((sprint) => (
                   <option key={sprint.id} value={sprint.id}>
                     {sprint.name}

@@ -56,7 +56,7 @@ function SprintList({ project, manages }: PlanningContext) {
       {sprints.isPending ? (
         <div
           role="status"
-          aria-label="Sprint 불러오는 중"
+          aria-label="스프린트 불러오는 중"
           className="grid gap-3"
         >
           <Skeleton className="h-32" />
@@ -65,24 +65,17 @@ function SprintList({ project, manages }: PlanningContext) {
         </div>
       ) : sprints.isError ? (
         <ErrorState
-          title="Sprint를 불러오지 못했습니다"
+          title="스프린트를 불러오지 못했습니다"
           description={sprintErrorMessage(normalizeApiError(sprints.error))}
           onRetry={() => void sprints.refetch()}
         />
       ) : list.length === 0 ? (
         <EmptyState
-          title="아직 Sprint가 없습니다"
+          title="아직 스프린트가 없습니다"
           description={
             manages
-              ? "기간과 목표를 정해 첫 Sprint를 만들고, 버킷이나 검토 필요 업무를 넣으세요."
-              : "PM 또는 헤드 어드민이 Sprint를 만들면 여기에 보입니다."
-          }
-          action={
-            manages && (
-              <Button variant="secondary" onClick={() => setCreating(true)}>
-                새 Sprint
-              </Button>
-            )
+              ? "기간과 목표를 정해 첫 스프린트를 만들고, 버킷이나 검토 필요 업무를 넣으세요."
+              : "PM 또는 헤드 어드민이 스프린트를 만들면 여기에 보입니다."
           }
         />
       ) : (
@@ -98,7 +91,7 @@ function SprintList({ project, manages }: PlanningContext) {
               진행 중인 Sprint가 없습니다.
               {manages &&
                 planned.length > 0 &&
-                " 예정 Sprint를 열어 시작하세요."}
+                " 예정 스프린트를 열어 시작하세요."}
             </p>
           )}
           <SprintRows projectId={project.id} title="예정" sprints={planned} />

@@ -173,7 +173,11 @@ test("같은 화면에서 비공개 → 공개 → 비공개를 3번 되풀이�
         characterData: true,
       });
     }, issueTitle);
-    await nav(page, "내 보드");
+    await nav(page, "내 업무");
+    await page
+      .getByRole("navigation", { name: "보기" })
+      .getByRole("link", { name: "보드" })
+      .click();
     await expect(page).toHaveURL(/\/me$/);
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1_500);

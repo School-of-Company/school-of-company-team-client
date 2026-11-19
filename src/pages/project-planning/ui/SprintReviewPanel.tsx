@@ -43,7 +43,7 @@ export function SprintReviewPanel({
   if (sprint.status === "PLANNED")
     return (
       <EmptyState
-        title="Sprint를 시작하면 리뷰를 씁니다"
+        title="스프린트를 시작하면 리뷰를 씁니다"
         description="완료·이월·막힘 업무로 초안을 만들어 PM이 고쳐 게시합니다."
       />
     );
@@ -80,7 +80,7 @@ export function SprintReviewPanel({
       />
     );
   return (
-    <article className="review-body grid gap-3" aria-label="Sprint 리뷰">
+    <article className="review-body grid gap-3" aria-label="스프린트 리뷰">
       <ReviewStamp review={review.data} />
       <Markdown>{review.data.body}</Markdown>
     </article>

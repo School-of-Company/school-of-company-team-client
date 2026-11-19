@@ -140,7 +140,7 @@ export function TaskProperties({
         )}
         {task.scope === "PROJECT" && task.projectId && (
           <div>
-            <dt>Sprint</dt>
+            <dt>스프린트</dt>
             <dd>
               {task.sprint ? (
                 <>
@@ -162,14 +162,14 @@ export function TaskProperties({
         )}
         {task.scope === "PROJECT" && (
           <div>
-            <dt>Milestone</dt>
+            <dt>마일스톤</dt>
             <dd>
               {editable &&
               onMilestone &&
               milestones &&
               milestones.length > 0 ? (
                 <Select
-                  aria-label="Milestone 변경"
+                  aria-label="마일스톤 변경"
                   value={task.milestone?.id ?? ""}
                   disabled={milestonePending}
                   onChange={(event) => onMilestone(event.target.value)}

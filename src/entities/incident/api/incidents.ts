@@ -43,14 +43,15 @@ export const incidentApi = {
     (
       await api.get<readonly IncidentSummary[]>("/api/v1/incidents", {
         params: {
-          status: filter.statuses.length ? filter.statuses.join(",") : undefined,
+          status: filter.statuses.length
+            ? filter.statuses.join(",")
+            : undefined,
           serviceId: filter.serviceId || undefined,
           limit: 200,
         },
       })
     ).data,
-  detail: async (id: string) =>
-    (await api.get<IncidentDetail>(path(id))).data,
+  detail: async (id: string) => (await api.get<IncidentDetail>(path(id))).data,
   create: async (body: CreateIncident) =>
     (await api.post<IncidentDetail>("/api/v1/incidents", body)).data,
   update: async (id: string, body: UpdateIncident) =>

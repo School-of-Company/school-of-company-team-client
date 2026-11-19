@@ -86,7 +86,7 @@ export function TaskDetailWorkspace({
     mutationFn: (milestoneId: string) =>
       taskApi.update(taskId, { milestoneId }),
     onSuccess: async () => {
-      setMessage("Milestone을 변경했습니다.");
+      setMessage("마일스톤을 변경했습니다.");
       await Promise.all([
         client.invalidateQueries({ queryKey: taskKeys.all }),
         // 진행률이 바뀐다.
