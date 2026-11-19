@@ -140,12 +140,17 @@ export function AppShell({
     { href: routes.home, label: "내 업무", icon: "home", also: routes.me },
     { href: routes.team, label: "팀 공용", icon: "team" },
     { href: routes.projects, label: "프로젝트", icon: "project" },
+    { href: routes.labs, label: "실험실", icon: "flask" },
   ];
   const orgLinks: readonly NavLink[] = [
     { href: routes.members, label: "팀원", icon: "user" },
     { href: routes.services, label: "서비스", icon: "service" },
     { href: routes.incidents, label: "사고", icon: "alert" },
     { href: routes.docs, label: "문서", icon: "doc" },
+  ];
+  const teamLinks: readonly NavLink[] = [
+    { href: routes.culture, label: "팀 문화", icon: "heart" },
+    { href: routes.guide, label: "사용법", icon: "help" },
   ];
   const accountLinks: readonly NavLink[] = [
     ...(isHeadAdmin
@@ -186,6 +191,7 @@ export function AppShell({
   );
   const accountNavigation = (
     <nav aria-label="관리" className="grid">
+      {navLinks(teamLinks)}
       {navLinks(accountLinks)}
     </nav>
   );
