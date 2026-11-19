@@ -12,7 +12,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { projectQueries } from "@/entities/project";
 import { useMe, userDestination } from "@/entities/user";
-import { isSearchShortcut, SearchPalette } from "@/features/global-search";
+import { isSearchShortcut } from "../model/search";
+import { SearchPalette } from "./SearchPalette";
 import { routes } from "@/shared/config";
 import {
   BrandMark,

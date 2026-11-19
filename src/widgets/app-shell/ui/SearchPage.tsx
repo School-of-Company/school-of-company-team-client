@@ -5,19 +5,18 @@ import { Suspense, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { AuthGuard } from "@/features/auth";
+import { searchQueries } from "../api/search";
 import {
   availableTypes,
   itemHref,
   SEARCH_MAX_LENGTH,
-  SearchItemLine,
   searchErrorMessage,
-  searchQueries,
   searchTypeLabels,
   searchTypes,
-  useDebounced,
   visibleGroups,
   type SupportedSearchType,
-} from "@/features/global-search";
+} from "../model/search";
+import { SearchItemLine, useDebounced } from "./SearchPalette";
 import { normalizeApiError } from "@/shared/api";
 import { EmptyState, ErrorState, Skeleton, Spinner } from "@/shared/ui";
 

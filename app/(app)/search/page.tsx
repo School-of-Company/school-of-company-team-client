@@ -1,1 +1,1 @@
-export { SearchPage as default } from "@/pages/search";
+export { SearchPage as default } from "@/widgets/app-shell";
