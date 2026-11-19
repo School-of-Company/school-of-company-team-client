@@ -647,9 +647,11 @@ select.ui-input {
   border-color: var(--foreground);
   color: var(--foreground);
 }
+/* 탭이 폭보다 많으면 줄을 바꾸지 않고 탭 줄 안에서만 가로로 스크롤한다. */
 .settings-nav {
   display: inline-flex;
-  flex-wrap: wrap;
+  max-width: 100%;
+  overflow-x: auto;
   gap: 2px;
   justify-self: start;
   padding: 2px;
@@ -658,7 +660,9 @@ select.ui-input {
 }
 .settings-nav a {
   display: inline-flex;
+  flex-shrink: 0;
   min-height: 26px;
+  white-space: nowrap;
   align-items: center;
   padding-inline: var(--space-3);
   border-radius: var(--radius-sm);
@@ -2206,7 +2210,8 @@ select.ui-input {
   min-height: var(--control-md);
   align-items: center;
   gap: var(--space-2);
-  margin: var(--space-4) 0 var(--space-1);
+  /* 아래 여백은 메뉴 묶음 간격(nav + nav)과 같게 둔다. */
+  margin: var(--space-4) 0 var(--space-5);
   padding-inline: var(--space-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -2235,7 +2240,6 @@ select.ui-input {
 }
 .ui-drawer .app-search-button {
   margin-top: 0;
-  margin-bottom: var(--space-4);
 }
 .search-dialog {
   width: min(40rem, calc(100% - 2rem));
