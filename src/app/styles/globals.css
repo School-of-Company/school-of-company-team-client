@@ -3765,6 +3765,10 @@ a.search-option:hover {
   gap: var(--space-2);
   font-size: var(--text-sm);
 }
+.lab-link .ui-link-button {
+  flex: none;
+  white-space: nowrap;
+}
 .lab-link svg {
   width: 16px;
   height: 16px;
