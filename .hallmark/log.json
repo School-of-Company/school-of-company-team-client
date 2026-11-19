@@ -247,5 +247,25 @@
   "sweep": "sloplint static: 0 FAIL, 0 WARN, 3 DISMISSED — identical to origin/main baseline; authenticated screens verified with real-API Playwright captures in .omo/evidence/T8-F",
   "prompt": "Stage 8 F8 automation rules and unified search in the existing design system (design.md), no new tokens",
   "date": "2026-11-19"
+ },
+ {
+  "mode": "audit",
+  "depth": "component",
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
+  "signature": "UI polish: sidebar search button spacing matches nav group gap; segmented tab rows (settings-nav) stay on one line and scroll inside the row when they overflow",
+  "sections": [
+   "sidebar search button",
+   "mobile drawer search button",
+   "project settings tabs",
+   "settings-nav tab rows (incidents, services, docs, sprint, search)"
+  ],
+  "entry": "src/app/styles/globals.css (.app-search-button, .settings-nav)",
+  "waived": [],
+  "sweep": "sloplint static: 0 FAIL, 2 REFLEX, 0 WARN, 4 DISMISSED — identical to origin/main baseline; before/after real-API Playwright captures (1440·390 × light·dark) in .omo/evidence/T-polish",
+  "prompt": "Fix V-8-front L1 (search button → '내 일' 4px gap) and T9 Low (b) (390 settings tabs wrap) with existing tokens, no redesign",
+  "date": "2026-11-19"
  }
 ]
