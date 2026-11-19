@@ -2254,6 +2254,12 @@ select.ui-input {
 .incident-entry[data-kind="CREATED"] .incident-entry-marker {
   border-radius: var(--radius-sm);
 }
+/* 한국어 낱말이 줄 끝에서 쪼개지지 않게 한다(긴 영문·URL은 그래도 넘치지 않게 끊는다). */
+.incident-entry p,
+.action-items > li > span:first-child {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 .incident-entry-kind {
   color: var(--muted);
   font-size: var(--text-xs);
