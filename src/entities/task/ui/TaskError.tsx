@@ -10,10 +10,13 @@ export function TaskError({
   error,
   onRetry,
   imported = false,
+  retryMissing = false,
 }: {
   readonly error: unknown;
   readonly onRetry: () => void;
   readonly imported?: boolean;
+  /** 404에도 다시 시도를 둔다. 권한이 돌아올 수 있는 상세(비공개 전환·참여 해제 뒤 회복)에서만 쓴다. */
+  readonly retryMissing?: boolean;
 }) {
   const problem = normalizeApiError(error);
   const titles: Readonly<Record<string, string>> = {
@@ -34,7 +37,7 @@ export function TaskError({
             ? "GitHub에서 가져온 업무라면 원본 접근 권한을 확인하거나 다시 로그인해 주세요."
             : problem.message
         }
-        onRetry={problem.status === 404 ? undefined : onRetry}
+        onRetry={problem.status === 404 && !retryMissing ? undefined : onRetry}
       />
       {problem.code === "ONBOARDING_REQUIRED" && (
         <Link href="/pending" className="text-brand underline">
