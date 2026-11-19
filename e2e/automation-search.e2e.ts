@@ -281,6 +281,71 @@ test("Sprint 결과는 Sprint 상세로 연다", async ({ page }) => {
   await expect(page.getByText(sprintName, { exact: true })).toBeVisible();
 });
 
+test("문서·사고를 검색하고 키보드·유형 필터로 연다", async ({ page }) => {
+  const query = `${seed.run} 게이트웨이`;
+  const service = await call<{ id: string }>(
+    "/api/v1/services",
+    seed.admin,
+    "POST",
+    {
+      key: `t8f-gw-${seed.run}`,
+      name: `T8F 게이트웨이 서비스 ${seed.run}`,
+      primaryOwnerId: seed.member.id,
+    },
+  );
+  const incident = await call<{ id: string }>(
+    "/api/v1/incidents",
+    seed.admin,
+    "POST",
+    { title: `${query} 장애`, severity: "SEV2", serviceIds: [service.id] },
+  );
+  const doc = await call<{ id: string }>(
+    "/api/v1/knowledge",
+    seed.admin,
+    "POST",
+    {
+      kind: "RUNBOOK",
+      title: `${query} 복구 절차`,
+      body: "재시작 순서",
+      serviceIds: [service.id],
+    },
+  );
+
+  await signIn(page, seed.admin);
+  await page.goto("/");
+  await expect(
+    page.getByRole("button", { name: /검색/ }).first(),
+  ).toBeVisible();
+  await page.keyboard.press("ControlOrMeta+k");
+  const palette = page.getByRole("dialog", { name: "검색" });
+  await palette.getByRole("combobox", { name: "검색어" }).fill(query);
+  const results = palette.getByRole("listbox", { name: "검색 결과" });
+  // 묶음 순서: 업무 → 문서 → 사고 → 서비스 → Sprint(서버 순서).
+  await expect(results.getByRole("group", { name: "문서" })).toContainText(
+    `${query} 복구 절차`,
+  );
+  await expect(results.getByRole("group", { name: "사고" })).toContainText(
+    "SEV2",
+  );
+  await capture(page, "search-docs-incidents-1440");
+  // 첫 항목(문서) → 아래 화살표 한 번 = 사고.
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`/incidents/${incident.id}$`));
+
+  await page.goto(`/search?q=${encodeURIComponent(query)}&type=DOCUMENT`);
+  await expect(
+    page.getByRole("navigation", { name: "결과 유형" }).getByRole("link", {
+      name: "문서",
+    }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("heading", { name: /사고/ })).toHaveCount(0);
+  await page
+    .getByRole("link", { name: new RegExp(`${query} 복구 절차`) })
+    .click();
+  await expect(page).toHaveURL(new RegExp(`/docs/${doc.id}$`));
+});
+
 test("남의 개인 업무와 참여하지 않은 프로젝트 업무는 검색되지 않는다", async ({
   page,
 }) => {
@@ -319,8 +384,9 @@ test("전체 결과 화면과 검색 실패 상태", async ({ page }) => {
   ).toBeVisible();
   const types = page.getByRole("navigation", { name: "결과 유형" });
   await expect(types.getByRole("link", { name: "업무" })).toBeVisible();
-  // 단계 7 merge 전: 문서·사고 필터는 안내 없이 없다.
-  await expect(types.getByRole("link", { name: "문서" })).toHaveCount(0);
+  // 단계 7 뒤 서버가 문서·사고 원천을 갖고 있어 필터에 나온다(unavailableTypes=[]).
+  await expect(types.getByRole("link", { name: "문서" })).toBeVisible();
+  await expect(types.getByRole("link", { name: "사고" })).toBeVisible();
   await expect(
     page.getByRole("link", { name: new RegExp(title) }),
   ).toBeVisible();

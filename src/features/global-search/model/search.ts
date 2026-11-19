@@ -1,3 +1,10 @@
+import { incidentStatusLabels, type IncidentStatus } from "@/entities/incident";
+import {
+  kindLabels as documentKindLabels,
+  knowledgeStatusLabels,
+  type KnowledgeKind,
+  type KnowledgeStatus,
+} from "@/entities/knowledge";
 import { statusLabels, type TaskStatus } from "@/entities/task";
 import { tierLabels, type ServiceTier } from "@/entities/service";
 import { routes } from "@/shared/config";
@@ -26,15 +33,19 @@ export type SearchResponse = {
   readonly unavailableTypes: readonly SearchType[];
 };
 
-// ponytail: 문서·사고 화면(단계 7)이 merge 되면 여기에 DOCUMENT·INCIDENT 를 더하고 itemHref 에 경로를 넣는다.
+/** 서버 SearchType 순서와 같다(묶음 순서). */
 export const searchTypes = [
   "TASK",
+  "DOCUMENT",
+  "INCIDENT",
   "SERVICE",
   "SPRINT",
 ] as const satisfies readonly SearchType[];
 export type SupportedSearchType = (typeof searchTypes)[number];
 export const searchTypeLabels: Readonly<Record<SupportedSearchType, string>> = {
   TASK: "업무",
+  DOCUMENT: "문서",
+  INCIDENT: "사고",
   SERVICE: "서비스",
   SPRINT: "Sprint",
 };
@@ -74,6 +85,10 @@ export function itemHref(item: SearchItem): string | null {
   switch (item.type) {
     case "TASK":
       return routes.task(item.id);
+    case "DOCUMENT":
+      return routes.doc(item.id);
+    case "INCIDENT":
+      return routes.incident(item.id);
     case "SERVICE":
       return item.key ? routes.service(item.key) : null;
     case "SPRINT":
@@ -101,6 +116,23 @@ export function itemMeta(item: SearchItem): readonly string[] {
       context,
     ].filter((value): value is string => !!value);
   }
+  // 문서·사고는 서버가 제목·상태·종류/심각도만 준다(연결 업무 정보는 응답에 없다).
+  if (item.type === "DOCUMENT")
+    return [
+      item.status
+        ? (knowledgeStatusLabels[item.status as KnowledgeStatus] ?? item.status)
+        : null,
+      item.context
+        ? (documentKindLabels[item.context as KnowledgeKind] ?? item.context)
+        : null,
+    ].filter((value): value is string => !!value);
+  if (item.type === "INCIDENT")
+    return [
+      item.context,
+      item.status
+        ? (incidentStatusLabels[item.status as IncidentStatus] ?? item.status)
+        : null,
+    ].filter((value): value is string => !!value);
   if (item.type === "SERVICE")
     return item.context
       ? [tierLabels[item.context as ServiceTier] ?? item.context]

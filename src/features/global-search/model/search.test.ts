@@ -53,7 +53,7 @@ const response: SearchResponse = {
 test("only non-empty groups of types the screen can open are shown, in server order", () => {
   assert.deepEqual(
     visibleGroups(response).map((group) => group.type),
-    ["TASK", "SERVICE"],
+    ["TASK", "DOCUMENT", "SERVICE"],
   );
   assert.deepEqual(
     visibleGroups(response, "SERVICE").map((group) => group.type),
@@ -63,8 +63,23 @@ test("only non-empty groups of types the screen can open are shown, in server or
 });
 
 test("types the server cannot search yet are left out of the filter without notice", () => {
-  assert.deepEqual(availableTypes(response), ["TASK", "SERVICE"]);
-  assert.deepEqual(availableTypes(undefined), ["TASK", "SERVICE", "SPRINT"]);
+  assert.deepEqual(availableTypes(response), [
+    "TASK",
+    "DOCUMENT",
+    "INCIDENT",
+    "SERVICE",
+  ]);
+  assert.deepEqual(availableTypes(undefined), [
+    "TASK",
+    "DOCUMENT",
+    "INCIDENT",
+    "SERVICE",
+    "SPRINT",
+  ]);
+  assert.deepEqual(
+    availableTypes({ ...response, unavailableTypes: ["DOCUMENT", "INCIDENT"] }),
+    ["TASK", "SERVICE", "SPRINT"],
+  );
 });
 
 test("results link to their own screens", () => {
@@ -77,7 +92,11 @@ test("results link to their own screens", () => {
     itemHref({ ...task, type: "SPRINT", id: "S1" }),
     "/projects/P1/sprints/S1",
   );
-  assert.equal(itemHref({ ...task, type: "INCIDENT" }), null);
+  assert.equal(itemHref({ ...task, type: "DOCUMENT", id: "D1" }), "/docs/D1");
+  assert.equal(
+    itemHref({ ...task, type: "INCIDENT", id: "I1" }),
+    "/incidents/I1",
+  );
 });
 
 test("meta shows readable status and scope", () => {
@@ -93,6 +112,28 @@ test("meta shows readable status and scope", () => {
   assert.deepEqual(
     itemMeta({ ...task, type: "SPRINT", status: "ACTIVE", context: "HUB" }),
     ["진행 중", "HUB"],
+  );
+});
+
+test("documents and incidents show their own status, kind and severity", () => {
+  const base = { ...task, key: null, projectId: null };
+  assert.deepEqual(
+    itemMeta({
+      ...base,
+      type: "DOCUMENT",
+      status: "PUBLISHED",
+      context: "RUNBOOK",
+    }),
+    ["게시", "Runbook"],
+  );
+  assert.deepEqual(
+    itemMeta({
+      ...base,
+      type: "INCIDENT",
+      status: "MITIGATED",
+      context: "SEV1",
+    }),
+    ["SEV1", "완화됨"],
   );
 });
 
