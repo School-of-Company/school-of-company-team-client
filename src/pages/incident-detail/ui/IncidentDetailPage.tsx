@@ -1,0 +1,201 @@
+"use client";
+
+import Link from "next/link";
+import { Suspense, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import {
+  incidentErrorMessage,
+  incidentQueries,
+  IncidentStatusLabel,
+  isNotFound,
+  postmortemStatusLabels,
+  SeverityLabel,
+  type IncidentDetail,
+} from "@/entities/incident";
+import { StaleNotice } from "@/entities/service";
+import { isHeadAdmin } from "@/entities/user";
+import { AuthGuard } from "@/features/auth";
+import {
+  DeleteIncident,
+  IncidentFormDialog,
+  IncidentStatusDialog,
+  nextStatus,
+  nextStatusAction,
+  PostmortemPanel,
+} from "@/features/manage-incident";
+import { routes } from "@/shared/config";
+import { Button, ErrorState, Skeleton, Spinner } from "@/shared/ui";
+import { IncidentProperties } from "./IncidentProperties";
+import { IncidentTimeline } from "./IncidentTimeline";
+
+const tabs = [
+  { value: "timeline", label: "타임라인" },
+  { value: "postmortem", label: "사후 검토" },
+] as const;
+
+export function IncidentDetailPage({
+  incidentId,
+}: {
+  readonly incidentId: string;
+}) {
+  return (
+    <AuthGuard require="work">
+      {(user) => (
+        <Suspense fallback={<Spinner label="사고 불러오는 중" />}>
+          <IncidentDetailContent
+            key={incidentId}
+            incidentId={incidentId}
+            headAdmin={isHeadAdmin(user)}
+          />
+        </Suspense>
+      )}
+    </AuthGuard>
+  );
+}
+
+function IncidentDetailContent({
+  incidentId,
+  headAdmin,
+}: {
+  readonly incidentId: string;
+  readonly headAdmin: boolean;
+}) {
+  const detail = useQuery(incidentQueries.detail(incidentId));
+  if (isNotFound(detail.error))
+    return (
+      <ErrorState
+        title="사고를 찾을 수 없습니다"
+        description="삭제되었거나 주소가 잘못되었습니다. 사고 목록에서 다시 고르세요."
+      />
+    );
+  if (!detail.data && detail.isError)
+    return (
+      <ErrorState
+        description={incidentErrorMessage(detail.error)}
+        onRetry={() => void detail.refetch()}
+      />
+    );
+  if (!detail.data)
+    return (
+      <div role="status" aria-label="사고를 불러오는 중" className="grid gap-4">
+        <Skeleton className="w-24" />
+        <Skeleton className="h-8 w-1/2" />
+        <Skeleton className="h-64" />
+      </div>
+    );
+  return (
+    <>
+      <StaleNotice query={detail} />
+      <IncidentWorkspace incident={detail.data} headAdmin={headAdmin} />
+    </>
+  );
+}
+
+function IncidentWorkspace({
+  incident,
+  headAdmin,
+}: {
+  readonly incident: IncidentDetail;
+  readonly headAdmin: boolean;
+}) {
+  const pathname = usePathname() ?? routes.incident(incident.id);
+  const search = useSearchParams();
+  const tab =
+    tabs.find((item) => item.value === search?.get("tab"))?.value ?? "timeline";
+  const [editing, setEditing] = useState(false);
+  const [status, setStatus] = useState<IncidentDetail["status"] | null>(null);
+  return (
+    <div className="incident-detail grid gap-5">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <Link href={routes.incidents}>사고</Link>
+            <span aria-hidden="true">/</span>
+            <span>{incident.status === "RESOLVED" ? "해결됨" : "진행 중"}</span>
+          </p>
+          <h1 className="task-title font-semibold">{incident.title}</h1>
+          <p className="mt-2 flex flex-wrap items-center gap-3">
+            <SeverityLabel severity={incident.severity} />
+            <IncidentStatusLabel status={incident.status} />
+            {incident.postmortemStatus && (
+              <span className="text-xs text-muted">
+                사후 검토 {postmortemStatusLabels[incident.postmortemStatus]}
+              </span>
+            )}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {incident.canEdit && (
+            <>
+              <Button
+                className="ui-button-sm"
+                onClick={() => setStatus(nextStatus[incident.status])}
+              >
+                {nextStatusAction[incident.status]}
+              </Button>
+              <Button
+                variant="secondary"
+                className="ui-button-sm"
+                onClick={() => setStatus(incident.status)}
+              >
+                상태 변경
+              </Button>
+              <Button
+                variant="secondary"
+                className="ui-button-sm"
+                onClick={() => setEditing(true)}
+              >
+                수정
+              </Button>
+            </>
+          )}
+          {headAdmin && <DeleteIncident incidentId={incident.id} />}
+        </div>
+      </header>
+      <nav
+        aria-label="사고 메뉴"
+        className="project-nav flex min-w-0 overflow-x-auto border-b"
+      >
+        {tabs.map((item) => (
+          <Link
+            key={item.value}
+            href={
+              item.value === "timeline"
+                ? pathname
+                : `${pathname}?tab=${item.value}`
+            }
+            aria-current={tab === item.value ? "page" : undefined}
+            className="ui-nav-link flex shrink-0 items-center border-b-2 border-transparent font-medium"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+      <div className="task-detail">
+        <div className="task-detail-grid">
+          <div className="task-main">
+            {tab === "timeline" ? (
+              <IncidentTimeline incident={incident} />
+            ) : (
+              <PostmortemPanel incident={incident} />
+            )}
+          </div>
+          <IncidentProperties incident={incident} headAdmin={headAdmin} />
+        </div>
+      </div>
+      <IncidentFormDialog
+        open={editing}
+        incident={incident}
+        onClose={() => setEditing(false)}
+        onSaved={() => setEditing(false)}
+      />
+      <IncidentStatusDialog
+        open={!!status}
+        incident={incident}
+        initialStatus={status ?? incident.status}
+        onClose={() => setStatus(null)}
+      />
+    </div>
+  );
+}

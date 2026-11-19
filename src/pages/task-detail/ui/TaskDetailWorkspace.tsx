@@ -18,6 +18,7 @@ import { TaskEditor } from "@/features/edit-task";
 import { activeUsersQueryOptions } from "@/entities/user";
 import { TaskGithubPanel } from "@/features/link-github-issue";
 import { TaskDiscussion } from "./TaskDiscussion";
+import { TaskDocuments } from "./TaskDocuments";
 import { normalizeApiError } from "@/shared/api";
 import { Button, Dialog, Skeleton } from "@/shared/ui";
 import { TaskDescription, TaskProperties } from "./TaskContent";
@@ -271,6 +272,7 @@ export function TaskDetailWorkspace({
               onAccessLost={setDenied}
             />
           )}
+          {data.scope !== "PERSONAL" && <TaskDocuments taskId={data.id} />}
         </div>
         <TaskProperties
           task={data}
