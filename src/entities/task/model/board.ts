@@ -17,6 +17,8 @@ export const boardFilterKeys = [
   "bucket",
   "reviewer",
   "relation",
+  "sprint",
+  "milestone",
 ] as const;
 export type BoardFilterKey = (typeof boardFilterKeys)[number];
 export type BoardSort = "manual" | "priority" | "deadline";

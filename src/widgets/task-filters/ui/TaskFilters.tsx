@@ -21,6 +21,8 @@ export function TaskFilters({
   buckets = [],
   personal,
   repositories = [],
+  sprints = [],
+  milestones = [],
 }: {
   readonly search: string;
   readonly onChange: (search: string) => void;
@@ -36,6 +38,16 @@ export function TaskFilters({
   readonly repositories?: readonly {
     readonly id: string;
     readonly fullName: string;
+  }[];
+  /** 프로젝트 보드에서만 넘어온다. 비어 있으면 Sprint·Milestone 축을 숨긴다. */
+  readonly sprints?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly status: "PLANNED" | "ACTIVE" | "CLOSED";
+  }[];
+  readonly milestones?: readonly {
+    readonly id: string;
+    readonly name: string;
   }[];
 }) {
   const root = useRef<HTMLDetailsElement>(null);
@@ -60,6 +72,14 @@ export function TaskFilters({
     };
   }, []);
   const params = new URLSearchParams(search);
+  // 종료된 Sprint 에는 열린 소속이 없어 고를 이유가 없다(필터는 열린 소속 기준).
+  const openSprints = sprints.filter((sprint) => sprint.status !== "CLOSED");
+  const sprintLabel = (value: string | null) =>
+    value === "current"
+      ? "현재 Sprint"
+      : value === "none"
+        ? "Sprint 없음"
+        : `Sprint ${sprints.find((sprint) => sprint.id === value)?.name ?? ""}`.trim();
   const selected = (key: BoardFilterKey) =>
     params.getAll(key).flatMap((value) => value.split(","));
   const axes: readonly {
@@ -115,6 +135,19 @@ export function TaskFilters({
       ],
     },
     {
+      key: "milestone",
+      label: "Milestone",
+      choices: milestones.length
+        ? [
+            ...milestones.map((milestone) => ({
+              value: milestone.id,
+              label: milestone.name,
+            })),
+            { value: "none", label: "Milestone 없음" },
+          ]
+        : [],
+    },
+    {
       key: "status",
       label: "상태",
       choices: taskStatuses.map((status) => ({
@@ -165,6 +198,9 @@ export function TaskFilters({
                 {axis.label} {selected(axis.key).length}
               </Badge>
             ))}
+          {params.get("sprint") && (
+            <Badge>{sprintLabel(params.get("sprint"))}</Badge>
+          )}
           {params.get("dueWithin") && (
             <Badge>
               마감{" "}
@@ -236,6 +272,28 @@ export function TaskFilters({
                 ))}
               </fieldset>
             ))}
+          {sprints.length > 0 && (
+            <label className="grid content-start gap-2 text-sm font-semibold">
+              Sprint
+              <Select
+                value={params.get("sprint") ?? ""}
+                onChange={(event) =>
+                  onChange(
+                    changeBoardFilter(search, "sprint", [event.target.value]),
+                  )
+                }
+              >
+                <option value="">전체</option>
+                <option value="current">현재 Sprint</option>
+                <option value="none">Sprint 없음</option>
+                {openSprints.map((sprint) => (
+                  <option key={sprint.id} value={sprint.id}>
+                    {sprint.name}
+                  </option>
+                ))}
+              </Select>
+            </label>
+          )}
           <label className="grid content-start gap-2 text-sm font-semibold">
             마감일
             <Select

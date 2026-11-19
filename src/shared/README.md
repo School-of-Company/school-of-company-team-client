@@ -8,7 +8,9 @@
 
 W2는 client effect에서 `api.interceptors.request.use`로 토큰을 주입하고 cleanup에서 eject합니다. shared는 토큰을 저장하지 않습니다. `subscribeApiErrors(callback)`은 정규화된 오류를 구독하며 반환 함수를 effect cleanup으로 사용합니다. callback은 401 또는 403 `SUSPENDED`, `ACCESS_DENIED`, `ONBOARDING_REQUIRED`를 구분해 가드 정책을 적용합니다. `PROJECT_FORBIDDEN`(403), `PROJECT_ARCHIVED`(409)는 각 화면에서 안내합니다. 404는 리소스 존재를 드러내지 않는 일반 안내를 사용합니다.
 
-404/권한 실패에서 상세의 기존 `data`를 계속 표시하지 않습니다. 업무 query owner는 해당 detail/card query를 `queryClient.removeQueries({ queryKey })`로 제거하고 보드·목록을 invalidate합니다. 각 슬라이스가 자신의 query key를 소유하므로 전역에서 임의 key를 추측하지 않습니다. 제목/본문은 localStorage 등 영구 캐시에 저장하지 않습니다.
+404/권한 실패에서 상세의 기존 `data`를 계속 표시하지 않습니다. 업무 단건이 404·403이면 `forgetTask(client)`(entities/task)가 업무 쿼리를 지우고, 업무를 담는 목록(프로젝트·홈·내 리뷰 요청·팀원)은 화면에 없는 것은 지우고 화면에 있는 것은 다시 받습니다. 새 목록 슬라이스가 업무를 담으면 그 키를 `forgetTask`의 목록에 더합니다.
+
+폴링 목록의 재조회가 실패하면 `useLastData`(shared/lib) 규칙을 따릅니다: 일시 장애(네트워크·5xx)이고 마지막 성공 후 60초(서버 원본 권한 캐시 상한) 안이면 마지막 목록과 비차단 안내를, 그 밖(60초 경과, 401·403·404)은 목록을 비우고 오류만 보여 줍니다. 제목/본문은 localStorage 등 영구 캐시에 저장하지 않습니다.
 
 Query 기본값은 staleTime 10초, 4xx 재시도 없음, 일시 오류 최대 2회 재시도, mutation 재시도 없음입니다. 보드 query에만 `refetchInterval: BOARD_POLL_INTERVAL`을 지정합니다(전역 폴링 없음). 목록·상세마다 loading/empty/error 상태를 렌더링합니다.
 

@@ -4,8 +4,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { taskApi, taskKeys, taskQueries, TaskError } from "@/entities/task";
+import {
+  forgetTask,
+  taskApi,
+  taskKeys,
+  taskQueries,
+  TaskError,
+} from "@/entities/task";
 import { projectAccess, projectQueries } from "@/entities/project";
+import { milestoneQueries } from "@/entities/milestone";
 import { TaskEditor } from "@/features/edit-task";
 import { activeUsersQueryOptions } from "@/entities/user";
 import { TaskGithubPanel } from "@/features/link-github-issue";
@@ -34,7 +41,14 @@ export function TaskDetailWorkspace({
   const [deleting, setDeleting] = useState(false);
   const [denied, setDenied] = useState<unknown>(null);
   const [message, setMessage] = useState("");
-  const task = useQuery({ ...taskQueries.detail(taskId), enabled: !denied });
+  // 404·403을 받은 상세는 다시 받지 않는다(10초 폴링·재마운트가 같은 404를 되풀이하지 않게). 다시 시도는 수동 refetch.
+  const lastError = client.getQueryState(taskKeys.detail(taskId))?.error;
+  const gone =
+    !!lastError && [403, 404].includes(normalizeApiError(lastError).status);
+  const task = useQuery({
+    ...taskQueries.detail(taskId),
+    enabled: !denied && !gone,
+  });
   const project = useQuery({
     ...projectQueries.detail(task.data?.projectId ?? ""),
     enabled: !denied && !!task.data?.projectId,
@@ -43,12 +57,35 @@ export function TaskDetailWorkspace({
     ...projectQueries.buckets(task.data?.projectId ?? ""),
     enabled: !denied && task.data?.scope === "PROJECT" && !!task.data.projectId,
   });
+  const milestones = useQuery({
+    ...milestoneQueries.list(task.data?.projectId ?? ""),
+    enabled: !denied && task.data?.scope === "PROJECT" && !!task.data.projectId,
+  });
   const changeBucket = useMutation({
     mutationFn: (planningBucketId: string) =>
       taskApi.update(taskId, { planningBucketId }),
     onSuccess: async () => {
       setMessage("계획 버킷을 변경했습니다.");
       await client.invalidateQueries({ queryKey: taskKeys.all });
+    },
+    onError: (cause) => {
+      const problem = normalizeApiError(cause);
+      setMessage(problem.message);
+      if (problem.status === 403 || problem.status === 404) setDenied(cause);
+    },
+  });
+  const changeMilestone = useMutation({
+    mutationFn: (milestoneId: string) =>
+      taskApi.update(taskId, { milestoneId }),
+    onSuccess: async () => {
+      setMessage("Milestone을 변경했습니다.");
+      await Promise.all([
+        client.invalidateQueries({ queryKey: taskKeys.all }),
+        // 진행률이 바뀐다.
+        client.invalidateQueries({
+          queryKey: milestoneQueries.list(task.data?.projectId ?? "").queryKey,
+        }),
+      ]);
     },
     onError: (cause) => {
       const problem = normalizeApiError(cause);
@@ -70,14 +107,14 @@ export function TaskDetailWorkspace({
     (projectProblem.status === 403 || projectProblem.status === 404)
       ? project.error
       : null);
+  // 404 응답 하나에 정리 한 번(forgetTask가 QueryClient 단위로 응답 시각을 기억). 목록 제외는 매번 한다.
+  const errorAt = task.errorUpdatedAt;
   useEffect(() => {
     if (!taskError) return;
     const problem = normalizeApiError(taskError);
-    if (problem.status === 403 || problem.status === 404) {
-      client.removeQueries({ queryKey: taskKeys.all });
-      void client.invalidateQueries({ queryKey: ["projects"] });
-    }
-  }, [taskError, client]);
+    if (problem.status === 403 || problem.status === 404)
+      forgetTask(client, taskId, errorAt || Date.now());
+  }, [taskError, errorAt, client, taskId]);
   const changeStatus = useMutation({
     mutationFn: (status: Parameters<typeof taskApi.move>[1]["status"]) =>
       taskApi.move(taskId, { status, prevId: null, nextId: null }),
@@ -230,6 +267,11 @@ export function TaskDetailWorkspace({
           onBucket={(bucketId) => {
             if (!changeBucket.isPending) changeBucket.mutate(bucketId);
           }}
+          milestones={milestones.data}
+          milestonePending={changeMilestone.isPending}
+          onMilestone={(milestoneId) => {
+            if (!changeMilestone.isPending) changeMilestone.mutate(milestoneId);
+          }}
         />
       </div>
       <Dialog
@@ -245,6 +287,7 @@ export function TaskDetailWorkspace({
             initial={data}
             project={project.data}
             buckets={buckets.data ?? []}
+            milestones={milestones.data ?? []}
             candidates={candidates}
             onCancel={() => setEditing(false)}
             onUpdate={async (body) => {

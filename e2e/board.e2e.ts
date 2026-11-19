@@ -15,8 +15,10 @@ type TaskDetail = {
 };
 
 const seed = readSeed();
-const title = `E2E 업무 ${seed.run}`;
-const edited = `${title} 수정`;
+// `--repeat-each` 로 반복하면 같은 시드 프로젝트에 카드가 쌓인다. 회차마다 제목을 새로 만들어
+// strict 모드에서 같은 제목 카드 두 개를 만나지 않게 한다(뒤 시험들은 이 회차의 제목을 이어 쓴다).
+let title = `E2E 업무 ${seed.run}`;
+let edited = `${title} 수정`;
 let taskId = "";
 
 const column = (page: Page, status: string) =>
@@ -37,6 +39,8 @@ test("토큰을 주입하면 내 보드로 들어간다", async ({ page }) => {
 test("사이드바에서 프로젝트 보드로 이동해 시작 상태를 지정해 업무를 만든다", async ({
   page,
 }) => {
+  title = `E2E 업무 ${seed.run}-${Date.now().toString(36)}`;
+  edited = `${title} 수정`;
   await signIn(page, seed.member.tokens);
   await page.goto("/me");
   await page
@@ -145,7 +149,7 @@ test("팀 공용 보드에 업무를 만든다", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 1, name: "팀 공용 보드" }),
   ).toBeVisible();
-  const teamTitle = `E2E 팀 업무 ${seed.run}`;
+  const teamTitle = `E2E 팀 업무 ${seed.run}-${Date.now().toString(36)}`;
   await page.getByRole("button", { name: "업무 등록" }).click();
   const dialog = page.getByRole("dialog", { name: "업무 등록" });
   await dialog.getByLabel("제목 (필수)").fill(teamTitle);
