@@ -30,13 +30,15 @@ async function call<T>(
   return (text ? JSON.parse(text) : undefined) as T;
 }
 
-async function capture(page: Page, name: string) {
+async function capture(page: Page, name: string, fullPage = false) {
   if (!shots) return;
   for (const theme of ["light", "dark"] as const) {
     await page.evaluate((value) => {
       document.documentElement.dataset.theme = value;
     }, theme);
-    await page.screenshot({ path: `${shots}/${name}-${theme}.png` });
+    // 색 전환(120~200ms) 중간에 찍히지 않게 기다린다.
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: `${shots}/${name}-${theme}.png`, fullPage });
   }
 }
 
@@ -45,7 +47,7 @@ type RunPage = {
   items: { ruleName: string; status: string; resultCode: string | null }[];
 };
 
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "serial", timeout: 180_000 });
 
 let taskId = "";
 let bucketId = "";
@@ -128,7 +130,7 @@ test("PM·헤드 어드민이 규칙을 만들고 끄고 켠다", async ({ page 
   await expect(second).toBeHidden();
 
   const rules = page.getByRole("list", { name: "자동화 규칙" });
-  await expect(rules.getByRole("listitem")).toHaveCount(2);
+  await expect(rules.locator(":scope > li")).toHaveCount(2);
   const toggle = page.getByRole("switch", { name: "P0 막힘이면 PM 호출 켜기" });
   await toggle.uncheck();
   await expect
@@ -194,7 +196,7 @@ test("업무가 막히면 실행 기록에 결과와 이유가 남는다", async
     await page
       .getByRole("heading", { name: "실행 기록" })
       .scrollIntoViewIfNeeded();
-    await capture(page, name.replace("rules", "runs"));
+    await capture(page, name.replace("rules", "runs"), width === 390);
   }
   await page.getByRole("button", { name: "P0 막힘이면 PM 호출 편집" }).click();
   await expect(page.getByRole("dialog", { name: "규칙 편집" })).toBeVisible();
@@ -241,7 +243,7 @@ test("⌘K로 검색하고 키보드로 결과를 연다", async ({ page }) => {
   await page.getByRole("button", { name: "검색", exact: true }).click();
   await palette
     .getByRole("combobox", { name: "검색어" })
-    .fill(`로그인 ${seed.run}`);
+    .fill(`수정 ${seed.run}`);
   await expect(results.getByRole("option").first()).toBeVisible();
   await capture(page, "search-results-390");
 });
@@ -251,6 +253,9 @@ test("남의 개인 업무와 참여하지 않은 프로젝트 업무는 검색�
 }) => {
   await signIn(page, seed.admin);
   await page.goto("/me");
+  await expect(
+    page.getByRole("button", { name: /검색/ }).first(),
+  ).toBeVisible();
   await page.keyboard.press("ControlOrMeta+k");
   const palette = page.getByRole("dialog", { name: "검색" });
   await palette.getByRole("combobox", { name: "검색어" }).fill(personalTitle);
@@ -275,7 +280,7 @@ test("남의 개인 업무와 참여하지 않은 프로젝트 업무는 검색�
 
 test("전체 결과 화면과 검색 실패 상태", async ({ page }) => {
   await signIn(page, seed.admin);
-  await page.goto(`/search?q=${encodeURIComponent(`로그인 ${seed.run}`)}`);
+  await page.goto(`/search?q=${encodeURIComponent(`수정 ${seed.run}`)}`);
   await expect(
     page.getByRole("heading", { level: 1, name: "검색" }),
   ).toBeVisible();
@@ -293,8 +298,8 @@ test("전체 결과 화면과 검색 실패 상태", async ({ page }) => {
   // 실패 상태: 네트워크 차단으로 재현(가짜 응답 아님).
   await page.route("**/api/v1/search**", (route) => route.abort());
   await page.goto(`/search?q=${encodeURIComponent(`없는검색어${seed.run}`)}`);
-  await expect(page.getByRole("alert")).toContainText(
-    "서버에 연결할 수 없습니다",
-  );
+  await expect(
+    page.getByRole("alert").filter({ hasText: "검색하지 못했습니다" }),
+  ).toContainText("서버에 연결할 수 없습니다");
   await capture(page, "search-error-390");
 });

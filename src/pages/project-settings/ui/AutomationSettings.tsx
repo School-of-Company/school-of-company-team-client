@@ -51,6 +51,10 @@ export function AutomationSettings({
   const [editing, setEditing] = useState<AutomationRule | null | undefined>();
   const [deleting, setDeleting] = useState<AutomationRule | null>(null);
   const [runRuleId, setRunRuleId] = useState("");
+  const [toggling, setToggling] = useState<{
+    readonly ruleId: string;
+    readonly enabled: boolean;
+  } | null>(null);
   const reviewers = project.members
     .filter((member) => activeUserIds.has(member.userId))
     .map((member) => ({ value: member.userId, label: member.name }));
@@ -104,16 +108,24 @@ export function AutomationSettings({
               <RuleRow
                 key={rule.id}
                 rule={rule}
+                // 보내는 중인 값을 바로 보여 준다. 쿼리 상태 알림은 다음 틱이라, 그 사이 스위치가 되돌아 보이지 않게 한다.
+                enabled={
+                  toggling?.ruleId === rule.id ? toggling.enabled : rule.enabled
+                }
                 now={now}
                 editable={editable}
                 pending={change.isPending}
-                onToggle={(enabled) =>
-                  change.mutate({
-                    kind: "update",
-                    ruleId: rule.id,
-                    body: toggleRequest(rule, enabled),
-                  })
-                }
+                onToggle={(enabled) => {
+                  setToggling({ ruleId: rule.id, enabled });
+                  change.mutate(
+                    {
+                      kind: "update",
+                      ruleId: rule.id,
+                      body: toggleRequest(rule, enabled),
+                    },
+                    { onSettled: () => setToggling(null) },
+                  );
+                }}
                 onEdit={() => {
                   change.reset();
                   setEditing(rule);
@@ -197,6 +209,7 @@ function RuleRow({
   rule,
   now,
   editable,
+  enabled,
   pending,
   onToggle,
   onEdit,
@@ -204,6 +217,7 @@ function RuleRow({
   onShowRuns,
 }: {
   readonly rule: AutomationRule;
+  readonly enabled: boolean;
   readonly now: number;
   readonly editable: boolean;
   readonly pending: boolean;
@@ -221,13 +235,13 @@ function RuleRow({
       conditionValueLabel(condition.field, condition.value, condition.label),
     ]);
   return (
-    <li className="rule-row" data-enabled={rule.enabled || undefined}>
+    <li className="rule-row" data-enabled={enabled || undefined}>
       <input
         id={switchId}
         type="checkbox"
         role="switch"
         className="notify-switch"
-        checked={rule.enabled}
+        checked={enabled}
         aria-label={`${rule.name} 켜기`}
         disabled={!editable || pending}
         onChange={(event) => onToggle(event.currentTarget.checked)}

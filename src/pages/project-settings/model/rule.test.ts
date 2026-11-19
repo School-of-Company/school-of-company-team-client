@@ -9,6 +9,7 @@ import {
   resultMessage,
   ruleToForm,
   selectableEvents,
+  since,
   toggleRequest,
   triggerText,
   validateRuleForm,
@@ -140,4 +141,7 @@ test("summaries read as short Korean phrases", () => {
     "보낼 업무 스레드나 프로젝트 채널이 없습니다.",
   );
   assert.equal(resultMessage("NEW_CODE"), "NEW_CODE");
+  const now = Date.parse("2026-11-19T10:00:30+09:00");
+  assert.equal(since("2026-11-19T10:00:00+09:00", now), "방금");
+  assert.equal(since("2026-11-19T09:55:00+09:00", now), "5분 전");
 });

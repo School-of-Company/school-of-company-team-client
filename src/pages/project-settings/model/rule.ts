@@ -350,7 +350,8 @@ export const eventStatusOptions: readonly TaskStatus[] = taskStatuses;
 const relative = new Intl.RelativeTimeFormat("ko", { numeric: "auto" });
 /** `now` 는 렌더 밖에서 정한 값(쿼리 dataUpdatedAt)을 받는다. */
 export function since(value: string, now: number): string {
-  const minutes = Math.max(0, Math.round((now - Date.parse(value)) / 60_000));
+  const minutes = Math.max(0, Math.floor((now - Date.parse(value)) / 60_000));
+  if (minutes < 1) return "방금";
   if (minutes < 60) return relative.format(-minutes, "minute");
   const hours = Math.round(minutes / 60);
   if (hours < 48) return relative.format(-hours, "hour");
