@@ -37,6 +37,8 @@ for (const [id, role, settingsVisible] of [
     // Sprint·Milestone 은 조회 권한이 있으면 모두에게 보인다(관리 동작만 PM·헤드 어드민).
     assert.match(html, /href="\/projects\/project\/sprints"/);
     assert.match(html, /href="\/projects\/project\/milestones"/);
+    // 링크도 조회 권한이 있으면 모두에게 보인다(쓰기는 카드의 canEdit·canDelete).
+    assert.match(html, /href="\/projects\/project\/links"/);
   });
 }
 
