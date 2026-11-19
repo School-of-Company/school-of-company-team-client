@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   forgetTask,
+  isGoneError,
   taskApi,
   taskKeys,
   taskQueries,
@@ -43,15 +44,21 @@ export function TaskDetailWorkspace({
   const [message, setMessage] = useState("");
   // 404·403을 받은 상세는 다시 받지 않는다(10초 폴링·재마운트가 같은 404를 되풀이하지 않게). 다시 시도는 수동 refetch.
   const lastError = client.getQueryState(taskKeys.detail(taskId))?.error;
-  const gone =
-    !!lastError && [403, 404].includes(normalizeApiError(lastError).status);
+  const gone = !!lastError && isGoneError(lastError);
   const task = useQuery({
     ...taskQueries.detail(taskId),
     enabled: !denied && !gone,
   });
+  // 프로젝트 상세도 404·403이면 다시 받지 않는다(업무는 200인데 프로젝트만 404인 경우의 폴링·정리 반복 방지).
+  const projectError = client.getQueryState(
+    projectQueries.detail(task.data?.projectId ?? "").queryKey,
+  )?.error;
   const project = useQuery({
     ...projectQueries.detail(task.data?.projectId ?? ""),
-    enabled: !denied && !!task.data?.projectId,
+    enabled:
+      !denied &&
+      !!task.data?.projectId &&
+      !(projectError && isGoneError(projectError)),
   });
   const buckets = useQuery({
     ...projectQueries.buckets(task.data?.projectId ?? ""),
@@ -108,7 +115,13 @@ export function TaskDetailWorkspace({
       ? project.error
       : null);
   // 404 응답 하나에 정리 한 번(forgetTask가 QueryClient 단위로 응답 시각을 기억). 목록 제외는 매번 한다.
-  const errorAt = task.errorUpdatedAt;
+  // 기준 시각은 오류가 난 쪽의 응답 시각이다(업무·프로젝트). 거부(denied)는 effect가 도는 시각.
+  const errorAt =
+    taskError && taskError === task.error
+      ? task.errorUpdatedAt
+      : taskError && taskError === project.error
+        ? project.errorUpdatedAt
+        : 0;
   useEffect(() => {
     if (!taskError) return;
     const problem = normalizeApiError(taskError);
@@ -144,9 +157,13 @@ export function TaskDetailWorkspace({
     return (
       <TaskError
         error={taskError}
+        retryMissing
+        // 404·403 뒤에는 상세·프로젝트 쿼리를 꺼 두므로(반복 방지) 권한이 돌아오면 사람이 다시 받는다.
+        // 오류가 난 그 쿼리만 다시 받는다.
         onRetry={() => {
           setDenied(null);
           void task.refetch();
+          if (project.error && task.data?.projectId) void project.refetch();
         }}
       />
     );

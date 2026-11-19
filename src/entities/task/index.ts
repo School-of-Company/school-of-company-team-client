@@ -1,5 +1,6 @@
 export {
   forgetTask,
+  isGoneError,
   taskApi,
   taskKeys,
   taskQueries,

@@ -1,4 +1,4 @@
-import { api } from "@/shared/api";
+import { api, normalizeApiError } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
 import { keepPreviousKey } from "@/shared/lib";
 import {
@@ -96,6 +96,10 @@ const taskListKeys: readonly QueryKey[] = [
 
 const goneKey = (taskId: string) => ["gone-task", taskId] as const;
 
+/** 404·403: 리소스가 없거나 볼 수 없게 됐다. 다시 받아도 같은 응답이다. */
+export const isGoneError = (error: unknown) =>
+  [403, 404].includes(normalizeApiError(error).status);
+
 /**
  * 업무 단건이 404·403이면 그 업무가 남아 있을 수 있는 캐시를 정리한다.
  * - **목록 제외는 매번 한다**: 화면에 있는 목록은 그 업무를 바로 빼고(`withoutTask`), 화면에 없는 목록은 지운다
@@ -112,12 +116,17 @@ export function forgetTask(
   taskId: string,
   responseAt: number,
 ) {
-  const others = ({ queryKey }: { readonly queryKey: QueryKey }) =>
+  // 정리에서 빼는 쿼리: 404가 난 그 업무의 상세·GitHub 패널, 그리고 지금 404·403 오류 상태인 쿼리
+  // (예: 업무는 200인데 프로젝트 상세만 404). 다시 받아도 같은 오류가 새로 생겨 정리가 되풀이될 뿐이다.
+  const others = (query: {
+    readonly queryKey: QueryKey;
+    readonly state: { readonly status: string; readonly error: unknown };
+  }) =>
     !(
-      queryKey[0] === "tasks" &&
-      (queryKey[1] === "detail" || queryKey[1] === "github") &&
-      queryKey[2] === taskId
-    );
+      query.queryKey[0] === "tasks" &&
+      (query.queryKey[1] === "detail" || query.queryKey[1] === "github") &&
+      query.queryKey[2] === taskId
+    ) && !(query.state.status === "error" && isGoneError(query.state.error));
   const keys = [taskKeys.all, ...taskListKeys];
   for (const queryKey of keys) {
     client.removeQueries({ queryKey, type: "inactive", predicate: others });
