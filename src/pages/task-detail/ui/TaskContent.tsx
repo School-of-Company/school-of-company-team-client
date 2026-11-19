@@ -5,7 +5,11 @@ import {
   type TaskDetail,
   type TaskStatus,
 } from "@/entities/task";
+import Link from "next/link";
 import type { PlanningBucket } from "@/entities/project";
+import type { Milestone } from "@/entities/milestone";
+import { sprintStatusLabels } from "@/entities/sprint";
+import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
 import { Markdown, Select } from "@/shared/ui";
 
@@ -17,6 +21,9 @@ export function TaskProperties({
   buckets,
   bucketPending,
   onBucket,
+  milestones,
+  milestonePending = false,
+  onMilestone,
 }: {
   readonly task: TaskDetail;
   readonly editable: boolean;
@@ -26,6 +33,10 @@ export function TaskProperties({
   readonly buckets?: readonly PlanningBucket[];
   readonly bucketPending: boolean;
   readonly onBucket: (bucketId: string) => void;
+  /** 프로젝트 업무일 때만. 없으면 Milestone 행을 읽기 전용으로 보인다. */
+  readonly milestones?: readonly Milestone[];
+  readonly milestonePending?: boolean;
+  readonly onMilestone?: (milestoneId: string) => void;
 }) {
   const current = task.planningBucket ?? null;
   const choices =
@@ -119,6 +130,64 @@ export function TaskProperties({
                   {current.name}
                   {current.archived && (
                     <span className="text-muted"> (보관)</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-muted">없음</span>
+              )}
+            </dd>
+          </div>
+        )}
+        {task.scope === "PROJECT" && task.projectId && (
+          <div>
+            <dt>Sprint</dt>
+            <dd>
+              {task.sprint ? (
+                <>
+                  <Link
+                    href={routes.projectSprint(task.projectId, task.sprint.id)}
+                    className="hover:underline"
+                  >
+                    {task.sprint.name}
+                  </Link>
+                  <span className="text-xs text-muted">
+                    {sprintStatusLabels[task.sprint.status]}
+                  </span>
+                </>
+              ) : (
+                <span className="text-muted">없음</span>
+              )}
+            </dd>
+          </div>
+        )}
+        {task.scope === "PROJECT" && (
+          <div>
+            <dt>Milestone</dt>
+            <dd>
+              {editable &&
+              onMilestone &&
+              milestones &&
+              milestones.length > 0 ? (
+                <Select
+                  aria-label="Milestone 변경"
+                  value={task.milestone?.id ?? ""}
+                  disabled={milestonePending}
+                  onChange={(event) => onMilestone(event.target.value)}
+                >
+                  <option value="">없음</option>
+                  {milestones.map((milestone) => (
+                    <option key={milestone.id} value={milestone.id}>
+                      {milestone.name}
+                    </option>
+                  ))}
+                </Select>
+              ) : task.milestone ? (
+                <>
+                  {task.milestone.name}
+                  {task.milestone.dueDate && (
+                    <span className="text-xs text-muted">
+                      {formatDate(task.milestone.dueDate)}
+                    </span>
                   )}
                 </>
               ) : (
