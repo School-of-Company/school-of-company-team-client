@@ -93,7 +93,7 @@ export function BoardCardMenu({
           id={menuId}
           role="menu"
           aria-label={task.title + " 작업"}
-          className="absolute top-full right-0 z-20 grid w-52 rounded-md border border-border bg-surface p-1 shadow-md"
+          className="absolute top-full right-0 z-20 grid w-52 rounded-xl bg-surface-raised p-1 shadow-[var(--shadow-overlay)]"
           onKeyDown={(event) => {
             if (event.key === "Tab") {
               close();

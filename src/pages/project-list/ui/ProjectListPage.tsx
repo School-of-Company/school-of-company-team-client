@@ -38,7 +38,7 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           className="grid gap-3"
         >
           {Array.from({ length: 3 }, (_, index) => (
-            <Skeleton key={index} className="h-24" />
+            <Skeleton key={index} className="h-13" />
           ))}
         </div>
       ) : projects.isError ? (
@@ -52,30 +52,30 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           description="프로젝트 관리자에게 참여를 요청해 주세요."
         />
       ) : (
-        <ul className="divide-y divide-border border-y border-border">
+        <ul className="list">
           {projects.data.map((project) => (
-            <li key={project.id}>
+            <li key={project.id} className="list-row">
               <Link
                 href={`/projects/${encodeURIComponent(project.id)}`}
-                className="block py-4 hover:bg-surface-hover"
+                className="list-row-main"
               >
-                <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-base font-medium break-words">
-                    {project.name}
-                  </h2>
-                  <Badge>
-                    {project.visibility === "TEAM"
-                      ? "팀 전체 공개"
-                      : "참여자 공개"}
-                  </Badge>
-                </div>
-                <p className="mt-2 text-sm break-words text-muted">
-                  {project.key}
+                <span className="list-row-key">{project.key}</span>
+                <div className="grid min-w-0 gap-0.5">
+                  <h2 className="list-row-title">{project.name}</h2>
                   {project.description && (
-                    <span className="ml-3">{project.description}</span>
+                    <span className="truncate text-sm text-muted">
+                      {project.description}
+                    </span>
                   )}
-                </p>
+                </div>
               </Link>
+              <span className="list-row-meta">
+                <Badge>
+                  {project.visibility === "TEAM"
+                    ? "팀 전체 공개"
+                    : "참여자 공개"}
+                </Badge>
+              </span>
             </li>
           ))}
         </ul>

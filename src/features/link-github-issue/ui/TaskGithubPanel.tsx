@@ -241,7 +241,7 @@ export function TaskGithubPanel({
         {github.data.links.length === 0 ? (
           <p className="text-sm text-muted">없음</p>
         ) : (
-          <ul className="divide-y divide-border rounded-md border border-border">
+          <ul className="grid gap-1">
             {github.data.links.map((item) => (
               <li key={item.id} className="github-link-row">
                 <div className="flex min-w-0 items-center justify-between gap-2">

@@ -217,7 +217,7 @@ export function TaskEditor({
           aria-describedby={`${prefix}-description-hint`}
         />
         {descriptionMode === "preview" && (
-          <div className="min-h-28 rounded-md border border-border p-3">
+          <div className="min-h-28 rounded-xl bg-surface-box p-4">
             {description.trim() ? (
               <Markdown>{description}</Markdown>
             ) : (

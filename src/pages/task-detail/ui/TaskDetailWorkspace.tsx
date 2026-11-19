@@ -20,7 +20,7 @@ import { TaskGithubPanel } from "@/features/link-github-issue";
 import { TaskDiscussion } from "./TaskDiscussion";
 import { TaskDocuments } from "./TaskDocuments";
 import { normalizeApiError } from "@/shared/api";
-import { Button, Dialog, Skeleton } from "@/shared/ui";
+import { Button, Dialog, Icon, Skeleton } from "@/shared/ui";
 import { TaskDescription, TaskProperties } from "./TaskContent";
 
 export function TaskDetailWorkspace({
@@ -178,6 +178,8 @@ export function TaskDetailWorkspace({
     );
   if (!task.data) return null;
   const data = task.data;
+  const boardName =
+    data.projectName ?? (data.scope === "TEAM" ? "팀 공용" : "내 업무");
   const access =
     project.data && user ? projectAccess(project.data, user) : null;
   const editable = !!user && (data.scope !== "PROJECT" || !!access?.editable);
@@ -203,11 +205,11 @@ export function TaskDetailWorkspace({
                 ? "/team"
                 : "/me"
           }
-          className="ui-button ui-button-secondary ui-button-sm"
+          className="ui-button ui-button-ghost ui-button-sm -ml-2 gap-1"
+          aria-label={`${boardName} 보드로 돌아가기`}
         >
-          {data.projectName ??
-            (data.scope === "TEAM" ? "팀 공용 보드" : "내 보드")}
-          로 이동
+          <Icon name="chevronLeft" aria-hidden />
+          {boardName}
         </Link>
         <span className="ml-auto flex flex-wrap gap-2">
           {editable && (

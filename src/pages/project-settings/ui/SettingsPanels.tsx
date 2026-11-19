@@ -177,7 +177,7 @@ export function SettingsPanels(props: SettingsProps) {
             위험 영역
           </h2>
           <p className="text-sm text-muted">
-            아카이브하면 조회만 가능하며 기본 보드·내 보드에서 제외됩니다.
+            아카이브하면 조회만 가능하며 보드와 내 업무에서 빠집니다.
             기록은 보존됩니다.
           </p>
           {confirmArchive && (
