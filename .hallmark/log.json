@@ -6,6 +6,35 @@
   "shape": "app screen",
   "theme": "project design.md (locked)",
   "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell; 조직 group gains 사고·문서 per docs/ia.md",
+  "signature": "incident timeline (status/severity read by shape + name) and deterministic postmortem",
+  "imagery": "none",
+  "entry": "src/app/styles/globals.css (/* Incidents */ block)",
+  "sections": [
+   "incidents list",
+   "incident detail timeline",
+   "postmortem + action items",
+   "docs list",
+   "doc detail + relations",
+   "service Runbook tab",
+   "task related docs"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "prompt": "Stage 7 F7 incidents, postmortem, knowledge (ADR·RFC·Runbook) on real API",
+  "sweep": "sloplint --scope app: 0 FAIL, 2 REFLEX (7b brand tile, pre-existing on origin/main), 0 WARN; real-API Playwright captures light/dark x 1440/390 in .omo/evidence/T7-F",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
+  "mode": "build",
+  "depth": "full",
+  "shape": "app screen",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
   "nav": "existing app shell; sidebar regrouped per docs/ia.md (내 일 · 조직 · 프로젝트 · 관리)",
   "signature": "service dependency graph (SVG, no library) and deployment timeline",
   "imagery": "none",
