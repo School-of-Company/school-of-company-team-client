@@ -40,8 +40,10 @@ export function formatDate(
 
 const relative = new Intl.RelativeTimeFormat("ko", { numeric: "auto" });
 
-/** "3분 전", "5시간 전", "2일 전". 48시간까지는 시간 단위로 센다(24시간 기준이 보이게). */
+/** "방금", "3분 전", "5시간 전", "2일 전". 48시간까지는 시간 단위로 센다(24시간 기준이 보이게). */
 export function relativeSince(value: string, now: number): string {
+  // 1분 미만은 Intl 이 "현재 분"으로 써서 읽기 어색하다.
+  if (now - Date.parse(value) < 60_000) return "방금";
   const minutes = Math.max(0, Math.round((now - Date.parse(value)) / 60_000));
   if (minutes < 60) return relative.format(-minutes, "minute");
   const hours = Math.round(minutes / 60);

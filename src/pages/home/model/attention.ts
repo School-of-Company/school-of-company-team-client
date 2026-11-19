@@ -9,6 +9,7 @@ export const ruleLabels: Readonly<Record<AttentionRule, string>> = {
   HIGH_PRIORITY_UNASSIGNED: "담당자 없는 긴급·높음",
   DUE_SOON: "오늘·내일 마감",
   MERGED_NOT_DONE: "merge됐지만 미완료",
+  RULE_MARKED: "자동화 규칙이 표시함",
   SPRINT_ENDING: "Sprint 종료 임박",
 };
 
@@ -58,4 +59,6 @@ export const itemKey = (item: AttentionItem) =>
     item.pullRequest &&
       `${item.pullRequest.repositoryFullName}#${item.pullRequest.number}`,
     item.pullRequest?.reviewerLogin,
-  ].join(":");
+  ].join(":") +
+  // 같은 업무를 여러 자동화 규칙이 표시할 수 있다(규칙·업무마다 한 항목).
+  (item.automationRule ? `:${item.automationRule.id}` : "");

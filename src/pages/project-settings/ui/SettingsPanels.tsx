@@ -10,6 +10,7 @@ import {
 } from "@/features/project-integrations";
 import { getSettingsPermissions } from "@/features/project-settings";
 import { NotificationSettingsForm } from "@/features/notification-settings";
+import { AutomationSettings } from "./AutomationSettings";
 import { Button } from "@/shared/ui";
 import type { SettingsProps } from "../model/props";
 import { GeneralSettings } from "./GeneralSettings";
@@ -22,11 +23,15 @@ export function SettingsPanels(props: SettingsProps) {
   const pathname = usePathname();
   const search = useSearchParams();
   const selected = search?.get("tab");
+  const manager =
+    props.user.role === "LEAD" || props.project.pmUserId === props.user.id;
+  // 자동화 탭은 헤드 어드민·PM 에게만 있다(규칙 API 도 ADMIN 만 허용). 다른 사람의 ?tab=automation 은 기본 정보로.
   const tab =
     selected === "members" ||
     selected === "integrations" ||
     selected === "buckets" ||
-    selected === "notifications"
+    selected === "notifications" ||
+    (selected === "automation" && manager)
       ? selected
       : "general";
   const [confirmArchive, setConfirmArchive] = useState(false);
@@ -34,8 +39,6 @@ export function SettingsPanels(props: SettingsProps) {
   const archiveButton = useRef<HTMLButtonElement>(null);
   const permissions = getSettingsPermissions(props.user, props.project);
   const archive = useProjectArchive(props.project.id, props.onSaved);
-  const manager =
-    props.user.role === "LEAD" || props.project.pmUserId === props.user.id;
   return (
     <div className="grid gap-10">
       <nav aria-label="설정 영역" className="settings-nav">
@@ -46,6 +49,7 @@ export function SettingsPanels(props: SettingsProps) {
             ["integrations", "연동"],
             ["buckets", "계획 버킷"],
             ["notifications", "알림"],
+            ...(manager ? ([["automation", "자동화"]] as const) : []),
           ] as const
         ).map(([value, label]) => {
           const params = new URLSearchParams(search?.toString());
@@ -149,6 +153,18 @@ export function SettingsPanels(props: SettingsProps) {
             projectId={props.project.id}
             editable={permissions.manage}
             channelHref={manager ? `${pathname}?tab=integrations` : undefined}
+          />
+        </section>
+      )}
+      {tab === "automation" && (
+        <section className="grid gap-5" aria-labelledby="automation-heading">
+          <h2 id="automation-heading" className="text-xl font-semibold">
+            자동화 규칙
+          </h2>
+          <AutomationSettings
+            project={props.project}
+            activeUserIds={new Set(props.candidates.map((user) => user.id))}
+            editable={permissions.manage}
           />
         </section>
       )}

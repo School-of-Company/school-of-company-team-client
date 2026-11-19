@@ -63,3 +63,32 @@ test("blocked label counts whole days and never shows zero", () => {
   assert.equal(blockedLabel("2026-11-16T09:00:00+09:00", now), "3일째 막힘");
   assert.equal(blockedLabel("2026-11-19T09:00:00+09:00", now), "1일째 막힘");
 });
+
+test("rule-marked items sit after merged-not-done and stay distinct per automation rule", () => {
+  const marked = (ruleId: string): AttentionItem => ({
+    ...item("RULE_MARKED", "x"),
+    sprint: null,
+    task: { id: "t1" } as AttentionItem["task"],
+    automationRule: { id: ruleId, name: `규칙 ${ruleId}` },
+  });
+  const attention = {
+    items: [
+      item("SPRINT_ENDING", "s1"),
+      marked("r1"),
+      marked("r2"),
+      item("MERGED_NOT_DONE", "m"),
+    ],
+    counts: {},
+  } as unknown as Attention;
+  assert.deepEqual(
+    groupByRule(attention).map((group) => [
+      group.rule,
+      group.items.map(itemKey),
+    ]),
+    [
+      ["MERGED_NOT_DONE", ["MERGED_NOT_DONE:m::"]],
+      ["RULE_MARKED", ["RULE_MARKED:t1:::r1", "RULE_MARKED:t1:::r2"]],
+      ["SPRINT_ENDING", ["SPRINT_ENDING:s1::"]],
+    ],
+  );
+});

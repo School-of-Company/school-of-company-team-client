@@ -27,6 +27,7 @@ const paths = {
   minus: "M5 12h14",
   doc: "M6 3h8l5 5v13H6z M14 3v5h5 M9 13h7 M9 17h7",
   service: "M12 3 3 7.5l9 4.5 9-4.5z M3 12l9 4.5 9-4.5 M3 16.5 12 21l9-4.5",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14 M20 20l-4-4",
 } as const;
 
 export type IconName = keyof typeof paths;
