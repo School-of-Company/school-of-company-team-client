@@ -75,7 +75,7 @@ export function AppShell({
   const me = useMe();
   const projects = useQuery({
     ...projectQueries.list(),
-    enabled: me.data !== undefined && userDestination(me.data) === "/me",
+    enabled: me.data !== undefined && userDestination(me.data) === "/",
   });
   const activeProjects =
     projects.data?.filter((project) => !project.archived) ?? [];
@@ -86,11 +86,13 @@ export function AppShell({
   };
   // 순서와 그룹은 docs/ia.md "완성 후 사이드바"를 따른다. 관리자·설정은 맨 아래.
   const workLinks: readonly NavLink[] = [
+    { href: routes.home, label: "홈", icon: "home" },
     { href: routes.me, label: "내 보드", icon: "board" },
     { href: routes.team, label: "팀 공용", icon: "team" },
     { href: routes.projects, label: "프로젝트", icon: "project" },
   ];
   const orgLinks: readonly NavLink[] = [
+    { href: routes.members, label: "팀원", icon: "user" },
     { href: routes.services, label: "서비스", icon: "service" },
   ];
   const accountLinks: readonly NavLink[] = [
@@ -101,7 +103,8 @@ export function AppShell({
   ];
   const navLinks = (links: readonly NavLink[]) =>
     links.map(({ href, label, icon }) => {
-      const active = pathname === href || pathname.startsWith(`${href}/`);
+      const active =
+        pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
       return (
         <Link
           key={href}
@@ -184,7 +187,7 @@ export function AppShell({
       </a>
       <aside className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col">
         <Link
-          href={routes.me}
+          href={routes.home}
           className="flex min-w-0 items-center gap-2 text-sm font-semibold"
         >
           <BrandMark size={28} label />
@@ -211,9 +214,9 @@ export function AppShell({
             <Icon name="menu" />
           </IconButton>
           <Link
-            href={routes.me}
+            href={routes.home}
             className="shrink-0 min-[60rem]:hidden"
-            aria-label="School of Company 내 보드"
+            aria-label="School of Company 홈"
           >
             <BrandMark size={24} label />
           </Link>

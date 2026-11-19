@@ -6,6 +6,65 @@
   "shape": "app screen",
   "theme": "project design.md (locked)",
   "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell; sidebar regrouped per docs/ia.md (내 일: 홈 · 내 보드 · 팀 공용 · 프로젝트 / 조직: 팀원 / 관리)",
+  "hero": "none (app screen)",
+  "footer": "none",
+  "signature": "Needs Attention grouped by rule with the reason on each row (PM·head admin can switch to a managed project)",
+  "imagery": "none",
+  "photos": [],
+  "entry": "src/app/styles/globals.css (/* Home */ block)",
+  "fingerprint": "two-column home: attention + today | review requests + active sprints; members table that stacks under 48rem",
+  "sections": [
+   "home: 확인 필요",
+   "home: 오늘 할 일",
+   "home: 리뷰 요청",
+   "home: 진행 중 Sprint",
+   "members table"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "prompt": "Stage 5 F5 Home, Needs Attention and Members (/members) on real API",
+  "sweep": "sloplint --scope app: 0 FAIL, 0 WARN, 4 DISMISSED (41 .home-panel inherits --foreground on a raised surface, same as board card); render tier not run (no puppeteer), Playwright real-API screenshots light/dark x 1440/390 instead; contrast: --muted on --surface-raised 5.04 light / 5.5 dark",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
+  "mode": "redesign",
+  "depth": "polish",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
+  "nav": "existing app shell (unchanged); project tabs 보드 · Sprint · Milestone · 설정 per docs/ia.md",
+  "signature": "sprint planning two panes (candidates to sprint drag) and KPT retro columns",
+  "sections": [
+   "project-sprints",
+   "sprint-detail(plan,progress,review,retro)",
+   "close-carry-over-dialog",
+   "project-milestones",
+   "milestone-panel",
+   "project-board(sprint/milestone filter)",
+   "task(sprint/milestone properties)"
+  ],
+  "waived": [],
+  "dismissed": [
+   "41",
+   "F5"
+  ],
+  "fixed": [
+   "15: plan drop target used a transitioned outline; now an instant inset box-shadow"
+  ],
+  "prompt": "Stage 4 F4: Sprint list/detail tabs, planning drag from buckets/backlog, close and carry-over dialog, deterministic review draft edit/publish, KPT retro, milestone list with progress and panel, board sprint=current and milestone filters, task detail sprint/milestone",
+  "date": "2026-11-19"
+ },
+ {
+  "scope": "app",
+  "mode": "build",
+  "depth": "full",
+  "shape": "app screen",
+  "theme": "project design.md (locked)",
+  "axes": "light+dark/pretendard/pink",
   "nav": "existing app shell; sidebar regrouped per docs/ia.md (내 일 · 조직 · 프로젝트 · 관리)",
   "signature": "service dependency graph (SVG, no library) and deployment timeline",
   "imagery": "none",

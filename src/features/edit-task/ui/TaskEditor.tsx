@@ -13,6 +13,7 @@ import {
   type UpdateTask,
 } from "@/entities/task";
 import type { PlanningBucket, ProjectDetail } from "@/entities/project";
+import type { Milestone } from "@/entities/milestone";
 import { normalizeApiError } from "@/shared/api";
 import { TaskAssignees } from "./TaskAssignees";
 import {
@@ -39,6 +40,8 @@ type Props = {
   readonly initialBucketId?: string;
   /** 프로젝트 계획 버킷(아카이브 포함). 프로젝트 업무에서만 쓴다. */
   readonly buckets?: readonly PlanningBucket[];
+  /** 프로젝트 Milestone. 프로젝트 업무에서만 쓴다. */
+  readonly milestones?: readonly Milestone[];
   readonly candidates: readonly {
     readonly id: string;
     readonly name: string;
@@ -55,6 +58,7 @@ export function TaskEditor({
   initialStatus,
   initialBucketId,
   buckets = [],
+  milestones = [],
   candidates,
   onCreate,
   onUpdate,
@@ -126,6 +130,8 @@ export function TaskEditor({
     const description = String(form.get("description") ?? "");
     const partId = String(form.get("partId") ?? "");
     const bucketId = String(form.get("planningBucketId") ?? initialBucket);
+    const initialMilestone = initial?.milestone?.id ?? "";
+    const milestoneId = String(form.get("milestoneId") ?? initialMilestone);
     // 리뷰어는 개발 업무만(계약 D3-a). 일반 업무로 바꾸면 같은 요청에서 비운다.
     const nextReviewers =
       scope === "PERSONAL" || type !== "DEV" ? [] : reviewers;
@@ -143,6 +149,7 @@ export function TaskEditor({
           partId,
           ...(scope === "PERSONAL" ? {} : { assigneeIds: assignees }),
           ...(bucketId !== initialBucket ? { planningBucketId: bucketId } : {}),
+          ...(milestoneId !== initialMilestone ? { milestoneId } : {}),
           ...(reviewersChanged ? { reviewerIds: nextReviewers } : {}),
           ...(deadline ? { deadline } : { clearDeadline: true }),
           blocked,
@@ -160,6 +167,7 @@ export function TaskEditor({
           assigneeIds: scope === "PERSONAL" ? [] : assignees,
           ...(partId ? { partId } : {}),
           ...(bucketId ? { planningBucketId: bucketId } : {}),
+          ...(milestoneId ? { milestoneId } : {}),
           ...(nextReviewers.length ? { reviewerIds: nextReviewers } : {}),
           ...(deadline ? { deadline } : {}),
         });
@@ -317,6 +325,22 @@ export function TaskEditor({
               {bucketChoices.map((bucket) => (
                 <option key={bucket.id} value={bucket.id}>
                   {bucket.archived ? `${bucket.name} (보관)` : bucket.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        )}
+        {project && milestones.length > 0 && (
+          <Field id={`${prefix}-milestone`} label="Milestone">
+            <Select
+              id={`${prefix}-milestone`}
+              name="milestoneId"
+              defaultValue={initial?.milestone?.id ?? ""}
+            >
+              <option value="">없음</option>
+              {milestones.map((milestone) => (
+                <option key={milestone.id} value={milestone.id}>
+                  {milestone.name}
                 </option>
               ))}
             </Select>
