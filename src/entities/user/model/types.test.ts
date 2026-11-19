@@ -36,7 +36,7 @@ test("an approved administrator without Discord must connect before entering wor
 });
 
 test("approved and linked users enter their board while only LEAD sees administration", () => {
-  assert.equal(userDestination(user), "/me");
+  assert.equal(userDestination(user), "/");
   assert.equal(isHeadAdmin(user), true);
   assert.equal(isHeadAdmin({ ...user, role: "MEMBER" }), false);
 });
@@ -49,7 +49,7 @@ test("a legacy password account (no GitHub) enters work without Discord, as the 
     discordLinked: false,
     discordUsername: null,
   };
-  assert.equal(userDestination(legacy), "/me");
+  assert.equal(userDestination(legacy), "/");
   for (const status of ["PENDING", "REJECTED", "SUSPENDED"] as const)
     assert.equal(userDestination({ ...legacy, status }), "/pending");
 });

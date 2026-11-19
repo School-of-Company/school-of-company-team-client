@@ -68,7 +68,7 @@ export function IdentityProvider({
         router.replace("/pending");
       } else if (error.code === "ACCESS_DENIED") {
         client.clear();
-        router.replace("/me");
+        router.replace("/");
       }
     });
     return unsubscribe;

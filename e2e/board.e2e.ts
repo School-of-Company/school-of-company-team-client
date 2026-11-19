@@ -26,12 +26,12 @@ const column = (page: Page, status: string) =>
 const card = (page: Page | Locator, text: string) =>
   page.locator("article.board-card", { hasText: text });
 
-test("토큰을 주입하면 내 보드로 들어간다", async ({ page }) => {
+test("토큰을 주입하면 홈으로 들어간다", async ({ page }) => {
   await signIn(page, seed.member.tokens);
   await page.goto("/");
-  await expect(page).toHaveURL(/\/me$/);
+  await expect(page).toHaveURL(/\/$/);
   await expect(
-    page.getByRole("heading", { level: 1, name: "내 보드" }),
+    page.getByRole("heading", { level: 1, name: "홈" }),
   ).toBeVisible();
   await expect(page.getByText(seed.member.name).first()).toBeVisible();
 });
