@@ -157,9 +157,13 @@ export function TaskDetailWorkspace({
     return (
       <TaskError
         error={taskError}
+        retryMissing
+        // 404·403 뒤에는 상세·프로젝트 쿼리를 꺼 두므로(반복 방지) 권한이 돌아오면 사람이 다시 받는다.
+        // 오류가 난 그 쿼리만 다시 받는다.
         onRetry={() => {
           setDenied(null);
           void task.refetch();
+          if (project.error && task.data?.projectId) void project.refetch();
         }}
       />
     );
