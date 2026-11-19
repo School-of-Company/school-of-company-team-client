@@ -99,10 +99,6 @@ function RuleEditorForm({
   const set = (patch: Partial<RuleForm>) =>
     setForm((current) => ({ ...current, ...patch }));
   const incident = form.event === "INCIDENT_CREATED";
-  const events: readonly RuleEvent[] =
-    rule?.event === "INCIDENT_CREATED"
-      ? [...selectableEvents, "INCIDENT_CREATED"]
-      : selectableEvents;
   const options: Readonly<Record<RuleConditionField, readonly Option[]>> = {
     PRIORITY: (Object.keys(priorityLabels) as TaskPriority[]).map((value) => ({
       value,
@@ -188,7 +184,7 @@ function RuleEditorForm({
               });
             }}
           >
-            {events.map((value) => (
+            {selectableEvents.map((value) => (
               <option key={value} value={value}>
                 {eventLabels[value]}
               </option>
@@ -216,6 +212,13 @@ function RuleEditorForm({
           </Field>
         )}
       </div>
+      {incident && (
+        <p className="text-xs text-muted">
+          사고의 영향 서비스가 이 프로젝트에 연결된 저장소를 쓰면 걸립니다.
+          사고에는 업무 조건을 둘 수 없고, 동작은 Discord 알림(PM 멘션)만
+          있습니다.
+        </p>
+      )}
       {!incident && (
         <fieldset className="grid gap-3">
           <legend className="text-sm font-medium">조건</legend>
@@ -361,8 +364,9 @@ function RuleEditorForm({
               ))}
           </div>
           <p className="text-xs text-muted">
-            업무 스레드, 없으면 프로젝트 채널로 보냅니다. Discord를 연결한
-            사람만 멘션합니다.
+            {incident
+              ? "프로젝트 채널로 보냅니다. Discord를 연결한 사람만 멘션합니다."
+              : "업무 스레드, 없으면 프로젝트 채널로 보냅니다. Discord를 연결한 사람만 멘션합니다."}
           </p>
         </fieldset>
       )}

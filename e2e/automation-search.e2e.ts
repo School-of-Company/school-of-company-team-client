@@ -443,3 +443,107 @@ test("'확인 필요로 표시' 규칙이 담당자 홈의 확인 필요에 규�
   await group.scrollIntoViewIfNeeded();
   await capture(page, "home-rule-marked-1440");
 });
+
+// 사고 → 프로젝트 경로(계약 D8-h): 사고의 영향 서비스 → 서비스 저장소 → 프로젝트 저장소.
+// 저장소 연결에 GitHub App이 필요해 GitHub 스텁(공식 응답 형식, 실제 GitHub 아님)을 띄운 스택에서만 돈다.
+const githubInstallationId = Number(process.env.E2E_GITHUB_INSTALLATION_ID);
+const githubRepositoryId = Number(process.env.E2E_GITHUB_REPOSITORY_ID);
+test("사고가 생기면 '사고가 생길 때' 규칙이 실행 기록에 남는다", async ({
+  page,
+}) => {
+  test.skip(
+    !githubInstallationId || !githubRepositoryId,
+    "E2E_GITHUB_INSTALLATION_ID·E2E_GITHUB_REPOSITORY_ID(GitHub 스텁) 필요",
+  );
+  test.setTimeout(120_000);
+  const repository = {
+    installationId: githubInstallationId,
+    repositoryId: githubRepositoryId,
+  };
+  await call(
+    `/api/v1/projects/${seed.project.id}/github/repositories`,
+    seed.admin,
+    "POST",
+    { ...repository, isDefault: false },
+  );
+  const service = await call<{ id: string }>(
+    "/api/v1/services",
+    seed.admin,
+    "POST",
+    {
+      key: `t8f-inc-${seed.run}`,
+      name: `T8F 사고 서비스 ${seed.run}`,
+      primaryOwnerId: seed.member.id,
+    },
+  );
+  await call(
+    `/api/v1/services/${service.id}/repositories`,
+    seed.admin,
+    "POST",
+    repository,
+  );
+
+  // 규칙은 화면에서 만든다: 사고 이벤트는 조건이 없고 동작은 Discord 알림(PM 멘션)만.
+  const name = `사고 나면 PM 호출 ${seed.run}`;
+  await signIn(page, seed.admin);
+  await page.goto(settings);
+  await page.getByRole("button", { name: "규칙 추가" }).click();
+  const dialog = page.getByRole("dialog", { name: "새 규칙" });
+  await dialog.getByLabel("이름").fill(name);
+  await dialog.getByLabel("언제").selectOption("INCIDENT_CREATED");
+  await expect(dialog.getByRole("group", { name: "우선순위" })).toHaveCount(0);
+  await expect(dialog.getByText("업무 조건을 둘 수 없고")).toBeVisible();
+  await expect(dialog.getByLabel("동작").locator("option")).toHaveText([
+    "Discord로 알림",
+  ]);
+  await expect(dialog.getByLabel("담당자", { exact: true })).toHaveCount(0);
+  await dialog.getByLabel("PM", { exact: true }).check();
+  await capture(page, "rule-editor-incident-1440");
+  await dialog.getByRole("button", { name: "규칙 만들기" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(
+    page.getByRole("list", { name: "자동화 규칙" }).locator(":scope > li", {
+      hasText: name,
+    }),
+  ).toContainText("사고가 생길 때, Discord로 알림, PM 멘션");
+
+  const incident = await call<{ id: string }>(
+    "/api/v1/incidents",
+    seed.admin,
+    "POST",
+    {
+      title: `E2E 사고 ${seed.run}`,
+      severity: "SEV1",
+      serviceIds: [service.id],
+    },
+  );
+  type IncidentRuns = {
+    items: { ruleName: string; status: string; incidentId: string | null }[];
+  };
+  // Discord 봇이 없는 스택이라 결과는 건너뜀(DISCORD_NOT_CONFIGURED). 핵심은 사고 → 규칙 실행이 남는 것.
+  await expect
+    .poll(
+      async () =>
+        (
+          await apiGet<IncidentRuns>(
+            `/api/v1/projects/${seed.project.id}/rule-runs`,
+            seed.admin,
+          )
+        ).items.find(
+          (run) =>
+            run.ruleName === name &&
+            run.incidentId === incident.id &&
+            !["PENDING", "SENDING"].includes(run.status),
+        )?.status,
+      { timeout: 90_000, intervals: [2_000] },
+    )
+    .toBeTruthy();
+  await page.reload();
+  const runs = page.getByRole("list", { name: "실행 기록 목록" });
+  const row = runs.getByRole("listitem").filter({ hasText: name });
+  await expect(row).toContainText("사고가 생길 때");
+  await row.scrollIntoViewIfNeeded();
+  await capture(page, "runs-incident-1440");
+  await row.getByRole("link", { name: "사고 보기" }).click();
+  await expect(page).toHaveURL(new RegExp(`/incidents/${incident.id}$`));
+});

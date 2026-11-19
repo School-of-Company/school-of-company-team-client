@@ -91,14 +91,14 @@ test("incident rules carry no conditions and can only mention the PM", () => {
   assert.deepEqual(allowedActions("INCIDENT_CREATED"), ["NOTIFY_DISCORD"]);
 });
 
-test("there is no status-changing or external write action, and incident is not offered before stage 7", () => {
+test("there is no status-changing or external write action, and the incident event is offered", () => {
   assert.deepEqual(allowedActions("TASK_STATUS_CHANGED"), [
     "NOTIFY_DISCORD",
     "MARK_ATTENTION",
     "ASSIGN_REVIEWER",
     "MOVE_BUCKET",
   ]);
-  assert.ok(!selectableEvents.includes("INCIDENT_CREATED"));
+  assert.equal(selectableEvents.at(-1), "INCIDENT_CREATED");
 });
 
 test("targets are required for move and reviewer actions", () => {

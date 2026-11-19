@@ -167,7 +167,14 @@ export function RuleRuns({
                       <span className="truncate">{run.task.title}</span>
                     </Link>
                   ) : run.incidentId ? (
-                    <span className="text-muted">사고</span>
+                    <Link
+                      href={routes.incident(run.incidentId)}
+                      className="rule-run-task"
+                    >
+                      <span className="truncate">사고 보기</span>
+                    </Link>
+                  ) : run.event === "INCIDENT_CREATED" ? (
+                    <span className="text-muted">삭제된 사고</span>
                   ) : (
                     <span className="text-muted">삭제된 업무</span>
                   )}

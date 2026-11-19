@@ -97,13 +97,14 @@ export const eventLabels: Readonly<Record<RuleEvent, string>> = {
   DEADLINE_APPROACHING: "마감 하루 전",
   INCIDENT_CREATED: "사고가 생길 때",
 };
-// ponytail: 사고(단계 7)가 merge 되기 전에는 걸릴 일이 없는 이벤트라 새로 고를 수 없게 한다. 단계 7 뒤 목록에 추가.
+/** 업무 이벤트 다음에 사고 이벤트. 사고 이벤트는 업무 필드가 없어 조건을 두지 않는다. */
 export const selectableEvents: readonly RuleEvent[] = [
   "TASK_STATUS_CHANGED",
   "TASK_BLOCKED",
   "CI_FAILED",
   "REVIEW_REQUESTED",
   "DEADLINE_APPROACHING",
+  "INCIDENT_CREATED",
 ];
 export const actionLabels: Readonly<Record<RuleAction, string>> = {
   NOTIFY_DISCORD: "Discord로 알림",
