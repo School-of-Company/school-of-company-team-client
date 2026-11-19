@@ -170,6 +170,7 @@ export function RuleRuns({
                     <Link
                       href={routes.incident(run.incidentId)}
                       className="rule-run-task"
+                      aria-label={`사고 보기: ${run.ruleName} ${formatDate(run.createdAt, time)}`}
                     >
                       <span className="truncate">사고 보기</span>
                     </Link>
@@ -186,11 +187,11 @@ export function RuleRuns({
                       {run.attempts}회 시도
                     </span>
                   )}
-                  {resultMessage(run.resultCode, run.status) && (
+                  {resultMessage(run.resultCode, run.status, run.event) && (
                     <p
                       className={`text-xs ${run.status === "FAILED" ? "text-danger" : "text-muted"}`}
                     >
-                      {resultMessage(run.resultCode, run.status)}
+                      {resultMessage(run.resultCode, run.status, run.event)}
                     </p>
                   )}
                 </div>

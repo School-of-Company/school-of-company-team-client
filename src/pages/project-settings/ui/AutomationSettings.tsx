@@ -86,7 +86,7 @@ export function AutomationSettings({
       <div className="grid gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <p className="max-w-xl text-sm text-muted">
-            이벤트가 생기면 조건에 맞는 프로젝트 업무에 동작 하나를 실행합니다.
+            업무 이벤트나 사고가 생기면 조건에 맞을 때 동작 하나를 실행합니다.
             업무 상태는 바꾸지 않고, 개인·팀 공용 업무에는 걸리지 않습니다.
           </p>
           {list.length > 0 && create}
@@ -279,11 +279,19 @@ function RuleRow({
             <span className="text-xs text-muted">
               {relativeSince(rule.lastRun.createdAt, now)}
             </span>
-            {resultMessage(rule.lastRun.resultCode, rule.lastRun.status) && (
+            {resultMessage(
+              rule.lastRun.resultCode,
+              rule.lastRun.status,
+              rule.event,
+            ) && (
               <span
                 className={`block text-xs ${rule.lastRun.status === "FAILED" ? "text-danger" : "text-muted"}`}
               >
-                {resultMessage(rule.lastRun.resultCode, rule.lastRun.status)}
+                {resultMessage(
+                  rule.lastRun.resultCode,
+                  rule.lastRun.status,
+                  rule.event,
+                )}
               </span>
             )}
           </button>

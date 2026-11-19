@@ -4,6 +4,7 @@ import {
   actionText,
   allowedActions,
   brokenReferences,
+  changeEvent,
   emptyRuleForm,
   formToRequest,
   resultMessage,
@@ -156,5 +157,61 @@ test("summaries read as short Korean phrases", () => {
   assert.equal(
     resultMessage("SOMETHING_NEW", "FAILED"),
     "실행하지 못했습니다(SOMETHING_NEW).",
+  );
+});
+
+test("switching a bucket rule with conditions to the incident event resets the action and sends no task fields", () => {
+  const form = changeEvent(
+    {
+      ...ruleToForm(rule),
+      action: "MOVE_BUCKET",
+      bucketId: "B1",
+    },
+    "INCIDENT_CREATED",
+  );
+  assert.equal(form.action, "NOTIFY_DISCORD");
+  // 조건은 폼에 남아(다시 업무 이벤트로 돌리면 보인다) 보낼 때만 빠진다.
+  assert.deepEqual(form.conditions.PRIORITY, ["P0", "P1"]);
+  const body = formToRequest(form);
+  assert.deepEqual(body.conditions, []);
+  assert.equal(body.bucketId, null);
+  assert.deepEqual(body.mentions, {
+    assignees: false,
+    reviewers: false,
+    pm: true,
+  });
+  assert.equal(changeEvent(form, "TASK_BLOCKED").action, "NOTIFY_DISCORD");
+});
+
+test("toggling an incident rule sends a body the server accepts", () => {
+  const incidentRule: AutomationRule = {
+    ...rule,
+    event: "INCIDENT_CREATED",
+    conditions: [],
+    mentions: { assignees: false, reviewers: false, pm: true },
+  };
+  const body = toggleRequest(incidentRule, false);
+  assert.equal(body.enabled, false);
+  assert.deepEqual(body.conditions, []);
+  assert.equal(body.action, "NOTIFY_DISCORD");
+  assert.deepEqual(body.mentions, {
+    assignees: false,
+    reviewers: false,
+    pm: true,
+  });
+});
+
+test("incident runs explain reasons without task wording", () => {
+  assert.equal(
+    resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "INCIDENT_CREATED"),
+    "사고가 삭제되었습니다.",
+  );
+  assert.equal(
+    resultMessage("DISCORD_CHANNEL_MISSING", "SKIPPED", "INCIDENT_CREATED"),
+    "Discord 프로젝트 채널이 연결되지 않았습니다.",
+  );
+  assert.equal(
+    resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "TASK_BLOCKED"),
+    "업무가 삭제되었거나 프로젝트 업무가 아닙니다.",
   );
 });

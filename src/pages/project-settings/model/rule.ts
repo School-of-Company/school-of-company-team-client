@@ -158,12 +158,20 @@ const resultMessages: Readonly<Record<string, string>> = {
  * 실행 결과 code 의 한국어 이유. 서버가 새 code 를 더해도 원문 code 만 덩그러니 보이지 않게,
  * 비공개 원본 공유 제한 계열은 그 뜻으로, 나머지는 상태에 맞는 문장 + code 로 보여 준다.
  */
+/** 사고 실행에는 대상 업무·업무 스레드가 없어 같은 code 라도 뜻이 다르다. */
+const incidentResultMessages: Readonly<Record<string, string>> = {
+  TASK_NOT_ELIGIBLE: "사고가 삭제되었습니다.",
+  DISCORD_CHANNEL_MISSING: "Discord 프로젝트 채널이 연결되지 않았습니다.",
+};
 export function resultMessage(
   code: string | null,
   status?: RuleRunStatus,
+  event?: RuleEvent,
 ): string | null {
   if (!code) return null;
-  const known = resultMessages[code];
+  const known =
+    (event === "INCIDENT_CREATED" ? incidentResultMessages[code] : undefined) ??
+    resultMessages[code];
   if (known) return known;
   if (/PRIVATE|RESTRICT|SHARING/.test(code))
     return "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.";
@@ -255,6 +263,17 @@ export function ruleToForm(rule: AutomationRule): RuleForm {
 /** 사고 이벤트는 조건 없이 Discord 알림(PM 멘션)만 된다(서버 저장 검증 3). */
 export function allowedActions(event: RuleEvent): readonly RuleAction[] {
   return event === "INCIDENT_CREATED" ? ["NOTIFY_DISCORD"] : actions;
+}
+
+/** 이벤트를 바꾸면 그 이벤트가 허용하지 않는 동작은 Discord 알림으로 되돌린다(조건·대상은 남겨 두고 보낼 때 뺀다). */
+export function changeEvent(form: RuleForm, event: RuleEvent): RuleForm {
+  return {
+    ...form,
+    event,
+    action: allowedActions(event).includes(form.action)
+      ? form.action
+      : "NOTIFY_DISCORD",
+  };
 }
 
 /** 서버로 보낼 본문. 이벤트·동작에 맞지 않는 값은 빼서 RULE_*_NOT_APPLICABLE 을 미리 피한다. */

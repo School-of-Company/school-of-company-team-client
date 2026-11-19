@@ -492,7 +492,9 @@ test("사고가 생기면 '사고가 생길 때' 규칙이 실행 기록에 남�
   await dialog.getByLabel("이름").fill(name);
   await dialog.getByLabel("언제").selectOption("INCIDENT_CREATED");
   await expect(dialog.getByRole("group", { name: "우선순위" })).toHaveCount(0);
-  await expect(dialog.getByText("업무 조건을 둘 수 없고")).toBeVisible();
+  await expect(dialog.getByLabel("언제")).toHaveAccessibleDescription(
+    /영향 서비스가 이 프로젝트에 연결된 저장소/,
+  );
   await expect(dialog.getByLabel("동작").locator("option")).toHaveText([
     "Discord로 알림",
   ]);

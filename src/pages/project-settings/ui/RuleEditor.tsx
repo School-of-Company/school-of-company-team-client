@@ -20,6 +20,7 @@ import {
 import {
   actionLabels,
   allowedActions,
+  changeEvent,
   conditionFields,
   conditionValueLabel,
   emptyRuleForm,
@@ -174,15 +175,12 @@ function RuleEditorForm({
           <Select
             id={id("event")}
             value={form.event}
-            onChange={(event) => {
-              const next = event.target.value as RuleEvent;
-              set({
-                event: next,
-                action: allowedActions(next).includes(form.action)
-                  ? form.action
-                  : "NOTIFY_DISCORD",
-              });
-            }}
+            aria-describedby={incident ? id("incident-note") : undefined}
+            onChange={(event) =>
+              setForm((current) =>
+                changeEvent(current, event.target.value as RuleEvent),
+              )
+            }
           >
             {selectableEvents.map((value) => (
               <option key={value} value={value}>
@@ -213,10 +211,8 @@ function RuleEditorForm({
         )}
       </div>
       {incident && (
-        <p className="text-xs text-muted">
+        <p id={id("incident-note")} className="text-xs text-muted">
           사고의 영향 서비스가 이 프로젝트에 연결된 저장소를 쓰면 걸립니다.
-          사고에는 업무 조건을 둘 수 없고, 동작은 Discord 알림(PM 멘션)만
-          있습니다.
         </p>
       )}
       {!incident && (
