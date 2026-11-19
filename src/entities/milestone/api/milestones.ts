@@ -1,6 +1,7 @@
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { keepPreviousKey } from "@/shared/lib";
+import { queryOptions } from "@tanstack/react-query";
 import type { Milestone, MilestoneInput } from "../model/types";
 
 export const milestoneKeys = {
@@ -49,7 +50,7 @@ export const milestoneQueries = {
       queryKey: milestoneKeys.list(projectId),
       queryFn: () => milestoneApi.list(projectId),
       refetchInterval: BOARD_POLL_INTERVAL,
-      placeholderData: keepPreviousData,
+      placeholderData: keepPreviousKey(milestoneKeys.list(projectId)),
       retry: false,
     }),
 };

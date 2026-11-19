@@ -1,6 +1,7 @@
 import { api, normalizeApiError } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { keepPreviousKey } from "@/shared/lib";
+import { queryOptions, type QueryKey } from "@tanstack/react-query";
 import type {
   CarryOver,
   CloseSprint,
@@ -136,41 +137,38 @@ export const sprintApi = {
   },
 };
 
-const polled = {
+// 다른 Sprint로 옮길 때만 이전 데이터를 빌린다. 같은 키 캐시가 지워진 뒤(Sprint 삭제·권한 변경)에는 다시 그리지 않는다.
+const polled = <K extends QueryKey>(queryKey: K) => ({
+  queryKey,
   refetchInterval: BOARD_POLL_INTERVAL,
-  placeholderData: keepPreviousData,
+  placeholderData: keepPreviousKey(queryKey),
   retry: false,
-} as const;
+});
 
 export const sprintQueries = {
   list: (projectId: string) =>
     queryOptions({
-      queryKey: sprintKeys.list(projectId),
+      ...polled(sprintKeys.list(projectId)),
       queryFn: () => sprintApi.list(projectId),
-      ...polled,
     }),
   detail: (projectId: string, sprintId: string) =>
     queryOptions({
-      queryKey: sprintKeys.detail(projectId, sprintId),
+      ...polled(sprintKeys.detail(projectId, sprintId)),
       queryFn: () => sprintApi.detail(projectId, sprintId),
-      ...polled,
     }),
   carryOvers: (projectId: string, sprintId: string) =>
     queryOptions({
-      queryKey: sprintKeys.carryOvers(projectId, sprintId),
+      ...polled(sprintKeys.carryOvers(projectId, sprintId)),
       queryFn: () => sprintApi.carryOvers(projectId, sprintId),
-      ...polled,
     }),
   review: (projectId: string, sprintId: string) =>
     queryOptions({
-      queryKey: sprintKeys.review(projectId, sprintId),
+      ...polled(sprintKeys.review(projectId, sprintId)),
       queryFn: () => sprintApi.review(projectId, sprintId),
-      ...polled,
     }),
   retro: (projectId: string, sprintId: string) =>
     queryOptions({
-      queryKey: sprintKeys.retro(projectId, sprintId),
+      ...polled(sprintKeys.retro(projectId, sprintId)),
       queryFn: () => sprintApi.retro(projectId, sprintId),
-      ...polled,
     }),
 };
