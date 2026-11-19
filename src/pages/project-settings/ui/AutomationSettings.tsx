@@ -279,11 +279,11 @@ function RuleRow({
             <span className="text-xs text-muted">
               {since(rule.lastRun.createdAt, now)}
             </span>
-            {resultMessage(rule.lastRun.resultCode) && (
+            {resultMessage(rule.lastRun.resultCode, rule.lastRun.status) && (
               <span
                 className={`block text-xs ${rule.lastRun.status === "FAILED" ? "text-danger" : "text-muted"}`}
               >
-                {resultMessage(rule.lastRun.resultCode)}
+                {resultMessage(rule.lastRun.resultCode, rule.lastRun.status)}
               </span>
             )}
           </button>

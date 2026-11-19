@@ -78,7 +78,7 @@ export function itemHref(item: SearchItem): string | null {
       return item.key ? routes.service(item.key) : null;
     case "SPRINT":
       return item.projectId
-        ? `${routes.project(item.projectId)}/sprints/${encodeURIComponent(item.id)}`
+        ? routes.projectSprint(item.projectId, item.id)
         : null;
     default:
       return null;

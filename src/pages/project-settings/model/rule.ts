@@ -151,10 +151,23 @@ const resultMessages: Readonly<Record<string, string>> = {
     "대상 버킷이 보관되었거나 리뷰어가 참여자가 아닙니다.",
   RULE_ACTION_ERROR: "예상하지 못한 오류로 실행하지 못했습니다.",
 };
-/** 실행 결과 code 의 한국어 이유. 모르는 code 는 그대로 보여 준다(새 code 가 생겨도 숨기지 않는다). */
-export function resultMessage(code: string | null): string | null {
+/**
+ * 실행 결과 code 의 한국어 이유. 서버가 새 code 를 더해도 원문 code 만 덩그러니 보이지 않게,
+ * 비공개 원본 공유 제한 계열은 그 뜻으로, 나머지는 상태에 맞는 문장 + code 로 보여 준다.
+ */
+export function resultMessage(
+  code: string | null,
+  status?: RuleRunStatus,
+): string | null {
   if (!code) return null;
-  return resultMessages[code] ?? code;
+  const known = resultMessages[code];
+  if (known) return known;
+  if (/PRIVATE|RESTRICT|SHARING/.test(code))
+    return "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.";
+  if (status === "SKIPPED")
+    return `조건이 맞지 않아 실행하지 않았습니다(${code}).`;
+  if (status === "FAILED") return `실행하지 못했습니다(${code}).`;
+  return code;
 }
 
 const errorMessages: Readonly<Record<string, string>> = {

@@ -179,11 +179,11 @@ export function RuleRuns({
                       {run.attempts}회 시도
                     </span>
                   )}
-                  {resultMessage(run.resultCode) && (
+                  {resultMessage(run.resultCode, run.status) && (
                     <p
                       className={`text-xs ${run.status === "FAILED" ? "text-danger" : "text-muted"}`}
                     >
-                      {resultMessage(run.resultCode)}
+                      {resultMessage(run.resultCode, run.status)}
                     </p>
                   )}
                 </div>

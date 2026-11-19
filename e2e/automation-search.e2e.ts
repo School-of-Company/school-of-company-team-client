@@ -51,6 +51,8 @@ test.describe.configure({ mode: "serial", timeout: 180_000 });
 
 let taskId = "";
 let bucketId = "";
+let sprintId = "";
+const sprintName = `로그인 개선 Sprint ${seed.run}`;
 const settings = `/projects/${seed.project.id}/settings?tab=automation`;
 
 test.beforeAll(async () => {
@@ -71,6 +73,18 @@ test.beforeAll(async () => {
     status: "IN_PROGRESS",
   });
   taskId = task.id;
+  const sprint = await call<{ id: string }>(
+    `/api/v1/projects/${seed.project.id}/sprints`,
+    seed.admin,
+    "POST",
+    {
+      name: sprintName,
+      goal: null,
+      startDate: "2026-11-23",
+      endDate: "2026-12-04",
+    },
+  );
+  sprintId = sprint.id;
   await call("/api/v1/tasks", seed.member.tokens, "POST", {
     scope: "PERSONAL",
     title: personalTitle,
@@ -246,6 +260,25 @@ test("⌘K로 검색하고 키보드로 결과를 연다", async ({ page }) => {
     .fill(`수정 ${seed.run}`);
   await expect(results.getByRole("option").first()).toBeVisible();
   await capture(page, "search-results-390");
+});
+
+test("Sprint 결과는 Sprint 상세로 연다", async ({ page }) => {
+  await signIn(page, seed.admin);
+  await page.goto("/me");
+  await expect(
+    page.getByRole("button", { name: /검색/ }).first(),
+  ).toBeVisible();
+  await page.keyboard.press("ControlOrMeta+k");
+  const palette = page.getByRole("dialog", { name: "검색" });
+  await palette.getByRole("combobox", { name: "검색어" }).fill(sprintName);
+  const group = palette.getByRole("group", { name: "Sprint" });
+  await expect(group.getByRole("option").first()).toContainText(sprintName);
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(
+    new RegExp(`/projects/${seed.project.id}/sprints/${sprintId}$`),
+  );
+  // Sprint 상세: 제목선은 프로젝트 이름, Sprint 이름은 그 아래 머리글.
+  await expect(page.getByText(sprintName, { exact: true })).toBeVisible();
 });
 
 test("남의 개인 업무와 참여하지 않은 프로젝트 업무는 검색되지 않는다", async ({
