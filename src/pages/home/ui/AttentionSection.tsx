@@ -77,11 +77,16 @@ export function AttentionSection({
     });
   };
 
+  // 내 범위에 확인할 것이 없고 바꿔 볼 프로젝트도 없으면 자리를 차지하지 않는다.
+  if (!projectId && mine.items.length === 0 && managed.length === 0)
+    return null;
   return (
     <Panel
       id="home-attention"
-      title="확인 필요"
-      meta={total === undefined ? undefined : `${total}건`}
+      title="지금 확인할 것"
+      meta={
+        total === undefined ? undefined : total === 0 ? "없음" : `${total}건`
+      }
       action={
         managed.length > 0 && (
           <Select
@@ -122,11 +127,9 @@ export function AttentionSection({
           onRetry={() => void project.refetch()}
         />
       ) : attention && attention.items.length === 0 ? (
-        <p className="home-note">
-          {projectId
-            ? "이 프로젝트에 확인할 항목이 없습니다."
-            : "지금 확인할 항목이 없습니다."}
-        </p>
+        projectId ? (
+          <p className="home-note">이 프로젝트에 확인할 항목이 없습니다.</p>
+        ) : null
       ) : (
         attention &&
         groupByRule(attention).map(({ rule, items }) => (

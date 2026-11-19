@@ -132,11 +132,12 @@ export function AppShell({
     readonly href: string;
     readonly label: string;
     readonly icon: IconName;
+    /** Another path that belongs to the same entry (내 업무 목록 / 보드). */
+    readonly also?: string;
   };
   // 순서와 그룹은 docs/ia.md "완성 후 사이드바"를 따른다. 관리자·설정은 맨 아래.
   const workLinks: readonly NavLink[] = [
-    { href: routes.home, label: "홈", icon: "home" },
-    { href: routes.me, label: "내 보드", icon: "board" },
+    { href: routes.home, label: "내 업무", icon: "home", also: routes.me },
     { href: routes.team, label: "팀 공용", icon: "team" },
     { href: routes.projects, label: "프로젝트", icon: "project" },
   ];
@@ -153,9 +154,11 @@ export function AppShell({
     { href: routes.account, label: "설정", icon: "settings" },
   ];
   const navLinks = (links: readonly NavLink[]) =>
-    links.map(({ href, label, icon }) => {
+    links.map(({ href, label, icon, also }) => {
       const active =
-        pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+        pathname === href ||
+        (href !== "/" && pathname.startsWith(`${href}/`)) ||
+        (!!also && (pathname === also || pathname.startsWith(`${also}/`)));
       return (
         <Link
           key={href}

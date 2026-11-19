@@ -43,6 +43,8 @@ export function dueLabel(today: string, date: string) {
   const days = daysFrom(today, date);
   if (days === 0) return "오늘 마감";
   if (days === 1) return "내일 마감";
+  if (days > 14)
+    return `${Number(date.slice(5, 7))}월 ${Number(date.slice(8, 10))}일`;
   return days < 0 ? `${-days}일 지남` : `${days}일 남음`;
 }
 

@@ -17,6 +17,7 @@ export {
   ErrorState,
 } from "./feedback";
 export { Dialog } from "./dialog";
+export { SegmentedLinks } from "./segmented-links";
 export { Markdown } from "./markdown";
 export { ToastProvider, useToast } from "./toast";
 export { Icon } from "./icons";
