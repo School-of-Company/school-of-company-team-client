@@ -1618,11 +1618,6 @@ select.ui-input {
   border-radius: var(--radius-xl);
 }
 /* My board: review requests above the toolbar. */
-.review-requests {
-  border: 0;
-  background: var(--surface-box);
-  border-radius: var(--radius-xl);
-}
 .review-requests-header {
   display: flex;
   min-height: var(--control-md);
@@ -1630,10 +1625,6 @@ select.ui-input {
   gap: var(--space-2);
   padding: 0 var(--space-3);
   border-bottom: 1px solid var(--border);
-}
-.review-requests-header h2 {
-  font-size: var(--text-sm);
-  font-weight: 600;
 }
 .review-requests-note {
   padding: var(--space-3);
