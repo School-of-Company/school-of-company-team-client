@@ -137,6 +137,8 @@ export const typeLabels: Readonly<Record<TaskType, string>> = {
 };
 
 const resultMessages: Readonly<Record<string, string>> = {
+  PRIVATE_SOURCE_RESTRICTED:
+    "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.",
   ALREADY_APPLIED: "이미 적용되어 있었습니다.",
   REVIEWER_NOT_APPLICABLE: "개발 업무가 아니라 리뷰어를 지정하지 않았습니다.",
   TASK_NOT_ELIGIBLE: "업무가 삭제되었거나 프로젝트 업무가 아닙니다.",
@@ -359,14 +361,3 @@ export function actionText(rule: AutomationRule): string {
 }
 
 export const eventStatusOptions: readonly TaskStatus[] = taskStatuses;
-
-const relative = new Intl.RelativeTimeFormat("ko", { numeric: "auto" });
-/** `now` 는 렌더 밖에서 정한 값(쿼리 dataUpdatedAt)을 받는다. */
-export function since(value: string, now: number): string {
-  const minutes = Math.max(0, Math.floor((now - Date.parse(value)) / 60_000));
-  if (minutes < 1) return "방금";
-  if (minutes < 60) return relative.format(-minutes, "minute");
-  const hours = Math.round(minutes / 60);
-  if (hours < 48) return relative.format(-hours, "hour");
-  return relative.format(-Math.round(hours / 24), "day");
-}

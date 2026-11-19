@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { projectQueries, type ProjectDetail } from "@/entities/project";
 import { StaleNotice } from "@/entities/service";
 import { normalizeApiError } from "@/shared/api";
+import { relativeSince } from "@/shared/lib";
 import {
   Badge,
   Button,
@@ -22,7 +23,6 @@ import {
   fieldLabels,
   resultMessage,
   ruleErrorMessage,
-  since,
   toggleRequest,
   triggerText,
   type AutomationRule,
@@ -277,7 +277,7 @@ function RuleRow({
           >
             <RunStatus status={rule.lastRun.status} />
             <span className="text-xs text-muted">
-              {since(rule.lastRun.createdAt, now)}
+              {relativeSince(rule.lastRun.createdAt, now)}
             </span>
             {resultMessage(rule.lastRun.resultCode, rule.lastRun.status) && (
               <span

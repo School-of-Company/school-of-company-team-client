@@ -336,3 +336,44 @@ test("전체 결과 화면과 검색 실패 상태", async ({ page }) => {
   ).toContainText("서버에 연결할 수 없습니다");
   await capture(page, "search-error-390");
 });
+
+test("'확인 필요로 표시' 규칙이 담당자 홈의 확인 필요에 규칙 이름과 함께 나온다", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const name = `리뷰 진입 시 확인 ${seed.run}`;
+  await call(`/api/v1/projects/${seed.project.id}/rules`, seed.admin, "POST", {
+    name,
+    enabled: true,
+    event: "TASK_STATUS_CHANGED",
+    eventStatus: "REVIEW",
+    conditions: [],
+    action: "MARK_ATTENTION",
+  });
+  await call(`/api/v1/tasks/${taskId}/position`, seed.admin, "PATCH", {
+    status: "REVIEW",
+    prevId: null,
+    nextId: null,
+  });
+  await expect
+    .poll(
+      async () =>
+        (
+          await apiGet<RunPage>(
+            `/api/v1/projects/${seed.project.id}/rule-runs?status=SUCCEEDED`,
+            seed.admin,
+          )
+        ).items.some((run) => run.ruleName === name),
+      { timeout: 90_000, intervals: [2_000] },
+    )
+    .toBe(true);
+  await signIn(page, seed.member.tokens);
+  await page.goto("/");
+  const group = page
+    .locator(".home-group")
+    .filter({ hasText: "자동화 규칙이 표시함" });
+  await expect(group).toContainText(name);
+  await expect(group).toContainText(title);
+  await group.scrollIntoViewIfNeeded();
+  await capture(page, "home-rule-marked-1440");
+});

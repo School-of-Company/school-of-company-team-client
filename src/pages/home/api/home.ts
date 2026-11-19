@@ -13,6 +13,8 @@ export const attentionRules = [
   "HIGH_PRIORITY_UNASSIGNED",
   "DUE_SOON",
   "MERGED_NOT_DONE",
+  // 단계 8: 자동화 규칙의 "확인 필요로 표시" 동작(계약 s8 8.1). 서버가 아직 보내지 않으면 묶음이 없다.
+  "RULE_MARKED",
   "SPRINT_ENDING",
 ] as const;
 export type AttentionRule = (typeof attentionRules)[number];
@@ -38,6 +40,11 @@ export type AttentionItem = {
   } | null;
   readonly since: string | null;
   readonly dueDate: string | null;
+  /** RULE_MARKED 만 값이 있다. 표시한 자동화 규칙. */
+  readonly automationRule?: {
+    readonly id: string;
+    readonly name: string;
+  } | null;
 };
 
 export type Attention = {

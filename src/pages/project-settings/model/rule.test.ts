@@ -9,7 +9,6 @@ import {
   resultMessage,
   ruleToForm,
   selectableEvents,
-  since,
   toggleRequest,
   triggerText,
   validateRuleForm,
@@ -141,6 +140,10 @@ test("summaries read as short Korean phrases", () => {
     "보낼 업무 스레드나 프로젝트 채널이 없습니다.",
   );
   assert.equal(resultMessage("NEW_CODE"), "NEW_CODE");
+  assert.equal(
+    resultMessage("PRIVATE_SOURCE_RESTRICTED", "SKIPPED"),
+    "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.",
+  );
   // 서버가 SKIPPED 사유를 새로 더해도 문장으로 보인다(M1: 비공개 원본 공유 채널 게시 금지).
   assert.equal(
     resultMessage("SHARING_RESTRICTED_TASK", "SKIPPED"),
@@ -154,7 +157,4 @@ test("summaries read as short Korean phrases", () => {
     resultMessage("SOMETHING_NEW", "FAILED"),
     "실행하지 못했습니다(SOMETHING_NEW).",
   );
-  const now = Date.parse("2026-11-19T10:00:30+09:00");
-  assert.equal(since("2026-11-19T10:00:00+09:00", now), "방금");
-  assert.equal(since("2026-11-19T09:55:00+09:00", now), "5분 전");
 });

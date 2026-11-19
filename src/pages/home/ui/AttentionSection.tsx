@@ -262,6 +262,18 @@ function AttentionRow({
           완료로 옮기세요
         </SignalChip>
       )}
+      {item.rule === "RULE_MARKED" && item.automationRule && (
+        <>
+          <SignalChip
+            tone="warning"
+            icon="alert"
+            title={item.since ? `${formatDate(item.since)} 표시` : undefined}
+          >
+            {item.automationRule.name}
+          </SignalChip>
+          {item.since && <span>{relativeSince(item.since, now)}</span>}
+        </>
+      )}
       {item.rule === "REVIEW_OVERDUE" && item.pullRequest && (
         <>
           <a
