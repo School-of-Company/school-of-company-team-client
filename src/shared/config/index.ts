@@ -16,6 +16,8 @@ export const routes = {
     `/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
   projectMilestones: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/milestones`,
+  projectWhiteboards: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/whiteboards`,
   task: (taskId: string) => `/tasks/${encodeURIComponent(taskId)}`,
   services: "/services",
   service: (key: string) => `/services/${encodeURIComponent(key)}`,
@@ -24,6 +26,8 @@ export const routes = {
   docs: "/docs",
   labs: "/labs",
   lab: (id: string) => `/labs/${encodeURIComponent(id)}`,
+  whiteboards: "/whiteboards",
+  whiteboard: (id: string) => `/whiteboards/${encodeURIComponent(id)}`,
   culture: "/culture",
   guide: "/guide",
   doc: (id: string) => `/docs/${encodeURIComponent(id)}`,
