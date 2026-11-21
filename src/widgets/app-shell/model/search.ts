@@ -11,7 +11,7 @@ import { routes } from "@/shared/config";
 
 // 계약: 서버 docs/spec/s8-rules-search.md 5절. 읽기 정책(개인 업무 본인만, 비공개 원본은 현재 GitHub 권한까지)은 서버가 건다.
 export type SearchType =
-  "TASK" | "DOCUMENT" | "INCIDENT" | "SERVICE" | "SPRINT";
+  "TASK" | "DOCUMENT" | "INCIDENT" | "SERVICE" | "SPRINT" | "WHITEBOARD";
 export type SearchItem = {
   readonly type: SearchType;
   readonly id: string;
@@ -40,6 +40,7 @@ export const searchTypes = [
   "INCIDENT",
   "SERVICE",
   "SPRINT",
+  "WHITEBOARD",
 ] as const satisfies readonly SearchType[];
 export type SupportedSearchType = (typeof searchTypes)[number];
 export const searchTypeLabels: Readonly<Record<SupportedSearchType, string>> = {
@@ -48,6 +49,7 @@ export const searchTypeLabels: Readonly<Record<SupportedSearchType, string>> = {
   INCIDENT: "사고",
   SERVICE: "서비스",
   SPRINT: "스프린트",
+  WHITEBOARD: "화이트보드",
 };
 export const SEARCH_MAX_LENGTH = 100;
 
@@ -95,6 +97,8 @@ export function itemHref(item: SearchItem): string | null {
       return item.projectId
         ? routes.projectSprint(item.projectId, item.id)
         : null;
+    case "WHITEBOARD":
+      return routes.whiteboard(item.id);
     default:
       return null;
   }
@@ -142,6 +146,11 @@ export function itemMeta(item: SearchItem): readonly string[] {
       item.status ? (sprintStatusLabels[item.status] ?? item.status) : null,
       item.context,
     ].filter((value): value is string => !!value);
+  // 서버 context 는 프로젝트 key 또는 TEAM.
+  if (item.type === "WHITEBOARD")
+    return item.context
+      ? [item.context === "TEAM" ? "팀 공용" : item.context]
+      : [];
   return [];
 }
 
