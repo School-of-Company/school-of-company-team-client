@@ -3886,3 +3886,126 @@ a.search-option:hover {
     background: var(--surface-fill);
   }
 }
+
+/* ───────────────────────── Calendar (달력) ───────────────────────── */
+
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+/* 늘 6주 × 7일. 좁은 화면에서도 가로 스크롤 없이 칸을 줄이고 글자를 자른다. */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+.calendar-weekday {
+  padding: 6px 8px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: center;
+}
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: 6.5rem;
+  padding: 4px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.calendar-day[data-outside] {
+  background: var(--surface-sunken);
+}
+.calendar-day[data-outside] .calendar-day-number {
+  color: var(--faint);
+}
+.calendar-day-number {
+  align-self: flex-start;
+  min-width: 1.75rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.calendar-day-number:hover {
+  background: var(--surface-hover);
+}
+.calendar-day[data-today] .calendar-day-number {
+  background: var(--brand);
+  color: var(--background);
+  font-weight: 700;
+}
+/* 종류는 왼쪽 띠 색과 화면 낭독용 이름으로 구분한다(색만으로 읽히지 않게). */
+.calendar-chip {
+  --kind: var(--gray-8);
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  padding: 1px 6px;
+  border-left: 3px solid var(--kind);
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--kind) 12%, var(--surface));
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.calendar-chip:hover {
+  background: color-mix(in oklab, var(--kind) 22%, var(--surface));
+}
+.calendar-chip[data-wide] {
+  font-size: var(--text-sm);
+  padding: 4px 8px;
+}
+.calendar-chip[data-done] {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.calendar-chip[data-kind="EVENT"] {
+  --kind: var(--hue-blue);
+}
+.calendar-chip[data-kind="TASK"] {
+  --kind: var(--hue-orange);
+}
+.calendar-chip[data-kind="MILESTONE"] {
+  --kind: var(--hue-red);
+}
+.calendar-chip[data-kind="SPRINT"] {
+  --kind: var(--hue-green);
+}
+.calendar-chip[data-kind="EXPERIMENT"] {
+  --kind: var(--hue-violet);
+}
+.calendar-more {
+  align-self: flex-start;
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.calendar-more:hover {
+  color: var(--foreground);
+}
+@media (max-width: 640px) {
+  .calendar-day {
+    min-height: 4.5rem;
+    padding: 2px;
+  }
+  .calendar-chip {
+    padding: 0 3px;
+    border-left-width: 2px;
+    font-size: 0.625rem;
+  }
+}

@@ -24,6 +24,7 @@ const paths = {
   alert: "M12 3 2 21h20L12 3 M12 9v5 M12 17v1",
   merge:
     "M6 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4 M6 7v14 M18 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4 M6 9a9 9 0 0 0 10 7",
+  calendar: "M4 6h16v15H4z M4 10h16 M8 3v4 M16 3v4",
   clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 7v5l3 2",
   minus: "M5 12h14",
   doc: "M6 3h8l5 5v13H6z M14 3v5h5 M9 13h7 M9 17h7",

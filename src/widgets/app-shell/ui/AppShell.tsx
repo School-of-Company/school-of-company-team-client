@@ -140,6 +140,7 @@ export function AppShell({
     { href: routes.home, label: "내 업무", icon: "home", also: routes.me },
     { href: routes.team, label: "팀 공용", icon: "team" },
     { href: routes.projects, label: "프로젝트", icon: "project" },
+    { href: routes.calendar, label: "달력", icon: "calendar" },
     { href: routes.labs, label: "실험실", icon: "flask" },
   ];
   const orgLinks: readonly NavLink[] = [
