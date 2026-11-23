@@ -68,6 +68,7 @@ test("types the server cannot search yet are left out of the filter without noti
     "DOCUMENT",
     "INCIDENT",
     "SERVICE",
+    "WHITEBOARD",
   ]);
   assert.deepEqual(availableTypes(undefined), [
     "TASK",
@@ -75,10 +76,11 @@ test("types the server cannot search yet are left out of the filter without noti
     "INCIDENT",
     "SERVICE",
     "SPRINT",
+    "WHITEBOARD",
   ]);
   assert.deepEqual(
     availableTypes({ ...response, unavailableTypes: ["DOCUMENT", "INCIDENT"] }),
-    ["TASK", "SERVICE", "SPRINT"],
+    ["TASK", "SERVICE", "SPRINT", "WHITEBOARD"],
   );
 });
 
@@ -97,6 +99,10 @@ test("results link to their own screens", () => {
     itemHref({ ...task, type: "INCIDENT", id: "I1" }),
     "/incidents/I1",
   );
+  assert.equal(
+    itemHref({ ...task, type: "WHITEBOARD", id: "W1" }),
+    "/whiteboards/W1",
+  );
 });
 
 test("meta shows readable status and scope", () => {
@@ -112,6 +118,10 @@ test("meta shows readable status and scope", () => {
   assert.deepEqual(
     itemMeta({ ...task, type: "SPRINT", status: "ACTIVE", context: "HUB" }),
     ["진행 중", "HUB"],
+  );
+  assert.deepEqual(
+    itemMeta({ ...task, type: "WHITEBOARD", status: null, context: "TEAM" }),
+    ["팀 공용"],
   );
 });
 

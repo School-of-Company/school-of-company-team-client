@@ -16,6 +16,10 @@ export const routes = {
     `/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
   projectMilestones: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/milestones`,
+  projectLinks: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/links`,
+  projectWhiteboards: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/whiteboards`,
   projectCalendar: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/calendar`,
   calendar: "/calendar",
@@ -27,6 +31,8 @@ export const routes = {
   docs: "/docs",
   labs: "/labs",
   lab: (id: string) => `/labs/${encodeURIComponent(id)}`,
+  whiteboards: "/whiteboards",
+  whiteboard: (id: string) => `/whiteboards/${encodeURIComponent(id)}`,
   culture: "/culture",
   guide: "/guide",
   doc: (id: string) => `/docs/${encodeURIComponent(id)}`,

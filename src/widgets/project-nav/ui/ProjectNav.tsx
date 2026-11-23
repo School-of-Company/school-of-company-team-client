@@ -11,7 +11,7 @@ export type ProjectNavProps = {
   readonly user: Pick<User, "id" | "role">;
 };
 
-// 탭 순서는 docs/ia.md "프로젝트 안"에 고정: 보드 · Sprint · Milestone · 달력 · 설정.
+// 탭 순서는 docs/ia.md "프로젝트 안"에 고정: 보드 · Sprint · Milestone · 달력 · 링크 · 화이트보드 · 설정.
 export function ProjectNav({ project, user }: ProjectNavProps) {
   const pathname = usePathname() ?? "";
   const board = routes.project(project.id);
@@ -33,6 +33,16 @@ export function ProjectNav({ project, user }: ProjectNavProps) {
       href: routes.projectCalendar(project.id),
       label: "달력",
       active: within(routes.projectCalendar(project.id)),
+    },
+    {
+      href: routes.projectLinks(project.id),
+      label: "링크",
+      active: within(routes.projectLinks(project.id)),
+    },
+    {
+      href: routes.projectWhiteboards(project.id),
+      label: "화이트보드",
+      active: within(routes.projectWhiteboards(project.id)),
     },
     ...(projectAccess(project, user).manages
       ? [
