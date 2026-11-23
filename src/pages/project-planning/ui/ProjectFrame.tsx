@@ -22,7 +22,7 @@ export type PlanningContext = {
   readonly writes: boolean;
 };
 
-/** 프로젝트 안 Sprint·Milestone 화면의 공통 틀: 로그인 → 프로젝트 → 머리·탭 → 본문. */
+/** 프로젝트 안 Sprint·Milestone·링크 화면의 공통 틀: 로그인 → 프로젝트 → 머리·탭 → 본문. */
 export function ProjectFrame({
   projectId,
   trail,
