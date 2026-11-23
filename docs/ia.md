@@ -6,25 +6,26 @@
 
 사이드바는 위에서 아래로 검색 버튼, `내 일` · `조직` · `프로젝트` 그룹, 맨 아래 관리자·설정입니다. 로고와 로그인 후 첫 화면은 홈(`/`)입니다.
 
-| 위치             | 항목                                                     | 경로                                                                                                                 | 보이는 사람                      |
-| ---------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| 맨 위            | 검색                                                     | ⌘K / Ctrl+K 명령 팔레트, 전체 결과 `/search?q=`                                                                      | 활성 팀원                        |
-| 내 일            | 홈                                                       | `/`                                                                                                                  | 활성 팀원                        |
-| 내 일            | 내 보드                                                  | `/me`                                                                                                                | 활성 팀원                        |
-| 내 일            | 팀 공용                                                  | `/team`                                                                                                              | 활성 팀원                        |
-| 내 일            | 프로젝트                                                 | `/projects`                                                                                                          | 활성 팀원(볼 수 있는 프로젝트만) |
-| 내 일            | 화이트보드(팀 공용)                                      | `/whiteboards`, `/whiteboards/{id}`                                                                                  | 활성 팀원                        |
-| 조직             | 팀원                                                     | `/members`                                                                                                           | 활성 팀원                        |
-| 조직             | 서비스                                                   | `/services`, `/services/{key}?tab=overview\|releases\|deployments\|runbooks`                                         | 활성 팀원                        |
-| 조직             | 사고                                                     | `/incidents`, `/incidents/{id}`(타임라인 · 사후 검토)                                                                | 활성 팀원                        |
-| 조직             | 문서                                                     | `/docs`, `/docs/{id}`                                                                                                | 활성 팀원                        |
-| 프로젝트         | 아카이브되지 않은 프로젝트                               | `/projects/{id}`                                                                                                     | 볼 수 있는 프로젝트              |
-| 맨 아래          | 관리자                                                   | `/admin`                                                                                                             | 헤드 어드민                      |
-| 맨 아래          | 설정                                                     | `/account`                                                                                                           | 본인                             |
-| 프로젝트 탭      | 보드 · Sprint · Milestone · 링크 · 화이트보드 · 설정     | `/projects/{id}`, `…/sprints`, `…/sprints/{sprintId}`, `…/milestones`, `…/links`, `…/whiteboards`, `…/settings?tab=` | 설정 탭은 PM·헤드 어드민         |
-| 프로젝트 설정 탭 | 기본 정보 · 멤버·권한 · 연동 · 계획 버킷 · 알림 · 자동화 | `?tab=general\|members\|integrations\|buckets\|notifications\|automation`                                            | PM·헤드 어드민                   |
-| 업무             | 상세                                                     | `/tasks/{id}`, 보드에서는 `?task=` 패널                                                                              | 읽기 권한                        |
-| 온보딩           | 로그인 · 승인 대기 · Discord 연결                        | `/login`, `/pending`, `/connect-discord`                                                                             | 셸 밖                            |
+| 위치             | 항목                                                        | 경로                                                                                                                               | 보이는 사람                      |
+| ---------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| 맨 위            | 검색                                                        | ⌘K / Ctrl+K 명령 팔레트, 전체 결과 `/search?q=`                                                                                    | 활성 팀원                        |
+| 내 일            | 홈                                                          | `/`                                                                                                                                | 활성 팀원                        |
+| 내 일            | 내 보드                                                     | `/me`                                                                                                                              | 활성 팀원                        |
+| 내 일            | 팀 공용                                                     | `/team`                                                                                                                            | 활성 팀원                        |
+| 내 일            | 프로젝트                                                    | `/projects`                                                                                                                        | 활성 팀원(볼 수 있는 프로젝트만) |
+| 내 일            | 화이트보드(팀 공용)                                         | `/whiteboards`, `/whiteboards/{id}`                                                                                                | 활성 팀원                        |
+| 내 일            | 달력                                                        | `/calendar`                                                                                                                        | 활성 팀원                        |
+| 조직             | 팀원                                                        | `/members`                                                                                                                         | 활성 팀원                        |
+| 조직             | 서비스                                                      | `/services`, `/services/{key}?tab=overview\|releases\|deployments\|runbooks`                                                       | 활성 팀원                        |
+| 조직             | 사고                                                        | `/incidents`, `/incidents/{id}`(타임라인 · 사후 검토)                                                                              | 활성 팀원                        |
+| 조직             | 문서                                                        | `/docs`, `/docs/{id}`                                                                                                              | 활성 팀원                        |
+| 프로젝트         | 아카이브되지 않은 프로젝트                                  | `/projects/{id}`                                                                                                                   | 볼 수 있는 프로젝트              |
+| 맨 아래          | 관리자                                                      | `/admin`                                                                                                                           | 헤드 어드민                      |
+| 맨 아래          | 설정                                                        | `/account`                                                                                                                         | 본인                             |
+| 프로젝트 탭      | 보드 · Sprint · Milestone · 달력 · 링크 · 화이트보드 · 설정 | `/projects/{id}`, `…/sprints`, `…/sprints/{sprintId}`, `…/milestones`, `…/calendar`, `…/links`, `…/whiteboards`, `…/settings?tab=` | 설정 탭은 PM·헤드 어드민         |
+| 프로젝트 설정 탭 | 기본 정보 · 멤버·권한 · 연동 · 계획 버킷 · 알림 · 자동화    | `?tab=general\|members\|integrations\|buckets\|notifications\|automation`                                                          | PM·헤드 어드민                   |
+| 업무             | 상세                                                        | `/tasks/{id}`, 보드에서는 `?task=` 패널                                                                                            | 읽기 권한                        |
+| 온보딩           | 로그인 · 승인 대기 · Discord 연결                           | `/login`, `/pending`, `/connect-discord`                                                                                           | 셸 밖                            |
 
 ## 완성 후 사이드바
 
@@ -37,6 +38,7 @@
 | 내 일     | 내 보드       | `/me`                                             | 지금 | 활성 팀원           |
 | 내 일     | 팀 공용       | `/team`                                           | 지금 | 활성 팀원           |
 | 내 일     | 프로젝트      | `/projects`                                       | 지금 | 활성 팀원           |
+| 내 일     | 달력          | `/calendar`                                       | 11   | 활성 팀원           |
 | 조직      | 팀원          | `/members`                                        | 5    | 활성 팀원           |
 | 조직      | 서비스        | `/services`                                       | 6    | 활성 팀원           |
 | 조직      | 사고          | `/incidents`                                      | 7    | 활성 팀원           |
@@ -58,6 +60,7 @@
 | 보드       | `/projects/{id}`                                              | 지금 | 칸반. 3단계에서 그룹 축에 버킷·리뷰어, 스윔레인 추가(새 탭 아님)                                                            |
 | Sprint     | `/projects/{id}/sprints`, `/projects/{id}/sprints/{sprintId}` | 4    | 목록 → 상세(계획 · 진행 · 리뷰 · 회고를 상세 안의 탭으로, `?tab=`)                                                          |
 | Milestone  | `/projects/{id}/milestones`                                   | 4    | 목록과 진행 막대. 상세 경로 없이 목록 위 패널(Dialog)로 연다                                                                |
+| 달력       | `/projects/{id}/calendar`                                     | 11   | 그 프로젝트의 일정·업무 마감·마일스톤·스프린트. 일정은 대화상자로 만들고 고친다                                             |
 | 링크       | `/projects/{id}/links`                                        | ②    | 자주 여는 링크 카드 그리드. 추가·수정·정렬은 참여자·PM·헤드 어드민, 삭제는 만든 사람·PM·헤드 어드민. 미리보기는 Dialog      |
 | 화이트보드 | `/projects/{id}/whiteboards`, 편집은 `/whiteboards/{id}`      | 10   | 프로젝트 보드 목록. 편집 화면은 팀 공용과 같은 경로(서버 `docs/spec/s10-whiteboard.md`)                                     |
 | 설정       | `/projects/{id}/settings?tab=`                                | 지금 | 기본 정보 · 멤버·권한 · 연동, 이후 `알림`(2단계, 토글 3개) · `계획 버킷`(3단계) · `자동화`(8단계) 탭 추가. PM·헤드 어드민만 |
@@ -74,6 +77,7 @@
 | 서비스 | `/services`, `/services/{key}`               | 6    | 목록 → 상세 탭: 개요(소유자·저장소·의존) · 릴리스 · 배포 · Runbook(7단계 연결). Release·Deployment는 서비스 상세 안에만 둠                   |
 | 사고   | `/incidents`, `/incidents/{id}`              | 7    | 목록(심각도·상태 필터) → 상세: 타임라인 · Postmortem 탭                                                                                      |
 | 문서   | `/docs?type=ADR\|RFC\|RUNBOOK`, `/docs/{id}` | 7    | 종류 필터가 있는 한 목록. 관계(서비스·업무·사고·문서)는 상세 속성 열                                                                         |
+| 달력   | `/calendar`                                  | 11   | 팀 공용 일정 + 볼 수 있는 프로젝트의 업무 마감·마일스톤·스프린트 + 실험. 달 보기, 날짜를 누르면 그날 목록. 외부 캘린더 동기화 없음           |
 | 검색   | `/search?q=`                                 | 8    | 명령 팔레트의 "전체 결과 보기" 목적지                                                                                                        |
 
 ## 다른 화면에 붙는 것 (새 메뉴 없음)

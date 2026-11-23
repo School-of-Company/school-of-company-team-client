@@ -20,6 +20,9 @@ export const routes = {
     `/projects/${encodeURIComponent(projectId)}/links`,
   projectWhiteboards: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/whiteboards`,
+  projectCalendar: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/calendar`,
+  calendar: "/calendar",
   task: (taskId: string) => `/tasks/${encodeURIComponent(taskId)}`,
   services: "/services",
   service: (key: string) => `/services/${encodeURIComponent(key)}`,
