@@ -16,6 +16,8 @@ export const routes = {
     `/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
   projectMilestones: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/milestones`,
+  projectLinks: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/links`,
   projectWhiteboards: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/whiteboards`,
   task: (taskId: string) => `/tasks/${encodeURIComponent(taskId)}`,

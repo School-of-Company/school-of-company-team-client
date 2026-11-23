@@ -11,6 +11,8 @@ export class ApiError extends Error {
     readonly status: number,
     readonly code: string,
     message: string,
+    /** 서버 `ErrorResponse.details`(예: `{ limit }`, `{ retryAfterSeconds }`). */
+    readonly details?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -30,7 +32,12 @@ export function normalizeApiError(error: unknown): ApiError {
       "message" in data &&
       typeof data.message === "string"
     ) {
-      return new ApiError(status, data.code, data.message);
+      return new ApiError(
+        status,
+        data.code,
+        data.message,
+        "details" in data ? data.details : undefined,
+      );
     }
     return new ApiError(
       status,
