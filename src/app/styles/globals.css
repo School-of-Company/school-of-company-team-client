@@ -3995,3 +3995,57 @@ a.search-option:hover {
   height: 100%;
   border: 0;
 }
+
+/* ───────────────────────── Whiteboard ───────────────────────── */
+
+/* 캔버스는 화면 높이를 채운다. 머리글 아래 남은 높이, 너무 작은 창에서는 최소 높이를 지킨다. */
+.whiteboard-layout {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.whiteboard-layout[data-panel] {
+  grid-template-columns: minmax(0, 1fr) 20rem;
+}
+.whiteboard-canvas {
+  height: calc(100dvh - 12rem);
+  min-height: 28rem;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--surface-box);
+}
+.whiteboard-panel {
+  max-height: calc(100dvh - 12rem);
+  overflow-y: auto;
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--surface-box);
+}
+.whiteboard-comment {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+}
+.whiteboard-comment[data-resolved] {
+  color: var(--muted);
+}
+.whiteboard-template {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--surface-fill);
+  cursor: pointer;
+}
+.whiteboard-template:has(input:checked) {
+  background: var(--brand-soft);
+}
+@media (width < 60rem) {
+  .whiteboard-layout[data-panel] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .whiteboard-panel {
+    max-height: none;
+  }
+}
