@@ -29,7 +29,7 @@
 | 5 | GitHub App·저장소·Issue 발행·PR 상태 | 신규 domain/github, 연동 전용 테이블·설정·테스트 | V5 GitHub |
 | 6 | Discord 봇·스레드·멘션·채널 설정 | 신규 domain/discord, 연동 전용 테이블·설정·테스트 | V6 Discord |
 
-프로젝트 워커는 기존 user role LEAD를 헤드 어드민으로 해석하고 auth/user 파일은 직접 수정하지 않는다. identity 워커도 이 역할 코드를 호환 유지한다. PM·파트 리더는 프로젝트 역할이며 전역 UserRole에 넣지 않는다.
+프로젝트 워커는 기존 user role LEAD를 헤드 어드민으로 해석하고 auth/user 파일은 직접 수정하지 않는다. identity 워커도 이 역할 코드를 호환 유지한다. PM은 프로젝트 역할이며(파트 리더는 팀 운영 문서 v3에서 없어졌다) 전역 UserRole에 넣지 않는다.
 
 ## 협의할 최소 계약
 
