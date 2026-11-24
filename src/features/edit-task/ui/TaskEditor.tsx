@@ -15,10 +15,20 @@ import {
 import type { PlanningBucket, ProjectDetail } from "@/entities/project";
 import type { Milestone } from "@/entities/milestone";
 import { normalizeApiError } from "@/shared/api";
+import { todayIso } from "@/shared/lib";
+import {
+  dateBounds,
+  dateErrors,
+  overlapReason,
+  overlapping,
+  taskErrorMessage,
+  type DateErrors,
+} from "../model/rules";
 import { TaskAssignees } from "./TaskAssignees";
 import {
   Button,
   Checkbox,
+  DatePicker,
   Field,
   Input,
   Label,
@@ -94,6 +104,19 @@ export function TaskEditor({
     (bucket) => !bucket.archived || bucket.id === initial?.planningBucket?.id,
   );
   const [blocked, setBlocked] = useState(initial?.blocked ?? false);
+  const initialStartDate = initial?.startDate ?? "";
+  const initialDeadline = initial?.deadline ?? "";
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [deadline, setDeadline] = useState(initialDeadline);
+  const [dateError, setDateError] = useState<DateErrors>({});
+  const today = todayIso();
+  const { startMin, deadlineMin } = dateBounds({
+    today,
+    creating: !initial,
+    startDate,
+  });
+  // 리뷰어는 개발 업무만(계약 D3-a). 일반 업무면 리뷰어 칸은 자리만 남기고 잠근다.
+  const reviewing = scope !== "PERSONAL" && type === "DEV";
   const people = [
     ...new Map(
       [...candidates, ...(initial?.assignees ?? [])].map((person) => [
@@ -117,7 +140,6 @@ export function TaskEditor({
     if (pending) return;
     const form = new FormData(event.currentTarget);
     const title = String(form.get("title") ?? "").trim();
-    const deadline = String(form.get("deadline") ?? "");
     const priorityValue = String(form.get("priority"));
     const priority =
       priorityValue === "P0" || priorityValue === "P1" || priorityValue === "P3"
@@ -127,14 +149,26 @@ export function TaskEditor({
       setError("제목은 1~200자로 입력해 주세요.");
       return;
     }
+    const dates = dateErrors({
+      today,
+      creating: !initial,
+      startDate,
+      deadline,
+      initialDeadline,
+    });
+    setDateError(dates);
+    if (dates.startDate || dates.deadline) return;
     const description = String(form.get("description") ?? "");
     const partId = String(form.get("partId") ?? "");
     const bucketId = String(form.get("planningBucketId") ?? initialBucket);
     const initialMilestone = initial?.milestone?.id ?? "";
     const milestoneId = String(form.get("milestoneId") ?? initialMilestone);
     // 리뷰어는 개발 업무만(계약 D3-a). 일반 업무로 바꾸면 같은 요청에서 비운다.
-    const nextReviewers =
-      scope === "PERSONAL" || type !== "DEV" ? [] : reviewers;
+    const nextReviewers = reviewing ? reviewers : [];
+    if (overlapping(assignees, nextReviewers).length) {
+      setError("담당자와 리뷰어에 같은 사람이 있어요. 한쪽에서 빼 주세요.");
+      return;
+    }
     const reviewersChanged =
       [...nextReviewers].sort().join() !== [...initialReviewers].sort().join();
     setPending(true);
@@ -151,6 +185,9 @@ export function TaskEditor({
           ...(bucketId !== initialBucket ? { planningBucketId: bucketId } : {}),
           ...(milestoneId !== initialMilestone ? { milestoneId } : {}),
           ...(reviewersChanged ? { reviewerIds: nextReviewers } : {}),
+          ...(startDate !== initialStartDate
+            ? { startDate: startDate || null }
+            : {}),
           ...(deadline ? { deadline } : { clearDeadline: true }),
           blocked,
           blockedReason: String(form.get("blockedReason") ?? "").trim(),
@@ -169,11 +206,17 @@ export function TaskEditor({
           ...(bucketId ? { planningBucketId: bucketId } : {}),
           ...(milestoneId ? { milestoneId } : {}),
           ...(nextReviewers.length ? { reviewerIds: nextReviewers } : {}),
+          ...(startDate ? { startDate } : {}),
           ...(deadline ? { deadline } : {}),
         });
       }
     } catch (cause) {
-      setError(normalizeApiError(cause).message);
+      setError(
+        taskErrorMessage(normalizeApiError(cause), [
+          ...people,
+          ...reviewerPeople,
+        ]),
+      );
     } finally {
       setPending(false);
     }
@@ -251,6 +294,43 @@ export function TaskEditor({
         </div>
       </fieldset>
       <div className="grid items-start gap-4 sm:grid-cols-2">
+        <Field
+          id={`${prefix}-start`}
+          label="시작일 (선택)"
+          error={dateError.startDate}
+        >
+          <DatePicker
+            id={`${prefix}-start`}
+            label="시작일"
+            value={startDate}
+            min={startMin}
+            max={deadline || undefined}
+            invalid={!!dateError.startDate}
+            onChange={(next) => {
+              setStartDate(next);
+              setDateError({});
+            }}
+          />
+        </Field>
+        <Field
+          id={`${prefix}-deadline`}
+          label="마감일"
+          error={dateError.deadline}
+        >
+          <DatePicker
+            id={`${prefix}-deadline`}
+            label="마감일"
+            value={deadline}
+            min={deadlineMin}
+            invalid={!!dateError.deadline}
+            onChange={(next) => {
+              setDeadline(next);
+              setDateError({});
+            }}
+          />
+        </Field>
+      </div>
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <Field id={`${prefix}-type`} label="업무 타입">
           <Select
             id={`${prefix}-type`}
@@ -290,14 +370,6 @@ export function TaskEditor({
             </Select>
           </Field>
         )}
-        <Field id={`${prefix}-deadline`} label="마감일">
-          <Input
-            id={`${prefix}-deadline`}
-            name="deadline"
-            type="date"
-            defaultValue={initial?.deadline ?? ""}
-          />
-        </Field>
         {project && (
           <Field id={`${prefix}-part`} label="파트">
             <Select
@@ -354,24 +426,33 @@ export function TaskEditor({
           people={people}
           selected={assignees}
           onChange={setAssignees}
+          blocked={(id) =>
+            reviewing
+              ? overlapReason(id, assignees, reviewers, "리뷰어로 지정됨")
+              : undefined
+          }
         />
       )}
-      {scope !== "PERSONAL" && type === "DEV" && (
+      {scope !== "PERSONAL" && (
         <TaskAssignees
-          legend="리뷰어 (개발 업무만 · 복수 선택)"
+          legend="리뷰어"
+          hint={
+            reviewing
+              ? "여러 명 선택할 수 있어요. 담당자는 리뷰어가 될 수 없어요."
+              : initialReviewers.length > 0
+                ? `일반 업무로 바꾸면 리뷰어 ${initialReviewers.length}명이 해제돼요.`
+                : "개발 업무에서만 리뷰어를 지정할 수 있어요."
+          }
           empty="선택할 수 있는 리뷰어가 없습니다."
+          disabled={!reviewing}
           people={reviewerPeople}
-          selected={reviewers}
+          selected={reviewing ? reviewers : []}
           onChange={setReviewers}
+          blocked={(id) =>
+            overlapReason(id, reviewers, assignees, "담당자로 지정됨")
+          }
         />
       )}
-      {scope !== "PERSONAL" &&
-        type === "TASK" &&
-        initialReviewers.length > 0 && (
-          <p className="text-sm text-muted">
-            일반 업무로 바꾸면 리뷰어 {initialReviewers.length}명이 해제됩니다.
-          </p>
-        )}
       {initial && (
         <>
           <label className="flex min-h-11 items-center gap-3">
