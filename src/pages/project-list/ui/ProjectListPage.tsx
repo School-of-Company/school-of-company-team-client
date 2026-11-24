@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   kindLabels,
   ProjectAvatar,
@@ -25,7 +25,10 @@ export function ProjectListPage() {
 
 function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
   const [stage, setStage] = useState<ProjectStage | "">("");
-  const projects = useQuery(projectQueries.list(false, stage || undefined));
+  const projects = useQuery({
+    ...projectQueries.list(false, stage || undefined),
+    placeholderData: keepPreviousData,
+  });
   return (
     <div className="grid gap-6">
       <header className="page-header">
@@ -39,23 +42,28 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           </Link>
         )}
       </header>
-      <div className="max-w-48">
-        <Field id="project-stage-filter" label="단계">
-          <Select
-            id="project-stage-filter"
-            value={stage}
-            onChange={(event) =>
-              setStage(event.target.value as ProjectStage | "")
-            }
-          >
-            <option value="">전체</option>
-            {Object.entries(stageLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </Select>
-        </Field>
+      <div className="flex items-end gap-3">
+        <div className="max-w-48 grow">
+          <Field id="project-stage-filter" label="단계">
+            <Select
+              id="project-stage-filter"
+              value={stage}
+              onChange={(event) =>
+                setStage(event.target.value as ProjectStage | "")
+              }
+            >
+              <option value="">전체</option>
+              {Object.entries(stageLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+        <span role="status" className="text-sm text-muted">
+          {projects.isFetching && !projects.isPending ? "조회 중…" : ""}
+        </span>
       </div>
       {projects.isPending ? (
         <div
@@ -91,7 +99,7 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
                 className="list-row-main"
               >
                 <ProjectAvatar project={project} />
-                <span className="list-row-key">{project.key}</span>
+                <Badge className="font-mono">{project.key}</Badge>
                 <div className="grid min-w-0 gap-0.5">
                   <h2 className="list-row-title">{project.name}</h2>
                   {project.description && (
