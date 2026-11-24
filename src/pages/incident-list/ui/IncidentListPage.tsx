@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useId, useState } from "react";
+import { Suspense, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -20,15 +20,17 @@ import { serviceQueries } from "@/entities/service";
 import { AuthGuard } from "@/features/auth";
 import { IncidentFormDialog } from "@/features/manage-incident";
 import { routes } from "@/shared/config";
+import { settledData } from "@/shared/lib";
 import {
   Button,
+  ChipSelect,
   EmptyState,
-  ErrorState,
   Icon,
-  Select,
-  Skeleton,
-  Spinner,
-  StaleNotice,
+  ListSkeleton,
+  PageHeader,
+  PageSkeleton,
+  QueryState,
+  SegmentedLinks,
 } from "@/shared/ui";
 
 /** 목록 기본은 진행 중(대응 중·완화됨). 상태 묶음은 URL `?status=`에 둔다. */
@@ -46,7 +48,7 @@ export function IncidentListPage() {
   return (
     <AuthGuard require="work">
       {() => (
-        <Suspense fallback={<Spinner label="장애 불러오는 중" />}>
+        <Suspense fallback={<PageSkeleton label="장애 불러오는 중" />}>
           <IncidentListContent />
         </Suspense>
       )}
@@ -55,7 +57,6 @@ export function IncidentListPage() {
 }
 
 function IncidentListContent() {
-  const id = useId();
   const router = useRouter();
   const pathname = usePathname() ?? routes.incidents;
   const search = useSearchParams();
@@ -75,88 +76,71 @@ function IncidentListContent() {
     const query = params.toString();
     return query ? `${pathname}?${query}` : pathname;
   };
+  const count = settledData(incidents)?.length;
   return (
     <div className="grid gap-5">
-      <header className="page-header">
-        <div className="min-w-0">
-          <h1>장애</h1>
-          {incidents.data && (
-            <p className="page-subtitle tabular-nums">
-              {view.label} {incidents.data.length}건
-            </p>
-          )}
-        </div>
-        <Button onClick={() => setCreating(true)}>
-          <Icon name="plus" className="inline-block" /> 장애 등록
-        </Button>
-      </header>
-      <div className="flex flex-wrap items-center gap-3">
-        <nav aria-label="장애 상태" className="settings-nav">
-          {views.map((item) => (
-            <Link
-              key={item.value}
-              href={href({
-                status: item.value === "active" ? null : item.value,
-              })}
-              aria-current={view.value === item.value ? "page" : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+      <PageHeader
+        title="장애"
+        subtitle={
+          count !== undefined
+            ? `${view.label} ${count}건`
+            : incidents.isError && !incidents.data
+              ? "장애 집계를 불러오지 못했습니다"
+              : `${view.label} 장애 집계 중`
+        }
+        actions={
+          <Button onClick={() => setCreating(true)}>
+            <Icon name="plus" className="inline-block" /> 장애 등록
+          </Button>
+        }
+      />
+      <div className="page-toolbar">
+        <SegmentedLinks
+          label="장애 상태"
+          items={views.map((item) => ({
+            href: href({
+              status: item.value === "active" ? null : item.value,
+            }),
+            label: item.label,
+            active: view.value === item.value,
+          }))}
+        />
         {services.data && services.data.length > 0 && (
-          <span className="flex items-center gap-2">
-            <label htmlFor={`${id}-service`} className="text-sm text-muted">
-              영향 서비스
-            </label>
-            <Select
-              id={`${id}-service`}
-              className="incident-filter-select"
-              value={serviceId}
-              onChange={(event) =>
-                router.replace(href({ service: event.target.value || null }))
-              }
-            >
-              <option value="">전체</option>
-              {services.data.map((service) => (
-                <option key={service.id} value={service.id}>
-                  {service.name}
-                </option>
-              ))}
-            </Select>
-          </span>
+          <ChipSelect
+            label="영향 서비스"
+            value={serviceId}
+            options={[
+              { value: "", label: "영향 서비스 전체" },
+              ...services.data.map((service) => ({
+                value: service.id,
+                label: service.name,
+              })),
+            ]}
+            onChange={(value) =>
+              router.replace(href({ service: value || null }))
+            }
+          />
         )}
       </div>
-      {incidents.isPending ? (
-        <div
-          role="status"
-          aria-label="장애를 불러오는 중"
-          className="grid gap-2"
-        >
-          {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} className="h-12" />
-          ))}
-        </div>
-      ) : !incidents.data ? (
-        <ErrorState
-          description={incidentErrorMessage(incidents.error)}
-          onRetry={() => void incidents.refetch()}
-        />
-      ) : incidents.data.length === 0 ? (
-        view.value === "active" && !serviceId ? (
-          <EmptyState
-            title="진행 중인 장애가 없습니다"
-            description="장애나 이상을 발견하면 바로 등록하고 대응 기록을 남기세요."
-          />
-        ) : (
-          <EmptyState title="조건에 맞는 장애가 없습니다" />
-        )
-      ) : (
-        <>
-          <StaleNotice query={incidents} />
-          <IncidentTable incidents={incidents.data} />
-        </>
-      )}
+      <QueryState
+        query={incidents}
+        skeleton={
+          <ListSkeleton label="장애를 불러오는 중" rowClassName="h-16" />
+        }
+        errorMessage={incidentErrorMessage}
+        empty={
+          view.value === "active" && !serviceId ? (
+            <EmptyState
+              title="진행 중인 장애가 없습니다"
+              description="장애나 이상을 발견하면 바로 등록하고 대응 기록을 남기세요."
+            />
+          ) : (
+            <EmptyState title="조건에 맞는 장애가 없습니다" />
+          )
+        }
+      >
+        {(data) => <IncidentTable incidents={data} />}
+      </QueryState>
       <IncidentFormDialog
         open={creating}
         onClose={() => setCreating(false)}
