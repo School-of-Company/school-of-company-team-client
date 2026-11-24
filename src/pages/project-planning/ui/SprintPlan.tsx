@@ -7,14 +7,7 @@ import { projectQueries, type ProjectDetail } from "@/entities/project";
 import { sprintErrorMessage, type Sprint } from "@/entities/sprint";
 import { taskQueries, type TaskCard } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
-import {
-  Button,
-  Checkbox,
-  ChipSelect,
-  EmptyState,
-  ErrorState,
-  Skeleton,
-} from "@/shared/ui";
+import { ChipSelect, ErrorState, Skeleton } from "@/shared/ui";
 import { useSprintScope } from "../api/sprint-actions";
 import {
   applyScopeOverlay,
@@ -22,7 +15,7 @@ import {
   sourceParams,
   type ScopeOverlay,
 } from "../model/sprint-tasks";
-import { TaskRow } from "./TaskRow";
+import { PlanTaskList } from "./PlanTaskList";
 
 const DRAG_TYPE = "application/x-soc-task";
 
@@ -160,6 +153,18 @@ export function SprintPlan({
     (sum, group) => sum + group.columns.DONE.length,
     0,
   );
+  const listProps = {
+    manages,
+    busy,
+    checked,
+    dragProps,
+    onCheck: (id: string, selected: boolean) =>
+      setChecked((current) =>
+        selected ? [...current, id] : current.filter((item) => item !== id),
+      ),
+    onAdd: add,
+    onRemove: remove,
+  };
   return (
     <div className={manages ? "sprint-plan" : "grid gap-3"}>
       {manages && (
@@ -201,60 +206,8 @@ export function SprintPlan({
               )}
               onRetry={() => void candidates.refetch()}
             />
-          ) : view.candidates.length === 0 ? (
-            <EmptyState
-              title="넣을 업무가 없습니다"
-              description="원천을 바꿔 다른 업무를 찾아보세요."
-            />
           ) : (
-            <>
-              <ul className="plan-list" aria-label="후보 업무">
-                {view.candidates.map((task) => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    {...dragProps(task)}
-                    leading={
-                      <Checkbox
-                        aria-label={`${task.key} 선택`}
-                        checked={checked.includes(task.id)}
-                        disabled={busy}
-                        onChange={(event) =>
-                          setChecked((current) =>
-                            event.target.checked
-                              ? [...current, task.id]
-                              : current.filter((id) => id !== task.id),
-                          )
-                        }
-                      />
-                    }
-                    action={
-                      <Button
-                        variant="ghost"
-                        className="ui-button-sm"
-                        disabled={busy}
-                        aria-label={`${task.key} 스프린트에 넣기`}
-                        onClick={() => add([task.id])}
-                      >
-                        넣기
-                      </Button>
-                    }
-                  />
-                ))}
-              </ul>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  variant="secondary"
-                  className="ui-button-sm"
-                  disabled={!checked.length || busy}
-                  onClick={() => add(checked)}
-                >
-                  {checked.length
-                    ? `선택한 ${checked.length}개 넣기`
-                    : "선택한 업무 넣기"}
-                </Button>
-              </div>
-            </>
+            <PlanTaskList {...listProps} tasks={view.candidates} candidate />
           )}
         </section>
       )}
@@ -276,38 +229,8 @@ export function SprintPlan({
             description={sprintErrorMessage(normalizeApiError(scoped.error))}
             onRetry={() => void scoped.refetch()}
           />
-        ) : view.scoped.length === 0 ? (
-          <div className="plan-drop-empty">
-            <EmptyState
-              title="아직 넣은 업무가 없습니다"
-              description={
-                manages ? "왼쪽 후보를 여기로 끌어 오세요." : undefined
-              }
-            />
-          </div>
         ) : (
-          <ul className="plan-list" aria-label="스프린트 업무">
-            {view.scoped.map((task) => (
-              <TaskRow
-                key={task.id}
-                task={task}
-                {...dragProps(task)}
-                action={
-                  manages && (
-                    <Button
-                      variant="ghost"
-                      className="ui-button-sm"
-                      disabled={busy}
-                      aria-label={`${task.key} 스프린트에서 빼기`}
-                      onClick={() => remove(task)}
-                    >
-                      빼기
-                    </Button>
-                  )
-                }
-              />
-            ))}
-          </ul>
+          <PlanTaskList {...listProps} tasks={view.scoped} />
         )}
         {!!scoped.data && (scoped.data.counts.DONE ?? 0) > (shownDone ?? 0) && (
           <p className="planning-note">
@@ -316,14 +239,12 @@ export function SprintPlan({
           </p>
         )}
       </section>
-      {message && (
-        <p
-          role={message.tone === "error" ? "alert" : "status"}
-          className={`plan-message text-sm ${message.tone === "error" ? "text-danger" : ""}`}
-        >
-          {message.text}
-        </p>
-      )}
+      <p
+        role={message?.tone === "error" ? "alert" : "status"}
+        className={`plan-message text-sm ${message?.tone === "error" ? "text-danger" : ""}`}
+      >
+        {message?.text}
+      </p>
     </div>
   );
 }

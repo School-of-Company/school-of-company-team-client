@@ -14,7 +14,7 @@ import {
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
-import { Button, Dialog, ErrorState, Skeleton } from "@/shared/ui";
+import { Button, Dialog, ErrorState, Markdown, Skeleton } from "@/shared/ui";
 import { useSprintLifecycle, useUpdateSprint } from "../api/sprint-actions";
 import { formatRange, remainingLabel } from "../model/dates";
 import { selectedSprintTab, sprintTabLabels, sprintTabs } from "../model/tabs";
@@ -180,7 +180,9 @@ function SprintScreen({
           )}
         </p>
         {sprint.goal ? (
-          <p className="sprint-goal">{sprint.goal}</p>
+          <div className="sprint-goal">
+            <Markdown>{sprint.goal}</Markdown>
+          </div>
         ) : (
           <p className="text-sm text-muted">목표가 없습니다.</p>
         )}
@@ -256,16 +258,18 @@ function SprintScreen({
           manages={manages}
         />
       )}
-      <SprintFormDialog
-        open={editing}
-        initial={sprint}
-        defaults={{ startDate: sprint.startDate, endDate: sprint.endDate }}
-        onClose={() => setEditing(false)}
-        onSubmit={async (input) => {
-          await update.mutateAsync(input);
-          setMessage({ tone: "ok", text: "스프린트를 수정했습니다." });
-        }}
-      />
+      {editing && (
+        <SprintFormDialog
+          open={editing}
+          initial={sprint}
+          defaults={{ startDate: sprint.startDate, endDate: sprint.endDate }}
+          onClose={() => setEditing(false)}
+          onSubmit={async (input) => {
+            await update.mutateAsync(input);
+            setMessage({ tone: "ok", text: "스프린트를 수정했습니다." });
+          }}
+        />
+      )}
       {closing && (
         <CloseSprintDialog
           project={project}

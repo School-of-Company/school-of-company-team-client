@@ -3214,11 +3214,57 @@ a.search-option:hover {
   border-top: 0;
   display: grid;
   gap: var(--space-1);
+  align-content: start;
+}
+.plan-list-viewport {
+  height: var(--plan-list-height);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  overflow-anchor: none;
+}
+.plan-message {
+  min-height: calc(var(--text-sm) * var(--leading-body));
 }
 .plan-pane .plan-task {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-raised);
+  height: var(--plan-row-height);
+}
+.plan-pane .plan-task-title,
+.plan-pane .plan-task-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.plan-pane .plan-task-meta {
+  flex-wrap: nowrap;
+}
+.plan-pane .plan-task-action {
+  width: var(--plan-action-width);
+}
+.plan-pane .plan-task-action .ui-button {
+  width: 100%;
+}
+
+.project-danger-zone {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid color-mix(in oklab, var(--danger) 45%, var(--border));
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--danger) 4%, var(--surface));
+}
+.project-danger-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--danger-foreground);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.project-danger-zone .ui-button-danger {
+  color: var(--danger-foreground);
 }
 .plan-drop-empty .ui-empty {
   padding-block: var(--space-6);
