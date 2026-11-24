@@ -1,7 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 
-// 서버 계약: 팀 문화(feat/experiments-team-guide). 조직에 하나뿐인 마크다운 문서.
+// 서버 계약: 팀 문화(feat/ops-v3). 섹션마다 마크다운 문서 하나, 버전은 섹션별로 쌓인다.
+export type GuideSection =
+  "CULTURE" | "COLLABORATION" | "PROJECT" | "DEVELOPMENT" | "OPERATIONS";
+
 export type GuideAuthor = {
   readonly id: string;
   readonly username: string;
@@ -9,6 +12,7 @@ export type GuideAuthor = {
 };
 
 export type TeamGuide = {
+  readonly section: GuideSection;
   readonly content: string;
   readonly version: number;
   readonly updatedAt: string;
@@ -24,40 +28,49 @@ export type GuideRevision = {
 
 export const teamGuideKeys = {
   all: ["team-guide"] as const,
-  current: ["team-guide", "current"] as const,
-  revisions: ["team-guide", "revisions"] as const,
-  revision: (version: number) => ["team-guide", "revision", version] as const,
+  section: (section: GuideSection) => ["team-guide", section] as const,
+  current: (section: GuideSection) =>
+    ["team-guide", section, "current"] as const,
+  revisions: (section: GuideSection) =>
+    ["team-guide", section, "revisions"] as const,
+  revision: (section: GuideSection, version: number) =>
+    ["team-guide", section, "revision", version] as const,
 };
 
+const base = (section: GuideSection) => `/api/v1/team-guide/${section}`;
+
 export const teamGuideApi = {
-  get: async () => (await api.get<TeamGuide>("/api/v1/team-guide")).data,
-  save: async (body: { content: string; baseVersion: number }) =>
-    (await api.put<TeamGuide>("/api/v1/team-guide", body)).data,
-  revisions: async () =>
-    (await api.get<readonly GuideRevision[]>("/api/v1/team-guide/revisions"))
+  get: async (section: GuideSection) =>
+    (await api.get<TeamGuide>(base(section))).data,
+  save: async (
+    section: GuideSection,
+    body: { content: string; baseVersion: number },
+  ) => (await api.put<TeamGuide>(base(section), body)).data,
+  revisions: async (section: GuideSection) =>
+    (await api.get<readonly GuideRevision[]>(`${base(section)}/revisions`))
       .data,
-  revision: async (version: number) =>
+  revision: async (section: GuideSection, version: number) =>
     (
       await api.get<GuideRevision & { readonly content: string }>(
-        `/api/v1/team-guide/revisions/${version}`,
+        `${base(section)}/revisions/${version}`,
       )
     ).data,
 };
 
 export const teamGuideQueries = {
-  current: () =>
+  current: (section: GuideSection) =>
     queryOptions({
-      queryKey: teamGuideKeys.current,
-      queryFn: teamGuideApi.get,
+      queryKey: teamGuideKeys.current(section),
+      queryFn: () => teamGuideApi.get(section),
     }),
-  revisions: () =>
+  revisions: (section: GuideSection) =>
     queryOptions({
-      queryKey: teamGuideKeys.revisions,
-      queryFn: teamGuideApi.revisions,
+      queryKey: teamGuideKeys.revisions(section),
+      queryFn: () => teamGuideApi.revisions(section),
     }),
-  revision: (version: number) =>
+  revision: (section: GuideSection, version: number) =>
     queryOptions({
-      queryKey: teamGuideKeys.revision(version),
-      queryFn: () => teamGuideApi.revision(version),
+      queryKey: teamGuideKeys.revision(section, version),
+      queryFn: () => teamGuideApi.revision(section, version),
     }),
 };
