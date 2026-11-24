@@ -8,17 +8,16 @@ export function BoardHeader({
   scope,
   project,
   board,
+  failed,
   canCreate,
-  editable,
-  signedIn,
   onCreate,
 }: {
   readonly scope: TaskScope;
   readonly project?: ProjectDetail;
+  /** 확정된 보드(placeholder 아님). 없으면 집계 중. */
   readonly board?: Board;
+  readonly failed?: boolean;
   readonly canCreate: boolean;
-  readonly editable: boolean;
-  readonly signedIn: boolean;
   readonly onCreate: () => void;
 }) {
   return (
@@ -39,9 +38,15 @@ export function BoardHeader({
                 (scope === "PERSONAL" ? "내 업무" : "팀 공용 보드")}
             </h1>
           </div>
-          {board && (
+          {/* 프로젝트 보드는 다른 프로젝트 탭과 머리 높이를 맞추려고 부제를 두지 않는다(개수는 컬럼마다 있다).
+              내 업무, 팀 보드는 집계 중에도 부제 줄을 잡아 두고, 필터를 바꾼 직후 이전 필터의 개수를 보이지 않는다. */}
+          {!project && (
             <p className="page-subtitle tabular-nums">
-              업무 {boardTotal(board)}개
+              {board
+                ? `업무 ${boardTotal(board)}개`
+                : failed
+                  ? ""
+                  : "업무 집계 중"}
             </p>
           )}
         </div>
@@ -67,11 +72,6 @@ export function BoardHeader({
       {project?.archived && (
         <p role="status" className="text-sm text-muted">
           아카이브된 프로젝트입니다. 조회만 가능합니다.
-        </p>
-      )}
-      {scope === "PROJECT" && signedIn && !editable && !project?.archived && (
-        <p className="text-sm text-muted">
-          참여자만 업무를 등록하거나 수정할 수 있습니다.
         </p>
       )}
     </>

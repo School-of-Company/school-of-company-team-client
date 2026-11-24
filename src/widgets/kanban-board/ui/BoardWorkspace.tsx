@@ -28,7 +28,8 @@ import { taskGithubQueries } from "@/features/link-github-issue";
 import { TaskError } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
-import { Spinner, useToast } from "@/shared/ui";
+import { useToast } from "@/shared/ui";
+import { settledData } from "@/shared/lib";
 import { KanbanBoard } from "./KanbanBoard";
 import { BoardViewControls } from "./BoardViewControls";
 import { BoardCreateDialog } from "./BoardCreateDialog";
@@ -36,7 +37,7 @@ import {
   BoardDetailPanel,
   type BoardDetailComponent,
 } from "./BoardDetailPanel";
-import { BoardSkeleton } from "./BoardSkeleton";
+import { BoardPageSkeleton, BoardSkeleton } from "./BoardSkeleton";
 import { BoardHeader } from "./BoardHeader";
 
 export type BoardActor = {
@@ -261,19 +262,27 @@ export function BoardWorkspace({
       <TaskError error={project.error} onRetry={() => void project.refetch()} />
     );
   if (projectId && project.isPending)
-    return <Spinner label="프로젝트를 불러오는 중" />;
+    return <BoardPageSkeleton scope={scope} />;
   return (
     <div className="board-workspace grid min-w-0 gap-6 [overflow-wrap:anywhere] break-keep">
       <BoardHeader
         scope={scope}
         project={project.data}
-        board={board.isError ? undefined : board.data}
+        board={board.isError ? undefined : settledData(board)}
+        failed={board.isError}
         canCreate={canCreate}
-        editable={!!access?.editable}
-        signedIn={!!user}
         onCreate={() => setCreating({ status: "BACKLOG" })}
       />
       {project.data && renderProjectNav?.(project.data)}
+      {/* 안내는 탭 줄 아래에 두어 탭 줄 위치가 다른 프로젝트 탭과 같다. */}
+      {scope === "PROJECT" &&
+        user &&
+        !access?.editable &&
+        !project.data?.archived && (
+          <p className="text-sm text-muted">
+            참여자만 업무를 등록하거나 수정할 수 있습니다.
+          </p>
+        )}
       {aside}
       <div className="board-toolbar flex min-w-0 flex-wrap items-start justify-between gap-3">
         {renderFilters({
@@ -317,68 +326,75 @@ export function BoardWorkspace({
       ) : board.isError ? (
         <TaskError error={board.error} onRetry={() => void board.refetch()} />
       ) : (
-        <KanbanBoard
-          board={board.data}
-          sort={sort}
-          groupBy={groupBy}
-          laneScope={pathname ?? ""}
-          archivedBuckets={
-            buckets.data
-              ?.filter((bucket) => bucket.archived)
-              .map((bucket) => bucket.id) ?? []
-          }
-          visibleStatus={
-            taskStatuses.find((status) => status === params.get("column")) ??
-            "BACKLOG"
-          }
-          onVisibleStatus={(status) => {
-            const next = new URLSearchParams(search);
-            next.set("column", status);
-            change(next.toString());
-          }}
-          editable={editable}
-          pending={mutation.isPending}
-          onSelect={
-            Detail
-              ? (id) => {
-                  selectionTrigger.current =
-                    document.activeElement instanceof HTMLElement
-                      ? document.activeElement
-                      : null;
-                  selectTask(id);
-                }
-              : undefined
-          }
-          onMove={(id, move) => {
-            if (!mutation.isPending) mutation.mutate({ id, move });
-          }}
-          filtered={boardFilterKeys.some((key) => params.has(key))}
-          onClearFilters={() => {
-            const next = new URLSearchParams(search);
-            for (const key of boardFilterKeys) next.delete(key);
-            next.delete("doneLimit");
-            change(next.toString());
-          }}
-          onMore={() => {
-            const next = new URLSearchParams(search);
-            next.set(
-              "doneLimit",
-              String(Number(boardParams.get("doneLimit") ?? 50) + 50),
-            );
-            change(next.toString());
-          }}
-          onCreate={
-            canCreate
-              ? (status, laneKey) =>
-                  setCreating({
-                    status,
-                    ...(groupBy === "bucket" && laneKey
-                      ? { bucketId: laneKey }
-                      : {}),
-                  })
-              : undefined
-          }
-        />
+        // 필터를 바꾼 직후 이전 결과는 흐리게 둔다(자리는 그대로, display: contents).
+        <div
+          className="query-region"
+          aria-busy={board.isFetching || undefined}
+          data-placeholder={board.isPlaceholderData || undefined}
+        >
+          <KanbanBoard
+            board={board.data}
+            sort={sort}
+            groupBy={groupBy}
+            laneScope={pathname ?? ""}
+            archivedBuckets={
+              buckets.data
+                ?.filter((bucket) => bucket.archived)
+                .map((bucket) => bucket.id) ?? []
+            }
+            visibleStatus={
+              taskStatuses.find((status) => status === params.get("column")) ??
+              "BACKLOG"
+            }
+            onVisibleStatus={(status) => {
+              const next = new URLSearchParams(search);
+              next.set("column", status);
+              change(next.toString());
+            }}
+            editable={editable}
+            pending={mutation.isPending}
+            onSelect={
+              Detail
+                ? (id) => {
+                    selectionTrigger.current =
+                      document.activeElement instanceof HTMLElement
+                        ? document.activeElement
+                        : null;
+                    selectTask(id);
+                  }
+                : undefined
+            }
+            onMove={(id, move) => {
+              if (!mutation.isPending) mutation.mutate({ id, move });
+            }}
+            filtered={boardFilterKeys.some((key) => params.has(key))}
+            onClearFilters={() => {
+              const next = new URLSearchParams(search);
+              for (const key of boardFilterKeys) next.delete(key);
+              next.delete("doneLimit");
+              change(next.toString());
+            }}
+            onMore={() => {
+              const next = new URLSearchParams(search);
+              next.set(
+                "doneLimit",
+                String(Number(boardParams.get("doneLimit") ?? 50) + 50),
+              );
+              change(next.toString());
+            }}
+            onCreate={
+              canCreate
+                ? (status, laneKey) =>
+                    setCreating({
+                      status,
+                      ...(groupBy === "bucket" && laneKey
+                        ? { bucketId: laneKey }
+                        : {}),
+                    })
+                : undefined
+            }
+          />
+        </div>
       )}
       {creating && (
         <BoardCreateDialog

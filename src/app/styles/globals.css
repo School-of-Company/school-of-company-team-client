@@ -1259,6 +1259,10 @@ html[data-sidebar-closed~="account"]
 .board-workspace {
   gap: var(--space-4);
 }
+/* 프로젝트 보드의 탭 줄은 다른 프로젝트 탭(.planning-page, 간격 24)과 같은 높이에 둔다. */
+.board-workspace > .project-nav {
+  margin-top: var(--space-2);
+}
 .board-breadcrumb {
   display: flex;
   align-items: center;
