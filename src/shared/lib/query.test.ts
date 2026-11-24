@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { hashKey } from "@tanstack/react-query";
-import { HIDDEN_REPOSITORY, keepPreviousKey, repositoryName } from "./query";
+import {
+  HIDDEN_REPOSITORY,
+  keepPreviousKey,
+  repositoryName,
+  settledData,
+} from "./query";
 
 test("키가 바뀔 때만 이전 데이터를 빌려 오고, 같은 키가 지워진 뒤에는 빌려 오지 않는다", () => {
   const keep = keepPreviousKey(["tasks", "board", "status=DONE"]);
@@ -24,4 +29,13 @@ test("이름이 숨겨진 저장소는 이름 대신 비공개 저장소로 쓴�
   );
   assert.equal(repositoryName({ fullName: null }), HIDDEN_REPOSITORY);
   assert.equal(repositoryName({ fullName: "" }), HIDDEN_REPOSITORY);
+});
+
+test("placeholder 데이터로는 개수나 빈 상태를 그리지 않는다", () => {
+  assert.deepEqual(settledData({ data: [1], isPlaceholderData: false }), [1]);
+  assert.equal(settledData({ data: [1], isPlaceholderData: true }), undefined);
+  assert.equal(
+    settledData({ data: undefined, isPlaceholderData: false }),
+    undefined,
+  );
 });

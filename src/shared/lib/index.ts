@@ -70,6 +70,7 @@ export {
   keepPreviousKey,
   refetchOnVisit,
   repositoryName,
+  settledData,
 } from "./query";
 export {
   addDays,

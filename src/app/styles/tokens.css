@@ -123,6 +123,10 @@
   --content-narrow: 44rem;
   --content-reading: 64rem;
   --sidebar-shortcuts-height: 30dvh;
+  /* 레이아웃 안정성: 빈 상태와 첫 로딩 자리는 어디서나 이 높이를 먼저 잡는다. */
+  --empty-height: 12rem;
+  --segment-height: 36px; /* 세그먼트 바 전체 높이(3px 안쪽 여백 + 30px 칸) */
+  --toolbar-gap: var(--space-3); /* 머리글 아래 보기 전환과 필터 줄의 간격 */
   --admin-user-table-min: 32rem;
   --detail-sidebar-width: 17.5rem;
   --plan-list-height: 24rem;

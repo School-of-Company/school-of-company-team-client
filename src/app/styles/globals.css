@@ -995,9 +995,19 @@ select.ui-input {
   letter-spacing: -0.02em;
 }
 .page-subtitle {
+  /* 집계가 늦게 와도 머리글 높이가 변하지 않게 한 줄을 늘 잡아 둔다. */
+  min-height: 1lh;
   margin-top: 2px;
   color: var(--muted);
   font-size: var(--text-sm);
+}
+/* 머리글 아래 보기 전환과 필터 줄. 세그먼트가 사라져도 줄 높이는 유지한다. */
+.page-toolbar {
+  display: flex;
+  min-height: var(--segment-height);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--toolbar-gap);
 }
 .page-actions {
   display: flex;
@@ -2221,9 +2231,12 @@ select.ui-input {
   color: var(--background);
 }
 
-/* Empty and error states: quiet and sized to the region they sit in. */
+/* Empty and error states: one size everywhere (page, tab, panel), so switching
+   filters or tabs never resizes the grey box. Loading placeholders use the same height. */
 .ui-empty {
   display: grid;
+  min-height: var(--empty-height);
+  align-content: center;
   justify-items: center;
   gap: var(--space-2);
   padding: var(--space-10) var(--space-6);
@@ -2238,6 +2251,44 @@ select.ui-input {
 }
 .ui-empty .ui-button {
   margin-top: var(--space-2);
+}
+.ui-empty p {
+  max-width: 28rem;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+/* 첫 로딩 목록 자리: 빈 상태와 같은 높이부터 시작해 결과가 비어도 박스 크기가 그대로다. */
+.ui-skeleton-list {
+  display: grid;
+  min-height: var(--empty-height);
+  align-content: start;
+  gap: var(--space-2);
+}
+/* 글자 자리 스켈레톤: 비슷한 길이의 글자를 투명하게 넣어 실제 줄 높이와 폭을 그대로 잡는다. */
+.ui-skeleton-text {
+  border-radius: var(--radius-sm);
+  background: var(--surface-hover);
+  color: transparent;
+  user-select: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-skeleton-text {
+    animation: skeleton-pulse 2s ease-in-out infinite;
+  }
+}
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+/* 필터나 탭을 바꿔 이전 결과를 잠시 보여 주는 동안: 흐리게만 하고 자리는 그대로 둔다. */
+.query-region {
+  display: grid;
+  gap: inherit;
+  transition: opacity 120ms;
+}
+.query-region[data-placeholder] {
+  opacity: 0.6;
 }
 /* Form buttons keep their own width instead of stretching across the column. */
 .settings-page .ui-button {
@@ -3506,9 +3557,6 @@ a.search-option:hover {
 }
 .project-danger-zone .ui-button-danger {
   color: var(--danger-foreground);
-}
-.plan-drop-empty .ui-empty {
-  padding-block: var(--space-6);
 }
 .plan-task {
   display: flex;

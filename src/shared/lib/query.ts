@@ -15,6 +15,15 @@ export const keepPreviousKey =
       : undefined;
 
 /**
+ * 개수, 빈 상태처럼 "확정된 결과"로만 그려야 하는 값에 쓴다. 필터를 바꾼 직후의 placeholder(이전 키의 데이터)는 버린다.
+ * 예: 부제 `운영 중 3개`를 아카이브 탭으로 바꾼 순간 `아카이브 3개`로 잘못 보이지 않게 한다.
+ */
+export const settledData = <T>(query: {
+  readonly data: T | undefined;
+  readonly isPlaceholderData: boolean;
+}) => (query.isPlaceholderData ? undefined : query.data);
+
+/**
  * 저장소 목록처럼 권한이 바뀌면 바로 달라져야 하는 목록. 화면을 떠나면 캐시를 버리고(다시 들어와도 옛 이름을 그리지 않는다),
  * 화면에 들어올 때와 창 포커스 때마다 다시 받는다.
  */
