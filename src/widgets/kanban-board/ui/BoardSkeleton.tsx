@@ -59,7 +59,8 @@ function ProjectTitleSkeleton() {
 function ProjectNavSkeleton() {
   return (
     <div aria-hidden="true" className="project-nav flex min-w-0 border-b">
-      {["보드", "문서", "스프린트", "마일스톤"].map((label) => (
+      {/* AGENTS.md 정보 구조의 프로젝트 탭 순서 앞부분. */}
+      {["보드", "스프린트", "마일스톤", "달력", "링크"].map((label) => (
         <span
           key={label}
           className="ui-nav-link flex shrink-0 items-center border-b-2 border-transparent"

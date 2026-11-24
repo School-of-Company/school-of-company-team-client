@@ -45,7 +45,7 @@ export function BoardHeader({
               {board
                 ? `업무 ${boardTotal(board)}개`
                 : failed
-                  ? ""
+                  ? "업무 수를 불러오지 못했습니다"
                   : "업무 집계 중"}
             </p>
           )}
