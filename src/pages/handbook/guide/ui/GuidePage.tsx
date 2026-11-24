@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AuthGuard } from "@/features/auth";
 import { routes } from "@/shared/config";
-import { Markdown, Select } from "@/shared/ui";
+import { Markdown, PageHeader, Select } from "@/shared/ui";
 import { guideSections } from "../model/sections";
 
 /** 사용법: 기능별 짧은 안내. 왼쪽 목차, 오른쪽 본문. */
@@ -68,18 +68,18 @@ function GuideContent() {
   };
   return (
     <div className="guide-page break-keep">
-      <header className="page-header">
-        <div className="min-w-0">
-          <h1>사용법</h1>
-          <p className="page-subtitle">
+      <PageHeader
+        title="사용법"
+        subtitle={
+          <>
             처음이라면 위에서부터 읽어 보세요. 팀의 약속은{" "}
             <Link href={routes.culture} className="underline">
               팀 문화
             </Link>
             에 있습니다.
-          </p>
-        </div>
-      </header>
+          </>
+        }
+      />
       <div className="guide-layout">
         <div className="guide-mobile-toc">
           <label htmlFor="guide-section-select" className="sr-only">

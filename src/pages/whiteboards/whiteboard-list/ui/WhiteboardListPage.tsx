@@ -25,10 +25,13 @@ import {
   Field,
   Icon,
   Input,
+  ListSkeleton,
+  PageHeader,
+  QueryState,
   Skeleton,
   useToast,
 } from "@/shared/ui";
-import { ProjectHeading } from "@/widgets/project-nav";
+import { ProjectHeading, ProjectHeadingSkeleton } from "@/widgets/project-nav";
 
 /** projectId 가 없으면 팀 공용 화이트보드 목록(`/whiteboards`), 있으면 프로젝트 탭. */
 export function WhiteboardListPage({
@@ -37,26 +40,15 @@ export function WhiteboardListPage({
   readonly projectId?: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard
+      require="work"
+      fallback={projectId ? <ProjectHeadingSkeleton /> : undefined}
+    >
       {(user) =>
         projectId ? (
           <ProjectWhiteboards projectId={projectId} user={user} />
         ) : (
-          <div className="grid gap-5">
-            <Boards
-              projectId={null}
-              canCreate
-              heading={
-                <div className="min-w-0">
-                  <h1>화이트보드</h1>
-                  <p className="page-subtitle">
-                    팀 공용 보드입니다. 활성 팀원 누구나 그리고 고칠 수
-                    있습니다.
-                  </p>
-                </div>
-              }
-            />
-          </div>
+          <Boards projectId={null} canCreate />
         )
       }
     </AuthGuard>
@@ -71,17 +63,7 @@ function ProjectWhiteboards({
   readonly user: User;
 }) {
   const project = useQuery(projectQueries.detail(projectId));
-  if (project.isPending)
-    return (
-      <div
-        role="status"
-        aria-label="프로젝트 불러오는 중"
-        className="grid gap-3"
-      >
-        <Skeleton className="h-7 w-48" />
-        <Skeleton className="h-9 w-64 max-w-full" />
-      </div>
-    );
+  if (project.isPending) return <ProjectHeadingSkeleton />;
   if (project.isError)
     return (
       <ErrorState
@@ -95,11 +77,6 @@ function ProjectWhiteboards({
       <Boards
         projectId={projectId}
         canCreate={projectAccess(project.data, user).editable}
-        heading={
-          <h2 id="whiteboards-heading" className="text-lg font-semibold">
-            화이트보드
-          </h2>
-        }
       />
     </div>
   );
@@ -108,51 +85,55 @@ function ProjectWhiteboards({
 function Boards({
   projectId,
   canCreate,
-  heading,
 }: {
   readonly projectId: string | null;
   readonly canCreate: boolean;
-  readonly heading: React.ReactNode;
 }) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
   const boards = useQuery(whiteboardQueries.list(projectId));
+  const createButton = canCreate && (
+    <Button onClick={() => setCreating(true)}>
+      <Icon name="plus" className="inline-block" /> 새 화이트보드
+    </Button>
+  );
   return (
     <section className="grid gap-5">
-      <div className={projectId ? "planning-section-head" : "page-header"}>
-        {heading}
-        {canCreate && (
-          <Button onClick={() => setCreating(true)}>
-            <Icon name="plus" className="inline-block" /> 새 화이트보드
-          </Button>
-        )}
-      </div>
-      {boards.isPending ? (
-        <div
-          role="status"
-          aria-label="화이트보드 불러오는 중"
-          className="grid gap-2"
-        >
-          <Skeleton className="h-14" />
-          <Skeleton className="h-14" />
+      {projectId ? (
+        <div className="planning-section-head">
+          <h2 id="whiteboards-heading" className="text-lg font-semibold">
+            화이트보드
+          </h2>
+          {createButton}
         </div>
-      ) : !boards.data ? (
-        <ErrorState
-          description={whiteboardErrorMessage(boards.error)}
-          onRetry={() => void boards.refetch()}
-        />
-      ) : boards.data.length === 0 ? (
-        <EmptyState
-          title="화이트보드가 없습니다"
-          description="회의 메모, 회고, 흐름도를 템플릿으로 바로 시작할 수 있습니다."
-        />
       ) : (
-        <ul className="list" aria-label="화이트보드 목록">
-          {boards.data.map((board) => (
-            <BoardRow key={board.id} board={board} />
-          ))}
-        </ul>
+        <PageHeader
+          title="화이트보드"
+          subtitle="팀 공용 보드입니다. 활성 팀원 누구나 그리고 고칠 수 있습니다."
+          actions={createButton}
+        />
       )}
+      <QueryState
+        query={boards}
+        skeleton={
+          <ListSkeleton label="화이트보드 불러오는 중" rowClassName="h-14" />
+        }
+        errorMessage={whiteboardErrorMessage}
+        empty={
+          <EmptyState
+            title="화이트보드가 없습니다"
+            description="회의 메모, 회고, 흐름도를 템플릿으로 바로 시작할 수 있습니다."
+          />
+        }
+      >
+        {(data) => (
+          <ul className="list" aria-label="화이트보드 목록">
+            {data.map((board) => (
+              <BoardRow key={board.id} board={board} />
+            ))}
+          </ul>
+        )}
+      </QueryState>
       <CreateDialog
         open={creating}
         projectId={projectId}

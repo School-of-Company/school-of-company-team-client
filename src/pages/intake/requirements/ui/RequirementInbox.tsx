@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useId } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   RequesterPriorityLabel,
   requirementErrorMessage,
+  requirementKeys,
   requirementQueries,
   requirementStatuses,
   requirementStatusLabels,
@@ -14,14 +14,14 @@ import {
   type RequirementStatus,
 } from "@/entities/requirement";
 import { routes } from "@/shared/config";
-import { formatDate } from "@/shared/lib";
+import { formatDate, keepPreviousKey } from "@/shared/lib";
 import {
   Button,
+  ChipSelect,
   EmptyState,
-  ErrorState,
+  ListSkeleton,
+  QueryState,
   SegmentedLinks,
-  Select,
-  Skeleton,
 } from "@/shared/ui";
 
 const isStatus = (value: string | null): value is RequirementStatus =>
@@ -38,16 +38,17 @@ export function RequirementInbox({
   readonly projectId?: string;
   readonly isLead: boolean;
 }) {
-  const id = useId();
   const router = useRouter();
   const pathname = usePathname() ?? "";
   const search = useSearchParams();
   const statusParam = search?.get("status") ?? null;
   const status = isStatus(statusParam) ? statusParam : undefined;
   const org = !projectId && isLead && search?.get("scope") === "org";
-  const list = useInfiniteQuery(
-    requirementQueries.list({ projectId, org, status }),
-  );
+  const filter = { projectId, org, status };
+  const list = useInfiniteQuery({
+    ...requirementQueries.list(filter),
+    placeholderData: keepPreviousKey(requirementKeys.list(filter)),
+  });
   const href = (changes: Record<string, string | null>) => {
     const params = new URLSearchParams(search?.toString());
     for (const [key, value] of Object.entries(changes))
@@ -56,33 +57,21 @@ export function RequirementInbox({
     const query = params.toString();
     return query ? `${pathname}?${query}` : pathname;
   };
-  const rows = list.data?.pages.flat() ?? [];
   return (
-    <div className="grid min-w-0 gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="requirement-status-filter">
-          <label
-            htmlFor={`${id}-status`}
-            className="shrink-0 text-sm whitespace-nowrap text-muted"
-          >
-            상태
-          </label>
-          <Select
-            className="min-w-0 flex-1"
-            id={`${id}-status`}
-            value={status ?? ""}
-            onChange={(event) =>
-              router.replace(href({ status: event.target.value || null }))
-            }
-          >
-            <option value="">전체</option>
-            {requirementStatuses.map((value) => (
-              <option key={value} value={value}>
-                {requirementStatusLabels[value]}
-              </option>
-            ))}
-          </Select>
-        </span>
+    <div className="grid min-w-0 gap-5">
+      <div className="page-toolbar">
+        <ChipSelect
+          label="상태"
+          value={status ?? ""}
+          options={[
+            { value: "", label: "모든 상태" },
+            ...requirementStatuses.map((value) => ({
+              value,
+              label: requirementStatusLabels[value],
+            })),
+          ]}
+          onChange={(value) => router.replace(href({ status: value || null }))}
+        />
         {!projectId && isLead && (
           <SegmentedLinks
             label="범위"
@@ -93,81 +82,93 @@ export function RequirementInbox({
           />
         )}
       </div>
-      {list.isPending ? (
-        <div
-          role="status"
-          aria-label="요구사항 불러오는 중"
-          className="grid gap-2"
-        >
-          {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} className="h-12" />
-          ))}
-        </div>
-      ) : list.isError && rows.length === 0 ? (
-        <ErrorState
-          description={requirementErrorMessage(list.error)}
-          onRetry={() => void list.refetch()}
-        />
-      ) : rows.length === 0 ? (
-        status || org ? (
-          <EmptyState title="조건에 맞는 요구사항이 없습니다" />
-        ) : (
-          <EmptyState
-            title="접수된 요구사항이 없습니다"
-            description={
-              projectId
-                ? "프로젝트 설정의 접수 양식 탭에서 링크를 만들어 요청자에게 전달하세요."
-                : "외부 요청자가 접수 양식으로 제출하면 여기에 쌓입니다."
-            }
-          />
-        )
-      ) : (
-        <>
-          <ul className="list min-w-0" aria-label="요구사항 목록">
-            {rows.map((row) => (
-              <li key={row.id} className="min-w-0">
-                <Link href={routes.requirement(row.id)} className="list-row">
-                  <span className="shrink-0 text-xs text-muted">
-                    {row.projectKey ?? "조직"}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium">
-                      {row.title}
+      <QueryState
+        query={{
+          data: list.data?.pages.flat(),
+          error: list.error,
+          isError: list.isError,
+          isPending: list.isPending,
+          isFetching: list.isFetching,
+          isPlaceholderData: list.isPlaceholderData,
+          refetch: list.refetch,
+        }}
+        skeleton={
+          <ListSkeleton label="요구사항 불러오는 중" rowClassName="h-14" />
+        }
+        errorMessage={requirementErrorMessage}
+        empty={
+          status || org ? (
+            <EmptyState title="조건에 맞는 요구사항이 없습니다" />
+          ) : (
+            <EmptyState
+              title="접수된 요구사항이 없습니다"
+              description={
+                projectId
+                  ? "프로젝트 설정의 접수 양식 탭에서 링크를 만들어 요청자에게 전달하세요."
+                  : "외부 요청자가 접수 양식으로 제출하면 여기에 쌓입니다."
+              }
+            />
+          )
+        }
+      >
+        {(rows) => (
+          <>
+            <ul className="list min-w-0" aria-label="요구사항 목록">
+              {rows.map((row) => (
+                <li key={row.id} className="min-w-0">
+                  <Link href={routes.requirement(row.id)} className="list-row">
+                    <span className="shrink-0 text-xs text-muted">
+                      {row.projectKey ?? "조직"}
                     </span>
-                    <span className="flex flex-wrap gap-x-2 text-xs text-muted">
-                      <span
-                        className="max-w-full min-w-0 truncate"
-                        title={row.formTitle ?? "삭제된 양식"}
-                      >
-                        {row.formTitle ?? "삭제된 양식"}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">
+                        {row.title}
                       </span>
-                      <RequesterPriorityLabel
-                        priority={row.requesterPriority}
-                      />
-                      {row.taskCount > 0 && <span>업무 {row.taskCount}</span>}
+                      <span className="flex flex-wrap gap-x-2 text-xs text-muted">
+                        <span
+                          className="max-w-full min-w-0 truncate"
+                          title={row.formTitle ?? "삭제된 양식"}
+                        >
+                          {row.formTitle ?? "삭제된 양식"}
+                        </span>
+                        <RequesterPriorityLabel
+                          priority={row.requesterPriority}
+                        />
+                        {row.taskCount > 0 && <span>업무 {row.taskCount}</span>}
+                      </span>
                     </span>
-                  </span>
-                  <RequirementStatusBadge status={row.status} />
-                  <span className="shrink-0 text-sm text-muted tabular-nums">
-                    {formatDate(row.submittedAt)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          {list.hasNextPage && (
-            <div>
-              <Button
-                variant="secondary"
-                loading={list.isFetchingNextPage}
-                onClick={() => void list.fetchNextPage()}
-              >
-                더 보기
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+                    <RequirementStatusBadge status={row.status} />
+                    <span className="shrink-0 text-sm text-muted tabular-nums">
+                      {formatDate(row.submittedAt)}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {list.hasNextPage && (
+              <div>
+                <Button
+                  variant="secondary"
+                  loading={list.isFetchingNextPage}
+                  onClick={() => void list.fetchNextPage()}
+                >
+                  더 보기
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </QueryState>
+    </div>
+  );
+}
+
+/** 접수함 `Suspense` 자리: 필터 줄 높이와 목록 자리를 그대로 잡는다. */
+export function RequirementInboxSkeleton() {
+  return (
+    <div className="grid min-w-0 gap-5">
+      <div className="page-toolbar" />
+      <ListSkeleton label="요구사항 불러오는 중" rowClassName="h-14" />
     </div>
   );
 }

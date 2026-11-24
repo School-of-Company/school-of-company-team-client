@@ -29,7 +29,7 @@ import {
   Icon,
   Input,
   Select,
-  Spinner,
+  Skeleton,
   Textarea,
 } from "@/shared/ui";
 
@@ -46,7 +46,7 @@ export function IntakeFormPage({ formToken }: { readonly formToken: string }) {
   const [statusToken, setStatusToken] = useState<string | null>(null);
 
   if (statusToken) return <Submitted token={statusToken} />;
-  if (form.isPending) return <Spinner label="양식 불러오는 중" />;
+  if (form.isPending) return <IntakeFormSkeleton />;
   if (form.isError) {
     const problem = normalizeApiError(form.error);
     return (
@@ -130,7 +130,7 @@ function IntakeFormBody({
     <form noValidate onSubmit={onSubmit} className="grid gap-8">
       <header className="grid gap-2">
         <p className="text-sm text-muted">요구사항 접수</p>
-        <h1 className="text-2xl font-bold break-words">{form.title}</h1>
+        <h1 className="public-title break-words">{form.title}</h1>
         {form.description && (
           <p className="text-sm whitespace-pre-wrap text-foreground-2">
             {form.description}
@@ -418,7 +418,7 @@ function TemplateInput({
 function Submitted({ token }: { readonly token: string }) {
   return (
     <section className="grid gap-5" aria-labelledby="intake-done">
-      <h1 id="intake-done" className="text-2xl font-bold">
+      <h1 id="intake-done" className="public-title">
         요구사항이 접수되었습니다
       </h1>
       <p className="text-sm text-foreground-2">
@@ -427,5 +427,38 @@ function Submitted({ token }: { readonly token: string }) {
       </p>
       <StatusLinkOnce token={token} />
     </section>
+  );
+}
+
+/** 양식 첫 로딩 자리: 머리글과 입력 칸 모양을 그대로 잡아 양식이 한 번에 0에서 커지지 않게 한다. */
+function IntakeFormSkeleton() {
+  return (
+    <div role="status" aria-label="양식 불러오는 중" className="grid gap-8">
+      <header aria-hidden="true" className="grid gap-2">
+        <p className="text-sm text-muted">요구사항 접수</p>
+        <h1 className="public-title">
+          <span className="ui-skeleton-text">요구사항 접수 양식</span>
+        </h1>
+        <p className="text-sm">
+          <span className="ui-skeleton-text">
+            양식 설명을 불러오는 중입니다. 잠시만 기다려 주세요.
+          </span>
+        </p>
+        <p className="text-sm text-muted">
+          파일 첨부는 받지 않습니다. 자료는 링크로 남겨 주세요.
+        </p>
+      </header>
+      {[4, 3].map((fields, section) => (
+        <div key={section} aria-hidden="true" className="grid gap-5">
+          <Skeleton className="h-7 w-32" />
+          {Array.from({ length: fields }, (_, index) => (
+            <div key={index} className="grid gap-2">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-11" />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
