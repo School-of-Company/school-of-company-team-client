@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useState, type FormEvent } from "react";
+import { useEffect, useReducer, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { normalizeApiError } from "@/shared/api";
 import { formatDate } from "@/shared/lib";
@@ -18,7 +18,7 @@ import {
 } from "@/shared/ui";
 import {
   apiTokensQueryKey,
-  createApiToken,
+  createTokenForDialog,
   listApiTokens,
   revokeApiToken,
 } from "../api/tokens";
@@ -26,6 +26,7 @@ import {
   claudeCodeSnippet,
   closedTokenDialog,
   codexSnippet,
+  discardTokenOnHide,
   expiryOptions,
   mcpEndpoint,
   scopeLabels,
@@ -133,27 +134,29 @@ function CreateTokenForm({
   readonly onCancel: () => void;
 }) {
   const client = useQueryClient();
-  const create = useMutation({
-    mutationFn: createApiToken,
-    // 평문 토큰이 mutation cache 에 남지 않게 바로 지운다.
-    gcTime: 0,
-    onSuccess: (token) => {
-      void client.invalidateQueries({ queryKey: apiTokensQueryKey });
-      onCreated(token);
-    },
-  });
+  // 생성 요청은 useMutation 밖에서 부른다(평문 토큰이 mutation cache 에 실리지 않게).
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<unknown>(null);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (create.isPending) return;
+    if (pending) return;
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
     const scope = form.get("scope") === "WRITE" ? "WRITE" : "READ";
     const expiresInDays = Number(form.get("expiresInDays"));
-    create.mutate({
-      name,
-      scope: scope satisfies ApiTokenScope,
-      expiresInDays,
-    });
+    setPending(true);
+    setError(null);
+    createTokenForDialog(
+      client,
+      { name, scope: scope satisfies ApiTokenScope, expiresInDays },
+      onCreated,
+    ).then(
+      () => setPending(false),
+      (failure: unknown) => {
+        setPending(false);
+        setError(failure);
+      },
+    );
   }
   return (
     <form onSubmit={submit} className="grid gap-5">
@@ -170,7 +173,7 @@ function CreateTokenForm({
           pattern=".*\S.*"
           autoComplete="off"
           aria-describedby="api-token-name-hint"
-          disabled={create.isPending}
+          disabled={pending}
         />
       </Field>
       <Field
@@ -183,7 +186,7 @@ function CreateTokenForm({
           name="scope"
           defaultValue="READ"
           aria-describedby="api-token-scope-hint"
-          disabled={create.isPending}
+          disabled={pending}
         >
           <option value="READ">읽기</option>
           <option value="WRITE">쓰기 (업무 상태 변경·생성 가능)</option>
@@ -194,7 +197,7 @@ function CreateTokenForm({
           id="api-token-expiry"
           name="expiresInDays"
           defaultValue="30"
-          disabled={create.isPending}
+          disabled={pending}
         >
           {expiryOptions.map((days) => (
             <option key={days} value={days}>
@@ -203,20 +206,16 @@ function CreateTokenForm({
           ))}
         </Select>
       </Field>
-      {create.isError && (
+      {error !== null && (
         <p role="alert" className="text-sm text-danger">
-          {tokenErrorMessage(create.error)}
+          {tokenErrorMessage(error)}
         </p>
       )}
       <div className="flex flex-wrap justify-end gap-3">
-        <Button
-          variant="secondary"
-          disabled={create.isPending}
-          onClick={onCancel}
-        >
+        <Button variant="secondary" disabled={pending} onClick={onCancel}>
           취소
         </Button>
-        <Button type="submit" loading={create.isPending}>
+        <Button type="submit" loading={pending}>
           토큰 만들기
         </Button>
       </div>
@@ -261,6 +260,8 @@ export function ApiTokens() {
     queryFn: listApiTokens,
   });
   const [dialog, dispatch] = useReducer(tokenDialogReducer, closedTokenDialog);
+  // 페이지가 Activity 로 숨겨지거나 떠나면 평문 토큰을 버린다(돌아와도 다시 보이지 않게).
+  useEffect(() => discardTokenOnHide(dispatch), []);
   const [revoking, setRevoking] = useState<ApiToken | null>(null);
   const revoke = useMutation({
     mutationFn: revokeApiToken,
@@ -324,7 +325,13 @@ export function ApiTokens() {
         ) : (
           dialog.open && (
             <CreateTokenForm
-              onCreated={(token) => dispatch({ type: "created", token })}
+              onCreated={(token) =>
+                dispatch({
+                  type: "created",
+                  generation: dialog.generation,
+                  token,
+                })
+              }
               onCancel={() => dispatch({ type: "close" })}
             />
           )

@@ -35,19 +35,28 @@ export const scopeLabels: Record<ApiTokenScope, string> = {
 export const expiryOptions = [7, 30, 90] as const;
 
 /**
- * 만들기 대화상자 상태. 평문 토큰은 `created` 에만 있고, 닫으면 통째로 버린다.
- * localStorage·sessionStorage·query cache·로그 어디에도 두지 않는다.
+ * 만들기 대화상자 상태. 평문 토큰은 `created` 에만 있고, 닫거나 화면을 떠나면 통째로 버린다.
+ * localStorage·sessionStorage·query/mutation cache·로그 어디에도 두지 않는다.
+ * `generation` 은 열 때마다 늘어, 닫았다 다시 연 대화상자가 이전 요청의 응답을 받지 않게 한다.
  */
 export type TokenDialog =
-  | { readonly open: false }
-  | { readonly open: true; readonly created: CreatedApiToken | null };
+  | { readonly open: false; readonly generation: number }
+  | {
+      readonly open: true;
+      readonly generation: number;
+      readonly created: CreatedApiToken | null;
+    };
 
 export type TokenDialogAction =
   | { readonly type: "open" }
-  | { readonly type: "created"; readonly token: CreatedApiToken }
+  | {
+      readonly type: "created";
+      readonly generation: number;
+      readonly token: CreatedApiToken;
+    }
   | { readonly type: "close" };
 
-export const closedTokenDialog: TokenDialog = { open: false };
+export const closedTokenDialog: TokenDialog = { open: false, generation: 0 };
 
 export function tokenDialogReducer(
   state: TokenDialog,
@@ -55,13 +64,25 @@ export function tokenDialogReducer(
 ): TokenDialog {
   switch (action.type) {
     case "open":
-      return { open: true, created: null };
+      return { open: true, generation: state.generation + 1, created: null };
     case "created":
-      return state.open ? { open: true, created: action.token } : state;
+      return state.open &&
+        state.generation === action.generation &&
+        !state.created
+        ? { ...state, created: action.token }
+        : state;
     case "close":
-      return closedTokenDialog;
+      return state.open ? { open: false, generation: state.generation } : state;
   }
 }
+
+/**
+ * effect cleanup 을 돌려준다. 화면이 숨겨지거나(Next cacheComponents 의 Activity hidden) 언마운트될 때 불린다.
+ * 공용 Dialog 는 이때 onClose 없이 조용히 닫히므로, 여기서 직접 토큰을 버린다.
+ */
+export const discardTokenOnHide =
+  (dispatch: (action: TokenDialogAction) => void) => () =>
+    dispatch({ type: "close" });
 
 export const mcpEndpoint = (apiUrl: string) =>
   `${apiUrl.replace(/\/+$/, "")}/mcp`;
