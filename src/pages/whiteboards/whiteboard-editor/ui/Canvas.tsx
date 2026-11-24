@@ -1,7 +1,7 @@
 "use client";
 
 import "@excalidraw/excalidraw/index.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import {
   CaptureUpdateAction,
   Excalidraw,
@@ -28,6 +28,7 @@ import {
   type WhiteboardScene,
 } from "@/entities/whiteboard";
 import { normalizeApiError } from "@/shared/api";
+import { readTheme, subscribeTheme } from "@/shared/lib";
 import {
   restoreOnto,
   selectedIds,
@@ -80,6 +81,18 @@ export default function Canvas({
   onGone,
 }: Props) {
   const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
+  const theme = useSyncExternalStore<"light" | "dark">(
+    subscribeTheme,
+    readTheme,
+    () => "light",
+  );
+  const crispFrame = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (crispFrame.current !== null) cancelAnimationFrame(crispFrame.current);
+    },
+    [],
+  );
   const version = useRef(board.version);
   const savedHash = useRef(hashElementsVersion(restore(board.scene)));
   /** 400·413 으로 거부된 내용. 같은 내용을 2초마다 다시 보내지 않는다. */
@@ -300,12 +313,22 @@ export default function Canvas({
       }}
       initialData={{
         elements: restore(board.scene),
-        appState: { ...board.scene.appState },
+        appState: { ...board.scene.appState, shouldCacheIgnoreZoom: false },
         scrollToContent: true,
       }}
-      onChange={(elements, appState) =>
-        engine.current.onChange(elements, appState)
-      }
+      onChange={(elements, appState) => {
+        engine.current.onChange(elements, appState);
+        if (appState.shouldCacheIgnoreZoom && crispFrame.current === null) {
+          crispFrame.current = requestAnimationFrame(() => {
+            crispFrame.current = null;
+            apiRef.current?.updateScene({
+              appState: { shouldCacheIgnoreZoom: false },
+              captureUpdate: CaptureUpdateAction.NEVER,
+            });
+          });
+        }
+      }}
+      theme={theme}
       onPointerUpdate={({ pointer: at }) => {
         pointer.current = { x: at.x, y: at.y };
       }}
