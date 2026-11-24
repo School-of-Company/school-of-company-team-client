@@ -545,6 +545,57 @@ select.ui-input {
 .app-shell {
   background: var(--background);
 }
+.app-main[data-layout="reading"] {
+  max-width: var(--content-reading);
+}
+.app-main .settings-page {
+  margin-inline: auto;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.sidebar-reveal {
+  display: none;
+}
+@media (min-width: 60rem) {
+  .app-shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  }
+  .app-shell[data-collapsed] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-shell[data-collapsed] .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    z-index: 40;
+    visibility: hidden;
+    box-shadow: var(--shadow-overlay);
+  }
+  .app-shell[data-peeking] .app-sidebar {
+    visibility: visible;
+  }
+  .sidebar-reveal {
+    display: block;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--sidebar-edge-width);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    z-index: 39;
+  }
+  .sidebar-reveal:focus-visible {
+    background: var(--brand-soft);
+    outline-offset: 0;
+  }
+}
 .app-sidebar {
   padding: var(--space-4) var(--space-3);
   border-color: var(--border);
@@ -891,6 +942,25 @@ select.ui-input {
 .task-group-count {
   color: var(--faint);
   font-weight: 600;
+}
+.my-task-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+.my-task-row .list-row-main {
+  width: 100%;
+}
+.my-task-row .list-row-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.my-task-row .list-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-left: 0;
+  gap: var(--space-2) var(--space-4);
 }
 .task-group-more {
   justify-self: start;

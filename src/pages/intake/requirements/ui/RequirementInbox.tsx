@@ -60,11 +60,15 @@ export function RequirementInbox({
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="flex items-center gap-2">
-          <label htmlFor={`${id}-status`} className="text-sm text-muted">
+        <span className="flex max-w-full min-w-0 items-center gap-2">
+          <label
+            htmlFor={`${id}-status`}
+            className="shrink-0 text-sm whitespace-nowrap text-muted"
+          >
             상태
           </label>
           <Select
+            className="min-w-0 flex-1"
             id={`${id}-status`}
             value={status ?? ""}
             onChange={(event) =>
@@ -131,11 +135,11 @@ export function RequirementInbox({
                       {row.title}
                     </span>
                     <span className="block truncate text-xs text-muted">
-                      {row.formTitle ?? "삭제된 양식"} ·{" "}
+                      {row.formTitle ?? "삭제된 양식"},{" "}
                       <RequesterPriorityLabel
                         priority={row.requesterPriority}
                       />
-                      {row.taskCount > 0 && ` · 업무 ${row.taskCount}`}
+                      {row.taskCount > 0 && `, 업무 ${row.taskCount}`}
                     </span>
                   </span>
                   <RequirementStatusBadge status={row.status} />

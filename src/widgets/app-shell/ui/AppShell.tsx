@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   useEffect,
+  useCallback,
   useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { projectQueries } from "@/entities/project";
+import { ProjectAvatar, projectQueries } from "@/entities/project";
 import { useMe, userDestination } from "@/entities/user";
 import { isSearchShortcut } from "../model/search";
 import { SearchPalette } from "./SearchPalette";
@@ -51,6 +52,54 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
+  const storedCollapsed = useSyncExternalStore(
+    noSubscribe,
+    () => {
+      try {
+        return localStorage.getItem("soc.sidebar.collapsed") === "true";
+      } catch {
+        return false;
+      }
+    },
+    () => false,
+  );
+  const [collapsedOverride, setCollapsed] = useState<boolean | null>(null);
+  const collapsed = collapsedOverride ?? storedCollapsed;
+  const [peeking, setPeeking] = useState(false);
+  const sidebar = useRef<HTMLElement>(null);
+  const toggleSidebar = useCallback(() => {
+    setCollapsed(!collapsed);
+    try {
+      localStorage.setItem("soc.sidebar.collapsed", String(!collapsed));
+    } catch {
+      // Storage may be blocked; keep the current in-memory preference.
+    }
+    setPeeking(false);
+    if (!collapsed) requestAnimationFrame(() => main.current?.focus());
+  }, [collapsed]);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (
+        event.key === "\\" &&
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        !event.repeat
+      ) {
+        event.preventDefault();
+        toggleSidebar();
+      }
+      if (event.key === "Escape" && collapsed) {
+        setPeeking(false);
+        if (
+          sidebar.current?.contains(document.activeElement) ||
+          document.activeElement?.id === "sidebar-reveal"
+        )
+          main.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [collapsed, toggleSidebar]);
   const main = useRef<HTMLElement>(null);
   const [announcement, setAnnouncement] = useState("");
   const shownPath = useRef(pathname);
@@ -231,6 +280,7 @@ export function AppShell({
               onClick={() => setMenuOpen(false)}
               className="ui-nav-link flex min-w-0 items-center"
             >
+              <ProjectAvatar project={project} />
               <span className="truncate" title={project.key}>
                 {project.name}
               </span>
@@ -241,20 +291,62 @@ export function AppShell({
     </nav>
   );
   return (
-    <div className="app-shell min-h-dvh min-[60rem]:grid min-[60rem]:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]">
+    <div
+      className="app-shell min-h-dvh"
+      data-collapsed={collapsed || undefined}
+      data-peeking={peeking || undefined}
+    >
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-surface focus:p-3"
       >
         본문으로 건너뛰기
       </a>
-      <aside className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col">
-        <Link
-          href={routes.home}
-          className="flex min-w-0 items-center gap-2 text-sm font-semibold"
-        >
-          <BrandMark size={28} label />
-        </Link>
+      {collapsed && (
+        <button
+          id="sidebar-reveal"
+          type="button"
+          className="sidebar-reveal"
+          aria-label="사이드바 미리 보기"
+          aria-controls="desktop-sidebar"
+          aria-expanded={peeking}
+          onPointerEnter={() => setPeeking(true)}
+          onFocus={() => setPeeking(true)}
+          onClick={() => setPeeking(true)}
+        />
+      )}
+      <aside
+        ref={sidebar}
+        id="desktop-sidebar"
+        inert={collapsed && !peeking}
+        className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col"
+        onPointerLeave={() => {
+          if (!sidebar.current?.contains(document.activeElement))
+            setPeeking(false);
+        }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget))
+            setPeeking(false);
+        }}
+      >
+        <div className="sidebar-brand">
+          <Link
+            href={routes.home}
+            className="flex min-w-0 items-center gap-2 text-sm font-semibold"
+          >
+            <BrandMark size={28} label />
+          </Link>
+          <IconButton
+            variant="ghost"
+            aria-label={collapsed ? "사이드바 고정" : "사이드바 접기"}
+            aria-expanded={!collapsed || peeking}
+            aria-controls="desktop-sidebar"
+            aria-keyshortcuts="Meta+Backslash Control+Backslash"
+            onClick={toggleSidebar}
+          >
+            <Icon name={collapsed ? "menu" : "chevronLeft"} />
+          </IconButton>
+        </div>
         {searchButton}
         {navigation}
         {projectNavigation}
@@ -302,7 +394,14 @@ export function AppShell({
           ref={main}
           id="main-content"
           tabIndex={-1}
-          className="app-main mx-auto w-full max-w-[90rem] min-w-0 p-4 outline-none min-[60rem]:p-[var(--page-inset)]"
+          className="app-main mx-auto w-full min-w-0 p-4 outline-none min-[60rem]:p-[var(--page-inset)]"
+          data-layout={
+            /^\/(account|culture|guide)(\/|$)/.test(pathname) ||
+            /^\/projects\/[^/]+\/settings/.test(pathname) ||
+            /^\/docs\/[^/]+/.test(pathname)
+              ? "reading"
+              : "data"
+          }
         >
           {children}
         </main>
