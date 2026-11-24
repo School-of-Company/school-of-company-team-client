@@ -74,7 +74,7 @@ test("knowledge placeholders retain filter results only within a successful read
   client.setQueryData(oldOptions.queryKey, [row]);
   const previous = client.getQueryCache().build(client, {
     queryKey: knowledgeKeys.list({ projectId: "p1", status: "DRAFT" }),
-    queryFn: async (): Promise<readonly KnowledgeSummary[]> => [row],
+    queryFn: async (): Promise<readonly KnowledgeSummary[]> => [],
   });
   const next = knowledgeQueries.list({
     projectId: "p1",
