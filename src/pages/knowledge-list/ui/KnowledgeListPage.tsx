@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useId, useState } from "react";
+import { Suspense, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { projectAccess, projectQueries } from "@/entities/project";
 import type { User } from "@/entities/user";
-import { ProjectHeading } from "@/widgets/project-nav";
+import { ProjectHeading, ProjectHeadingSkeleton } from "@/widgets/project-nav";
 import {
   KindLabel,
   kindLabels,
@@ -21,16 +21,19 @@ import {
 import { AuthGuard } from "@/features/auth";
 import { CreateDocumentDialog } from "@/features/manage-knowledge";
 import { routes } from "@/shared/config";
-import { formatDate } from "@/shared/lib";
+import { formatDate, settledData } from "@/shared/lib";
 import {
   Button,
   Badge,
+  ChipSelect,
   EmptyState,
   ErrorState,
   Icon,
-  Select,
-  Skeleton,
-  Spinner,
+  ListSkeleton,
+  PageHeader,
+  PageSkeleton,
+  QueryState,
+  SegmentedLinks,
 } from "@/shared/ui";
 
 /** 종류 필터가 있는 한 목록. 종류·상태는 URL `?type=`·`?status=`에 둔다(AGENTS.md). */
@@ -38,7 +41,7 @@ export function KnowledgeListPage() {
   return (
     <AuthGuard require="work">
       {(user) => (
-        <Suspense fallback={<Spinner label="문서 불러오는 중" />}>
+        <Suspense fallback={<PageSkeleton label="문서 불러오는 중" />}>
           <KnowledgeListContent user={user} />
         </Suspense>
       )}
@@ -52,7 +55,7 @@ export function ProjectDocumentsPage({
   readonly projectId: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<ProjectHeadingSkeleton />}>
       {(user) => <ProjectDocuments projectId={projectId} user={user} />}
     </AuthGuard>
   );
@@ -66,7 +69,7 @@ function ProjectDocuments({
   readonly user: User;
 }) {
   const project = useQuery(projectQueries.detail(projectId));
-  if (project.isPending) return <Spinner label="프로젝트 불러오는 중" />;
+  if (project.isPending) return <ProjectHeadingSkeleton />;
   if (project.isError)
     return (
       <ErrorState
@@ -77,7 +80,7 @@ function ProjectDocuments({
   return (
     <div className="grid min-w-0 gap-6">
       <ProjectHeading project={project.data} user={user} />
-      <Suspense fallback={<Spinner label="문서 불러오는 중" />}>
+      <Suspense fallback={<PageSkeleton label="문서 불러오는 중" />}>
         <KnowledgeListContent projectId={projectId} user={user} />
       </Suspense>
     </div>
@@ -91,7 +94,6 @@ function KnowledgeListContent({
   readonly projectId?: string;
   readonly user: User;
 }) {
-  const id = useId();
   const router = useRouter();
   const pathname = usePathname() ?? routes.docs;
   const search = useSearchParams();
@@ -124,138 +126,105 @@ function KnowledgeListContent({
     const query = params.toString();
     return query ? `${pathname}?${query}` : pathname;
   };
+  const count = settledData(documents)?.length;
+  const kindLabel = kind ? kindLabels[kind] : "전체";
   return (
-    <div className="grid gap-5" aria-busy={documents.isFetching || undefined}>
-      <header className="page-header">
-        <div className="min-w-0">
-          <h1>문서</h1>
-          {documents.data &&
-            !documents.isPlaceholderData &&
-            !documents.isError && (
-              <p className="page-subtitle tabular-nums">
-                {kind ? kindLabels[kind] : "전체"} {documents.data.length}개
-              </p>
-            )}
-        </div>
-        {canCreate && (
-          <Button onClick={() => setCreating(true)}>
-            <Icon name="plus" className="inline-block" /> 문서 만들기
-          </Button>
-        )}
-      </header>
-      <div className="flex flex-wrap items-center gap-3">
+    <div className="grid gap-5">
+      <PageHeader
+        title="문서"
+        subtitle={
+          count !== undefined
+            ? `${kindLabel} ${count}개`
+            : documents.isError && !documents.data
+              ? "문서 집계를 불러오지 못했습니다"
+              : `${kindLabel} 문서 집계 중`
+        }
+        actions={
+          canCreate && (
+            <Button onClick={() => setCreating(true)}>
+              <Icon name="plus" className="inline-block" /> 문서 만들기
+            </Button>
+          )
+        }
+      />
+      <div className="page-toolbar">
+        <SegmentedLinks
+          label="문서 종류"
+          items={[
+            { href: href({ type: null }), label: "전체", active: !kind },
+            ...knowledgeKinds.map((value) => ({
+              href: href({ type: value }),
+              label: kindLabels[value],
+              active: kind === value,
+            })),
+          ]}
+        />
         {!fixedProjectId && (
-          <span className="flex items-center gap-2">
-            <label htmlFor={`${id}-project`} className="text-sm text-muted">
-              프로젝트
-            </label>
-            <Select
-              id={`${id}-project`}
-              className="incident-filter-select"
-              value={projectId ?? scope ?? ""}
-              onChange={(event) =>
-                router.replace(
-                  href({
-                    projectId:
-                      event.target.value && event.target.value !== "ORG"
-                        ? event.target.value
-                        : null,
-                    scope: event.target.value === "ORG" ? "ORG" : null,
-                  }),
-                )
-              }
+          <ChipSelect
+            label="프로젝트"
+            value={projectId ?? scope ?? ""}
+            options={[
+              { value: "", label: "모든 프로젝트" },
+              { value: "ORG", label: "조직 문서" },
+              ...(projects.data ?? []).map((project) => ({
+                value: project.id,
+                label: project.name,
+              })),
+            ]}
+            onChange={(value) =>
+              router.replace(
+                href({
+                  projectId: value && value !== "ORG" ? value : null,
+                  scope: value === "ORG" ? "ORG" : null,
+                }),
+              )
+            }
+          />
+        )}
+        <ChipSelect
+          label="상태"
+          value={status ?? ""}
+          options={[
+            { value: "", label: "모든 상태" },
+            ...knowledgeStatuses.map((value) => ({
+              value,
+              label: knowledgeStatusLabels[value],
+            })),
+          ]}
+          onChange={(value) => router.replace(href({ status: value || null }))}
+        />
+        {projects.isError && !fixedProjectId && (
+          <span role="alert" className="text-sm text-danger">
+            프로젝트 필터를 불러오지 못했습니다.{" "}
+            <Button
+              variant="ghost"
+              className="ui-button-sm"
+              onClick={() => void projects.refetch()}
             >
-              <option value="">전체</option>
-              <option value="ORG">조직</option>
-              {projects.data?.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </Select>
+              다시 시도
+            </Button>
           </span>
         )}
-        <nav aria-label="문서 종류" className="settings-nav">
-          <Link
-            href={href({ type: null })}
-            aria-current={!kind ? "page" : undefined}
-          >
-            전체
-          </Link>
-          {knowledgeKinds.map((value) => (
-            <Link
-              key={value}
-              href={href({ type: value })}
-              aria-current={kind === value ? "page" : undefined}
-            >
-              {kindLabels[value]}
-            </Link>
-          ))}
-        </nav>
-        <span className="flex items-center gap-2">
-          <label htmlFor={`${id}-status`} className="text-sm text-muted">
-            상태
-          </label>
-          <Select
-            id={`${id}-status`}
-            className="incident-filter-select"
-            value={status ?? ""}
-            onChange={(event) =>
-              router.replace(href({ status: event.target.value || null }))
-            }
-          >
-            <option value="">전체</option>
-            {knowledgeStatuses.map((value) => (
-              <option key={value} value={value}>
-                {knowledgeStatusLabels[value]}
-              </option>
-            ))}
-          </Select>
-        </span>
       </div>
-      {projects.isError && !fixedProjectId && (
-        <p role="alert" className="text-sm text-danger">
-          프로젝트 필터를 불러오지 못했습니다.{" "}
-          <Button variant="ghost" onClick={() => void projects.refetch()}>
-            다시 시도
-          </Button>
-        </p>
-      )}
-      {documents.isFetching && !documents.isPending && (
-        <p role="status" className="text-sm text-muted">
-          {documents.isPlaceholderData && documents.data?.length === 0
-            ? "문서 불러오는 중"
-            : "문서 갱신 중"}
-        </p>
-      )}
-      {documents.isPending ? (
-        <div
-          role="status"
-          aria-label="문서를 불러오는 중"
-          className="grid gap-2"
-        >
-          {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} className="h-12" />
-          ))}
-        </div>
-      ) : documents.isError || !documents.data ? (
-        <ErrorState
-          description={knowledgeErrorMessage(documents.error)}
-          onRetry={() => void documents.refetch()}
-        />
-      ) : documents.isPlaceholderData &&
-        documents.data.length === 0 ? null : documents.data.length === 0 ? (
-        !kind && !status ? (
-          <EmptyState
-            title="아직 문서가 없습니다"
-            description="결정은 ADR, 제안은 RFC, 장애, 운영 대응 절차는 Runbook으로 남기세요."
-          />
-        ) : (
-          <EmptyState title="조건에 맞는 문서가 없습니다" />
-        )
-      ) : (
-        <DocumentTable documents={documents.data} />
-      )}
+      <QueryState
+        query={documents}
+        skeleton={
+          <ListSkeleton label="문서를 불러오는 중" rowClassName="h-12" />
+        }
+        errorMessage={knowledgeErrorMessage}
+        empty={
+          !kind && !status ? (
+            <EmptyState
+              title="아직 문서가 없습니다"
+              description="결정은 ADR, 제안은 RFC, 장애, 운영 대응 절차는 Runbook으로 남기세요."
+            />
+          ) : (
+            <EmptyState title="조건에 맞는 문서가 없습니다" />
+          )
+        }
+      >
+        {(data) => <DocumentTable documents={data} />}
+      </QueryState>
       <CreateDocumentDialog
         key={projectId ?? "org"}
         open={creating && canCreate}

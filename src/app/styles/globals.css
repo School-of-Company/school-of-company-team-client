@@ -4340,11 +4340,6 @@ a.search-option:hover {
   border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
 }
-.incident-filter-select {
-  width: auto;
-  min-width: 8rem;
-  max-width: 14rem;
-}
 /* 목록: 서비스 목록과 같은 줄 표. 좁으면 두 줄로 접는다. */
 .incident-table {
   border-top: 1px solid var(--border);
