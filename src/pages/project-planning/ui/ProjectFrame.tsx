@@ -10,8 +10,7 @@ import {
 import { TaskError } from "@/entities/task";
 import type { User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
-import { ProjectPageSkeleton } from "@/widgets/kanban-board";
-import { ProjectHeading } from "@/widgets/project-nav";
+import { ProjectHeading, ProjectHeadingSkeleton } from "@/widgets/project-nav";
 
 export type PlanningContext = {
   readonly project: ProjectDetail;
@@ -36,7 +35,7 @@ export function ProjectFrame({
   readonly children: (context: PlanningContext) => ReactNode;
 }) {
   return (
-    <AuthGuard require="work" fallback={<ProjectPageSkeleton />}>
+    <AuthGuard require="work" fallback={<ProjectHeadingSkeleton />}>
       {(user) => (
         <FrameContent projectId={projectId} user={user} trail={trail}>
           {children}
@@ -62,7 +61,7 @@ function FrameContent({
 }) {
   const project = useQuery(projectQueries.detail(projectId));
   if (project.isPending)
-    return <ProjectPageSkeleton label="프로젝트 불러오는 중" />;
+    return <ProjectHeadingSkeleton label="프로젝트 불러오는 중" />;
   if (project.isError)
     return (
       <TaskError error={project.error} onRetry={() => void project.refetch()} />

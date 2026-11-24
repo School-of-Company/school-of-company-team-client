@@ -32,8 +32,7 @@ import {
   Textarea,
   useToast,
 } from "@/shared/ui";
-import { ProjectPageSkeleton } from "@/widgets/kanban-board";
-import { ProjectHeading } from "@/widgets/project-nav";
+import { ProjectHeading, ProjectHeadingSkeleton } from "@/widgets/project-nav";
 import {
   itemHref,
   itemsOn,
@@ -54,7 +53,7 @@ export function CalendarPage({ projectId }: { readonly projectId?: string }) {
       require="work"
       fallback={
         projectId ? (
-          <ProjectPageSkeleton />
+          <ProjectHeadingSkeleton />
         ) : (
           <PageSkeleton label="달력 불러오는 중" />
         )
@@ -91,7 +90,7 @@ function ProjectCalendar({
 }) {
   const project = useQuery(projectQueries.detail(projectId));
   if (project.isPending)
-    return <ProjectPageSkeleton label="프로젝트 불러오는 중" />;
+    return <ProjectHeadingSkeleton label="프로젝트 불러오는 중" />;
   if (project.isError)
     return (
       <ErrorState

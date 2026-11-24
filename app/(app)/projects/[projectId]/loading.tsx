@@ -1,4 +1,4 @@
-import { ProjectPageSkeleton } from "@/widgets/kanban-board";
+import { ProjectHeadingSkeleton } from "@/widgets/project-nav";
 export default function Loading() {
-  return <ProjectPageSkeleton />;
+  return <ProjectHeadingSkeleton />;
 }

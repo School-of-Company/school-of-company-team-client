@@ -24,22 +24,6 @@ export function BoardSkeleton() {
   );
 }
 
-/**
- * 프로젝트 안 화면(보드, 스프린트, 링크 등) 머리의 임시 자리: 경로, 아바타와 제목, 탭 줄.
- * `ProjectHeading`과 같은 클래스와 줄 높이라 프로젝트를 받아도 탭 줄이 움직이지 않는다.
- * TODO: `@/widgets/project-nav`의 공용 ProjectHeadingSkeleton이 들어오면 그것으로 바꾼다.
- */
-function ProjectHeadingPlaceholder() {
-  return (
-    <>
-      <header aria-hidden="true" className="min-w-0">
-        <ProjectTitleSkeleton />
-      </header>
-      <ProjectNavSkeleton />
-    </>
-  );
-}
-
 function ProjectTitleSkeleton() {
   return (
     <>
@@ -68,24 +52,6 @@ function ProjectNavSkeleton() {
           <span className="ui-skeleton-text">{label}</span>
         </span>
       ))}
-    </div>
-  );
-}
-
-/** 프로젝트 안 화면의 라우트 로딩, 프로젝트 확인 중 자리. 본문은 빈 상태 높이로 잡는다. */
-export function ProjectPageSkeleton({
-  label = "프로젝트 화면 불러오는 중",
-}: {
-  readonly label?: string;
-}) {
-  return (
-    <div
-      role="status"
-      aria-label={label}
-      className="planning-page grid min-w-0 gap-6"
-    >
-      <ProjectHeadingPlaceholder />
-      <div aria-hidden="true" className="ui-empty" />
     </div>
   );
 }
