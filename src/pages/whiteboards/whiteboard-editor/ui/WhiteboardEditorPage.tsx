@@ -24,8 +24,10 @@ import {
   Icon,
   Input,
   Skeleton,
+  StaleNotice,
   useToast,
 } from "@/shared/ui";
+import { normalizeApiError } from "@/shared/api";
 import type { CanvasControls, SaveState } from "./Canvas";
 import { CommentsPanel } from "./CommentsPanel";
 import { RevisionsDialog } from "./RevisionsDialog";
@@ -49,33 +51,73 @@ export function WhiteboardEditorPage({
   readonly whiteboardId: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<WhiteboardEditorSkeleton />}>
       {() => <Editor whiteboardId={whiteboardId} />}
     </AuthGuard>
   );
 }
 
+/** 머리글(경로, 제목, 저장 상태, 버튼)과 고정 높이 캔버스 자리. 편집기로 바뀌어도 머리글과 캔버스 높이가 그대로다. */
+export function WhiteboardEditorSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="화이트보드 불러오는 중"
+      className="whiteboard-page grid min-w-0 gap-3"
+    >
+      <header aria-hidden="true" className="page-header">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <span className="ui-skeleton-text">프로젝트 / 화이트보드</span>
+          </p>
+          <h1 className="truncate">
+            <span className="ui-skeleton-text">화이트보드 불러오는 중</span>
+          </h1>
+          <p className="page-subtitle">
+            <span className="ui-skeleton-text">저장됨</span>
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">댓글</span>
+          </span>
+          <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">변경 이력</span>
+          </span>
+          <span className="ui-button ui-button-ghost">
+            <span className="ui-skeleton-text">이름 바꾸기</span>
+          </span>
+          <span className="ui-button ui-button-ghost">
+            <span className="ui-skeleton-text">X 지우기</span>
+          </span>
+        </div>
+      </header>
+      <div aria-hidden="true" className="whiteboard-layout">
+        <div className="whiteboard-canvas" />
+      </div>
+    </div>
+  );
+}
+
 function Editor({ whiteboardId }: { readonly whiteboardId: string }) {
   const board = useQuery(whiteboardQueries.detail(whiteboardId));
-  if (board.isPending)
-    return (
-      <div
-        role="status"
-        aria-label="화이트보드 불러오는 중"
-        className="grid gap-3"
-      >
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="whiteboard-canvas" />
-      </div>
-    );
-  if (board.isError)
+  if (board.isPending) return <WhiteboardEditorSkeleton />;
+  // 5xx·네트워크 실패는 편집기를 두고 위에 안내만 띄운다. 403·404(권한 잃음, 삭제)는 편집기를 내린다.
+  const lost =
+    board.isError && [403, 404].includes(normalizeApiError(board.error).status);
+  if (!board.data || lost)
     return (
       <ErrorState
         description={whiteboardErrorMessage(board.error)}
         onRetry={() => void board.refetch()}
       />
     );
-  return <EditorContent key={board.data.id} initial={board.data} />;
+  return (
+    <>
+      <StaleNotice query={board} />
+      <EditorContent key={board.data.id} initial={board.data} />
+    </>
+  );
 }
 
 function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {

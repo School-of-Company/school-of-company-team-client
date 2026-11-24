@@ -1,12 +1,14 @@
-import { ProjectSettingsPage } from "@/pages/project-settings";
+import {
+  ProjectSettingsPage,
+  ProjectSettingsSkeleton,
+} from "@/pages/project-settings";
 import { Suspense } from "react";
-import Loading from "../loading";
 
 type Props = { readonly params: Promise<{ projectId: string }> };
 
 export default function Page(props: Props) {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<ProjectSettingsSkeleton />}>
       <SettingsRoute {...props} />
     </Suspense>
   );

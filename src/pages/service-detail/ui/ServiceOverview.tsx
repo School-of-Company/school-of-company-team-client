@@ -133,15 +133,18 @@ function RecentReleases({ service }: { readonly service: ServiceDetail }) {
         <h2 id="recent-releases">최근 릴리스</h2>
         <AllLink href="?tab=releases" label="최근 릴리스 전체 보기" />
       </div>
-      <ReleasesState service={service} query={releases} compact>
-        {(items) => (
-          <ul className="service-list">
-            {items.slice(0, 3).map((release) => (
-              <ReleaseRow key={release.id} release={release} />
-            ))}
-          </ul>
-        )}
-      </ReleasesState>
+      {/* 최근 3건 높이를 먼저 잡아 두어 늦게 와도(또는 적게 와도) 아래 칸이 밀리지 않는다. */}
+      <div className="service-recent" data-kind="releases">
+        <ReleasesState service={service} query={releases} compact>
+          {(items) => (
+            <ul className="service-list">
+              {items.slice(0, 3).map((release) => (
+                <ReleaseRow key={release.id} release={release} />
+              ))}
+            </ul>
+          )}
+        </ReleasesState>
+      </div>
     </section>
   );
 }
@@ -154,15 +157,17 @@ function RecentDeployments({ service }: { readonly service: ServiceDetail }) {
         <h2 id="recent-deployments">최근 배포</h2>
         <AllLink href="?tab=deployments" label="최근 배포 전체 보기" />
       </div>
-      <DeploymentsState service={service} query={deployments} compact>
-        {(items) => (
-          <ol className="deploy-timeline">
-            {items.slice(0, 3).map((deployment) => (
-              <DeploymentEntry key={deployment.id} deployment={deployment} />
-            ))}
-          </ol>
-        )}
-      </DeploymentsState>
+      <div className="service-recent" data-kind="deployments">
+        <DeploymentsState service={service} query={deployments} compact>
+          {(items) => (
+            <ol className="deploy-timeline">
+              {items.slice(0, 3).map((deployment) => (
+                <DeploymentEntry key={deployment.id} deployment={deployment} />
+              ))}
+            </ol>
+          )}
+        </DeploymentsState>
+      </div>
     </section>
   );
 }

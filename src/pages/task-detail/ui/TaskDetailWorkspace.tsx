@@ -11,10 +11,11 @@ import { TaskDiscussion } from "./TaskDiscussion";
 import { TaskDocuments } from "./TaskDocuments";
 import { normalizeApiError } from "@/shared/api";
 import { formatDate } from "@/shared/lib";
-import { Button, Dialog, Skeleton, useToast } from "@/shared/ui";
+import { Button, Dialog, useToast } from "@/shared/ui";
 import { TaskProperties } from "./TaskContent";
 import { TaskDescription } from "./TaskDescription";
 import { TaskDetailHeader } from "./TaskDetailHeader";
+import { TaskDetailSkeleton } from "./TaskDetailSkeleton";
 import { useTaskDetail } from "../model/useTaskDetail";
 
 export function TaskDetailWorkspace({
@@ -75,14 +76,9 @@ export function TaskDetailWorkspace({
         }}
       />
     );
-  if (task.isPending)
-    return (
-      <div role="status" aria-label="업무를 불러오는 중" className="grid gap-5">
-        <Skeleton className="w-24" />
-        <Skeleton className="h-8 w-3/4" />
-        <Skeleton className="h-64" />
-      </div>
-    );
+  // 업무 첫 조회만 기다린다. 프로젝트, GitHub, 문서는 각 칸이 고정 높이 자리와 자기 로딩, 오류 상태를 가진다
+  // (곁가지 조회 하나가 실패해도 화면 전체가 스켈레톤에 묶이지 않는다).
+  if (task.isPending) return <TaskDetailSkeleton back={!headerAction} />;
   if (!task.data) return null;
   const data = task.data;
   const access =
@@ -141,15 +137,17 @@ export function TaskDetailWorkspace({
             }}
           />
           <TaskDescription task={data} />
-          <TaskGithubPanel
-            task={data}
-            editable={editable}
-            onAccessLost={setDenied}
-            onComplete={() => {
-              if (!changeStatus.isPending) changeStatus.mutate("DONE");
-            }}
-            completing={changeStatus.isPending}
-          />
+          <div className="task-github-slot">
+            <TaskGithubPanel
+              task={data}
+              editable={editable}
+              onAccessLost={setDenied}
+              onComplete={() => {
+                if (!changeStatus.isPending) changeStatus.mutate("DONE");
+              }}
+              completing={changeStatus.isPending}
+            />
+          </div>
           <section>
             <h2 className="task-section-title">활동</h2>
             <dl className="task-activity">

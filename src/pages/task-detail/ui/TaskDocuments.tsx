@@ -20,7 +20,7 @@ export function TaskDocuments({ taskId }: { readonly taskId: string }) {
       aria-labelledby="task-documents"
       className="grid gap-3 border-t border-border pt-6"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="task-docs-head flex flex-wrap items-center justify-between gap-2">
         <h2 id="task-documents" className="text-lg font-semibold">
           관련 문서{" "}
           {documents.data && (
@@ -36,40 +36,45 @@ export function TaskDocuments({ taskId }: { readonly taskId: string }) {
           />
         )}
       </div>
-      {documents.isPending ? (
-        <div role="status" aria-label="관련 문서를 불러오는 중">
-          <Skeleton className="h-10" />
-        </div>
-      ) : !documents.data ? (
-        <div role="alert" className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-danger">
-            {knowledgeErrorMessage(documents.error)}
-          </span>
-          <Button
-            variant="ghost"
-            className="ui-button-sm"
-            onClick={() => void documents.refetch()}
+      <div className="task-docs-slot">
+        {documents.isPending ? (
+          <div role="status" aria-label="관련 문서를 불러오는 중">
+            <Skeleton className="h-10" />
+          </div>
+        ) : !documents.data ? (
+          <div
+            role="alert"
+            className="flex flex-wrap items-center gap-2 text-sm"
           >
-            다시 시도
-          </Button>
-        </div>
-      ) : documents.data.length === 0 ? (
-        <p className="text-sm text-muted">연결된 문서가 없습니다.</p>
-      ) : (
-        <ul className="doc-links">
-          {documents.data.map((document) => (
-            <li key={document.id}>
-              <Link href={routes.doc(document.id)} className="doc-link-main">
-                <span className="truncate">{document.title}</span>
-                <span className="flex items-center gap-2">
-                  <KindLabel kind={document.kind} />
-                  <KnowledgeStatusLabel status={document.status} />
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+            <span className="text-danger">
+              {knowledgeErrorMessage(documents.error)}
+            </span>
+            <Button
+              variant="ghost"
+              className="ui-button-sm"
+              onClick={() => void documents.refetch()}
+            >
+              다시 시도
+            </Button>
+          </div>
+        ) : documents.data.length === 0 ? (
+          <p className="text-sm text-muted">연결된 문서가 없습니다.</p>
+        ) : (
+          <ul className="doc-links">
+            {documents.data.map((document) => (
+              <li key={document.id}>
+                <Link href={routes.doc(document.id)} className="doc-link-main">
+                  <span className="truncate">{document.title}</span>
+                  <span className="flex items-center gap-2">
+                    <KindLabel kind={document.kind} />
+                    <KnowledgeStatusLabel status={document.status} />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </section>
   );
 }

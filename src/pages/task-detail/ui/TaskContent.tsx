@@ -46,7 +46,7 @@ export function TaskProperties({
   return (
     <aside className="task-props" aria-label="업무 속성">
       <dl>
-        <div>
+        <div className="task-prop-control">
           <dt>상태</dt>
           <dd>
             {editable ? (
@@ -104,7 +104,7 @@ export function TaskProperties({
           </dd>
         </div>
         {task.scope === "PROJECT" && (
-          <div>
+          <div className="task-prop-control">
             <dt>버킷</dt>
             <dd>
               {editable && choices.length > 0 ? (
@@ -161,7 +161,7 @@ export function TaskProperties({
           </div>
         )}
         {task.scope === "PROJECT" && (
-          <div>
+          <div className="task-prop-control">
             <dt>마일스톤</dt>
             <dd>
               {editable &&

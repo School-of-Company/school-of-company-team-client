@@ -1,1 +1,4 @@
-export { WhiteboardEditorPage } from "./ui/WhiteboardEditorPage";
+export {
+  WhiteboardEditorPage,
+  WhiteboardEditorSkeleton,
+} from "./ui/WhiteboardEditorPage";

@@ -16,6 +16,7 @@ import { MemberSettings } from "./MemberSettings";
 import { PartSettings } from "./PartSettings";
 import { BucketSettings } from "./BucketSettings";
 import { ArchiveProjectSection } from "./ArchiveProjectSection";
+import { EmptyState } from "@/shared/ui";
 
 export function SettingsPanels(props: SettingsProps) {
   const pathname = usePathname();
@@ -138,9 +139,10 @@ export function SettingsPanels(props: SettingsProps) {
               </section>
             </>
           ) : (
-            <p className="text-sm text-muted">
-              저장소와 채널 연동은 헤드 어드민 또는 PM이 관리합니다.
-            </p>
+            <EmptyState
+              title="연동 설정 권한이 없습니다"
+              description="저장소와 채널 연동은 헤드 어드민 또는 PM이 관리합니다."
+            />
           )}
         </div>
       )}

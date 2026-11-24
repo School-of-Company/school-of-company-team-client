@@ -24,7 +24,7 @@ import {
 } from "@/features/manage-knowledge";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
-import { Button, ErrorState, Markdown, Skeleton, Spinner } from "@/shared/ui";
+import { Button, ErrorState, Markdown, StaleNotice } from "@/shared/ui";
 
 export function KnowledgeDetailPage({
   documentId,
@@ -32,13 +32,71 @@ export function KnowledgeDetailPage({
   readonly documentId: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<KnowledgeDetailSkeleton />}>
       {() => (
-        <Suspense fallback={<Spinner label="문서 불러오는 중" />}>
+        <Suspense fallback={<KnowledgeDetailSkeleton />}>
           <KnowledgeDetailContent key={documentId} documentId={documentId} />
         </Suspense>
       )}
     </AuthGuard>
+  );
+}
+
+/** 상세 머리글(경로, 제목, 종류와 상태 줄), 본문과 속성 열을 실제와 같은 클래스로 잡는다. */
+export function KnowledgeDetailSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="문서를 불러오는 중"
+      className="knowledge-detail grid gap-5"
+    >
+      <header aria-hidden="true" className="page-header">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <span className="ui-skeleton-text">문서 / 종류</span>
+          </p>
+          <h1 className="task-title font-semibold">
+            <span className="ui-skeleton-text">문서 제목을 불러오는 중</span>
+          </h1>
+          <p className="mt-2 flex flex-wrap items-center gap-3">
+            <span className="knowledge-kind">
+              <span className="ui-skeleton-text">ADR</span>
+            </span>
+            <span className="knowledge-status">
+              <span className="ui-skeleton-text">게시</span>
+            </span>
+          </p>
+        </div>
+      </header>
+      <div aria-hidden="true" className="task-detail">
+        <div className="task-detail-grid">
+          <div className="task-main">
+            <div className="ui-skeleton-list" />
+          </div>
+          <div className="task-props">
+            <dl>
+              {[
+                "프로젝트",
+                "상태",
+                "종류",
+                "작성자",
+                "처음 게시",
+                "수정한 날",
+              ].map((label) => (
+                <div key={label}>
+                  <dt>
+                    <span className="ui-skeleton-text">{label}</span>
+                  </dt>
+                  <dd>
+                    <span className="ui-skeleton-text">불러오는 중</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -62,15 +120,13 @@ function KnowledgeDetailContent({
         onRetry={() => void detail.refetch()}
       />
     );
-  if (!detail.data)
-    return (
-      <div role="status" aria-label="문서를 불러오는 중" className="grid gap-4">
-        <Skeleton className="w-24" />
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-64" />
-      </div>
-    );
-  return <DocumentWorkspace document={detail.data} />;
+  if (!detail.data) return <KnowledgeDetailSkeleton />;
+  return (
+    <>
+      <StaleNotice query={detail} />
+      <DocumentWorkspace document={detail.data} />
+    </>
+  );
 }
 
 function DocumentWorkspace({

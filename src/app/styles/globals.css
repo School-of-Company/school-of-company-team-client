@@ -1686,6 +1686,8 @@ html[data-sidebar-closed~="account"]
   width: min(var(--content-reading), calc(100% - 2rem));
 }
 .task-detail {
+  /* 크기 격리(inline-size) 요소는 내용 폭이 0이라, grid 안에서 margin auto 로 가운데 둘 때 폭을 직접 채운다. */
+  width: 100%;
   container-type: inline-size;
   max-width: var(--content-reading);
   margin-inline: auto;
@@ -1727,6 +1729,27 @@ html[data-sidebar-closed~="account"]
 }
 .task-detail .task-props dd > .ui-input {
   width: 100%;
+}
+/* 셀렉트가 들어갈 수 있는 줄(상태, 버킷, 마일스톤)은 권한이 오기 전 글자로 그려져도 셀렉트 높이를 잡는다. */
+.task-detail .task-props dl > div.task-prop-control {
+  min-height: var(--control-sm);
+}
+/* 수정, 삭제 버튼은 프로젝트 권한 뒤에 생기므로 줄 높이를 먼저 잡는다. 좁은 화면에서는 제목 아래 한 줄이다. */
+.task-detail-actions {
+  min-height: var(--control-sm);
+}
+/* GitHub, 관련 문서 칸은 늦게 오거나 실패해도 아래를 밀지 않게 자리를 먼저 잡는다(실측 높이). */
+.task-github-slot {
+  display: grid;
+  min-height: 13rem;
+}
+.task-docs-head {
+  min-height: var(--control-sm);
+}
+.task-docs-slot {
+  display: grid;
+  align-content: start;
+  min-height: 2.75rem;
 }
 .task-detail .task-section-title {
   color: var(--foreground);
@@ -1772,6 +1795,9 @@ html[data-sidebar-closed~="account"]
   .task-detail .task-props .ui-input {
     min-height: var(--control-touch);
     height: var(--control-touch);
+  }
+  .task-detail .task-props dl > div.task-prop-control {
+    min-height: var(--control-touch);
   }
 }
 
@@ -2958,6 +2984,22 @@ html[data-sidebar-closed~="account"]
   margin: 0;
   padding: 0;
   list-style: none;
+}
+/* 개요의 최근 릴리스, 배포 칸: 최근 3건 높이를 먼저 잡아 늦게 오거나 적게 와도 아래 칸이 밀리지 않는다. */
+.service-recent {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 13.5rem;
+}
+.service-recent[data-kind="deployments"] {
+  min-height: 11.75rem;
+}
+@media (width < 40rem) {
+  /* 좁으면 배포 한 건이 두 줄 더 접힌다(실측 3건 259px). */
+  .service-recent[data-kind="deployments"] {
+    min-height: 16.25rem;
+  }
 }
 .deploy-entry {
   --deploy: var(--gray-8);
