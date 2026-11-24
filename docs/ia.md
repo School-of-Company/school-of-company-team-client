@@ -1,5 +1,7 @@
 # 정보 구조 (IA)
 
+장애 화면의 대응 담당자는 "대응 책임자"로 표시합니다. 현재 API 심각도인 `SEV1`, `SEV2`, `SEV3`는 각각 "치명", "높음", "보통"으로 표시하며 설명을 함께 제공합니다.
+
 이후 단계가 추가할 화면의 자리와 내비 순서를 정합니다. **코드에는 빈 메뉴·준비 중 화면을 만들지 않습니다.** 각 단계의 프론트 워커가 자기 화면을 실제 API와 함께 완성할 때 이 문서의 자리에 넣고, 사이드바(`widgets/app-shell`)는 한 번에 한 워커만 고칩니다(계획 3.4).
 
 ## 지금 (main 기준, 단계 1~8 화면 반영)
@@ -17,7 +19,7 @@
 | 내 일             | 달력                                                                   | `/calendar`                                                                                                                                          | 활성 팀원                                      |
 | 조직              | 팀원                                                                   | `/members`                                                                                                                                           | 활성 팀원                                      |
 | 조직              | 서비스                                                                 | `/services`, `/services/{key}?tab=overview\|releases\|deployments\|runbooks`                                                                         | 활성 팀원                                      |
-| 조직              | 사고                                                                   | `/incidents`, `/incidents/{id}`(타임라인 · 사후 검토)                                                                                                | 활성 팀원                                      |
+| 조직              | 장애                                                                   | `/incidents`, `/incidents/{id}`(타임라인 · 사후 검토)                                                                                                | 활성 팀원                                      |
 | 조직              | 문서                                                                   | `/docs`, `/docs/{id}`                                                                                                                                | 활성 팀원                                      |
 | 조직              | 요구사항(외부 접수함)                                                  | `/requirements?status=&scope=org`, `/requirements/{id}`                                                                                              | 읽을 수 있는 프로젝트, 조직 단위는 헤드 어드민 |
 | 프로젝트          | 아카이브되지 않은 프로젝트                                             | `/projects/{id}`                                                                                                                                     | 볼 수 있는 프로젝트                            |
@@ -43,7 +45,7 @@
 | 내 일     | 달력          | `/calendar`                                       | 11   | 활성 팀원                                                   |
 | 조직      | 팀원          | `/members`                                        | 5    | 활성 팀원                                                   |
 | 조직      | 서비스        | `/services`                                       | 6    | 활성 팀원                                                   |
-| 조직      | 사고          | `/incidents`                                      | 7    | 활성 팀원                                                   |
+| 조직      | 장애          | `/incidents`                                      | 7    | 활성 팀원                                                   |
 | 조직      | 문서          | `/docs`                                           | 7    | 활성 팀원                                                   |
 | 조직      | 요구사항      | `/requirements`                                   | 12   | 활성 팀원(읽을 수 있는 프로젝트만, 조직 단위는 헤드 어드민) |
 | 프로젝트  | 바로가기 목록 | `/projects/{id}`                                  | 지금 | 볼 수 있는 프로젝트                                         |
@@ -80,8 +82,8 @@
 | 홈     | `/`                                          | 5    | 오늘 할 일 · Needs Attention · 진행 중 Sprint 요약 · 내 리뷰 요청. Needs Attention은 홈 안의 구역이며 메뉴가 아님                            |
 | 팀원   | `/members`                                   | 5    | 활성 팀원 목록(전공·프로젝트 역할·현재 부하). GitHub·Discord 연결 여부는 본인·헤드 어드민만. 상세(`/members/{userId}`)는 후속(상세 API 필요) |
 | 서비스 | `/services`, `/services/{key}`               | 6    | 목록 → 상세 탭: 개요(소유자·저장소·의존) · 릴리스 · 배포 · Runbook(7단계 연결). Release·Deployment는 서비스 상세 안에만 둠                   |
-| 사고   | `/incidents`, `/incidents/{id}`              | 7    | 목록(심각도·상태 필터) → 상세: 타임라인 · Postmortem 탭                                                                                      |
-| 문서   | `/docs?type=ADR\|RFC\|RUNBOOK`, `/docs/{id}` | 7    | 종류 필터가 있는 한 목록. 관계(서비스·업무·사고·문서)는 상세 속성 열                                                                         |
+| 장애   | `/incidents`, `/incidents/{id}`              | 7    | 목록(심각도·상태 필터) → 상세: 타임라인 · Postmortem 탭                                                                                      |
+| 문서   | `/docs?type=ADR\|RFC\|RUNBOOK`, `/docs/{id}` | 7    | 종류 필터가 있는 한 목록. 관계(서비스·업무·장애·문서)는 상세 속성 열                                                                         |
 | 달력   | `/calendar`                                  | 11   | 팀 공용 일정 + 볼 수 있는 프로젝트의 업무 마감·마일스톤·스프린트 + 실험. 달 보기, 날짜를 누르면 그날 목록. 외부 캘린더 동기화 없음           |
 | 검색   | `/search?q=`                                 | 8    | 명령 팔레트의 "전체 결과 보기" 목적지                                                                                                        |
 

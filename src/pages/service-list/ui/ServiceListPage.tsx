@@ -64,11 +64,15 @@ function ServiceListContent({ canCreate }: { readonly canCreate: boolean }) {
       <header className="page-header">
         <div className="min-w-0">
           <h1>서비스</h1>
-          {view === "list" && services.data && (
-            <p className="page-subtitle tabular-nums">
-              {archived ? "아카이브" : "운영 중"} {services.data.length}개
-            </p>
-          )}
+          <p className="page-subtitle tabular-nums">
+            {view === "graph"
+              ? "서비스 간 의존관계"
+              : services.data
+                ? `${archived ? "아카이브" : "운영 중"} ${services.data.length}개`
+                : services.isError
+                  ? "서비스 집계를 불러오지 못했습니다"
+                  : `${archived ? "아카이브" : "운영 중"} 서비스 집계 중`}
+          </p>
         </div>
         {canCreate && (
           <Button onClick={() => setCreating(true)}>

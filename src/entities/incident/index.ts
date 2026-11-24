@@ -13,6 +13,7 @@ export {
   incidentStatusLabels,
   postmortemStatusLabels,
   severityDescriptions,
+  severityLabels,
   timelineKindLabels,
 } from "./model/types";
 export type * from "./model/types";

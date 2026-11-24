@@ -35,7 +35,7 @@ export function IncidentProperties({
   const [creating, setCreating] = useState(false);
   const minutes = impactMinutes(incident);
   return (
-    <aside className="task-props" aria-label="사고 속성">
+    <aside className="task-props" aria-label="장애 속성">
       <dl>
         <div>
           <dt>상태</dt>
@@ -53,7 +53,7 @@ export function IncidentProperties({
           </dd>
         </div>
         <div>
-          <dt>커맨더</dt>
+          <dt>대응 책임자</dt>
           <dd>
             {incident.commander ? (
               <span className="service-owner">
@@ -130,8 +130,8 @@ export function IncidentProperties({
       </dl>
       {!incident.canEdit && (
         <p className="text-xs text-muted">
-          사고 작성자, 커맨더, 영향 서비스 소유자, 헤드 어드민이 바꿀 수 있습니다.
-          메모는 누구나 남길 수 있습니다.
+          장애 작성자, 대응 책임자, 영향 서비스 소유자, 헤드 어드민이 바꿀 수
+          있습니다. 메모는 누구나 남길 수 있습니다.
         </p>
       )}
       <PropSection title="Discord">
@@ -174,7 +174,7 @@ export function IncidentProperties({
       <CreateDocumentDialog
         open={creating}
         incidentId={incident.id}
-        context="이 사고에 연결합니다."
+        context="이 장애에 연결합니다."
         onClose={() => setCreating(false)}
         onCreated={(document) => {
           setCreating(false);

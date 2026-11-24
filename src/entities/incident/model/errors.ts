@@ -2,21 +2,21 @@ import { normalizeApiError } from "@/shared/api";
 
 const messages: Readonly<Record<string, string>> = {
   INCIDENT_NOT_FOUND:
-    "사고가 없습니다. 삭제되었을 수 있으니 목록에서 다시 고르세요.",
+    "장애가 없습니다. 삭제되었을 수 있으니 목록에서 다시 고르세요.",
   INCIDENT_FORBIDDEN:
-    "사고 작성자, 커맨더, 영향 서비스 소유자, 헤드 어드민만 변경할 수 있습니다.",
+    "장애 작성자, 대응 책임자, 영향 서비스 소유자, 헤드 어드민만 변경할 수 있습니다.",
   INCIDENT_COMMANDER_NOT_ACTIVE:
-    "커맨더는 활성 팀원만 맡을 수 있습니다. 다른 사람을 고르세요.",
+    "대응 책임자는 활성 팀원만 맡을 수 있습니다. 다른 사람을 고르세요.",
   INCIDENT_TIME_INVALID:
     "시각을 확인하세요. 미래 시각이나 시작보다 이른 상태 시각, 완화나 해결보다 늦은 시작 시각은 저장할 수 없습니다.",
   TIMELINE_ENTRY_NOT_FOUND: "이미 지워진 메모입니다. 새로고침해 확인하세요.",
   TIMELINE_ENTRY_NOT_DELETABLE:
-    "상태, 심각도, 커맨더 기록은 지울 수 없습니다. 메모만 지울 수 있습니다.",
+    "상태, 심각도, 대응 책임자 기록은 지울 수 없습니다. 메모만 지울 수 있습니다.",
   POSTMORTEM_NOT_FOUND: "사후 검토가 아직 없습니다.",
   POSTMORTEM_EXISTS: "사후 검토가 이미 있습니다. 새로고침하면 열립니다.",
   ACTION_ITEM_NOT_FOUND: "이미 지워진 조치 항목입니다. 새로고침해 확인하세요.",
   ACTION_ITEM_TASK_EXISTS: "이 조치 항목에는 이미 업무가 있습니다.",
-  PERSONAL_TASK_NOT_LINKABLE: "개인 업무는 사고에 연결할 수 없습니다.",
+  PERSONAL_TASK_NOT_LINKABLE: "개인 업무는 장애에 연결할 수 없습니다.",
   SERVICE_NOT_FOUND: "영향 서비스 중 없는 서비스가 있습니다. 다시 고르세요.",
   SERVICE_ARCHIVED: "아카이브된 서비스는 새로 고를 수 없습니다.",
   ACCESS_DENIED: "헤드 어드민 권한이 필요합니다.",

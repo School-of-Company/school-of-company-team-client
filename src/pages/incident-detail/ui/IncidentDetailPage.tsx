@@ -42,7 +42,7 @@ export function IncidentDetailPage({
   return (
     <AuthGuard require="work">
       {(user) => (
-        <Suspense fallback={<Spinner label="사고 불러오는 중" />}>
+        <Suspense fallback={<Spinner label="장애 불러오는 중" />}>
           <IncidentDetailContent
             key={incidentId}
             incidentId={incidentId}
@@ -65,8 +65,8 @@ function IncidentDetailContent({
   if (isNotFound(detail.error))
     return (
       <ErrorState
-        title="사고를 찾을 수 없습니다"
-        description="삭제되었거나 주소가 잘못되었습니다. 사고 목록에서 다시 고르세요."
+        title="장애를 찾을 수 없습니다"
+        description="삭제되었거나 주소가 잘못되었습니다. 장애 목록에서 다시 고르세요."
       />
     );
   if (!detail.data && detail.isError)
@@ -78,7 +78,7 @@ function IncidentDetailContent({
     );
   if (!detail.data)
     return (
-      <div role="status" aria-label="사고를 불러오는 중" className="grid gap-4">
+      <div role="status" aria-label="장애를 불러오는 중" className="grid gap-4">
         <Skeleton className="w-24" />
         <Skeleton className="h-8 w-1/2" />
         <Skeleton className="h-64" />
@@ -106,11 +106,11 @@ function IncidentWorkspace({
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState<IncidentDetail["status"] | null>(null);
   return (
-    <div className="incident-detail grid gap-5">
+    <div className="incident-detail incident-workspace grid gap-4">
       <header className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
-            <Link href={routes.incidents}>사고</Link>
+            <Link href={routes.incidents}>장애</Link>
             <span aria-hidden="true">/</span>
             <span>{incident.status === "RESOLVED" ? "해결됨" : "진행 중"}</span>
           </p>
@@ -154,7 +154,7 @@ function IncidentWorkspace({
         </div>
       </header>
       <nav
-        aria-label="사고 메뉴"
+        aria-label="장애 메뉴"
         className="project-nav flex min-w-0 overflow-x-auto border-b"
       >
         {tabs.map((item) => (

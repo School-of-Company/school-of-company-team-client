@@ -45,7 +45,7 @@ export function IncidentListPage() {
   return (
     <AuthGuard require="work">
       {() => (
-        <Suspense fallback={<Spinner label="사고 불러오는 중" />}>
+        <Suspense fallback={<Spinner label="장애 불러오는 중" />}>
           <IncidentListContent />
         </Suspense>
       )}
@@ -78,7 +78,7 @@ function IncidentListContent() {
     <div className="grid gap-5">
       <header className="page-header">
         <div className="min-w-0">
-          <h1>사고</h1>
+          <h1>장애</h1>
           {incidents.data && (
             <p className="page-subtitle tabular-nums">
               {view.label} {incidents.data.length}건
@@ -86,11 +86,11 @@ function IncidentListContent() {
           )}
         </div>
         <Button onClick={() => setCreating(true)}>
-          <Icon name="plus" className="inline-block" /> 사고 등록
+          <Icon name="plus" className="inline-block" /> 장애 등록
         </Button>
       </header>
       <div className="flex flex-wrap items-center gap-3">
-        <nav aria-label="사고 상태" className="settings-nav">
+        <nav aria-label="장애 상태" className="settings-nav">
           {views.map((item) => (
             <Link
               key={item.value}
@@ -129,7 +129,7 @@ function IncidentListContent() {
       {incidents.isPending ? (
         <div
           role="status"
-          aria-label="사고를 불러오는 중"
+          aria-label="장애를 불러오는 중"
           className="grid gap-2"
         >
           {Array.from({ length: 4 }, (_, index) => (
@@ -144,11 +144,11 @@ function IncidentListContent() {
       ) : incidents.data.length === 0 ? (
         view.value === "active" && !serviceId ? (
           <EmptyState
-            title="진행 중인 사고가 없습니다"
+            title="진행 중인 장애가 없습니다"
             description="장애나 이상을 발견하면 바로 등록하고 대응 기록을 남기세요."
           />
         ) : (
-          <EmptyState title="조건에 맞는 사고가 없습니다" />
+          <EmptyState title="조건에 맞는 장애가 없습니다" />
         )
       ) : (
         <>
@@ -176,14 +176,14 @@ function IncidentTable({
   return (
     <div className="incident-table">
       <div aria-hidden="true" className="incident-table-head">
-        <span>사고</span>
+        <span>장애</span>
         <span>심각도</span>
         <span>상태</span>
-        <span>커맨더</span>
+        <span>대응 책임자</span>
         <span>시작</span>
         <span>영향 시간</span>
       </div>
-      <ul aria-label="사고 목록">
+      <ul aria-label="장애 목록">
         {incidents.map((incident) => (
           <li key={incident.id}>
             <Link
@@ -211,7 +211,7 @@ function IncidentTable({
                 <IncidentStatusLabel status={incident.status} />
               </span>
               <span className="min-w-0 truncate text-sm">
-                <span className="incident-table-label">커맨더 </span>
+                <span className="incident-table-label">대응 책임자 </span>
                 {incident.commander?.name ?? "없음"}
               </span>
               <span className="text-sm text-muted tabular-nums">
