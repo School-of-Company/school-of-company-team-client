@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { projectAccess, type ProjectDetail } from "@/entities/project";
+import {
+  ProjectAvatar,
+  projectAccess,
+  type ProjectDetail,
+} from "@/entities/project";
 import type { User } from "@/entities/user";
 import { routes } from "@/shared/config";
 
@@ -119,7 +123,10 @@ export function ProjectHeading({
             </span>
           ))}
         </p>
-        <h1 className="text-xl font-semibold break-words">{project.name}</h1>
+        <div className="flex min-w-0 items-center gap-3">
+          <ProjectAvatar project={project} />
+          <h1 className="text-xl font-semibold break-words">{project.name}</h1>
+        </div>
       </header>
       {project.archived && (
         <p role="status" className="text-sm text-muted">

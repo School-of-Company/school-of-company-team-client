@@ -34,6 +34,7 @@ export type Project = {
   readonly key: string;
   readonly name: string;
   readonly description: string | null;
+  readonly imageUrl?: string | null;
   readonly archived: boolean;
   readonly visibility: "TEAM" | "MEMBERS";
   readonly pmUserId: string | null;

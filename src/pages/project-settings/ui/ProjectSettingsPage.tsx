@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { projectAccess, projectKeys, projectQueries } from "@/entities/project";
+import {
+  ProjectAvatar,
+  projectAccess,
+  projectKeys,
+  projectQueries,
+} from "@/entities/project";
 import { activeUsersQueryOptions, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { settingsErrorMessage } from "@/features/project-settings";
@@ -79,10 +84,13 @@ function ProjectSettingsContent({
           <span aria-hidden="true">/</span>
           <span>{project.data.key}</span>
         </p>
-        <h1 className="break-words">{project.data.name}</h1>
+        <div className="flex min-w-0 items-center gap-3">
+          <ProjectAvatar project={project.data} />
+          <h1 className="break-words">{project.data.name}</h1>
+        </div>
       </header>
       <ProjectNav project={project.data} user={user} />
-      {/* 머리글·프로젝트 탭은 다른 탭과 같은 폭, 설정 본문만 읽기 좋은 폭으로 줄인다. */}
+      {/* 머리글, 프로젝트 탭은 다른 탭과 같은 폭, 설정 본문만 읽기 좋은 폭으로 줄인다. */}
       <div className="settings-page grid w-full min-w-0">
         <Suspense fallback={<Spinner label="설정 불러오는 중" />}>
           <SettingsPanels

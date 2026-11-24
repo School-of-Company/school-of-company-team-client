@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   kindLabels,
+  ProjectAvatar,
   projectQueries,
   stageLabels,
   type ProjectStage,
@@ -89,6 +90,7 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
                 href={`/projects/${encodeURIComponent(project.id)}`}
                 className="list-row-main"
               >
+                <ProjectAvatar project={project} />
                 <span className="list-row-key">{project.key}</span>
                 <div className="grid min-w-0 gap-0.5">
                   <h2 className="list-row-title">{project.name}</h2>

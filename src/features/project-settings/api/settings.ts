@@ -39,3 +39,22 @@ export function useAssignPm(
     onSuccess: onSaved,
   });
 }
+
+export function useProjectImage(
+  projectId: string,
+  onSaved: () => Promise<unknown>,
+) {
+  return useMutation({
+    mutationFn: async (file: File | null) => {
+      const path = `/api/v1/projects/${encodeURIComponent(projectId)}/image`;
+      if (file === null) {
+        await api.delete(path);
+      } else {
+        const form = new FormData();
+        form.append("file", file);
+        await api.post(path, form);
+      }
+    },
+    onSuccess: onSaved,
+  });
+}
