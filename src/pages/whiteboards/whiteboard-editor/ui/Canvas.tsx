@@ -86,13 +86,6 @@ export default function Canvas({
     readTheme,
     () => "light",
   );
-  const crispFrame = useRef<number | null>(null);
-  useEffect(
-    () => () => {
-      if (crispFrame.current !== null) cancelAnimationFrame(crispFrame.current);
-    },
-    [],
-  );
   const version = useRef(board.version);
   const savedHash = useRef(hashElementsVersion(restore(board.scene)));
   /** 400·413 으로 거부된 내용. 같은 내용을 2초마다 다시 보내지 않는다. */
@@ -318,15 +311,6 @@ export default function Canvas({
       }}
       onChange={(elements, appState) => {
         engine.current.onChange(elements, appState);
-        if (appState.shouldCacheIgnoreZoom && crispFrame.current === null) {
-          crispFrame.current = requestAnimationFrame(() => {
-            crispFrame.current = null;
-            apiRef.current?.updateScene({
-              appState: { shouldCacheIgnoreZoom: false },
-              captureUpdate: CaptureUpdateAction.NEVER,
-            });
-          });
-        }
       }}
       theme={theme}
       onPointerUpdate={({ pointer: at }) => {
