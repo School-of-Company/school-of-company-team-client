@@ -28,7 +28,7 @@ import { taskGithubQueries } from "@/features/link-github-issue";
 import { TaskError } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
-import { Spinner } from "@/shared/ui";
+import { Spinner, useToast } from "@/shared/ui";
 import { KanbanBoard } from "./KanbanBoard";
 import { BoardViewControls } from "./BoardViewControls";
 import { BoardCreateDialog } from "./BoardCreateDialog";
@@ -60,7 +60,7 @@ export type BoardFilterProps = {
     readonly id: string;
     readonly fullName: string;
   }[];
-  /** 프로젝트 보드에서만: Sprint·Milestone 필터 선택지(단계 4). */
+  /** 프로젝트 보드에서만: Sprint, Milestone 필터 선택지(단계 4). */
   readonly sprints?: readonly {
     readonly id: string;
     readonly name: string;
@@ -137,7 +137,9 @@ export function BoardWorkspace({
     });
     return () => cancelAnimationFrame(frame);
   }, [selectedTask]);
+  // 성공 안내는 화면 낭독기에만 알린다(보드 위에 줄이 생겨 보드가 밀리지 않게). 실패는 알림으로 띄운다.
   const [message, setMessage] = useState("");
+  const toast = useToast();
   const project = useQuery({
     ...projectQueries.detail(projectId ?? ""),
     enabled: !!projectId,
@@ -226,8 +228,8 @@ export function BoardWorkspace({
       await queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
     onError: async (cause) => {
-      setMessage(normalizeApiError(cause).message);
-      // 이웃·버킷이 그 사이 바뀌었을 수 있으니 최신 보드로 맞춘다.
+      toast(normalizeApiError(cause).message, "error");
+      // 이웃, 버킷이 그 사이 바뀌었을 수 있으니 최신 보드로 맞춘다.
       await queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
   });
@@ -270,7 +272,6 @@ export function BoardWorkspace({
         editable={!!access?.editable}
         signedIn={!!user}
         onCreate={() => setCreating({ status: "BACKLOG" })}
-        onImport={(id) => router.push("/tasks/" + encodeURIComponent(id))}
       />
       {project.data && renderProjectNav?.(project.data)}
       {aside}
@@ -308,11 +309,9 @@ export function BoardWorkspace({
           onChange={change}
         />
       </div>
-      {message && (
-        <p role="status" aria-live="polite" className="text-sm">
-          {message}
-        </p>
-      )}
+      <p role="status" aria-live="polite" className="sr-only">
+        {message}
+      </p>
       {board.isPending ? (
         <BoardSkeleton />
       ) : board.isError ? (
@@ -394,11 +393,18 @@ export function BoardWorkspace({
             setCreating(null);
             dropCreateParam();
           }}
-          onCreated={async (notice) => {
-            setMessage(notice);
+          onCreated={async (notice, warning) => {
+            if (warning) toast(notice, "error");
+            else setMessage(notice);
             setCreating(null);
             dropCreateParam();
             await queryClient.invalidateQueries({ queryKey: taskKeys.all });
+          }}
+          onImported={(id) => {
+            setCreating(null);
+            dropCreateParam();
+            void queryClient.invalidateQueries({ queryKey: taskKeys.all });
+            router.push("/tasks/" + encodeURIComponent(id));
           }}
         />
       )}

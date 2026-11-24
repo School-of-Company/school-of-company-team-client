@@ -1,6 +1,6 @@
 export { taskGithubApi, taskGithubQueries } from "./api/github";
 export { TaskGithubPanel } from "./ui/TaskGithubPanel";
-export { ImportIssue } from "./ui/ImportIssue";
+export { ImportIssueForm } from "./ui/ImportIssue";
 export { publicationLabels, linkStateLabels } from "./model/types";
 export type {
   TaskGithub,

@@ -13,6 +13,8 @@ import {
 import { formatDate } from "@/shared/lib";
 import { BoardCardMenu } from "./BoardCardMenu";
 
+const shortDate = (value: string) => formatDate(value, { year: undefined });
+
 export function BoardCard({
   task,
   editable,
@@ -101,8 +103,14 @@ export function BoardCard({
           {task.reviewers.map((person) => person.name).join(", ")}
         </p>
       )}
-      {task.deadline && (
-        <p className="board-card-note">마감 {formatDate(task.deadline)}</p>
+      {(task.startDate || task.deadline) && (
+        <p className="board-card-note">
+          {task.startDate && task.deadline
+            ? `${shortDate(task.startDate)} ~ ${shortDate(task.deadline)}`
+            : task.deadline
+              ? `마감 ${formatDate(task.deadline)}`
+              : `시작 ${formatDate(task.startDate)}`}
+        </p>
       )}
       {task.blocked && (
         <p className="board-card-note break-words text-danger">
@@ -113,7 +121,7 @@ export function BoardCard({
   );
 }
 
-// NONE은 알릴 것이 없어 숨긴다. merge 제안은 완료 전일 때만 보이고 이동은 카드 메뉴·상세에서 사람이 한다.
+// NONE은 알릴 것이 없어 숨긴다. merge 제안은 완료 전일 때만 보이고 이동은 카드 메뉴, 상세에서 사람이 한다.
 function CardSignals({ task }: { readonly task: TaskCard }) {
   const signal = task.devSignal;
   if (!signal) return null;
