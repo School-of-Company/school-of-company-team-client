@@ -1,4 +1,6 @@
-import type { ComponentProps, ReactNode } from "react";
+"use client";
+
+import { useState, type ComponentProps, type ReactNode } from "react";
 import Image from "next/image";
 import { Button } from "./controls";
 
@@ -21,8 +23,9 @@ export function Avatar({
   readonly size?: "sm" | "lg";
 }) {
   const className = `ui-avatar ${size === "lg" ? "ui-avatar-lg" : ""}`;
+  const [failedSource, setFailedSource] = useState<string | null>(null);
   const pixels = size === "lg" ? 56 : 22;
-  return src ? (
+  return src && src !== failedSource ? (
     <Image
       unoptimized
       width={pixels}
@@ -31,6 +34,7 @@ export function Avatar({
       alt={name}
       className={className}
       referrerPolicy="no-referrer"
+      onError={() => setFailedSource(src)}
     />
   ) : (
     <span role="img" aria-label={name} className={className}>
