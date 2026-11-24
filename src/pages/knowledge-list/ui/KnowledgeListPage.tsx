@@ -125,15 +125,17 @@ function KnowledgeListContent({
     return query ? `${pathname}?${query}` : pathname;
   };
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-5" aria-busy={documents.isFetching || undefined}>
       <header className="page-header">
         <div className="min-w-0">
           <h1>문서</h1>
-          {documents.data && (
-            <p className="page-subtitle tabular-nums">
-              {kind ? kindLabels[kind] : "전체"} {documents.data.length}개
-            </p>
-          )}
+          {documents.data &&
+            !documents.isPlaceholderData &&
+            !documents.isError && (
+              <p className="page-subtitle tabular-nums">
+                {kind ? kindLabels[kind] : "전체"} {documents.data.length}개
+              </p>
+            )}
         </div>
         {canCreate && (
           <Button onClick={() => setCreating(true)}>
@@ -221,7 +223,9 @@ function KnowledgeListContent({
       )}
       {documents.isFetching && !documents.isPending && (
         <p role="status" className="text-sm text-muted">
-          문서 갱신 중
+          {documents.isPlaceholderData && documents.data?.length === 0
+            ? "문서 불러오는 중"
+            : "문서 갱신 중"}
         </p>
       )}
       {documents.isPending ? (
@@ -239,7 +243,8 @@ function KnowledgeListContent({
           description={knowledgeErrorMessage(documents.error)}
           onRetry={() => void documents.refetch()}
         />
-      ) : documents.data.length === 0 ? (
+      ) : documents.isPlaceholderData &&
+        documents.data.length === 0 ? null : documents.data.length === 0 ? (
         !kind && !status ? (
           <EmptyState
             title="아직 문서가 없습니다"
