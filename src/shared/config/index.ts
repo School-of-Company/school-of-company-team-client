@@ -22,6 +22,10 @@ export const routes = {
     `/projects/${encodeURIComponent(projectId)}/whiteboards`,
   projectCalendar: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/calendar`,
+  projectRequirements: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/requirements`,
+  requirements: "/requirements",
+  requirement: (id: string) => `/requirements/${encodeURIComponent(id)}`,
   calendar: "/calendar",
   task: (taskId: string) => `/tasks/${encodeURIComponent(taskId)}`,
   services: "/services",

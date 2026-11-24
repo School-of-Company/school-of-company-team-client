@@ -42,6 +42,8 @@ for (const [id, role, settingsVisible] of [
     assert.match(html, /href="\/projects\/project\/milestones"/);
     // 링크도 조회 권한이 있으면 모두에게 보인다(쓰기는 카드의 canEdit·canDelete).
     assert.match(html, /href="\/projects\/project\/links"/);
+    // 요구사항 탭도 조회 권한이 있으면 보인다(연락처·관리 동작은 서버가 PM·헤드 어드민에게만 준다).
+    assert.match(html, /href="\/projects\/project\/requirements"/);
   });
 }
 
