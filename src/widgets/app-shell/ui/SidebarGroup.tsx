@@ -1,6 +1,12 @@
 "use client";
 
-import { useId, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useId,
+  useLayoutEffect,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { Icon } from "@/shared/ui";
 
 const subscribe = (listener: () => void) => {
@@ -36,8 +42,17 @@ export function SidebarGroup({
   );
   const [override, setOverride] = useState<boolean | null>(null);
   const closed = override ?? saved;
+  // 첫 그림은 boot script가 적은 `html[data-sidebar-closed]`로 접는다. 그 뒤로는 이 묶음의 상태를 그 속성에 맞춰 둔다.
+  useLayoutEffect(() => {
+    const dataset = document.documentElement.dataset;
+    const groups = new Set((dataset.sidebarClosed ?? "").split(" "));
+    groups.delete("");
+    if (closed) groups.add(group);
+    else groups.delete(group);
+    dataset.sidebarClosed = [...groups].join(" ");
+  }, [closed, group]);
   return (
-    <nav aria-label={title} className="sidebar-group grid">
+    <nav aria-label={title} data-group={group} className="sidebar-group grid">
       <h2>
         <button
           type="button"

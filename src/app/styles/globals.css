@@ -685,6 +685,29 @@ select.ui-input {
   display: grid;
   min-width: 0;
 }
+/* 수화 전 첫 그림: boot script가 적은 접힌 묶음을 바로 접는다(localStorage를 읽은 뒤 메뉴가 밀리지 않게). */
+html[data-sidebar-closed~="work"] .sidebar-group[data-group="work"] > div,
+html[data-sidebar-closed~="org"] .sidebar-group[data-group="org"] > div,
+html[data-sidebar-closed~="projects"]
+  .sidebar-group[data-group="projects"]
+  > div,
+html[data-sidebar-closed~="account"]
+  .sidebar-group[data-group="account"]
+  > div {
+  display: none;
+}
+html[data-sidebar-closed~="work"] .sidebar-group[data-group="work"] h2 svg,
+html[data-sidebar-closed~="org"] .sidebar-group[data-group="org"] h2 svg,
+html[data-sidebar-closed~="projects"]
+  .sidebar-group[data-group="projects"]
+  h2
+  svg,
+html[data-sidebar-closed~="account"]
+  .sidebar-group[data-group="account"]
+  h2
+  svg {
+  rotate: -90deg;
+}
 .sidebar-group-toggle:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: var(--space-1);
