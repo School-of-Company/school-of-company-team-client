@@ -11,19 +11,18 @@ const base: ProjectDetail = {
   visibility: "MEMBERS",
   archived: false,
   pmUserId: "pm",
+  stage: "REVIEW",
+  kind: "INTERNAL",
+  workflow: "SPRINT",
   createdAt: "2026-11-18T00:00:00Z",
   members: [],
   parts: [],
 };
 
-test("only the head admin can assign PM; PM and own-part leader have bounded settings access", () => {
+test("only the head admin can assign PM; only PM and head admin manage settings and parts", () => {
   const project = base;
   const head = getSettingsPermissions({ id: "head", role: "LEAD" }, project);
   const pm = getSettingsPermissions({ id: "pm", role: "MEMBER" }, project);
-  const leader = getSettingsPermissions(
-    { id: "leader", role: "MEMBER" },
-    project,
-  );
   const member = getSettingsPermissions(
     { id: "member", role: "MEMBER" },
     project,
@@ -35,15 +34,7 @@ test("only the head admin can assign PM; PM and own-part leader have bounded set
   );
   assert.deepEqual([pm.assignPm, pm.manage, pm.archive], [false, true, true]);
   assert.deepEqual(
-    [
-      leader.manage,
-      leader.assignPartMembers("leader"),
-      leader.assignPartMembers("other"),
-    ],
-    [false, true, false],
-  );
-  assert.deepEqual(
-    [member.manage, member.archive, member.assignPartMembers(null)],
+    [member.assignPm, member.manage, member.archive],
     [false, false, false],
   );
 });
@@ -52,21 +43,10 @@ test("archived projects disable every settings write except manager restoration"
   const project = { ...base, archived: true };
   const head = getSettingsPermissions({ id: "head", role: "LEAD" }, project);
   const pm = getSettingsPermissions({ id: "pm", role: "MEMBER" }, project);
-  const leader = getSettingsPermissions(
-    { id: "leader", role: "MEMBER" },
-    project,
-  );
 
   assert.deepEqual(
-    [head.assignPm, head.manage, head.assignPartMembers("head"), head.archive],
-    [false, false, false, true],
-  );
-  assert.deepEqual(
-    [pm.manage, pm.assignPartMembers("pm"), pm.archive],
+    [head.assignPm, head.manage, head.archive],
     [false, false, true],
   );
-  assert.deepEqual(
-    [leader.assignPartMembers("leader"), leader.archive],
-    [false, false],
-  );
+  assert.deepEqual([pm.manage, pm.archive], [false, true]);
 });

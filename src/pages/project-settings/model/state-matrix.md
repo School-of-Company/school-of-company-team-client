@@ -2,18 +2,18 @@
 
 Implementation and browser acceptance checklist; no item is verified by this document alone.
 
-| Actor                          | Project fields, members, parts, integrations | PM assignment | Part member assignment                  | Archive / restore     | Admin users / create project |
-| ------------------------------ | -------------------------------------------- | ------------- | --------------------------------------- | --------------------- | ---------------------------- |
-| Active LEAD                    | Allowed                                      | Allowed       | Any part                                | Allowed               | Allowed                      |
-| Project PM                     | Allowed                                      | Hidden        | Any part                                | Allowed               | Hidden / denied              |
-| Own-part leader                | Read only                                    | Hidden        | Own part only, existing project members | Hidden                | Hidden / denied              |
-| Ordinary member                | Read only                                    | Hidden        | Hidden                                  | Hidden                | Hidden / denied              |
-| Non-member, TEAM visibility    | Read only                                    | Hidden        | Hidden                                  | Hidden                | Hidden / denied              |
-| Non-member, MEMBERS visibility | 404; reveal no project fields                | Hidden        | Hidden                                  | Hidden                | Hidden / denied              |
-| Archived project               | Read only, including LEAD and PM             | Disabled      | Disabled                                | LEAD / PM can restore | Independent of project       |
+| Actor                          | Project fields, members, parts, integrations | PM assignment | Part member assignment | Archive / restore     | Admin users / create project |
+| ------------------------------ | -------------------------------------------- | ------------- | ---------------------- | --------------------- | ---------------------------- |
+| Active LEAD                    | Allowed                                      | Allowed       | Any part               | Allowed               | Allowed                      |
+| Project PM                     | Allowed                                      | Hidden        | Any part               | Allowed               | Hidden / denied              |
+| Ordinary member                | Read only                                    | Hidden        | Hidden                 | Hidden                | Hidden / denied              |
+| Non-member, TEAM visibility    | Read only                                    | Hidden        | Hidden                 | Hidden                | Hidden / denied              |
+| Non-member, MEMBERS visibility | 404; reveal no project fields                | Hidden        | Hidden                 | Hidden                | Hidden / denied              |
+| Archived project               | Read only, including LEAD and PM             | Disabled      | Disabled               | LEAD / PM can restore | Independent of project       |
 
 PM exclusion is disabled until a LEAD replaces or clears the PM; former PM stays a participant.
-Each participant may belong to several parts. Removing a part member who leads it clears that leadership.
+Each participant may belong to several parts. Part Leader was removed (ops v3); only LEAD / PM manage parts.
+Stage / kind / workflow are project fields: LEAD / PM edit, everyone else reads.
 Part removal preserves tasks and clears only their part assignment.
 Last ACTIVE LEAD suspension / demotion is disabled; server LAST_HEAD_ADMIN remains authoritative.
 
@@ -37,6 +37,6 @@ At most one default is selected through the server endpoint. Default applies onl
 Discord ID help: developer mode, right-click channel, copy ID. IDs remain strings.
 MEMBERS links require explicit privacyConfirmed; channel / role permissions are never described as automatically synchronized.
 
-Browser scenarios: LEAD / PM / own-part leader / member; 375px / 1280px;
+Browser scenarios: LEAD / PM / member; 375px / 1280px;
 loading / empty / retry / denied / pending; Tab / Enter / Space and visible focus.
 Mock transport must be explicitly distinguished from real server, OAuth, GitHub App, and bot verification.

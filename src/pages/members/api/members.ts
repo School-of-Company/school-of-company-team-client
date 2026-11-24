@@ -19,7 +19,6 @@ export type Member = {
     readonly parts: readonly {
       readonly id: string;
       readonly name: string;
-      readonly leader: boolean;
     }[];
   }[];
   readonly load: { readonly inProgress: number; readonly reviewing: number };

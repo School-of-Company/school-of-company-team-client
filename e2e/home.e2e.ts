@@ -61,7 +61,7 @@ const titles = {
 
 test.beforeAll(async () => {
   const project = `/api/v1/projects/${seed.project.id}`;
-  // 참여자를 PM으로 두고 파트 리더도 맡긴다(프로젝트 범위 선택·역할 표시 확인).
+  // 참여자를 PM으로 두고 파트에도 배정한다(프로젝트 범위 선택·역할 표시 확인).
   await call("PUT", `${project}/pm`, seed.admin, { userId: seed.member.id });
   const part = await call<{ id: string }>(
     "POST",
@@ -72,9 +72,6 @@ test.beforeAll(async () => {
     },
   );
   await call("POST", `${project}/parts/${part.id}/members`, seed.admin, {
-    userId: seed.member.id,
-  });
-  await call("PUT", `${project}/parts/${part.id}/leader`, seed.admin, {
     userId: seed.member.id,
   });
 
@@ -455,7 +452,7 @@ test("members list shows roles and load, and hides projects the viewer cannot re
 }) => {
   await open(page, seed.member.tokens, "/members");
   const row = page.getByRole("row", { name: new RegExp(seed.member.name) });
-  await expect(row.getByText("PM, 서버 리더")).toBeVisible();
+  await expect(row.getByText("PM, 서버")).toBeVisible();
   await expect(
     row.getByText(stubPort ? `GitHub member-${seed.run}` : "GitHub 미연결"),
   ).toBeVisible();
@@ -528,7 +525,7 @@ const screens: readonly {
     name: "members",
     who: "member",
     path: () => "/members",
-    ready: (p) => expect(p.getByText("PM, 서버 리더")).toBeVisible(),
+    ready: (p) => expect(p.getByText("PM, 서버")).toBeVisible(),
   },
   {
     name: "members-admin",

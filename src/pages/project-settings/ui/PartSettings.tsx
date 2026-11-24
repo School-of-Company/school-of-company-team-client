@@ -33,10 +33,7 @@ export function PartSettings({ project, user, onSaved }: SettingsProps) {
   }
   return (
     <div className="grid gap-6">
-      {(permissions.manage ||
-        project.parts.some((part) =>
-          permissions.assignPartMembers(part.leaderUserId),
-        )) && (
+      {permissions.manage && (
         <Button
           variant="secondary"
           className="justify-self-start"
@@ -47,8 +44,8 @@ export function PartSettings({ project, user, onSaved }: SettingsProps) {
         </Button>
       )}
       <p className="text-sm text-muted">
-        참여자는 여러 파트에 속할 수 있습니다. 파트 리더는 자기 파트 구성원만
-        배정·해제합니다.
+        참여자는 여러 파트에 속할 수 있습니다. 파트와 구성원 배정은 헤드 어드민
+        또는 PM이 관리합니다.
       </p>
       {project.parts.length === 0 && (
         <EmptyState

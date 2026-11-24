@@ -10,7 +10,5 @@ export function getSettingsPermissions(
     assignPm: headAdmin && !project.archived,
     manage: manager && !project.archived,
     archive: manager,
-    assignPartMembers: (leaderUserId: string | null) =>
-      !project.archived && (manager || leaderUserId === actor.id),
   };
 }

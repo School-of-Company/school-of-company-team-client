@@ -64,36 +64,7 @@ export function PartRows({
                   이름 변경
                 </Button>
               </form>
-              <Field id={`part-leader-${part.id}`} label="파트 리더">
-                <Select
-                  id={`part-leader-${part.id}`}
-                  value={part.leaderUserId ?? ""}
-                  disabled={change.isPending}
-                  onChange={(event) =>
-                    change.mutate({
-                      action: "leader",
-                      partId: part.id,
-                      userId: event.target.value || null,
-                    })
-                  }
-                >
-                  <option value="">미지정</option>
-                  {project.members.map((member) => (
-                    <option key={member.userId} value={member.userId}>
-                      {member.name}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
             </>
-          )}
-          {(!permissions.manage || !editing) && (
-            <p className="text-sm text-muted">
-              리더:{" "}
-              {project.members.find(
-                (member) => member.userId === part.leaderUserId,
-              )?.name ?? "미지정"}
-            </p>
           )}
           {part.memberUserIds.length === 0 ? (
             <p className="text-sm text-muted">배정된 구성원이 없습니다.</p>
@@ -108,28 +79,27 @@ export function PartRows({
                     {project.members.find((member) => member.userId === userId)
                       ?.name ?? "참여자"}
                   </span>
-                  {editing &&
-                    permissions.assignPartMembers(part.leaderUserId) && (
-                      <Button
-                        variant="ghost"
-                        disabled={change.isPending}
-                        aria-label={`${part.name}에서 ${project.members.find((member) => member.userId === userId)?.name ?? "참여자"} 해제`}
-                        onClick={() =>
-                          change.mutate({
-                            action: "remove",
-                            partId: part.id,
-                            userId,
-                          })
-                        }
-                      >
-                        배정 해제
-                      </Button>
-                    )}
+                  {editing && permissions.manage && (
+                    <Button
+                      variant="ghost"
+                      disabled={change.isPending}
+                      aria-label={`${part.name}에서 ${project.members.find((member) => member.userId === userId)?.name ?? "참여자"} 해제`}
+                      onClick={() =>
+                        change.mutate({
+                          action: "remove",
+                          partId: part.id,
+                          userId,
+                        })
+                      }
+                    >
+                      배정 해제
+                    </Button>
+                  )}
                 </li>
               ))}
             </ul>
           )}
-          {editing && permissions.assignPartMembers(part.leaderUserId) && (
+          {editing && permissions.manage && (
             <form
               className="grid gap-3"
               onSubmit={(event) => {

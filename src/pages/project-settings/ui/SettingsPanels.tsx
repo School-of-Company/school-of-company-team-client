@@ -74,8 +74,7 @@ export function SettingsPanels(props: SettingsProps) {
       )}
       {!manager && (
         <p className="text-sm text-muted">
-          설정은 읽기 전용입니다. 파트 리더는 자기 파트 구성원만 변경할 수
-          있습니다.
+          설정은 읽기 전용입니다. 헤드 어드민 또는 PM이 변경할 수 있습니다.
         </p>
       )}
       {tab === "general" && (
