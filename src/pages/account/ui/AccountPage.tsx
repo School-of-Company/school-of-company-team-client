@@ -7,6 +7,7 @@ import {
   deleteAvatar,
   discordRequired,
   meQueryKey,
+  userDestination,
   updateProfile,
   uploadAvatar,
   userAvatarUrl,
@@ -14,6 +15,7 @@ import {
 } from "@/entities/user";
 import { AuthGuard, authErrorMessage, OAuthButton } from "@/features/auth";
 import { unlinkDiscord } from "../api/unlink-discord";
+import { ApiTokens } from "./ApiTokens";
 import { normalizeApiError } from "@/shared/api";
 import {
   Avatar,
@@ -236,7 +238,7 @@ function AccountContent({ user }: { readonly user: User }) {
       <header className="grid gap-2">
         <h1 className="text-2xl font-semibold">설정</h1>
         <p className="text-sm text-muted">
-          프로필과 로그인·알림 계정을 관리합니다.
+          프로필과 로그인·알림 계정, AI 도구용 API 토큰을 관리합니다.
         </p>
       </header>
       <section aria-labelledby="profile-title" className="grid gap-5">
@@ -301,6 +303,18 @@ function AccountContent({ user }: { readonly user: User }) {
           <OAuthButton provider="discord" />
         )}
       </section>
+      {/* 토큰은 업무 권한(WORK)이 있어야 만들고 쓸 수 있다. */}
+      {userDestination(user) === "/" && (
+        <section
+          aria-labelledby="api-tokens-title"
+          className="grid gap-4 border-t border-border pt-8"
+        >
+          <h2 id="api-tokens-title" className="text-lg font-semibold">
+            API 토큰 (MCP)
+          </h2>
+          <ApiTokens />
+        </section>
+      )}
       <section
         aria-labelledby="appearance-title"
         className="grid gap-4 border-t border-border pt-8"
