@@ -1,0 +1,31 @@
+name: 버그
+description: 잘못 동작하는 것을 알려 주세요
+title: "[버그] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 무슨 일이 있었나요
+      description: 실제로 본 동작과 기대한 동작
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      value: |
+        1.
+        2.
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: 환경
+      description: 화면 경로, 브라우저, 화면 폭, 계정 역할(LEAD·PM·Member)
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 스크린샷·로그
+      description: 비밀값·토큰·개인정보는 지우고 올려 주세요.

@@ -1,0 +1,35 @@
+name: 일반 작업
+description: 일 또는 주 단위로 끝낼 수 있는 작업
+title: "[작업] "
+body:
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 목적
+      description: 왜 이 작업이 필요한지, 무엇이 나아지는지 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 조건
+      description: 끝났다고 판단할 기준을 체크리스트로 적어 주세요.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: dropdown
+    id: size
+    attributes:
+      label: 크기
+      description: 하루 안에 끝나면 일, 일주일 안이면 주. 더 크면 나눠 주세요.
+      options:
+        - 일
+        - 주
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: 참고
+      description: 관련 문서·명세·링크
