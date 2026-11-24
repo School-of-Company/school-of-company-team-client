@@ -1,6 +1,7 @@
 name: 일반 작업
 description: 일 또는 주 단위로 끝낼 수 있는 작업
 title: "[작업] "
+labels: ["✨ Feature"]
 body:
   - type: textarea
     id: purpose

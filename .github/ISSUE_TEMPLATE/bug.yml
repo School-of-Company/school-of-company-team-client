@@ -1,7 +1,7 @@
 name: 버그
 description: 잘못 동작하는 것을 알려 주세요
 title: "[버그] "
-labels: ["bug"]
+labels: ["🐞 Bug"]
 body:
   - type: textarea
     id: what

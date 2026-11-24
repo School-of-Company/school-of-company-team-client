@@ -1,6 +1,7 @@
 name: 외주 요청
 description: 외주 고객의 요청·요구사항 접수
 title: "[외주] "
+labels: ["🤝 외주"]
 body:
   - type: input
     id: requester
