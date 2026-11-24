@@ -204,7 +204,7 @@ test("toggling an incident rule sends a body the server accepts", () => {
 test("incident runs explain reasons without task wording", () => {
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "INCIDENT_CREATED"),
-    "사고가 삭제되었습니다.",
+    "장애가 삭제되었습니다.",
   );
   assert.equal(
     resultMessage("DISCORD_CHANNEL_MISSING", "SKIPPED", "INCIDENT_CREATED"),

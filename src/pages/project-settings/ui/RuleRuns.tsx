@@ -170,12 +170,12 @@ export function RuleRuns({
                     <Link
                       href={routes.incident(run.incidentId)}
                       className="rule-run-task"
-                      aria-label={`사고 보기: ${run.ruleName} ${formatDate(run.createdAt, time)}`}
+                      aria-label={`장애 보기: ${run.ruleName} ${formatDate(run.createdAt, time)}`}
                     >
-                      <span className="truncate">사고 보기</span>
+                      <span className="truncate">장애 보기</span>
                     </Link>
                   ) : run.event === "INCIDENT_CREATED" ? (
-                    <span className="text-muted">삭제된 사고</span>
+                    <span className="text-muted">삭제된 장애</span>
                   ) : (
                     <span className="text-muted">삭제된 업무</span>
                   )}
