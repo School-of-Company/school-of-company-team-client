@@ -3611,6 +3611,27 @@ a.search-option:hover {
   display: grid;
   gap: var(--space-2);
 }
+/* 스프린트 머리는 상태(예정, 진행 중, 종료)와 권한에 상관없이 같은 줄 높이를 잡는다. 대기 자리와 같아 탭 줄이 움직이지 않는다. */
+.sprint-head > .sprint-head-row {
+  min-height: var(--control-md);
+}
+.sprint-progress-slot {
+  display: flex;
+  min-height: 1lh;
+  align-items: center;
+  font-size: var(--text-xs);
+}
+.sprint-head-note {
+  min-height: 1lh;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+/* 안내 문장은 휴대폰 폭에서 두 줄이라 두 줄을 잡는다. */
+@media (max-width: 30rem) {
+  .sprint-head-note {
+    min-height: 2lh;
+  }
+}
 .sprint-goal {
   max-width: var(--content-narrow);
   color: var(--foreground-2);

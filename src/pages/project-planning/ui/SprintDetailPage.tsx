@@ -54,37 +54,9 @@ export function SprintDetailPage({
 function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
   const { project, sprintId } = props;
   const sprint = useQuery(sprintQueries.detail(project.id, sprintId));
-  if (sprint.isPending)
-    return (
-      <div role="status" aria-label="스프린트 불러오는 중" className="contents">
-        {/* 실제 머리(이름, 기간, 목표)와 탭 줄과 같은 클래스로 자리를 잡는다. */}
-        <div aria-hidden="true" className="sprint-head">
-          <div className="sprint-head-row">
-            <h2 className="text-lg font-semibold">
-              <span className="ui-skeleton-text">스프린트 이름</span>
-            </h2>
-          </div>
-          <p className="sprint-meta">
-            <span className="ui-skeleton-text">2026. 1. 1. ~ 2026. 1. 14.</span>
-          </p>
-          <p className="text-sm">
-            <span className="ui-skeleton-text">
-              스프린트 목표를 불러오는 중
-            </span>
-          </p>
-        </div>
-        <div aria-hidden="true" className="page-toolbar">
-          <span className="ui-segmented">
-            {["진행", "계획", "리뷰", "회고"].map((label) => (
-              <span key={label} className="ui-segmented-option">
-                <span className="ui-skeleton-text">{label}</span>
-              </span>
-            ))}
-          </span>
-        </div>
-        <ListSkeleton label="스프린트 업무 불러오는 중" />
-      </div>
-    );
+  // 시작 막힘 안내는 스프린트 목록(다른 진행 중 스프린트)으로 정한다. 목록까지 받은 뒤 한 번에 그려 안내가 늦게 끼지 않게 한다.
+  const sprints = useQuery(sprintQueries.list(project.id));
+  if (sprint.isPending || sprints.isPending) return <SprintDetailSkeleton />;
   if (sprint.isError) {
     const problem = normalizeApiError(sprint.error);
     return (
@@ -138,6 +110,8 @@ function SprintScreen({
   const otherActive = sprints.data?.find(
     (item) => item.status === "ACTIVE" && item.id !== sprint.id,
   );
+  const startBlocked =
+    manages && sprint.status === "PLANNED" ? otherActive : undefined;
   function goTab(next: string) {
     const params = new URLSearchParams(search?.toString());
     params.set("tab", next);
@@ -209,32 +183,44 @@ function SprintScreen({
             <Markdown>{sprint.goal}</Markdown>
           </div>
         ) : (
-          <p className="text-sm text-muted">목표가 없습니다.</p>
+          <p className="sprint-goal text-muted">목표가 없습니다.</p>
         )}
-        {sprint.status !== "PLANNED" && (
-          <ProgressBar
-            done={progress.done}
-            total={progress.total}
-            label={`${sprint.name} 완료 비율`}
-          />
-        )}
-        {manages && otherActive && sprint.status === "PLANNED" && (
-          <p id="start-blocked" className="text-sm text-muted">
-            진행 중인 스프린트(
-            <Link
-              href={routes.projectSprint(project.id, otherActive.id)}
-              className="underline"
-            >
-              {otherActive.name}
-            </Link>
-            )를 종료한 뒤 시작할 수 있습니다.
-          </p>
-        )}
-        {!manages && sprint.status !== "CLOSED" && !project.archived && (
-          <p className="text-sm text-muted">
-            스프린트 범위와 시작, 종료는 PM 또는 헤드 어드민이 정합니다.
-          </p>
-        )}
+        {/* 진행률 줄과 안내 줄은 상태와 상관없이 자리를 둔다(대기 자리와 같은 높이, 안내가 늦게 끼지 않음). */}
+        <div className="sprint-progress-slot">
+          {sprint.status === "PLANNED" ? (
+            <span className="planning-note">
+              시작하면 완료 비율을 보여 줍니다.
+            </span>
+          ) : (
+            <ProgressBar
+              done={progress.done}
+              total={progress.total}
+              label={`${sprint.name} 완료 비율`}
+            />
+          )}
+        </div>
+        <p
+          id={startBlocked ? "start-blocked" : undefined}
+          className="sprint-head-note"
+        >
+          {startBlocked ? (
+            <>
+              진행 중인 스프린트(
+              <Link
+                href={routes.projectSprint(project.id, startBlocked.id)}
+                className="underline"
+              >
+                {startBlocked.name}
+              </Link>
+              )를 종료한 뒤 시작할 수 있습니다.
+            </>
+          ) : (
+            !manages &&
+            sprint.status !== "CLOSED" &&
+            !project.archived &&
+            "스프린트 범위와 시작, 종료는 PM 또는 헤드 어드민이 정합니다."
+          )}
+        </p>
       </section>
       {message && (
         <p
@@ -360,5 +346,43 @@ function SprintScreen({
         </div>
       </Dialog>
     </>
+  );
+}
+
+/**
+ * 스프린트 머리와 탭 줄의 대기 자리. 머리는 상태와 상관없이 같은 줄 수(제목 줄, 기간, 목표, 진행률 줄, 안내 줄)라
+ * 예정, 진행 중, 종료 어느 스프린트를 받아도 탭 줄이 움직이지 않는다.
+ */
+function SprintDetailSkeleton() {
+  return (
+    <div role="status" aria-label="스프린트 불러오는 중" className="contents">
+      <div aria-hidden="true" className="sprint-head">
+        <div className="sprint-head-row">
+          <h2 className="text-lg font-semibold">
+            <span className="ui-skeleton-text">스프린트 이름</span>
+          </h2>
+        </div>
+        <p className="sprint-meta">
+          <span className="ui-skeleton-text">11월 1일 – 11월 14일</span>
+        </p>
+        <p className="sprint-goal">
+          <span className="ui-skeleton-text">스프린트 목표</span>
+        </p>
+        <p className="sprint-progress-slot">
+          <span className="ui-skeleton-text">완료 비율</span>
+        </p>
+        <p className="sprint-head-note" />
+      </div>
+      <div aria-hidden="true" className="page-toolbar">
+        <span className="ui-segmented">
+          {["계획", "진행", "리뷰", "회고"].map((label) => (
+            <span key={label} className="ui-segmented-option">
+              <span className="ui-skeleton-text">{label}</span>
+            </span>
+          ))}
+        </span>
+      </div>
+      <ListSkeleton label="스프린트 업무 불러오는 중" />
+    </div>
   );
 }
