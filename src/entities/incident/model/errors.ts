@@ -8,7 +8,7 @@ const messages: Readonly<Record<string, string>> = {
   INCIDENT_COMMANDER_NOT_ACTIVE:
     "커맨더는 활성 팀원만 맡을 수 있습니다. 다른 사람을 고르세요.",
   INCIDENT_TIME_INVALID:
-    "시각을 확인하세요. 미래 시각, 시작보다 이른 상태 시각, 완화, 해결보다 늦은 시작 시각은 저장할 수 없습니다.",
+    "시각을 확인하세요. 미래 시각이나 시작보다 이른 상태 시각, 완화나 해결보다 늦은 시작 시각은 저장할 수 없습니다.",
   TIMELINE_ENTRY_NOT_FOUND: "이미 지워진 메모입니다. 새로고침해 확인하세요.",
   TIMELINE_ENTRY_NOT_DELETABLE:
     "상태, 심각도, 커맨더 기록은 지울 수 없습니다. 메모만 지울 수 있습니다.",

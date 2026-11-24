@@ -113,9 +113,9 @@ export function TaskGithubPanel({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">GitHub</h2>
         {publication && (
-          <Badge>
-            {publicationLabels[publication.state]}, {" "}
-            {publicationName(publication, repositoryOptions)}
+          <Badge className="gap-2">
+            <span>{publicationLabels[publication.state]}</span>
+            <span>{publicationName(publication, repositoryOptions)}</span>
           </Badge>
         )}
       </div>

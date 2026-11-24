@@ -134,12 +134,12 @@ export function RequirementInbox({
                     <span className="block truncate font-medium">
                       {row.title}
                     </span>
-                    <span className="block truncate text-xs text-muted">
-                      {row.formTitle ?? "삭제된 양식"},{" "}
+                    <span className="flex flex-wrap gap-x-2 text-xs text-muted">
+                      <span>{row.formTitle ?? "삭제된 양식"}</span>
                       <RequesterPriorityLabel
                         priority={row.requesterPriority}
                       />
-                      {row.taskCount > 0 && `, 업무 ${row.taskCount}`}
+                      {row.taskCount > 0 && <span>업무 {row.taskCount}</span>}
                     </span>
                   </span>
                   <RequirementStatusBadge status={row.status} />
