@@ -2,19 +2,24 @@
 
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { taskApi, taskKeys, TaskError } from "@/entities/task";
 import { projectAccess } from "@/entities/project";
 import { TaskEditor } from "@/features/edit-task";
-import { TaskGithubPanel } from "@/features/link-github-issue";
+import {
+  TaskGithubPanel,
+  taskGithubQueries,
+} from "@/features/link-github-issue";
+import { knowledgeQueries } from "@/entities/knowledge";
 import { TaskDiscussion } from "./TaskDiscussion";
 import { TaskDocuments } from "./TaskDocuments";
 import { normalizeApiError } from "@/shared/api";
 import { formatDate } from "@/shared/lib";
-import { Button, Dialog, Skeleton, useToast } from "@/shared/ui";
+import { Button, Dialog, useToast } from "@/shared/ui";
 import { TaskProperties } from "./TaskContent";
 import { TaskDescription } from "./TaskDescription";
 import { TaskDetailHeader } from "./TaskDetailHeader";
+import { TaskDetailSkeleton } from "./TaskDetailSkeleton";
 import { useTaskDetail } from "../model/useTaskDetail";
 
 export function TaskDetailWorkspace({
@@ -48,6 +53,29 @@ export function TaskDetailWorkspace({
     changeBucket,
     changeMilestone,
   } = useTaskDetail(taskId);
+  // 아래 칸들이 따로 도착하며 화면을 여러 번 밀지 않게, 첫 조회는 같은 키로 여기서 함께 기다린다(캐시 공유, 추가 요청 없음).
+  const scope = task.data?.scope;
+  const projectId = scope === "PROJECT" ? task.data?.projectId : null;
+  const github = useQuery({
+    ...taskGithubQueries.detail(taskId),
+    enabled: !!task.data,
+  });
+  const repositories = useQuery({
+    ...taskGithubQueries.repositories(projectId ?? ""),
+    enabled: !!projectId,
+  });
+  const documents = useQuery({
+    ...knowledgeQueries.list({ taskId }),
+    enabled: !!scope && scope !== "PERSONAL",
+  });
+  const settling = [
+    project,
+    buckets,
+    milestones,
+    github,
+    repositories,
+    documents,
+  ].some((query) => query.isLoading);
   const remove = useMutation({
     mutationFn: () => taskApi.delete(taskId),
     onSuccess: async () => {
@@ -75,14 +103,8 @@ export function TaskDetailWorkspace({
         }}
       />
     );
-  if (task.isPending)
-    return (
-      <div role="status" aria-label="업무를 불러오는 중" className="grid gap-5">
-        <Skeleton className="w-24" />
-        <Skeleton className="h-8 w-3/4" />
-        <Skeleton className="h-64" />
-      </div>
-    );
+  if (task.isPending || settling)
+    return <TaskDetailSkeleton back={!headerAction} />;
   if (!task.data) return null;
   const data = task.data;
   const access =
