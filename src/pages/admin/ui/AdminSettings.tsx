@@ -6,7 +6,14 @@ import { IntakeFormSettings } from "@/features/manage-intake-forms";
 import { NotificationSettingsForm } from "@/features/notification-settings";
 import { settingsErrorMessage } from "@/features/project-settings";
 import { normalizeApiError } from "@/shared/api";
-import { Badge, Button, EmptyState, ErrorState, Spinner } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  ErrorState,
+  ListSkeleton,
+  Spinner,
+} from "@/shared/ui";
 
 export function AdminSettings({
   user,
@@ -24,8 +31,6 @@ export function AdminSettings({
         description="헤드 어드민만 조직 사용자와 프로젝트를 관리할 수 있습니다."
       />
     );
-  if (section === "users" && users.isPending)
-    return <Spinner label="조직 사용자 불러오는 중" />;
   if (section === "users" && users.isError)
     return (
       <ErrorState
@@ -56,7 +61,13 @@ export function AdminSettings({
             승인 대기 사용자를 먼저 표시합니다. 이용 중지는 기록을 보존하고 담당
             배정을 해제합니다.
           </p>
-          {users.data?.length === 0 ? (
+          {users.isPending ? (
+            <ListSkeleton
+              label="조직 사용자 불러오는 중"
+              rows={5}
+              rowClassName="h-12"
+            />
+          ) : users.data?.length === 0 ? (
             <EmptyState title="조직 사용자가 없습니다" />
           ) : (
             <div className="admin-user-table-wrap">

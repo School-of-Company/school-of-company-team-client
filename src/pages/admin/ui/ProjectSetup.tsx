@@ -16,10 +16,11 @@ import { routes } from "@/shared/config";
 import {
   Button,
   Checkbox,
+  EmptyState,
   ErrorState,
   Field,
+  ListSkeleton,
   Select,
-  Spinner,
 } from "@/shared/ui";
 
 export function ProjectSetup({
@@ -47,7 +48,7 @@ export function ProjectSetup({
       {step === "team" ? (
         <>
           {detail.isPending || users.isPending ? (
-            <Spinner label="팀원 설정 불러오는 중" />
+            <ListSkeleton label="팀원 설정 불러오는 중" rowClassName="h-11" />
           ) : detail.isError || users.isError ? (
             <ErrorState
               description="팀원 설정을 불러오지 못했습니다. 프로젝트는 생성되어 있습니다."
@@ -142,9 +143,10 @@ function ProjectTeamStep({
       <fieldset className="grid min-w-0 gap-2" disabled={save.isPending}>
         <legend className="mb-2 text-sm font-medium">참여할 활성 팀원</legend>
         {users.length === 0 && (
-          <p className="text-sm text-muted">
-            추가할 활성 팀원이 없습니다. 나중에 설정할 수 있습니다.
-          </p>
+          <EmptyState
+            title="추가할 활성 팀원이 없습니다"
+            description="프로젝트 설정에서 나중에 추가할 수 있습니다."
+          />
         )}
         {users.map((user) => (
           <label

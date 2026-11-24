@@ -6,15 +6,16 @@ import { useQuery } from "@tanstack/react-query";
 import { avatarSrc, isHeadAdmin, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { normalizeApiError } from "@/shared/api";
-import { useLastData } from "@/shared/lib";
+import { settledData, useLastData } from "@/shared/lib";
 import {
   Avatar,
   Badge,
-  Button,
   EmptyState,
   ErrorState,
-  Skeleton,
-  Spinner,
+  ListSkeleton,
+  PageHeader,
+  PageSkeleton,
+  QueryState,
 } from "@/shared/ui";
 import { memberQueries, type Member } from "../api/members";
 import {
@@ -28,7 +29,7 @@ export function MembersPage() {
   return (
     <AuthGuard require="work">
       {(user) => (
-        <Suspense fallback={<Spinner />}>
+        <Suspense fallback={<PageSkeleton label="팀원 불러오는 중" />}>
           <MembersContent viewer={user} />
         </Suspense>
       )}
@@ -47,9 +48,19 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
   const params = new URLSearchParams(useSearchParams()?.toString());
   const sort = readSort(params.get("sort"));
   const members = useQuery(memberQueries.list());
-  // 일시 장애면 60초까지만 마지막 목록을 두고, 권한·존재 오류(4xx)면 바로 비운다.
-  const { data, stale } = useLastData(members);
-  const rows = data ? sortMembers(data, sort) : [];
+  // 일시 장애면 60초까지만 마지막 목록을 두고(QueryState가 StaleNotice를 그림), 권한·존재 오류(4xx)면 바로 비운다.
+  const { data } = useLastData(members);
+  // 목록은 useLastData 결과로 그린다(쿼리를 펼치면 모든 필드를 구독하므로 필요한 것만 넘긴다).
+  const view = {
+    data,
+    error: members.error,
+    isError: members.isError,
+    isPending: members.isPending,
+    isFetching: members.isFetching,
+    isPlaceholderData: members.isPlaceholderData,
+    refetch: members.refetch,
+  };
+  const count = settledData(view)?.length;
   // 연결 열은 헤드 어드민에게만. 다른 사람은 자기 행 이름 아래에서 자기 연결만 본다.
   const connectionColumn = isHeadAdmin(viewer);
 
@@ -65,13 +76,17 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
 
   return (
     <div className="grid gap-5">
-      <header className="page-header">
-        <div>
-          <h1>팀원</h1>
-          <p className="page-subtitle tabular-nums">
-            {data ? `활성 팀원 ${data.length}명` : "팀원 집계 중"}
-          </p>
-        </div>
+      <PageHeader
+        title="팀원"
+        subtitle={
+          count !== undefined
+            ? `활성 팀원 ${count}명`
+            : members.isError && !data
+              ? "팀원 집계를 불러오지 못했습니다"
+              : "팀원 집계 중"
+        }
+      />
+      <div className="page-toolbar">
         <div className="ui-segmented" role="group" aria-label="정렬">
           {(["name", "load"] as const).map((option) => (
             <button
@@ -85,77 +100,60 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
             </button>
           ))}
         </div>
-      </header>
-      <p className="text-sm text-muted">
-        활성 팀원의 프로젝트 역할과 진행 중인 업무, 리뷰 담당 업무 수입니다.
-        개인 업무는 세지 않습니다.
-      </p>
-      {stale && (
-        <div
-          role="status"
-          className="flex flex-wrap items-center gap-3 text-sm"
-        >
-          <span className="text-danger">
-            최신 목록을 불러오지 못해 마지막으로 받은 목록을 보여 줍니다.
-          </span>
-          <Button
-            variant="secondary"
-            className="ui-button-sm"
-            onClick={() => void members.refetch()}
-          >
-            다시 시도
-          </Button>
-        </div>
-      )}
-      {members.isPending ? (
-        <div
-          role="status"
-          aria-label="팀원을 불러오는 중"
-          className="grid gap-2"
-        >
-          {Array.from({ length: 5 }, (_, index) => (
-            <Skeleton key={index} className="h-12" />
-          ))}
-        </div>
-      ) : members.isError && !data ? (
-        <ErrorState
-          title="최신 정보를 불러오지 못했습니다"
-          description={normalizeApiError(members.error).message}
-          onRetry={() => void members.refetch()}
-        />
-      ) : rows.length === 0 ? (
-        <EmptyState title="활성 팀원이 없습니다" />
-      ) : (
-        <table className="members-table">
-          <caption className="sr-only">
-            활성 팀원의 프로젝트 역할과 진행 중인 업무, 리뷰 담당 업무 수
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col">팀원</th>
-              <th scope="col">전공</th>
-              <th scope="col">프로젝트 역할</th>
-              <th scope="col" className="members-number">
-                진행 중
-              </th>
-              <th scope="col" className="members-number">
-                리뷰
-              </th>
-              {connectionColumn && <th scope="col">연결</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((member) => (
-              <MemberRow
-                key={member.id}
-                member={member}
-                self={member.id === viewer.id}
-                connectionColumn={connectionColumn}
-              />
-            ))}
-          </tbody>
-        </table>
-      )}
+        <p className="text-sm text-muted">
+          진행 중, 리뷰 수에 개인 업무는 세지 않습니다.
+        </p>
+      </div>
+      <QueryState
+        query={view}
+        skeleton={
+          <ListSkeleton
+            label="팀원을 불러오는 중"
+            rows={5}
+            rowClassName="h-14"
+          />
+        }
+        error={(error, retry) => (
+          <ErrorState
+            title="최신 정보를 불러오지 못했습니다"
+            description={normalizeApiError(error).message}
+            onRetry={retry}
+          />
+        )}
+        empty={<EmptyState title="활성 팀원이 없습니다" />}
+      >
+        {(list) => (
+          <table className="members-table">
+            <caption className="sr-only">
+              활성 팀원의 프로젝트 역할과 진행 중인 업무, 리뷰 담당 업무 수
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">팀원</th>
+                <th scope="col">전공</th>
+                <th scope="col">프로젝트 역할</th>
+                <th scope="col" className="members-number">
+                  진행 중
+                </th>
+                <th scope="col" className="members-number">
+                  리뷰
+                </th>
+                {connectionColumn && <th scope="col">연결</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {sortMembers(list, sort).map((member) => (
+                <MemberRow
+                  key={member.id}
+                  member={member}
+                  self={member.id === viewer.id}
+                  connectionColumn={connectionColumn}
+                />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </QueryState>
     </div>
   );
 }

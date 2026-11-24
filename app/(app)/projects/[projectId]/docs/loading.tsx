@@ -1,5 +1,5 @@
-import { Spinner } from "@/shared/ui";
+import { ProjectHeadingSkeleton } from "@/widgets/project-nav";
 
 export default function Loading() {
-  return <Spinner label="프로젝트 문서 불러오는 중" />;
+  return <ProjectHeadingSkeleton label="프로젝트 문서 불러오는 중" />;
 }

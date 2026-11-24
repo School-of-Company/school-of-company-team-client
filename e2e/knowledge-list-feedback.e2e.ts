@@ -50,15 +50,19 @@ test("an empty placeholder does not claim the new document filter has zero resul
   await expect(
     page.getByText("조건에 맞는 문서가 없습니다", { exact: true }),
   ).toBeVisible();
-  await page.getByLabel("상태", { exact: true }).selectOption("DRAFT");
+  await page.getByRole("button", { name: /^상태:/ }).click();
+  await page.getByRole("option", { name: "초안" }).click();
   try {
+    // 빈 placeholder는 문구 없는 같은 크기 박스로, 부제는 개수 대신 "집계 중"으로 둔다.
     await expect(
-      page.getByText("문서 불러오는 중", { exact: true }),
+      page.getByRole("status", { name: "불러오는 중" }),
     ).toBeVisible();
     await expect(
       page.getByText("조건에 맞는 문서가 없습니다", { exact: true }),
     ).toBeHidden();
-    await expect(page.locator("main .page-subtitle")).toBeHidden();
+    await expect(page.locator("main .page-subtitle")).toHaveText(
+      "전체 문서 집계 중",
+    );
   } finally {
     release();
   }

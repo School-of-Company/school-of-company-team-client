@@ -8,6 +8,7 @@ import {
   ExperimentStatusLabel,
   OutcomeBadge,
   experimentErrorMessage,
+  experimentKeys,
   experimentQueries,
   type Experiment,
   type ExperimentView,
@@ -16,14 +17,16 @@ import type { User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { ExperimentFormDialog } from "@/features/manage-experiment";
 import { routes } from "@/shared/config";
-import { formatDate } from "@/shared/lib";
+import { formatDate, keepPreviousKey } from "@/shared/lib";
 import {
   Button,
   EmptyState,
-  ErrorState,
   Icon,
-  Skeleton,
-  Spinner,
+  ListSkeleton,
+  PageHeader,
+  PageSkeleton,
+  QueryState,
+  SegmentedLinks,
 } from "@/shared/ui";
 
 const views: readonly { value: ExperimentView; label: string }[] = [
@@ -37,7 +40,7 @@ export function LabListPage() {
   return (
     <AuthGuard require="work">
       {(user) => (
-        <Suspense fallback={<Spinner label="실험 불러오는 중" />}>
+        <Suspense fallback={<PageSkeleton label="실험 불러오는 중" />}>
           <LabListContent user={user} />
         </Suspense>
       )}
@@ -51,67 +54,60 @@ function LabListContent({ user }: { readonly user: User }) {
   const view =
     views.find((item) => item.value === search?.get("view"))?.value ?? "ACTIVE";
   const [creating, setCreating] = useState(false);
-  const experiments = useQuery(experimentQueries.list(view));
+  const experiments = useQuery({
+    ...experimentQueries.list(view),
+    placeholderData: keepPreviousKey(experimentKeys.list(view)),
+  });
   const label = views.find((item) => item.value === view)?.label ?? "";
   return (
     <div className="grid gap-5">
-      <header className="page-header">
-        <div className="min-w-0">
-          <h1>실험실</h1>
-          <p className="page-subtitle">
-            작게 해 보고, 결과를 남기고, 효과가 있으면 프로젝트로 옮깁니다.
-          </p>
-        </div>
-        <Button onClick={() => setCreating(true)}>
-          <Icon name="plus" className="inline-block" /> 새 실험
-        </Button>
-      </header>
-      <nav aria-label="실험 보기" className="settings-nav">
-        {views.map((item) => (
-          <Link
-            key={item.value}
-            href={
+      <PageHeader
+        title="실험실"
+        subtitle="작게 해 보고, 결과를 남기고, 효과가 있으면 프로젝트로 옮깁니다."
+        actions={
+          <Button onClick={() => setCreating(true)}>
+            <Icon name="plus" className="inline-block" /> 새 실험
+          </Button>
+        }
+      />
+      <div className="page-toolbar">
+        <SegmentedLinks
+          label="실험 보기"
+          items={views.map((item) => ({
+            href:
               item.value === "ACTIVE"
                 ? routes.labs
-                : `${routes.labs}?view=${item.value}`
-            }
-            aria-current={view === item.value ? "page" : undefined}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      {experiments.isPending ? (
-        <div
-          role="status"
-          aria-label="실험을 불러오는 중"
-          className="grid gap-2"
-        >
-          {Array.from({ length: 3 }, (_, index) => (
-            <Skeleton key={index} className="h-14" />
-          ))}
-        </div>
-      ) : !experiments.data ? (
-        <ErrorState
-          description={experimentErrorMessage(experiments.error)}
-          onRetry={() => void experiments.refetch()}
+                : `${routes.labs}?view=${item.value}`,
+            label: item.label,
+            active: view === item.value,
+          }))}
         />
-      ) : experiments.data.length === 0 ? (
-        view === "ACTIVE" ? (
-          <EmptyState
-            title="진행 중인 실험이 없습니다"
-            description="해 보고 싶은 기술, 방식이 있으면 가설과 측정 기준을 적고 작게 시작해 보세요."
-          />
-        ) : (
-          <EmptyState title={`${label} 실험이 없습니다`} />
-        )
-      ) : (
-        <ul className="list" aria-label="실험 목록">
-          {experiments.data.map((experiment) => (
-            <ExperimentRow key={experiment.id} experiment={experiment} />
-          ))}
-        </ul>
-      )}
+      </div>
+      <QueryState
+        query={experiments}
+        skeleton={
+          <ListSkeleton label="실험을 불러오는 중" rowClassName="h-13" />
+        }
+        errorMessage={experimentErrorMessage}
+        empty={
+          view === "ACTIVE" ? (
+            <EmptyState
+              title="진행 중인 실험이 없습니다"
+              description="해 보고 싶은 기술, 방식이 있으면 가설과 측정 기준을 적고 작게 시작해 보세요."
+            />
+          ) : (
+            <EmptyState title={`${label} 실험이 없습니다`} />
+          )
+        }
+      >
+        {(data) => (
+          <ul className="list" aria-label="실험 목록">
+            {data.map((experiment) => (
+              <ExperimentRow key={experiment.id} experiment={experiment} />
+            ))}
+          </ul>
+        )}
+      </QueryState>
       <ExperimentFormDialog
         open={creating}
         currentUserId={user.id}

@@ -18,14 +18,26 @@ import {
 } from "../model/search";
 import { SearchItemLine, useDebounced } from "./SearchPalette";
 import { normalizeApiError } from "@/shared/api";
-import { EmptyState, ErrorState, Skeleton, Spinner } from "@/shared/ui";
+import {
+  EmptyState,
+  ErrorState,
+  ListSkeleton,
+  PageHeader,
+  PageSkeleton,
+  SegmentedLinks,
+} from "@/shared/ui";
 
 /** 팔레트의 "전체 결과 보기" 목적지. type 별 최대 20건. 상태는 URL(`?q=`, `?type=`)에 둔다. */
 export function SearchPage() {
   return (
-    <AuthGuard require="work">
+    <AuthGuard
+      require="work"
+      fallback={<PageSkeleton label="계정 상태 확인 중" subtitle={false} />}
+    >
       {() => (
-        <Suspense fallback={<Spinner label="검색 준비 중" />}>
+        <Suspense
+          fallback={<PageSkeleton label="검색 준비 중" subtitle={false} />}
+        >
           <SearchContent />
         </Suspense>
       )}
@@ -70,60 +82,51 @@ function SearchContent() {
   const types = availableTypes(search.data);
   return (
     <div className="search-page grid gap-5">
-      <header className="grid gap-4">
-        <h1 className="text-xl font-semibold">검색</h1>
-        <form
-          role="search"
-          onSubmit={(event) => {
-            event.preventDefault();
-            router.replace(href({ q: input.trim() }), { scroll: false });
-          }}
-        >
-          <input
-            type="search"
-            aria-label="검색어"
-            className="ui-input search-input"
-            placeholder="업무 키, 제목, 문서, 장애, 서비스, 스프린트"
-            maxLength={SEARCH_MAX_LENGTH}
-            autoComplete="off"
-            spellCheck={false}
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-          />
-        </form>
-        {q && search.data && (
-          <nav aria-label="결과 유형" className="settings-nav">
-            <Link
-              href={href({ type: null })}
-              aria-current={!type ? "page" : undefined}
-              scroll={false}
-            >
-              전체
-            </Link>
-            {types.map((value) => (
-              <Link
-                key={value}
-                href={href({ type: value })}
-                aria-current={type === value ? "page" : undefined}
-                scroll={false}
-              >
-                {searchTypeLabels[value]}
-              </Link>
-            ))}
-          </nav>
-        )}
-      </header>
+      <PageHeader title="검색" subtitle={false} />
+      <form
+        role="search"
+        onSubmit={(event) => {
+          event.preventDefault();
+          router.replace(href({ q: input.trim() }), { scroll: false });
+        }}
+      >
+        <input
+          type="search"
+          aria-label="검색어"
+          className="ui-input search-input"
+          placeholder="업무 키, 제목, 문서, 장애, 서비스, 스프린트"
+          maxLength={SEARCH_MAX_LENGTH}
+          autoComplete="off"
+          spellCheck={false}
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+        />
+      </form>
+      {/* 결과 유형 줄은 검색어가 있으면 결과 전에도 높이를 잡아 둔다. */}
+      {q && (
+        <div className="page-toolbar">
+          {search.data && (
+            <SegmentedLinks
+              label="결과 유형"
+              items={[
+                { href: href({ type: null }), label: "전체", active: !type },
+                ...types.map((value) => ({
+                  href: href({ type: value }),
+                  label: searchTypeLabels[value],
+                  active: type === value,
+                })),
+              ]}
+            />
+          )}
+        </div>
+      )}
       {!q ? (
         <EmptyState
           title="검색어를 입력하세요"
           description="업무 키(HUB-142)나 제목, 문서, 장애 제목, 서비스 이름, 스프린트 이름으로 찾습니다. 어디서든 ⌘K 또는 Ctrl+K로 열 수 있습니다."
         />
       ) : search.isPending ? (
-        <div role="status" aria-label="검색하는 중" className="grid gap-2">
-          <Skeleton className="h-10" />
-          <Skeleton className="h-10" />
-          <Skeleton className="h-10" />
-        </div>
+        <ListSkeleton label="검색하는 중" rowClassName="h-10" />
       ) : search.isError && !search.data ? (
         <ErrorState
           title="검색하지 못했습니다"
