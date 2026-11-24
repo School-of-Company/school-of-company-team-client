@@ -36,6 +36,27 @@ export function SprintReviewPanel({
   readonly sprint: Sprint;
   readonly manages: boolean;
 }) {
+  return (
+    <section className="grid gap-4" aria-label="스프린트 리뷰">
+      <p className="planning-note">
+        스프린트가 끝나면 완료한 업무, merge된 PR, 이월한 업무와 막힌 업무를
+        모아 리뷰 초안을 만들 수 있어요. PM 또는 헤드 어드민이 초안을 불러와
+        다듬고 게시하면 프로젝트를 볼 수 있는 모두가 읽을 수 있어요.
+      </p>
+      <ReviewContent project={project} sprint={sprint} manages={manages} />
+    </section>
+  );
+}
+
+function ReviewContent({
+  project,
+  sprint,
+  manages,
+}: {
+  readonly project: ProjectDetail;
+  readonly sprint: Sprint;
+  readonly manages: boolean;
+}) {
   const review = useQuery({
     ...sprintQueries.review(project.id, sprint.id),
     enabled: sprint.status !== "PLANNED",
@@ -43,8 +64,8 @@ export function SprintReviewPanel({
   if (sprint.status === "PLANNED")
     return (
       <EmptyState
-        title="스프린트를 시작하면 리뷰를 씁니다"
-        description="완료, 이월, 막힘 업무로 초안을 만들어 PM이 고쳐 게시합니다."
+        title="예정 스프린트는 아직 리뷰할 수 없습니다"
+        description="스프린트를 시작한 뒤 초안을 불러올 수 있습니다. 종료 후 결과를 정리해 게시하세요."
       />
     );
   if (review.isPending)

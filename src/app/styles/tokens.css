@@ -68,6 +68,7 @@
   --brand-soft: var(--pink-3);
   --on-brand: #ffffff;
   --danger: #e42939;
+  --danger-foreground: #c91c2f;
   --success: var(--hue-green);
   --overlay: rgb(0 23 51 / 0.35);
   --identity-glow: color-mix(
@@ -122,6 +123,9 @@
   --content-narrow: 44rem;
   --content-reading: 64rem;
   --detail-sidebar-width: 17.5rem;
+  --plan-list-height: 24rem;
+  --plan-row-height: 4.5rem;
+  --plan-action-width: 3.5rem;
   --content-prose: 68ch;
   --toast-width: 24rem;
   --sidebar-edge-width: 24px;
@@ -204,6 +208,7 @@
   --border-strong: var(--gray-5);
   --on-brand: #17171c;
   --danger: var(--hue-red);
+  --danger-foreground: var(--hue-red);
   --overlay: rgb(0 0 0 / 0.6);
   --identity-glow: color-mix(
     in oklab,

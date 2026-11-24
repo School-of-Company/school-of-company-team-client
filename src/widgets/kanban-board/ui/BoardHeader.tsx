@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { boardTotal, type Board, type TaskScope } from "@/entities/task";
-import type { ProjectDetail } from "@/entities/project";
+import { ProjectAvatar, type ProjectDetail } from "@/entities/project";
 import { routes } from "@/shared/config";
 import { Button, Icon, SegmentedLinks } from "@/shared/ui";
 
@@ -32,10 +32,13 @@ export function BoardHeader({
               <span>{project.key}</span>
             </p>
           )}
-          <h1 className="break-words">
-            {project?.name ??
-              (scope === "PERSONAL" ? "내 업무" : "팀 공용 보드")}
-          </h1>
+          <div className="flex items-center gap-3">
+            {project && <ProjectAvatar project={project} />}
+            <h1 className="min-w-0 break-words">
+              {project?.name ??
+                (scope === "PERSONAL" ? "내 업무" : "팀 공용 보드")}
+            </h1>
+          </div>
           {board && (
             <p className="page-subtitle tabular-nums">
               업무 {boardTotal(board)}개

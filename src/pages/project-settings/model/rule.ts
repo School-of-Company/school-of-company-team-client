@@ -95,7 +95,7 @@ export const eventLabels: Readonly<Record<RuleEvent, string>> = {
   CI_FAILED: "연결된 PR의 CI가 실패할 때",
   REVIEW_REQUESTED: "연결된 PR에 리뷰가 요청될 때",
   DEADLINE_APPROACHING: "마감 하루 전",
-  INCIDENT_CREATED: "사고가 생길 때",
+  INCIDENT_CREATED: "장애가 생길 때",
 };
 /** 업무 이벤트 다음에 사고 이벤트. 사고 이벤트는 업무 필드가 없어 조건을 두지 않는다. */
 export const selectableEvents: readonly RuleEvent[] = [
@@ -160,7 +160,7 @@ const resultMessages: Readonly<Record<string, string>> = {
  */
 /** 사고 실행에는 대상 업무·업무 스레드가 없어 같은 code 라도 뜻이 다르다. */
 const incidentResultMessages: Readonly<Record<string, string>> = {
-  TASK_NOT_ELIGIBLE: "사고가 삭제되었습니다.",
+  TASK_NOT_ELIGIBLE: "장애가 삭제되었습니다.",
   DISCORD_CHANNEL_MISSING: "Discord 프로젝트 채널이 연결되지 않았습니다.",
 };
 export function resultMessage(
@@ -186,7 +186,7 @@ const errorMessages: Readonly<Record<string, string>> = {
   DUPLICATE_RULE_NAME: "같은 이름의 규칙이 있습니다. 다른 이름을 입력하세요.",
   RULE_EVENT_STATUS_NOT_APPLICABLE: "상태는 '상태가 바뀔 때'에서만 고릅니다.",
   RULE_CONDITION_INVALID: "조건 값이 올바르지 않습니다.",
-  RULE_CONDITION_NOT_APPLICABLE: "사고 이벤트에는 조건을 둘 수 없습니다.",
+  RULE_CONDITION_NOT_APPLICABLE: "장애 이벤트에는 조건을 둘 수 없습니다.",
   RULE_ACTION_NOT_APPLICABLE: "이 동작에 맞지 않는 대상이나 멘션이 있습니다.",
   RULE_ACTION_TARGET_REQUIRED:
     "옮길 버킷이나 지정할 리뷰어가 없습니다. 편집에서 대상을 고르세요.",

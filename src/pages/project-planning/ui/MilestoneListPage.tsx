@@ -240,8 +240,15 @@ function MilestonePanel({
           <p className="text-sm text-muted">설명이 없습니다.</p>
         )}
         <p className="text-xs text-muted">
-          진행률은 내가 볼 수 있는 업무만 셉니다.
+          진행률은 이 마일스톤에 배정된 업무 중 완료된 업무의 비율입니다. 내가
+          볼 수 있는 업무만 셉니다.
         </p>
+        {milestone.progress.total === 0 && (
+          <EmptyState
+            title="아직 연결된 업무가 없습니다"
+            description="업무 등록이나 상세 화면에서 이 마일스톤을 지정하면 진행률에 반영됩니다."
+          />
+        )}
         {error && (
           <p role="alert" className="text-sm text-danger">
             {error}

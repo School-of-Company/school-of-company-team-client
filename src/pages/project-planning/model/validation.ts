@@ -1,4 +1,5 @@
-import type { SprintInput } from "@/entities/sprint";
+import { sprintErrorMessage, type SprintInput } from "@/entities/sprint";
+import type { ApiError } from "@/shared/api";
 import type { MilestoneInput } from "@/entities/milestone";
 
 /** 서버와 같은 기준(계약 DTO)으로 먼저 막는다. 키는 입력 이름. */
@@ -12,6 +13,28 @@ export function validateSprint(input: SprintInput) {
   else if (input.startDate && input.endDate < input.startDate)
     errors.endDate = "종료일은 시작일과 같거나 뒤여야 합니다.";
   return errors;
+}
+
+export function sprintFormErrors(
+  error: ApiError,
+): Readonly<Record<string, string>> {
+  if (
+    error.code === "VALIDATION_ERROR" &&
+    typeof error.details === "object" &&
+    error.details !== null
+  ) {
+    const fields = Object.fromEntries(
+      Object.entries(error.details).filter(
+        ([key, value]) =>
+          ["name", "goal", "startDate", "endDate"].includes(key) &&
+          typeof value === "string",
+      ),
+    );
+    if (Object.keys(fields).length) return fields;
+  }
+  if (error.code === "DUPLICATE_SPRINT_NAME")
+    return { name: sprintErrorMessage(error) };
+  return { form: sprintErrorMessage(error) };
 }
 
 export function validateMilestone(input: MilestoneInput) {

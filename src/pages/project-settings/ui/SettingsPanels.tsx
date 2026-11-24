@@ -1,9 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useProjectArchive } from "../api/archive";
 import {
   DiscordChannelForm,
   RepositorySettings,
@@ -12,13 +10,12 @@ import { getSettingsPermissions } from "@/features/project-settings";
 import { NotificationSettingsForm } from "@/features/notification-settings";
 import { IntakeFormSettings } from "@/features/manage-intake-forms";
 import { AutomationSettings } from "./AutomationSettings";
-import { Button } from "@/shared/ui";
 import type { SettingsProps } from "../model/props";
 import { GeneralSettings } from "./GeneralSettings";
 import { MemberSettings } from "./MemberSettings";
 import { PartSettings } from "./PartSettings";
 import { BucketSettings } from "./BucketSettings";
-import { MutationFeedback } from "./MutationFeedback";
+import { ArchiveProjectSection } from "./ArchiveProjectSection";
 
 export function SettingsPanels(props: SettingsProps) {
   const pathname = usePathname();
@@ -35,11 +32,7 @@ export function SettingsPanels(props: SettingsProps) {
     ((selected === "automation" || selected === "intake") && manager)
       ? selected
       : "general";
-  const [confirmArchive, setConfirmArchive] = useState(false);
-  // 인라인 확인의 '취소'는 누르면 사라진다. 포커스를 확인을 연 버튼(같은 버튼)으로 돌린다.
-  const archiveButton = useRef<HTMLButtonElement>(null);
   const permissions = getSettingsPermissions(props.user, props.project);
-  const archive = useProjectArchive(props.project.id, props.onSaved);
   return (
     <div className="grid gap-10">
       <nav aria-label="설정 영역" className="settings-nav">
@@ -187,63 +180,10 @@ export function SettingsPanels(props: SettingsProps) {
         </section>
       )}
       {tab === "general" && permissions.archive && (
-        <section
-          className="grid gap-4 border-t border-border pt-6"
-          aria-labelledby="archive-heading"
-        >
-          <h2 id="archive-heading" className="text-xl font-semibold">
-            위험 영역
-          </h2>
-          <p className="text-sm text-muted">
-            아카이브하면 조회만 가능하며 보드와 내 업무에서 빠집니다. 기록은
-            보존됩니다.
-          </p>
-          {confirmArchive && (
-            <p role="alert" className="text-sm">
-              프로젝트를 아카이브할까요? 기록은 보존되며 나중에 복원할 수
-              있습니다.
-            </p>
-          )}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              ref={archiveButton}
-              variant={
-                confirmArchive && !props.project.archived
-                  ? "danger"
-                  : "secondary"
-              }
-              loading={archive.isPending}
-              onClick={() => {
-                if (!props.project.archived && !confirmArchive) {
-                  setConfirmArchive(true);
-                  return;
-                }
-                archive.mutate(props.project.archived ? "restore" : "archive", {
-                  onSuccess: () => setConfirmArchive(false),
-                });
-              }}
-            >
-              {props.project.archived
-                ? "프로젝트 복원"
-                : confirmArchive
-                  ? "아카이브"
-                  : "프로젝트 아카이브"}
-            </Button>
-            {confirmArchive && (
-              <Button
-                variant="ghost"
-                disabled={archive.isPending}
-                onClick={() => {
-                  setConfirmArchive(false);
-                  archiveButton.current?.focus();
-                }}
-              >
-                취소
-              </Button>
-            )}
-          </div>
-          <MutationFeedback error={archive.error} success={archive.isSuccess} />
-        </section>
+        <ArchiveProjectSection
+          project={props.project}
+          onSaved={props.onSaved}
+        />
       )}
     </div>
   );
