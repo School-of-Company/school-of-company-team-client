@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { Project } from "@/entities/project";
+import {
+  kindLabels,
+  workflowLabels,
+  type Project,
+  type ProjectKind,
+  type ProjectWorkflow,
+} from "@/entities/project";
 import { suggestProjectKey } from "../model/project-key";
 import { ProjectSetup } from "./ProjectSetup";
 import { useCreateProject } from "../api/projects";
@@ -43,6 +49,8 @@ export function CreateProjectForm({
             name,
             description: String(data.get("description") ?? ""),
             visibility: data.get("visibility") === "TEAM" ? "TEAM" : "MEMBERS",
+            kind: data.get("kind") as ProjectKind,
+            workflow: data.get("workflow") as ProjectWorkflow,
           },
           { onSuccess: setCreated },
         );
@@ -102,6 +110,33 @@ export function CreateProjectForm({
           >
             <option value="MEMBERS">참여자만 공개</option>
             <option value="TEAM">팀 전체 공개</option>
+          </Select>
+        </Field>
+        <Field id="create-project-kind" label="유형">
+          <Select id="create-project-kind" name="kind" defaultValue="INTERNAL">
+            {Object.entries(kindLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field
+          id="create-project-workflow"
+          label="진행 방식"
+          hint="새 개발은 Sprint, 운영 중인 프로젝트는 Kanban. 단계는 검토로 시작합니다."
+        >
+          <Select
+            id="create-project-workflow"
+            name="workflow"
+            defaultValue="SPRINT"
+            aria-describedby="create-project-workflow-hint"
+          >
+            {Object.entries(workflowLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
           </Select>
         </Field>
         <Button

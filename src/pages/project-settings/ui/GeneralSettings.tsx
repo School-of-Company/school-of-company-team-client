@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import {
+  kindLabels,
+  stageLabels,
+  workflowLabels,
+  type ProjectKind,
+  type ProjectStage,
+  type ProjectWorkflow,
+} from "@/entities/project";
+import {
   getSettingsPermissions,
   useUpdateProject,
   validateProjectForm,
@@ -39,6 +47,18 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
               {project.visibility === "TEAM" ? "팀 전체 공개" : "참여자만 공개"}
             </dd>
           </div>
+          <div>
+            <dt className="text-muted">단계</dt>
+            <dd className="mt-1">{stageLabels[project.stage]}</dd>
+          </div>
+          <div>
+            <dt className="text-muted">유형</dt>
+            <dd className="mt-1">{kindLabels[project.kind]}</dd>
+          </div>
+          <div>
+            <dt className="text-muted">진행 방식</dt>
+            <dd className="mt-1">{workflowLabels[project.workflow]}</dd>
+          </div>
         </dl>
         {permissions.manage && (
           <Button
@@ -73,6 +93,9 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
               name,
               description: String(data.get("description") ?? ""),
               visibility,
+              stage: data.get("stage") as ProjectStage,
+              kind: data.get("kind") as ProjectKind,
+              workflow: data.get("workflow") as ProjectWorkflow,
             },
             { onSuccess: () => setEditing(false) },
           );
@@ -111,6 +134,42 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
           >
             <option value="MEMBERS">참여자만 공개</option>
             <option value="TEAM">팀 전체 공개</option>
+          </Select>
+        </Field>
+        <Field id="project-stage" label="단계">
+          <Select id="project-stage" name="stage" defaultValue={project.stage}>
+            {Object.entries(stageLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field id="project-kind" label="유형">
+          <Select id="project-kind" name="kind" defaultValue={project.kind}>
+            {Object.entries(kindLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field
+          id="project-workflow"
+          label="진행 방식"
+          hint="Kanban 프로젝트는 프로젝트 메뉴에 스프린트 탭을 두지 않습니다."
+        >
+          <Select
+            id="project-workflow"
+            name="workflow"
+            defaultValue={project.workflow}
+            aria-describedby="project-workflow-hint"
+          >
+            {Object.entries(workflowLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
           </Select>
         </Field>
         {permissions.manage && (

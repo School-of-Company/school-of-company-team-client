@@ -1,7 +1,12 @@
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
 import { queryOptions } from "@tanstack/react-query";
-import type { PlanningBucket, Project, ProjectDetail } from "../model/types";
+import type {
+  PlanningBucket,
+  Project,
+  ProjectDetail,
+  ProjectStage,
+} from "../model/types";
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -9,10 +14,10 @@ export const projectKeys = {
   buckets: (id: string) => ["projects", id, "planning-buckets"] as const,
 };
 export const projectApi = {
-  list: async (includeArchived = false) =>
+  list: async (includeArchived = false, stage?: ProjectStage) =>
     (
       await api.get<readonly Project[]>("/api/v1/projects", {
-        params: { includeArchived },
+        params: { includeArchived, stage },
       })
     ).data,
   detail: async (id: string) =>
@@ -27,10 +32,10 @@ export const projectApi = {
 };
 
 export const projectQueries = {
-  list: (includeArchived = false) =>
+  list: (includeArchived = false, stage?: ProjectStage) =>
     queryOptions({
-      queryKey: [...projectKeys.all, "list", includeArchived],
-      queryFn: () => projectApi.list(includeArchived),
+      queryKey: [...projectKeys.all, "list", includeArchived, stage ?? null],
+      queryFn: () => projectApi.list(includeArchived, stage),
     }),
   detail: (id: string) =>
     queryOptions({

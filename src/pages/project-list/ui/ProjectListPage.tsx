@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { projectQueries } from "@/entities/project";
+import {
+  kindLabels,
+  projectQueries,
+  stageLabels,
+  type ProjectStage,
+} from "@/entities/project";
 import { TaskError } from "@/entities/task";
 import { AuthGuard } from "@/features/auth";
 import { isHeadAdmin } from "@/entities/user";
-import { Badge, EmptyState, Skeleton } from "@/shared/ui";
+import { Badge, EmptyState, Field, Select, Skeleton } from "@/shared/ui";
 
 export function ProjectListPage() {
   return (
@@ -17,7 +23,8 @@ export function ProjectListPage() {
 }
 
 function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
-  const projects = useQuery(projectQueries.list());
+  const [stage, setStage] = useState<ProjectStage | "">("");
+  const projects = useQuery(projectQueries.list(false, stage || undefined));
   return (
     <div className="grid gap-6">
       <header className="page-header">
@@ -31,6 +38,24 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           </Link>
         )}
       </header>
+      <div className="max-w-48">
+        <Field id="project-stage-filter" label="단계">
+          <Select
+            id="project-stage-filter"
+            value={stage}
+            onChange={(event) =>
+              setStage(event.target.value as ProjectStage | "")
+            }
+          >
+            <option value="">전체</option>
+            {Object.entries(stageLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
       {projects.isPending ? (
         <div
           role="status"
@@ -45,6 +70,11 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
         <TaskError
           error={projects.error}
           onRetry={() => void projects.refetch()}
+        />
+      ) : projects.data.length === 0 && stage ? (
+        <EmptyState
+          title={`${stageLabels[stage]} 단계 프로젝트가 없습니다`}
+          description="다른 단계를 선택해 보세요."
         />
       ) : projects.data.length === 0 ? (
         <EmptyState
@@ -70,6 +100,8 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
                 </div>
               </Link>
               <span className="list-row-meta">
+                <Badge>{stageLabels[project.stage]}</Badge>
+                <Badge>{kindLabels[project.kind]}</Badge>
                 <Badge>
                   {project.visibility === "TEAM"
                     ? "팀 전체 공개"

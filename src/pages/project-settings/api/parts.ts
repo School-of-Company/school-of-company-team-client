@@ -10,11 +10,6 @@ type PartChange =
     }
   | { readonly action: "delete"; readonly partId: string }
   | {
-      readonly action: "leader";
-      readonly partId: string;
-      readonly userId: string | null;
-    }
-  | {
       readonly action: "add" | "remove";
       readonly partId: string;
       readonly userId: string;
@@ -36,11 +31,6 @@ export function useProjectParts(
           return;
         case "delete":
           await api.delete(`${base}/${change.partId}`);
-          return;
-        case "leader":
-          await api.put(`${base}/${change.partId}/leader`, {
-            userId: change.userId,
-          });
           return;
         case "add":
           await api.post(`${base}/${change.partId}/members`, {

@@ -1,6 +1,8 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, type ReactNode } from "react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthGuard } from "@/features/auth";
 import { normalizeApiError } from "@/shared/api";
@@ -18,43 +20,84 @@ import {
   teamGuideApi,
   teamGuideKeys,
   teamGuideQueries,
+  type GuideSection,
   type TeamGuide,
 } from "../api/team-guide";
+import { guideTabs, readGuideTab, type GuideTab } from "../model/tabs";
 
-/** 팀 문화: 팀이 일하는 방식. 누구나 읽고 헤드 어드민이 고친다. 고칠 때마다 버전이 남는다. */
+/** 팀 문화: 팀이 일하는 방식. 탭(섹션)마다 문서 하나, 누구나 읽고 헤드 어드민이 고친다. 고칠 때마다 섹션별 버전이 남는다. */
 export function TeamGuidePage() {
   return (
     <AuthGuard require="work">
       {() => (
         <Suspense fallback={<Spinner label="팀 문화 불러오는 중" />}>
-          <TeamGuideContent />
+          <TeamGuideTabs />
         </Suspense>
       )}
     </AuthGuard>
   );
 }
 
-function TeamGuideContent() {
-  const guide = useQuery(teamGuideQueries.current());
+function TeamGuideTabs() {
+  const pathname = usePathname();
+  const search = useSearchParams();
+  const current = readGuideTab(search?.get("tab"));
+  // key 로 탭마다 편집·이력 상태를 새로 시작한다.
+  return (
+    <TeamGuideContent
+      key={current.section}
+      current={current}
+      nav={
+        <nav aria-label="팀 문화 영역" className="settings-nav">
+          {guideTabs.map((item) => (
+            <Link
+              key={item.tab}
+              href={`${pathname}?tab=${item.tab}`}
+              scroll={false}
+              aria-current={item.tab === current.tab ? "page" : undefined}
+              className="ui-nav-link"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      }
+    />
+  );
+}
+
+function TeamGuideContent({
+  current,
+  nav,
+}: {
+  readonly current: GuideTab;
+  readonly nav: ReactNode;
+}) {
+  const section = current.section;
+  const guide = useQuery(teamGuideQueries.current(section));
   const [editing, setEditing] = useState(false);
   const [history, setHistory] = useState(false);
   if (guide.isPending)
     return (
       <div
         role="status"
-        aria-label="팀 문화를 불러오는 중"
+        aria-label={`${current.label} 불러오는 중`}
         className="grid gap-3"
       >
+        {nav}
         <Skeleton className="h-8 w-40" />
         <Skeleton className="h-96" />
       </div>
     );
   if (!guide.data)
     return (
-      <ErrorState
-        description={normalizeApiError(guide.error).message}
-        onRetry={() => void guide.refetch()}
-      />
+      <div className="grid gap-3">
+        {nav}
+        <ErrorState
+          description={normalizeApiError(guide.error).message}
+          onRetry={() => void guide.refetch()}
+        />
+      </div>
     );
   const data = guide.data;
   return (
@@ -82,22 +125,37 @@ function TeamGuideContent() {
           </Button>
         )}
       </header>
+      {nav}
       {editing ? (
-        <GuideEditor guide={data} onDone={() => setEditing(false)} />
+        <GuideEditor
+          section={section}
+          label={current.label}
+          guide={data}
+          onDone={() => setEditing(false)}
+        />
       ) : (
         <article className="guide-body">
           <Markdown>{data.content}</Markdown>
         </article>
       )}
-      <HistoryDialog open={history} onClose={() => setHistory(false)} />
+      <HistoryDialog
+        section={section}
+        label={current.label}
+        open={history}
+        onClose={() => setHistory(false)}
+      />
     </div>
   );
 }
 
 function GuideEditor({
+  section,
+  label,
   guide,
   onDone,
 }: {
+  readonly section: GuideSection;
+  readonly label: string;
   readonly guide: TeamGuide;
   readonly onDone: () => void;
 }) {
@@ -106,10 +164,15 @@ function GuideEditor({
   const [preview, setPreview] = useState(false);
   const save = useMutation({
     mutationFn: () =>
-      teamGuideApi.save({ content: draft, baseVersion: guide.version }),
+      teamGuideApi.save(section, {
+        content: draft,
+        baseVersion: guide.version,
+      }),
     onSuccess: async (saved) => {
-      client.setQueryData(teamGuideKeys.current, saved);
-      await client.invalidateQueries({ queryKey: teamGuideKeys.revisions });
+      client.setQueryData(teamGuideKeys.current(section), saved);
+      await client.invalidateQueries({
+        queryKey: teamGuideKeys.revisions(section),
+      });
       onDone();
     },
   });
@@ -145,7 +208,7 @@ function GuideEditor({
         </article>
       ) : (
         <Textarea
-          aria-label="팀 문화 내용"
+          aria-label={`${label} 내용`}
           value={draft}
           maxLength={50000}
           className="guide-textarea"
@@ -164,7 +227,9 @@ function GuideEditor({
               variant="secondary"
               className="ui-button-sm"
               onClick={async () => {
-                await client.invalidateQueries({ queryKey: teamGuideKeys.all });
+                await client.invalidateQueries({
+                  queryKey: teamGuideKeys.section(section),
+                });
                 onDone();
               }}
             >
@@ -190,9 +255,13 @@ function GuideEditor({
 }
 
 function HistoryDialog({
+  section,
+  label,
   open,
   onClose,
 }: {
+  readonly section: GuideSection;
+  readonly label: string;
   readonly open: boolean;
   readonly onClose: () => void;
 }) {
@@ -204,25 +273,31 @@ function HistoryDialog({
         setVersion(null);
         onClose();
       }}
-      title={version ? `버전 ${version}` : "수정 이력"}
+      title={version ? `${label} 버전 ${version}` : `${label} 수정 이력`}
       className="incident-dialog"
     >
       {open &&
         (version ? (
-          <RevisionView version={version} onBack={() => setVersion(null)} />
+          <RevisionView
+            section={section}
+            version={version}
+            onBack={() => setVersion(null)}
+          />
         ) : (
-          <RevisionList onOpen={setVersion} />
+          <RevisionList section={section} onOpen={setVersion} />
         ))}
     </Dialog>
   );
 }
 
 function RevisionList({
+  section,
   onOpen,
 }: {
+  readonly section: GuideSection;
   readonly onOpen: (version: number) => void;
 }) {
-  const revisions = useQuery(teamGuideQueries.revisions());
+  const revisions = useQuery(teamGuideQueries.revisions(section));
   if (revisions.isPending) return <Spinner label="이력 불러오는 중" />;
   if (!revisions.data)
     return (
@@ -255,13 +330,15 @@ function RevisionList({
 }
 
 function RevisionView({
+  section,
   version,
   onBack,
 }: {
+  readonly section: GuideSection;
   readonly version: number;
   readonly onBack: () => void;
 }) {
-  const revision = useQuery(teamGuideQueries.revision(version));
+  const revision = useQuery(teamGuideQueries.revision(section, version));
   return (
     <div className="grid gap-4">
       <button

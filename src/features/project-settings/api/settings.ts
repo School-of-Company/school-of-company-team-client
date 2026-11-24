@@ -1,10 +1,19 @@
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/shared/api";
+import type {
+  ProjectKind,
+  ProjectStage,
+  ProjectWorkflow,
+} from "@/entities/project";
 
 export type UpdateProjectRequest = {
   readonly name: string;
   readonly description: string;
   readonly visibility: "TEAM" | "MEMBERS";
+  // 생략하면 서버가 그대로 둔다. PM·헤드 어드민(프로젝트 ADMIN)만 바꿀 수 있다.
+  readonly stage?: ProjectStage;
+  readonly kind?: ProjectKind;
+  readonly workflow?: ProjectWorkflow;
 };
 
 export function useUpdateProject(

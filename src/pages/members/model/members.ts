@@ -16,13 +16,11 @@ export function sortMembers(members: readonly Member[], sort: MemberSort) {
     .map(({ member }) => member);
 }
 
-/** 프로젝트별 역할 한 줄: "PM", "서버 리더", "서버·웹", 파트가 없으면 "참여". */
+/** 프로젝트별 역할 한 줄: "PM, 서버", "서버, 웹", 파트가 없으면 "참여". */
 export function projectRole(project: Member["projects"][number]) {
   const roles = [
     ...(project.pm ? ["PM"] : []),
-    ...project.parts.map((part) =>
-      part.leader ? `${part.name} 리더` : part.name,
-    ),
+    ...project.parts.map((part) => part.name),
   ];
   return roles.length ? roles.join(", ") : "참여";
 }

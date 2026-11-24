@@ -1,0 +1,41 @@
+name: 외주 요청
+description: 외주 고객의 요청·요구사항 접수
+title: "[외주] "
+labels: ["🤝 외주"]
+body:
+  - type: input
+    id: requester
+    attributes:
+      label: 고객 / 요청자
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: 요청 내용
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 합의 범위 여부
+      description: 계약·합의된 범위 안의 요청인지 PM이 확인합니다.
+      options:
+        - 합의 범위 안
+        - 합의 범위 밖 (PM 협의 필요)
+        - 확인 필요
+    validations:
+      required: true
+  - type: input
+    id: schedule
+    attributes:
+      label: 희망 일정
+      placeholder: 예) 2026-12-15까지
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 조건
+      value: |
+        - [ ]
+    validations:
+      required: true

@@ -1,3 +1,15 @@
 export { projectApi, projectKeys, projectQueries } from "./api/projects";
-export { projectAccess } from "./model/types";
-export type { PlanningBucket, Project, ProjectDetail } from "./model/types";
+export {
+  kindLabels,
+  projectAccess,
+  stageLabels,
+  workflowLabels,
+} from "./model/types";
+export type {
+  PlanningBucket,
+  Project,
+  ProjectDetail,
+  ProjectKind,
+  ProjectStage,
+  ProjectWorkflow,
+} from "./model/types";
