@@ -129,8 +129,9 @@
   --content-narrow: 44rem;
   --content-reading: 64rem;
   --sidebar-shortcuts-height: 30dvh;
-  /* 레이아웃 안정성: 빈 상태와 첫 로딩 자리는 어디서나 이 높이를 먼저 잡는다. */
-  --empty-height: 12rem;
+  /* 레이아웃 안정성: 빈 상태 박스는 어디서나 이 높이로 고정하고, 첫 로딩 자리도 이 높이부터 잡는다.
+     가장 긴 실제 경우(390폭, 제목 한 줄 + 설명 4줄 + 버튼)가 들어가는 높이다. */
+  --empty-height: 14rem;
   --segment-height: 36px; /* 세그먼트 바 전체 높이(3px 안쪽 여백 + 30px 칸) */
   --toolbar-gap: var(--space-3); /* 머리글 아래 보기 전환과 필터 줄의 간격 */
   --admin-user-table-min: 32rem;

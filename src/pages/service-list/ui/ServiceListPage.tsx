@@ -9,7 +9,6 @@ import {
   OwnerList,
   serviceErrorMessage,
   serviceQueries,
-  StaleNotice,
   TierLabel,
   type DependencyGraph as Graph,
   type ServiceSummary,
@@ -141,12 +140,7 @@ function ServiceListContent({ canCreate }: { readonly canCreate: boolean }) {
             )
           }
         >
-          {(data) => (
-            <>
-              <StaleNotice query={services} />
-              <ServiceTable services={data} />
-            </>
-          )}
+          {(data) => <ServiceTable services={data} />}
         </QueryState>
       )}
       {canCreate && (
@@ -227,7 +221,6 @@ function GraphView() {
     >
       {(data) => (
         <>
-          <StaleNotice query={graph} />
           <DependencyGraph graph={data} />
           <EdgeTable graph={data} />
         </>

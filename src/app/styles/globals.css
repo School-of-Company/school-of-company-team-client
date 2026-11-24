@@ -2354,16 +2354,22 @@ select.ui-input {
    filters or tabs never resizes the grey box. Loading placeholders use the same height. */
 .ui-empty {
   display: grid;
-  min-height: var(--empty-height);
+  height: var(--empty-height);
+  overflow: hidden;
   align-content: center;
   justify-items: center;
   gap: var(--space-2);
-  padding: var(--space-10) var(--space-6);
+  padding: var(--space-6);
   border-radius: var(--radius-xl);
   background: var(--surface-box);
   text-align: center;
 }
 .ui-empty h2 {
+  /* 문구 길이 규칙(design.md): 제목 한 줄, 설명은 390폭에서 4줄까지. 넘치면 말줄임으로 자르고 박스는 커지지 않는다. */
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   color: var(--foreground);
   font-size: var(--text-lg);
   font-weight: 700;
@@ -2372,6 +2378,10 @@ select.ui-input {
   margin-top: var(--space-2);
 }
 .ui-empty p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
   max-width: 28rem;
   color: var(--muted);
   font-size: var(--text-sm);
@@ -2400,13 +2410,15 @@ select.ui-input {
     opacity: 0.5;
   }
 }
-/* 필터나 탭을 바꿔 이전 결과를 잠시 보여 주는 동안: 흐리게만 하고 자리는 그대로 둔다. */
+/* QueryState 래퍼는 배치에 끼어들지 않는다(display: contents). 호출한 쪽의 grid/flex 간격을 그대로 쓴다.
+   필터나 탭을 바꿔 이전 결과를 잠시 보여 주는 동안에는 자식만 흐리게 하고 자리는 그대로 둔다. */
 .query-region {
-  display: grid;
-  gap: inherit;
+  display: contents;
+}
+.query-region > * {
   transition: opacity 120ms;
 }
-.query-region[data-placeholder] {
+.query-region[data-placeholder] > * {
   opacity: 0.6;
 }
 /* Form buttons keep their own width instead of stretching across the column. */
@@ -2884,6 +2896,7 @@ select.ui-input {
 .release-dialog {
   width: min(44rem, calc(100% - 2rem));
 }
+.ui-notice,
 .service-notice {
   padding: var(--space-3);
   border-radius: var(--radius-md);

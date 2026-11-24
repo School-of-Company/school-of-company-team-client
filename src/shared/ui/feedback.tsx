@@ -3,6 +3,7 @@
 import { useState, type ComponentProps, type ReactNode } from "react";
 import Image from "next/image";
 import { Button } from "./controls";
+import { StaleNotice } from "./stale-notice";
 
 export function Badge({
   children,
@@ -105,6 +106,7 @@ export function ListSkeleton({
 type QueryLike<T> = {
   readonly data: T | undefined;
   readonly error: unknown;
+  readonly isError: boolean;
   readonly isPending: boolean;
   readonly isFetching: boolean;
   readonly isPlaceholderData: boolean;
@@ -116,7 +118,8 @@ type QueryLike<T> = {
  * - 캐시가 있으면 스켈레톤 없이 바로 그린다. 첫 로딩만 `skeleton`.
  * - 필터나 탭을 바꿔 이전 결과(placeholder)를 보여 주는 동안에는 흐리게만 하고, 빈 결과면 문구 없는 같은 크기 박스를 둔다.
  *   placeholder로 빈 상태 문구나 개수를 보여 주지 않는다.
- * - 재조회 중에는 `aria-busy`.
+ * - 재조회 중에는 `aria-busy`. 감싸는 요소는 `display: contents`라 호출한 쪽의 grid/flex 배치를 그대로 쓴다.
+ * - 캐시가 있는데 재조회가 실패하면 캐시를 그대로 두고 위에 `StaleNotice`(다시 시도)를 띄운다. 첫 로딩 실패만 오류 화면.
  */
 export function QueryState<T>({
   query,
@@ -147,19 +150,16 @@ export function QueryState<T>({
         onRetry={() => void query.refetch()}
       />
     );
-  if (isEmpty(query.data))
-    return query.isPlaceholderData ? (
-      <div role="status" aria-label="불러오는 중" className="ui-empty" />
-    ) : (
-      empty
-    );
+  if (isEmpty(query.data) && query.isPlaceholderData)
+    return <div role="status" aria-label="불러오는 중" className="ui-empty" />;
   return (
     <div
       className="query-region"
       aria-busy={query.isFetching || undefined}
       data-placeholder={query.isPlaceholderData || undefined}
     >
-      {children(query.data)}
+      <StaleNotice query={query} />
+      {isEmpty(query.data) ? empty : children(query.data)}
     </div>
   );
 }
