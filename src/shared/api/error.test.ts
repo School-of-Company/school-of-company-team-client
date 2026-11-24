@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import { strict as assert } from "node:assert";
 import { AxiosError, AxiosHeaders } from "axios";
-import { ApiError, normalizeApiError } from "./error";
+import { ApiError, fieldErrors, normalizeApiError } from "./error";
 import { api, setAccessRefresher, subscribeApiErrors } from "./instance";
 
 test("normalization preserves server authorization codes and is idempotent", () => {
@@ -77,4 +77,32 @@ test("an expired access token is refreshed once and the request replayed", async
     api.defaults.adapter = adapter;
     setAccessRefresher(async () => false);
   }
+});
+
+test("fieldErrors maps validation details to known fields only", () => {
+  const error = new ApiError(400, "VALIDATION_ERROR", "bad", {
+    dueDate: "마감일 형식이 잘못되었습니다.",
+    other: "무시",
+    name: 3,
+  });
+  // 폼에 없는 other 와 문자열이 아닌 name 이 남으니 폼 전체 오류도 함께 보인다.
+  assert.deepEqual(fieldErrors(error, ["dueDate", "name"], "x"), {
+    dueDate: "마감일 형식이 잘못되었습니다.",
+    form: "x",
+  });
+  assert.deepEqual(
+    fieldErrors(
+      new ApiError(400, "VALIDATION_ERROR", "bad", { dueDate: "틀림" }),
+      ["dueDate"],
+      "x",
+    ),
+    { dueDate: "틀림" },
+  );
+  assert.deepEqual(fieldErrors(error, ["name"], "폼 오류"), {
+    form: "폼 오류",
+  });
+  assert.deepEqual(
+    fieldErrors(new ApiError(409, "CONFLICT", "c"), ["dueDate"], "충돌"),
+    { form: "충돌" },
+  );
 });

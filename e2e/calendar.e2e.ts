@@ -141,5 +141,6 @@ test("날짜를 누르면 그날 목록이 열리고 거기서 일정을 더한�
   ).toBeVisible();
   await day.getByRole("button", { name: "이 날 일정 추가" }).click();
   const create = page.getByRole("dialog", { name: "새 일정" });
-  await expect(create.getByLabel("시작일")).toHaveValue(today);
+  // 시작일은 DatePicker 라 폼에 실리는 숨은 값으로 확인한다.
+  await expect(create.locator('input[name="startDate"]')).toHaveValue(today);
 });

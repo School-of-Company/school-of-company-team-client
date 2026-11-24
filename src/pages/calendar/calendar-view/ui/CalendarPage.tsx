@@ -16,11 +16,12 @@ import { projectAccess, projectQueries } from "@/entities/project";
 import { seoulToday } from "@/entities/sprint";
 import type { User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
-import { normalizeApiError } from "@/shared/api";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
 import { formatDate } from "@/shared/lib";
 import {
   Button,
   Checkbox,
+  DatePicker,
   Dialog,
   ErrorState,
   Field,
@@ -329,6 +330,8 @@ function EventDialog({
   const queryClient = useQueryClient();
   const { item } = editing;
   const [allDay, setAllDay] = useState(!item?.startTime);
+  const [startDate, setStartDate] = useState(item?.startDate ?? editing.date);
+  const [endDate, setEndDate] = useState(item?.endDate ?? editing.date);
   const [pending, setPending] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [errors, setErrors] = useState<Readonly<Record<string, string>>>({});
@@ -343,7 +346,21 @@ function EventDialog({
       await action();
       done(message);
     } catch (cause) {
-      setErrors({ form: calendarErrorMessage(normalizeApiError(cause)) });
+      const problem = normalizeApiError(cause);
+      setErrors(
+        fieldErrors(
+          problem,
+          [
+            "title",
+            "description",
+            "startDate",
+            "endDate",
+            "startTime",
+            "endTime",
+          ],
+          calendarErrorMessage(problem),
+        ),
+      );
       setDeleting(false);
     } finally {
       setPending(false);
@@ -416,19 +433,24 @@ function EventDialog({
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id={`${id}-startDate`} label="시작일" error={errors.startDate}>
-            <Input
-              {...field("startDate")}
-              type="date"
-              defaultValue={item?.startDate ?? editing.date}
-              required
+            <DatePicker
+              id={`${id}-startDate`}
+              name="startDate"
+              label="시작일"
+              value={startDate}
+              onChange={setStartDate}
+              invalid={!!errors.startDate}
             />
           </Field>
           <Field id={`${id}-endDate`} label="종료일" error={errors.endDate}>
-            <Input
-              {...field("endDate")}
-              type="date"
-              defaultValue={item?.endDate ?? editing.date}
-              required
+            <DatePicker
+              id={`${id}-endDate`}
+              name="endDate"
+              label="종료일"
+              value={endDate}
+              onChange={setEndDate}
+              min={startDate || undefined}
+              invalid={!!errors.endDate}
             />
           </Field>
         </div>
@@ -441,7 +463,11 @@ function EventDialog({
         </label>
         {!allDay && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field id={`${id}-startTime`} label="시작 시각">
+            <Field
+              id={`${id}-startTime`}
+              label="시작 시각"
+              error={errors.startTime}
+            >
               <Input
                 {...field("startTime")}
                 type="time"

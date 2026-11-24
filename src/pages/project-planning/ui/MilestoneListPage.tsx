@@ -12,11 +12,12 @@ import {
   type MilestoneInput,
 } from "@/entities/milestone";
 import { seoulToday } from "@/entities/sprint";
-import { normalizeApiError } from "@/shared/api";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
 import {
   Button,
+  DatePicker,
   Dialog,
   EmptyState,
   ErrorState,
@@ -143,13 +144,16 @@ function Milestones({ project, manages }: PlanningContext) {
           찾는 마일스톤이 없습니다. 삭제됐을 수 있습니다.
         </p>
       )}
-      <MilestoneFormDialog
-        open={creating}
-        title="새 마일스톤"
-        submitLabel="마일스톤 만들기"
-        onClose={() => setCreating(false)}
-        onSubmit={(input) => actions.create.mutateAsync(input)}
-      />
+      {creating && (
+        // 닫을 때 내려서 다음에 열면 빈 양식(마감일 포함)으로 시작한다.
+        <MilestoneFormDialog
+          open
+          title="새 마일스톤"
+          submitLabel="마일스톤 만들기"
+          onClose={() => setCreating(false)}
+          onSubmit={(input) => actions.create.mutateAsync(input)}
+        />
+      )}
       {selected && (
         <MilestonePanel
           projectId={project.id}
@@ -340,6 +344,7 @@ function MilestoneFormDialog({
   const id = useId();
   const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<Readonly<Record<string, string>>>({});
+  const [dueDate, setDueDate] = useState(initial?.dueDate ?? "");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending) return;
@@ -357,7 +362,14 @@ function MilestoneFormDialog({
       await onSubmit(input);
       onClose();
     } catch (cause) {
-      setErrors({ form: milestoneErrorMessage(normalizeApiError(cause)) });
+      const problem = normalizeApiError(cause);
+      setErrors(
+        fieldErrors(
+          problem,
+          ["name", "description", "dueDate"],
+          milestoneErrorMessage(problem),
+        ),
+      );
     } finally {
       setPending(false);
     }
@@ -385,12 +397,14 @@ function MilestoneFormDialog({
               aria-describedby={errors.name ? `${id}-name-error` : undefined}
             />
           </Field>
-          <Field id={`${id}-dueDate`} label="마감일">
-            <Input
+          <Field id={`${id}-dueDate`} label="마감일" error={errors.dueDate}>
+            <DatePicker
               id={`${id}-dueDate`}
               name="dueDate"
-              type="date"
-              defaultValue={initial?.dueDate ?? ""}
+              label="마감일"
+              value={dueDate}
+              onChange={setDueDate}
+              invalid={!!errors.dueDate}
             />
           </Field>
           <Field

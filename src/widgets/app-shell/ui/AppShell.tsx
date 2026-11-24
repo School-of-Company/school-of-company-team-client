@@ -76,6 +76,19 @@ export function AppShell({
     if (hoverTimer.current) clearTimeout(hoverTimer.current);
     hoverTimer.current = null;
   };
+  // 포인터는 늦게 열고(지나가는 포인터에 깜빡이지 않게) 더 늦게 닫는다. 키보드와 Esc 는 바로 바꾼다.
+  const peekAfter = (next: boolean, ms: number) => {
+    cancelHover();
+    hoverTimer.current = setTimeout(() => {
+      hoverTimer.current = null;
+      if (next) keyboardPeek.current = false;
+      setPeeking(next);
+    }, ms);
+  };
+  const peekNow = (next: boolean) => {
+    cancelHover();
+    setPeeking(next);
+  };
   useEffect(
     () => () => {
       if (hoverTimer.current) clearTimeout(hoverTimer.current);
@@ -91,6 +104,7 @@ export function AppShell({
     } catch {
       // Storage may be blocked; keep the current in-memory preference.
     }
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
     setPeeking(false);
     if (!collapsed) requestAnimationFrame(() => main.current?.focus());
   }, [collapsed]);
@@ -101,6 +115,7 @@ export function AppShell({
         toggleSidebar();
       }
       if (event.key === "Escape" && collapsed) {
+        if (hoverTimer.current) clearTimeout(hoverTimer.current);
         setPeeking(false);
         if (
           sidebar.current?.contains(document.activeElement) ||
@@ -312,24 +327,19 @@ export function AppShell({
           aria-label="사이드바 미리 보기"
           aria-controls="desktop-sidebar"
           aria-expanded={peeking}
-          onPointerEnter={() => {
-            cancelHover();
-            hoverTimer.current = setTimeout(() => {
-              keyboardPeek.current = false;
-              setPeeking(true);
-            }, 150);
+          onPointerEnter={() => peekAfter(true, 120)}
+          onPointerLeave={() => {
+            if (!peeking) cancelHover();
           }}
-          onPointerLeave={cancelHover}
           onFocus={(event) => {
             keyboardPeek.current =
               event.currentTarget.matches(":focus-visible");
-            setPeeking(true);
+            peekNow(true);
           }}
           onBlur={(event) => {
-            if (!sidebar.current?.contains(event.relatedTarget))
-              setPeeking(false);
+            if (!sidebar.current?.contains(event.relatedTarget)) peekNow(false);
           }}
-          onClick={() => setPeeking(true)}
+          onClick={() => peekNow(true)}
         />
       )}
       <aside
@@ -337,16 +347,20 @@ export function AppShell({
         id="desktop-sidebar"
         inert={collapsed && !peeking}
         className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col"
+        onPointerEnter={() => {
+          if (peeking) cancelHover();
+        }}
         onPointerLeave={() => {
           if (
-            !keyboardPeek.current ||
-            !sidebar.current?.contains(document.activeElement)
+            peeking &&
+            (!keyboardPeek.current ||
+              !sidebar.current?.contains(document.activeElement))
           )
-            setPeeking(false);
+            peekAfter(false, 250);
         }}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget))
-            setPeeking(false);
+            peekNow(false);
         }}
       >
         <div className="sidebar-brand">
@@ -461,7 +475,7 @@ export function AppShell({
                 ? main.current
                 : searchOpener.current;
             if (collapsed) {
-              setPeeking(false);
+              peekNow(false);
             }
             requestAnimationFrame(() => restoreFocus(target));
           }}

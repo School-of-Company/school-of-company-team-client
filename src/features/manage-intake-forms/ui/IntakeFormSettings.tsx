@@ -10,11 +10,13 @@ import {
   type IntakeForm,
   type SaveIntakeForm,
 } from "@/entities/requirement";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
 import { formatDate } from "@/shared/lib";
 import {
   Badge,
   Button,
   Checkbox,
+  DateTimePicker,
   Dialog,
   EmptyState,
   ErrorState,
@@ -49,7 +51,12 @@ export function IntakeFormSettings({
   const toast = useToast();
   const client = useQueryClient();
   const forms = useQuery(requirementQueries.forms(projectId));
-  const [editing, setEditing] = useState<IntakeForm | "new" | null>(null);
+  const [editing, setEditingForm] = useState<IntakeForm | "new" | null>(null);
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
+  const setEditing = (next: IntakeForm | "new" | null) => {
+    setServerErrors({});
+    setEditingForm(next);
+  };
   const [confirm, setConfirm] = useState<{
     readonly form: IntakeForm;
     readonly action: "rotate" | "delete";
@@ -137,7 +144,7 @@ export function IntakeFormSettings({
                   )}
               </div>
               <p className="text-sm text-muted">
-                하루 {form.dailyLimit}건, {" "}
+                하루 {form.dailyLimit}건,{" "}
                 {form.expiresAt
                   ? `${formatDate(form.expiresAt, { hour: "2-digit", minute: "2-digit" })} 마감`
                   : "마감 없음"}
@@ -189,8 +196,10 @@ export function IntakeFormSettings({
         key={editing === "new" ? "new" : (editing?.id ?? "closed")}
         form={editing}
         pending={change.isPending}
+        serverErrors={serverErrors}
         onClose={() => setEditing(null)}
-        onSave={(body) =>
+        onSave={(body) => {
+          setServerErrors({});
           change.mutate(
             editing === "new" || !editing
               ? { action: "create", body }
@@ -203,11 +212,25 @@ export function IntakeFormSettings({
                   "success",
                 );
               },
-              onError: (error) =>
-                toast(requirementErrorMessage(error), "error"),
+              // 서버 검증 오류는 해당 칸 밑에 보이고, 나머지는 알림으로 띄운다.
+              onError: (error) => {
+                const found = fieldErrors(
+                  normalizeApiError(error),
+                  [
+                    "publicTitle",
+                    "publicDescription",
+                    "dailyLimit",
+                    "expiresAt",
+                  ],
+                  requirementErrorMessage(error),
+                );
+                const { form, ...fields } = found;
+                setServerErrors(fields);
+                if (form) toast(form, "error");
+              },
             },
-          )
-        }
+          );
+        }}
       />
       <Dialog
         open={!!confirm}
@@ -264,23 +287,17 @@ export function IntakeFormSettings({
   );
 }
 
-/** datetime-local 값(브라우저 시간대) ↔ ISO-8601. */
-const toLocalInput = (iso: string | null) => {
-  if (!iso) return "";
-  const date = new Date(iso);
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
-    .toISOString()
-    .slice(0, 16);
-};
-
 function FormDialog({
   form,
   pending,
+  serverErrors,
   onClose,
   onSave,
 }: {
   readonly form: IntakeForm | "new" | null;
   readonly pending: boolean;
+  /** 서버 필드 이름(publicTitle 등) → 메시지. */
+  readonly serverErrors: Readonly<Record<string, string>>;
   readonly onClose: () => void;
   readonly onSave: (body: SaveIntakeForm) => void;
 }) {
@@ -291,13 +308,18 @@ function FormDialog({
     existing?.publicDescription ?? "",
   );
   const [active, setActive] = useState(existing?.active ?? true);
-  const [expiresAt, setExpiresAt] = useState(
-    toLocalInput(existing?.expiresAt ?? null),
-  );
+  const [expiresAt, setExpiresAt] = useState(existing?.expiresAt ?? "");
   const [dailyLimit, setDailyLimit] = useState(
     String(existing?.dailyLimit ?? 50),
   );
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [localErrors, setErrors] = useState<Record<string, string>>({});
+  const errors = {
+    title: serverErrors.publicTitle,
+    description: serverErrors.publicDescription,
+    dailyLimit: serverErrors.dailyLimit,
+    expiresAt: serverErrors.expiresAt,
+    ...localErrors,
+  };
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     const found: Record<string, string> = {};
@@ -318,7 +340,7 @@ function FormDialog({
       active,
       dailyLimit: limit,
       ...(expiresAt
-        ? { expiresAt: new Date(expiresAt).toISOString() }
+        ? { expiresAt }
         : existing?.expiresAt
           ? { clearExpiresAt: true }
           : {}),
@@ -361,11 +383,14 @@ function FormDialog({
           hint="비우면 마감 없이 받습니다."
           error={errors.expiresAt}
         >
-          <Input
+          <DateTimePicker
             id={`${id}-expires`}
-            type="datetime-local"
+            label="마감 시각"
             value={expiresAt}
-            onChange={(event) => setExpiresAt(event.target.value)}
+            defaultTime="23:59"
+            invalid={!!errors.expiresAt}
+            describedBy={`${id}-expires-hint`}
+            onChange={setExpiresAt}
           />
         </Field>
         <Field

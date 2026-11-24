@@ -68,3 +68,20 @@ export function latestDate(
     .sort()
     .at(-1);
 }
+
+// ponytail: Asia/Seoul 은 서머타임 없이 늘 +09:00 이라 고정 오프셋으로 바꾼다.
+const seoulOffset = 9 * 60 * 60 * 1000;
+
+/** ISO 시각 → Asia/Seoul 벽시계 "YYYY-MM-DDTHH:mm". 비었거나 잘못되면 "". 브라우저 시간대와 무관하다. */
+export function toSeoulDateTime(iso: string | null | undefined): string {
+  const time = iso ? Date.parse(iso) : Number.NaN;
+  return Number.isNaN(time)
+    ? ""
+    : new Date(time + seoulOffset).toISOString().slice(0, 16);
+}
+
+/** Asia/Seoul 날짜("YYYY-MM-DD")와 시각("HH:mm") → ISO(UTC). 잘못되면 "". */
+export function fromSeoulDateTime(date: string, time: string): string {
+  const parsed = Date.parse(`${date}T${time}:00+09:00`);
+  return Number.isNaN(parsed) ? "" : new Date(parsed).toISOString();
+}

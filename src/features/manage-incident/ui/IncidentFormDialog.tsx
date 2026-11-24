@@ -3,21 +3,21 @@
 import { useId, useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  fromLocalInput,
   incidentApi,
   incidentErrorMessage,
   incidentSeverities,
   severityDescriptions,
   severityLabels,
-  toLocalInput,
   type IncidentDetail,
   type IncidentSeverity,
 } from "@/entities/incident";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
 import { serviceQueries } from "@/entities/service";
 import { activeUsersQueryOptions } from "@/entities/user";
 import {
   Button,
   Checkbox,
+  DateTimePicker,
   Dialog,
   Field,
   Input,
@@ -78,7 +78,7 @@ function IncidentForm({
     severity: incident?.severity ?? "",
     commanderId: incident?.commander?.id ?? "",
     serviceIds: incident?.services.map((service) => service.id) ?? [],
-    startedAt: incident ? toLocalInput(incident.startedAt) : "",
+    startedAt: incident?.startedAt ?? "",
   };
   const [values, setValues] = useState<Values>(initial);
   const [errors, setErrors] = useState<{ title?: string; severity?: string }>(
@@ -87,7 +87,7 @@ function IncidentForm({
   const users = useQuery(activeUsersQueryOptions());
   const services = useQuery(serviceQueries.list(false));
   const save = useIncidentMutation(incident?.id ?? "", (body: Values) => {
-    const startedAt = fromLocalInput(body.startedAt);
+    const startedAt = body.startedAt || undefined;
     const severity = body.severity || undefined;
     if (!incident)
       return incidentApi.create({
@@ -151,17 +151,30 @@ function IncidentForm({
       ? [incident.commander]
       : []),
   ];
+  const server = save.error
+    ? fieldErrors(
+        normalizeApiError(save.error),
+        ["title", "startedAt"],
+        incidentErrorMessage(save.error),
+      )
+    : {};
   return (
     <form className="grid gap-5" onSubmit={submit} noValidate>
-      <Field id={`${id}-title`} label="제목" error={errors.title}>
+      <Field
+        id={`${id}-title`}
+        label="제목"
+        error={errors.title ?? server.title}
+      >
         <Input
           id={`${id}-title`}
           value={values.title}
           maxLength={200}
           required
           autoFocus
-          aria-invalid={errors.title ? true : undefined}
-          aria-describedby={errors.title ? `${id}-title-error` : undefined}
+          aria-invalid={(errors.title ?? server.title) ? true : undefined}
+          aria-describedby={
+            (errors.title ?? server.title) ? `${id}-title-error` : undefined
+          }
           placeholder="예: 로그인 502 급증"
           onChange={(event) => set({ title: event.target.value })}
         />
@@ -223,13 +236,15 @@ function IncidentForm({
           id={`${id}-started`}
           label="시작 시각"
           hint={incident ? undefined : "비우면 지금으로 기록합니다."}
+          error={server.startedAt}
         >
-          <Input
+          <DateTimePicker
             id={`${id}-started`}
-            type="datetime-local"
+            label="시작 시각"
             value={values.startedAt}
-            aria-describedby={incident ? undefined : `${id}-started-hint`}
-            onChange={(event) => set({ startedAt: event.target.value })}
+            invalid={!!server.startedAt}
+            describedBy={incident ? undefined : `${id}-started-hint`}
+            onChange={(startedAt) => set({ startedAt })}
           />
         </Field>
       </div>
@@ -288,9 +303,9 @@ function IncidentForm({
           onChange={(event) => set({ summary: event.target.value })}
         />
       </Field>
-      {save.error ? (
+      {server.form ? (
         <p role="alert" className="text-sm text-danger">
-          {incidentErrorMessage(save.error)}
+          {server.form}
         </p>
       ) : null}
       <div className="flex flex-wrap justify-end gap-2">

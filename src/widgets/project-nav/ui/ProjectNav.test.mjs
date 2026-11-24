@@ -63,20 +63,15 @@ test("sprint detail keeps the Sprint tab current", () => {
   assert.match(current[0], /href="\/projects\/project\/sprints"/);
 });
 
-test("kanban projects hide the Sprint tab unless the user is already there", () => {
-  const kanban = { ...project, workflow: "KANBAN" };
-  const render = () =>
-    renderToStaticMarkup(
-      createElement(ProjectNav, {
-        project: kanban,
-        user: { id: "member", role: "MEMBER" },
-      }),
-    );
+test("kanban projects still show the Sprint tab", () => {
   pathname = "/projects/project";
-  assert.doesNotMatch(render(), /href="\/projects\/project\/sprints"/);
-  assert.match(render(), /href="\/projects\/project\/milestones"/);
-  pathname = "/projects/project/sprints/01SPRINT";
-  assert.match(render(), /href="\/projects\/project\/sprints"/);
+  const html = renderToStaticMarkup(
+    createElement(ProjectNav, {
+      project: { ...project, workflow: "KANBAN" },
+      user: { id: "member", role: "MEMBER" },
+    }),
+  );
+  assert.match(html, /href="\/projects\/project\/sprints"/);
 });
 
 test("project settings route identifies its current destination", () => {

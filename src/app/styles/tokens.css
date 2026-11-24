@@ -137,6 +137,7 @@
   --content-prose: 68ch;
   --toast-width: 24rem;
   --sidebar-edge-width: 24px;
+  --time-input-width: 8rem;
 
   /* Elevation: borders separate, shadows only lift overlays. */
   --shadow-card: 0 1px 3px rgb(0 27 55 / 0.06);

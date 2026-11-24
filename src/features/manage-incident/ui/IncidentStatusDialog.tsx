@@ -2,16 +2,15 @@
 
 import { useId, useState, type FormEvent } from "react";
 import {
-  fromLocalInput,
   incidentApi,
   incidentErrorMessage,
   incidentStatuses,
   incidentStatusLabels,
-  toLocalInput,
   type IncidentDetail,
   type IncidentStatus,
 } from "@/entities/incident";
-import { Button, Dialog, Field, Input } from "@/shared/ui";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
+import { Button, DateTimePicker, Dialog, Field, Input } from "@/shared/ui";
 import { useIncidentMutation } from "../api/mutations";
 
 /** 지금 상태에서 다음으로 가장 흔한 변경. 상세 머리의 주요 버튼이 이것을 연다. */
@@ -67,7 +66,7 @@ function StatusForm({
   const change = useIncidentMutation(incident.id, () =>
     incidentApi.changeStatus(incident.id, {
       status,
-      at: fromLocalInput(at),
+      at: at || undefined,
       note: note.trim() || undefined,
     }),
   );
@@ -77,6 +76,13 @@ function StatusForm({
     change.mutate(undefined, { onSuccess: onClose });
   };
   const same = status === incident.status;
+  const server = change.error
+    ? fieldErrors(
+        normalizeApiError(change.error),
+        ["at", "note"],
+        incidentErrorMessage(change.error),
+      )
+    : {};
   return (
     <form className="grid gap-5" onSubmit={submit}>
       <fieldset className="grid gap-2">
@@ -101,17 +107,19 @@ function StatusForm({
         id={`${id}-at`}
         label="변경 시각"
         hint="비우면 지금으로 기록합니다. 시작 시각보다 이를 수 없습니다."
+        error={server.at}
       >
-        <Input
+        <DateTimePicker
           id={`${id}-at`}
-          type="datetime-local"
+          label="변경 시각"
           value={at}
-          min={toLocalInput(incident.startedAt)}
-          aria-describedby={`${id}-at-hint`}
-          onChange={(event) => setAt(event.target.value)}
+          min={incident.startedAt}
+          invalid={!!server.at}
+          describedBy={`${id}-at-hint`}
+          onChange={setAt}
         />
       </Field>
-      <Field id={`${id}-note`} label="메모">
+      <Field id={`${id}-note`} label="메모" error={server.note}>
         <Input
           id={`${id}-note`}
           value={note}
@@ -120,9 +128,9 @@ function StatusForm({
           onChange={(event) => setNote(event.target.value)}
         />
       </Field>
-      {change.error ? (
+      {server.form ? (
         <p role="alert" className="text-sm text-danger">
-          {incidentErrorMessage(change.error)}
+          {server.form}
         </p>
       ) : null}
       <div className="flex flex-wrap justify-end gap-2">

@@ -16,7 +16,7 @@ export type ProjectNavProps = {
 };
 
 // 탭 순서는 AGENTS.md의 정보 구조 규칙을 따른다.
-// Sprint 탭은 진행 방식이 Sprint 인 프로젝트에만 있다.
+// 진행 방식(Sprint, Kanban)은 표시용 이름이라 탭을 숨기지 않는다.
 export function ProjectNav({ project, user }: ProjectNavProps) {
   const pathname = usePathname() ?? "";
   const board = routes.project(project.id);
@@ -29,17 +29,11 @@ export function ProjectNav({ project, user }: ProjectNavProps) {
       label: "문서",
       active: within(routes.projectDocs(project.id)),
     },
-    // Kanban 프로젝트는 스프린트로 이끌지 않는다. 주소로 들어오면 현재 위치를 보이게 탭은 남긴다.
-    ...(project.workflow !== "KANBAN" ||
-    within(routes.projectSprints(project.id))
-      ? [
-          {
-            href: routes.projectSprints(project.id),
-            label: "스프린트",
-            active: within(routes.projectSprints(project.id)),
-          },
-        ]
-      : []),
+    {
+      href: routes.projectSprints(project.id),
+      label: "스프린트",
+      active: within(routes.projectSprints(project.id)),
+    },
     {
       href: routes.projectMilestones(project.id),
       label: "마일스톤",
