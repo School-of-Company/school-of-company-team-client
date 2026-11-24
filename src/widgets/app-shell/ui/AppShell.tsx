@@ -202,7 +202,7 @@ export function AppShell({
     /** Another path that belongs to the same entry (내 업무 목록 / 보드). */
     readonly also?: string;
   };
-  // 순서와 그룹은 docs/ia.md "완성 후 사이드바"를 따른다. 관리자·설정은 맨 아래.
+  // 순서와 그룹은 AGENTS.md의 정보 구조 규칙을 따른다. 관리자·설정은 맨 아래.
   const workLinks: readonly NavLink[] = [
     { href: routes.home, label: "내 업무", icon: "home", also: routes.me },
     { href: routes.team, label: "팀 공용", icon: "team" },

@@ -123,6 +123,8 @@
   --content-reading: 64rem;
   --sidebar-shortcuts-height: 30dvh;
   --admin-user-table-min: 32rem;
+  --content-prose: 68ch;
+  --toast-width: 24rem;
   --sidebar-edge-width: 24px;
 
   /* Elevation: borders separate, shadows only lift overlays. */

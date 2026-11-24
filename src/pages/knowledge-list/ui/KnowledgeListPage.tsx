@@ -33,7 +33,7 @@ import {
   Spinner,
 } from "@/shared/ui";
 
-/** 종류 필터가 있는 한 목록(docs/ia.md). 종류·상태는 URL `?type=`·`?status=`에 둔다. */
+/** 종류 필터가 있는 한 목록. 종류·상태는 URL `?type=`·`?status=`에 둔다(AGENTS.md). */
 export function KnowledgeListPage() {
   return (
     <AuthGuard require="work">

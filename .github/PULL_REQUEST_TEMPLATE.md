@@ -12,7 +12,7 @@
 
 - [ ] CI 통과 (lint · type-check · lint:fsd · test · build)
 - [ ] 테스트 추가·수정 (핵심 로직·고위험 영역은 필수)
-- [ ] 문서 반영 (docs/, AGENTS.md 등 필요한 경우)
+- [ ] 문서 반영 (AGENTS.md, design.md 등 필요한 경우)
 - [ ] Issue 의 완료 조건 충족
 
 ## 고위험 여부

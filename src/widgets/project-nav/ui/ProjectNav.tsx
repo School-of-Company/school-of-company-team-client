@@ -15,7 +15,7 @@ export type ProjectNavProps = {
   readonly user: Pick<User, "id" | "role">;
 };
 
-// 탭 순서는 docs/ia.md "프로젝트 안"에 고정: 보드 · Sprint · Milestone · 달력 · 링크 · 화이트보드 · 요구사항 · 설정.
+// 탭 순서는 AGENTS.md의 정보 구조 규칙을 따른다.
 // Sprint 탭은 진행 방식이 Sprint 인 프로젝트에만 있다.
 export function ProjectNav({ project, user }: ProjectNavProps) {
   const pathname = usePathname() ?? "";
