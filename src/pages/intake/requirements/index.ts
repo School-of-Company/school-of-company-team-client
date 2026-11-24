@@ -2,4 +2,7 @@ export {
   ProjectRequirementsPage,
   RequirementListPage,
 } from "./ui/RequirementListPage";
-export { RequirementDetailPage } from "./ui/RequirementDetailPage";
+export {
+  RequirementDetailPage,
+  RequirementDetailSkeleton,
+} from "./ui/RequirementDetailPage";

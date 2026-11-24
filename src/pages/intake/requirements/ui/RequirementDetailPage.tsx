@@ -14,7 +14,7 @@ import { AuthGuard } from "@/features/auth";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
-import { Button, Dialog, ErrorState, Skeleton } from "@/shared/ui";
+import { Button, Dialog, ErrorState, StaleNotice } from "@/shared/ui";
 import { RequirementActions } from "./RequirementActions";
 import { RequirementStatusForm } from "./RequirementStatusForm";
 import { Sections, Requester, Events } from "./RequirementContent";
@@ -29,9 +29,61 @@ export function RequirementDetailPage({
   readonly requirementId: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<RequirementDetailSkeleton />}>
       {(user) => <DetailContent requirementId={requirementId} user={user} />}
     </AuthGuard>
+  );
+}
+
+/** 머리글(경로, 제목, 상태 줄, 상태 변경 버튼), 본문과 속성 카드 열을 실제와 같은 클래스로 잡는다. */
+export function RequirementDetailSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="요구사항 불러오는 중"
+      className="requirement-detail grid gap-5"
+    >
+      <header aria-hidden="true" className="page-header">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <span className="ui-skeleton-text">요구사항 / 프로젝트</span>
+          </p>
+          <h1 className="task-title font-semibold">
+            <span className="ui-skeleton-text">
+              요구사항 제목을 불러오는 중
+            </span>
+          </h1>
+          <p className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+            <span className="ui-skeleton-text">검토 중</span>
+            <span className="ui-skeleton-text">접수 11월 25일 10:00</span>
+          </p>
+        </div>
+        <span className="ui-button ui-button-secondary">
+          <span className="ui-skeleton-text">상태 변경</span>
+        </span>
+      </header>
+      <div aria-hidden="true" className="requirement-workspace">
+        <div className="requirement-grid">
+          <div className="requirement-main grid gap-6">
+            <div className="ui-skeleton-list" />
+          </div>
+          <div className="requirement-aside grid content-start gap-4">
+            <dl className="requirement-card requirement-properties">
+              {["우선순위", "희망 일정", "업무 진행"].map((label) => (
+                <div key={label}>
+                  <dt>
+                    <span className="ui-skeleton-text">{label}</span>
+                  </dt>
+                  <dd>
+                    <span className="ui-skeleton-text">불러오는 중</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -44,18 +96,7 @@ function DetailContent({
 }) {
   const [changingStatus, setChangingStatus] = useState(false);
   const detail = useQuery(requirementQueries.detail(requirementId));
-  if (detail.isPending)
-    return (
-      <div
-        role="status"
-        aria-label="요구사항 불러오는 중"
-        className="grid gap-4"
-      >
-        <Skeleton className="w-24" />
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-64" />
-      </div>
-    );
+  if (detail.isPending) return <RequirementDetailSkeleton />;
   if (!detail.data)
     return (
       <ErrorState
@@ -71,6 +112,7 @@ function DetailContent({
   const requirement = detail.data;
   return (
     <div className="requirement-detail grid gap-5 [overflow-wrap:anywhere] break-keep">
+      <StaleNotice query={detail} />
       <header className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
