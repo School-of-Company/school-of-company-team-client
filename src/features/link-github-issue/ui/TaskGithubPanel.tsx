@@ -113,9 +113,9 @@ export function TaskGithubPanel({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">GitHub</h2>
         {publication && (
-          <Badge>
-            {publicationLabels[publication.state]} ·{" "}
-            {publicationName(publication, repositoryOptions)}
+          <Badge className="gap-2">
+            <span>{publicationLabels[publication.state]}</span>
+            <span>{publicationName(publication, repositoryOptions)}</span>
           </Badge>
         )}
       </div>
@@ -129,7 +129,7 @@ export function TaskGithubPanel({
             #{github.data.source.number}
             에서 가져온 업무
             {github.data.source.private &&
-              " · 원본 저장소 권한이 있는 참여자에게만 보여요"}
+              ", 원본 저장소 권한이 있는 참여자에게만 보여요"}
           </span>
         </p>
       )}
@@ -137,7 +137,7 @@ export function TaskGithubPanel({
         <div className="grid gap-1 text-sm empty:hidden">
           {publication.publiclyVisible && publication.state !== "SUCCEEDED" && (
             <p className="text-danger">
-              공개 저장소라 제목·설명·업무 링크가 공개됩니다.
+              공개 저장소라 제목, 설명, 업무 링크가 공개됩니다.
             </p>
           )}
           {publication.state === "UNCERTAIN" && (
@@ -198,7 +198,7 @@ export function TaskGithubPanel({
             {repositoryOptions?.map((repository) => (
               <option key={repository.id} value={repository.id}>
                 {repositoryName(repository)}
-                {repository.private ? "" : " · 공개"}
+                {repository.private ? "" : ", 공개"}
               </option>
             ))}
           </Select>
@@ -212,7 +212,7 @@ export function TaskGithubPanel({
       )}
       {task.scope !== "PROJECT" && (
         <p className="text-sm text-muted">
-          팀 공용·개인 업무는 자동 발행하지 않습니다.
+          팀 공용, 개인 업무는 자동 발행하지 않습니다.
         </p>
       )}
       {suggestsDone(mergedPr, task.status) && (
@@ -237,7 +237,7 @@ export function TaskGithubPanel({
         </div>
       )}
       <div className="grid gap-2">
-        <h3 className="text-sm font-medium">연결된 Issue · PR</h3>
+        <h3 className="text-sm font-medium">연결된 Issue, PR</h3>
         {github.data.links.length === 0 ? (
           <p className="text-sm text-muted">없음</p>
         ) : (
@@ -273,7 +273,7 @@ export function TaskGithubPanel({
                     </a>
                   ) : (
                     <span className="text-sm text-muted">
-                      접근 권한 없음 · GitHub 권한을 확인해 주세요
+                      접근 권한 없음, GitHub 권한을 확인해 주세요
                     </span>
                   )}
                   {editable && (
@@ -309,8 +309,8 @@ export function TaskGithubPanel({
                 type="url"
                 required
                 maxLength={500}
-                aria-label="기존 Issue·PR URL"
-                placeholder="Issue·PR URL 붙여넣기"
+                aria-label="기존 Issue, PR URL"
+                placeholder="Issue, PR URL 붙여넣기"
                 className="min-w-0 flex-1"
               />
               <Button type="submit" variant="secondary" loading={pending}>

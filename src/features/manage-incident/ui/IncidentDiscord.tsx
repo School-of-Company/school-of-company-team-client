@@ -109,7 +109,7 @@ export function IncidentDiscord({
       )}
       {!url && (
         <p className="text-xs text-muted">
-          팀 채널에 제목·심각도·상태와 이 화면 링크만 올립니다.
+          팀 채널에 제목, 심각도, 상태와 이 화면 링크만 올립니다.
         </p>
       )}
       {message && (

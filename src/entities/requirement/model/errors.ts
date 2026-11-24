@@ -6,7 +6,7 @@ const messages: Readonly<Record<string, string>> = {
     "접수 링크를 찾을 수 없습니다. 링크가 바뀌었거나 닫혔을 수 있으니 담당자에게 새 링크를 요청해 주세요.",
   INTAKE_FORM_CLOSED:
     "이 양식은 접수가 마감되었습니다. 담당자에게 문의해 주세요.",
-  INTAKE_CONSENT_REQUIRED: "개인정보 수집·이용에 동의해야 제출할 수 있습니다.",
+  INTAKE_CONSENT_REQUIRED: "개인정보 수집, 이용에 동의해야 제출할 수 있습니다.",
   INTAKE_TOO_FAST:
     "제출을 처리하지 못했습니다. 양식을 새로 받았으니 잠시 뒤 다시 제출해 주세요.",
   INTAKE_DAILY_LIMIT:
@@ -17,7 +17,7 @@ const messages: Readonly<Record<string, string>> = {
     "이 요구사항을 관리할 권한이 없습니다. PM 또는 헤드 어드민에게 요청하세요.",
   REQUIREMENT_STATUS_INVALID:
     "지금 상태에서는 할 수 없는 변경입니다. 새로고침해 현재 상태를 확인하세요.",
-  REQUIREMENT_REASON_REQUIRED: "보류·반려에는 사유가 필요합니다.",
+  REQUIREMENT_REASON_REQUIRED: "보류, 반려에는 사유가 필요합니다.",
   REQUIREMENT_CLOSED: "철회했거나 닫힌 요구사항에는 답글을 달 수 없습니다.",
   REQUIREMENT_PROJECT_REQUIRED:
     "조직 단위 요구사항은 프로젝트를 지정한 뒤 업무를 만들 수 있습니다.",

@@ -49,7 +49,7 @@ export function DeleteDocument({
       <Dialog open={open} onClose={close} title="문서를 삭제할까요?">
         <div className="grid gap-4">
           <p className="text-sm text-foreground-2">
-            관계도 함께 사라집니다. 연결됐던 서비스·사고·업무·문서는 그대로
+            관계도 함께 사라집니다. 연결됐던 서비스, 사고, 업무, 문서는 그대로
             남습니다. 더 쓰지 않는 문서라면 삭제 대신 폐기로 바꿀 수 있습니다.
           </p>
           {remove.error ? (

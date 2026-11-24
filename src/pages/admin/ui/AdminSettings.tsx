@@ -47,7 +47,7 @@ export function AdminSettings({
         </h2>
         <p className="text-sm text-muted">
           이용 중지 시 업무와 기록은 보존되고 해당 사용자의 담당 배정은
-          해제됩니다. 마지막 활성 헤드 어드민은 해제·중지할 수 없습니다.
+          해제됩니다. 마지막 활성 헤드 어드민은 해제, 중지할 수 없습니다.
         </p>
         {users.data.length === 0 ? (
           <EmptyState title="조직 사용자가 없습니다" />
@@ -149,12 +149,12 @@ export function AdminSettings({
                   </div>
                   {lastLead && (
                     <p className="text-sm text-muted">
-                      마지막 활성 헤드 어드민이므로 해제·이용 중지가 차단됩니다.
+                      마지막 활성 헤드 어드민이므로 해제, 이용 중지가 차단됩니다.
                     </p>
                   )}
                   {self && !lastLead && (
                     <p className="text-sm text-muted">
-                      자기 계정의 관리자 해제·이용 중지는 할 수 없습니다.
+                      자기 계정의 관리자 해제, 이용 중지는 할 수 없습니다.
                     </p>
                   )}
                 </li>

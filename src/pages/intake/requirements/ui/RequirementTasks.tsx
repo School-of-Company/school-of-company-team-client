@@ -90,7 +90,7 @@ export function RequirementTasks({
         requirement.projectId &&
         !canCreateTasksIn(requirement.status) && (
           <p className="text-sm text-muted">
-            업무는 수락·진행 중 상태에서 만들 수 있습니다.
+            업무는 수락, 진행 중 상태에서 만들 수 있습니다.
           </p>
         )}
       {requirement.tasks.length === 0 && hidden <= 0 ? (
@@ -251,7 +251,7 @@ function CreateTasksDialog({
       <form noValidate onSubmit={onSubmit} className="grid gap-4">
         <p className="text-sm text-muted">
           업무는 검토 필요 상태로 만들어집니다. 설명에는 요구사항 링크와 기능
-          항목·수용 기준만 들어가고 요청자 정보는 들어가지 않습니다. 하나라도
+          항목, 수용 기준만 들어가고 요청자 정보는 들어가지 않습니다. 하나라도
           실패하면 아무것도 만들지 않습니다.
         </p>
         {publicDefault && (
@@ -259,7 +259,7 @@ function CreateTasksDialog({
             <span className="font-semibold">공개 저장소 주의. </span>
             기본 발행 저장소 {repositoryName(publicDefault)}는 공개
             저장소입니다. 업무가 진행 예정 이상이 되면 제목과 설명(기능
-            항목·수용 기준)이 누구나 볼 수 있는 Issue로 발행됩니다. 고객 정보가
+            항목, 수용 기준)이 누구나 볼 수 있는 Issue로 발행됩니다. 고객 정보가
             제목에 들어가지 않았는지 확인하세요.
           </p>
         )}

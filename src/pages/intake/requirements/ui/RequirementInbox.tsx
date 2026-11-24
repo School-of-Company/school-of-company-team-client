@@ -58,13 +58,17 @@ export function RequirementInbox({
   };
   const rows = list.data?.pages.flat() ?? [];
   return (
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="flex items-center gap-2">
-          <label htmlFor={`${id}-status`} className="text-sm text-muted">
+        <span className="flex max-w-full min-w-0 items-center gap-2">
+          <label
+            htmlFor={`${id}-status`}
+            className="shrink-0 text-sm whitespace-nowrap text-muted"
+          >
             상태
           </label>
           <Select
+            className="min-w-0 flex-1"
             id={`${id}-status`}
             value={status ?? ""}
             onChange={(event) =>
@@ -119,9 +123,9 @@ export function RequirementInbox({
         )
       ) : (
         <>
-          <ul className="list" aria-label="요구사항 목록">
+          <ul className="list min-w-0" aria-label="요구사항 목록">
             {rows.map((row) => (
-              <li key={row.id}>
+              <li key={row.id} className="min-w-0">
                 <Link href={routes.requirement(row.id)} className="list-row">
                   <span className="shrink-0 text-xs text-muted">
                     {row.projectKey ?? "조직"}
@@ -130,12 +134,17 @@ export function RequirementInbox({
                     <span className="block truncate font-medium">
                       {row.title}
                     </span>
-                    <span className="block truncate text-xs text-muted">
-                      {row.formTitle ?? "삭제된 양식"} ·{" "}
+                    <span className="flex flex-wrap gap-x-2 text-xs text-muted">
+                      <span
+                        className="max-w-full min-w-0 truncate"
+                        title={row.formTitle ?? "삭제된 양식"}
+                      >
+                        {row.formTitle ?? "삭제된 양식"}
+                      </span>
                       <RequesterPriorityLabel
                         priority={row.requesterPriority}
                       />
-                      {row.taskCount > 0 && ` · 업무 ${row.taskCount}`}
+                      {row.taskCount > 0 && <span>업무 {row.taskCount}</span>}
                     </span>
                   </span>
                   <RequirementStatusBadge status={row.status} />

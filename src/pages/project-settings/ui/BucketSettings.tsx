@@ -192,7 +192,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
   return (
     <div className="grid gap-5">
       <p className="text-sm text-muted">
-        버킷은 상태와 별개로 업무를 계획 단위(이번 주기·다음·보류 등)로
+        버킷은 상태와 별개로 업무를 계획 단위(이번 주기, 다음, 보류 등)로
         나눕니다. 보드에서 버킷별로 묶어 보고, 레인 사이로 끌어 옮깁니다.
         {!manage && " 버킷 관리는 헤드 어드민 또는 PM이 합니다."}
       </p>

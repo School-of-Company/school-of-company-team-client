@@ -89,7 +89,7 @@ function LinkForm({
         <Field
           id={`${id}-doc`}
           label="문서"
-          hint="문서 작성자·연결된 서비스 소유자·헤드 어드민만 관계를 바꿀 수 있습니다."
+          hint="문서 작성자, 연결된 서비스 소유자, 헤드 어드민만 관계를 바꿀 수 있습니다."
           error={error}
         >
           <Select

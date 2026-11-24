@@ -120,6 +120,8 @@
   --sidebar-width: 240px;
   --page-inset: 32px;
   --content-narrow: 44rem;
+  --content-reading: 64rem;
+  --sidebar-edge-width: 24px;
 
   /* Elevation: borders separate, shadows only lift overlays. */
   --shadow-card: 0 1px 3px rgb(0 27 55 / 0.06);

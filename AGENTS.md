@@ -15,6 +15,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 반복되는 문제는 하네스(이 파일, `docs/conventions.md`, CI)에 반영합니다. 모든 실수를 규칙으로 만들지는 않습니다.
 - 브랜치·커밋·리뷰·릴리스 규칙은 `docs/conventions.md` 를 따릅니다.
 
+## UI 문구와 스타일
+
+- UI 문구에 가운뎃점(·)을 구분자로 쓰지 않는다.
+- 화면 규칙은 `design.md`를 따릅니다.
+
 ## AI agent security — never
 
 - Secret 이나 `.env*` 파일(`.env.example` 제외)을 커밋하거나 출력하지 않는다.

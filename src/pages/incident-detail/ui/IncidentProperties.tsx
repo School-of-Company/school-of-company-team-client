@@ -130,7 +130,7 @@ export function IncidentProperties({
       </dl>
       {!incident.canEdit && (
         <p className="text-xs text-muted">
-          사고 작성자·커맨더·영향 서비스 소유자·헤드 어드민이 바꿀 수 있습니다.
+          사고 작성자, 커맨더, 영향 서비스 소유자, 헤드 어드민이 바꿀 수 있습니다.
           메모는 누구나 남길 수 있습니다.
         </p>
       )}

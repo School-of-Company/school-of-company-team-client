@@ -143,7 +143,7 @@ export function validateIntake(
       errors[path] = "이메일 형식이 아닙니다.";
   }
   if (!draft.consent)
-    errors.consent = "개인정보 수집·이용에 동의해야 제출할 수 있습니다.";
+    errors.consent = "개인정보 수집, 이용에 동의해야 제출할 수 있습니다.";
   return errors;
 }
 

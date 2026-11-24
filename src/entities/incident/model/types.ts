@@ -23,7 +23,7 @@ export const incidentStatuses: readonly IncidentStatus[] = [
 export const severityDescriptions: Readonly<Record<IncidentSeverity, string>> =
   {
     SEV1: "핵심 사용자 기능 중단",
-    SEV2: "일부 기능·일부 사용자 영향",
+    SEV2: "일부 기능, 일부 사용자 영향",
     SEV3: "경미하거나 우회 가능",
   };
 export const incidentStatusLabels: Readonly<Record<IncidentStatus, string>> = {

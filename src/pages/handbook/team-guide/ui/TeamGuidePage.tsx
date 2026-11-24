@@ -109,7 +109,7 @@ function TeamGuideContent({
             {data.updatedBy
               ? `${formatDate(data.updatedAt)} ${data.updatedBy.name} 수정`
               : "처음 작성된 내용입니다"}
-            {" · "}
+            {", "}
             <button
               type="button"
               className="guide-history-link"

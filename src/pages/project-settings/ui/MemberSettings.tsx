@@ -38,7 +38,7 @@ export function MemberSettings({
             disabled={pending}
             onClick={() => setEditing(!editing)}
           >
-            {editing ? "편집 마침" : "참여자·PM 편집"}
+            {editing ? "편집 마침" : "참여자와 PM 편집"}
           </Button>
         )}
       </div>
@@ -47,7 +47,7 @@ export function MemberSettings({
           <Field
             id="project-pm"
             label="PM"
-            hint="PM은 한 명이며, 교체·해제된 기존 PM은 참여자로 남습니다."
+            hint="PM은 한 명이며, 교체하거나 해제한 기존 PM은 참여자로 남습니다."
           >
             <Select
               id="project-pm"
@@ -86,7 +86,7 @@ export function MemberSettings({
                   disabled={pending || member.userId === project.pmUserId}
                   title={
                     member.userId === project.pmUserId
-                      ? "PM은 먼저 교체·해제해야 합니다."
+                      ? "PM은 먼저 교체하거나 해제해야 합니다."
                       : undefined
                   }
                   aria-label={`${member.name} 참여자 제외`}
@@ -143,8 +143,8 @@ export function MemberSettings({
             참여자 추가
           </Button>
           <p className="text-sm text-muted">
-            PM을 제외하려면 헤드 어드민이 먼저 교체·해제해야 합니다. 참여자 제외
-            시 기록은 보존되며 업무 배정·파트 소속은 해제됩니다.
+            PM을 제외하려면 헤드 어드민이 먼저 교체하거나 해제해야 합니다.
+            참여자 제외 시 기록은 보존되며 업무 배정, 파트 소속은 해제됩니다.
           </p>
         </form>
       )}

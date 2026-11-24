@@ -59,7 +59,7 @@ export function CreateProjectForm({
       <fieldset disabled={create.isPending} className="grid min-w-0 gap-4">
         <ol className="ui-steps" aria-label="프로젝트 생성 단계">
           <li aria-current="step">기본 정보</li>
-          <li>팀원·PM</li>
+          <li>팀원, PM</li>
           <li>저장소 연결</li>
         </ol>
         <p className="text-sm">
@@ -82,7 +82,7 @@ export function CreateProjectForm({
         <Field
           id="create-project-key"
           label="프로젝트 키"
-          hint="대문자로 시작하는 대문자·숫자 2~10자. 생성 후 변경할 수 없습니다."
+          hint="대문자로 시작하는 대문자, 숫자 2~10자. 생성 후 변경할 수 없습니다."
         >
           <Input
             id="create-project-key"

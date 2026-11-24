@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { Providers } from "@/app/providers";
-import { themeBootScript } from "@/shared/lib";
+import { sidebarBootScript, themeBootScript } from "@/shared/lib";
 import "@/app/styles/globals.css";
 
 const bodyFont = localFont({
@@ -32,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         {/* Pre-paint: stored theme or system preference, before the first frame. */}
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: sidebarBootScript }} />
       </head>
       <body className="flex min-h-full flex-col overflow-x-clip">
         <Providers>{children}</Providers>

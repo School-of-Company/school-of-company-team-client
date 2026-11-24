@@ -337,7 +337,7 @@ export function TaskDetailWorkspace({
         title="업무를 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          업무를 삭제해도 외부 Issue·PR·Discord 대화는 삭제하지 않습니다.
+          업무를 삭제해도 외부 Issue, PR, Discord 대화는 삭제하지 않습니다.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

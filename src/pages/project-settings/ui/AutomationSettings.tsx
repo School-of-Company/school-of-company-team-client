@@ -87,7 +87,7 @@ export function AutomationSettings({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <p className="max-w-xl text-sm text-muted">
             업무 이벤트나 사고가 생기면 조건에 맞을 때 동작 하나를 실행합니다.
-            업무 상태는 바꾸지 않고, 개인·팀 공용 업무에는 걸리지 않습니다.
+            업무 상태는 바꾸지 않고, 개인, 팀 공용 업무에는 걸리지 않습니다.
           </p>
           {list.length > 0 && create}
         </div>

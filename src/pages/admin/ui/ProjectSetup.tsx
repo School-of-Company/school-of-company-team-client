@@ -39,7 +39,7 @@ export function ProjectSetup({
       </p>
       <ol className="ui-steps" aria-label="프로젝트 생성 단계">
         <li>기본 정보</li>
-        <li aria-current={step === "team" ? "step" : undefined}>팀원·PM</li>
+        <li aria-current={step === "team" ? "step" : undefined}>팀원, PM</li>
         <li aria-current={step === "team" ? undefined : "step"}>
           저장소 연결 (선택)
         </li>
@@ -197,7 +197,7 @@ function ProjectTeamStep({
         loading={save.isPending}
         className="justify-self-start"
       >
-        {save.isError ? "실패한 단계 재시도" : "팀원·PM 저장하고 계속"}
+        {save.isError ? "실패한 단계 재시도" : "팀원, PM 저장하고 계속"}
       </Button>
     </form>
   );

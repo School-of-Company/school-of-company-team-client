@@ -29,7 +29,7 @@ export function validateLinkForm(form: LinkForm): Record<string, string> {
       parsed.password
     )
       errors.url =
-        "http:// 또는 https://로 시작하는 주소를 넣으세요. 아이디·비밀번호가 들어간 주소는 쓸 수 없습니다.";
+        "http:// 또는 https://로 시작하는 주소를 넣으세요. 아이디, 비밀번호가 들어간 주소는 쓸 수 없습니다.";
   }
   if (form.title.trim().length > 100)
     errors.title = "제목은 100자까지 쓸 수 있습니다.";

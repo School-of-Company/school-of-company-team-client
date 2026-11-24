@@ -56,7 +56,7 @@ export function DiscordChannelForm({
         </div>
       )}
       <p className="text-sm text-muted">
-        Discord 역할·채널·기존 스레드 권한은 자동으로 변경되지 않습니다. 공개
+        Discord 역할, 채널, 기존 스레드 권한은 자동으로 변경되지 않습니다. 공개
         범위나 참여자가 바뀌면 관리자가 직접 점검한 뒤 다시 연결하세요.
       </p>
       {!disabled && !editing && (
@@ -126,7 +126,7 @@ export function DiscordChannelForm({
                   className="mt-1 shrink-0"
                 />
                 <span>
-                  이 채널을 볼 수 있는 역할·사용자를 프로젝트 참여자로 제한했고,
+                  이 채널을 볼 수 있는 역할, 사용자를 프로젝트 참여자로 제한했고,
                   기존 스레드 권한도 직접 점검했습니다.
                 </span>
               </label>

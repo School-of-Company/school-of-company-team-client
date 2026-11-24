@@ -4,16 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   useEffect,
+  useCallback,
   useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { projectQueries } from "@/entities/project";
+import { ProjectAvatar, projectQueries } from "@/entities/project";
 import { useMe, userDestination } from "@/entities/user";
 import { isSearchShortcut } from "../model/search";
 import { SearchPalette } from "./SearchPalette";
+import { isSidebarShortcut } from "../model/sidebar";
 import { routes } from "@/shared/config";
 import {
   BrandMark,
@@ -22,6 +24,7 @@ import {
   IconButton,
   Icon,
   Skeleton,
+  restoreFocus,
   type IconName,
 } from "@/shared/ui";
 import { headingAnnouncement, shouldFocusMain } from "../model/route-focus";
@@ -51,6 +54,62 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
+  const storedCollapsed = useSyncExternalStore(
+    noSubscribe,
+    () => {
+      try {
+        return localStorage.getItem("soc.sidebar.collapsed") === "true";
+      } catch {
+        return false;
+      }
+    },
+    () => false,
+  );
+  const [collapsedOverride, setCollapsed] = useState<boolean | null>(null);
+  const collapsed = collapsedOverride ?? storedCollapsed;
+  const [peeking, setPeeking] = useState(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const keyboardPeek = useRef(false);
+  const cancelHover = () => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    hoverTimer.current = null;
+  };
+  useEffect(
+    () => () => {
+      if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    },
+    [],
+  );
+  const sidebar = useRef<HTMLElement>(null);
+  const toggleSidebar = useCallback(() => {
+    setCollapsed(!collapsed);
+    document.documentElement.dataset.sidebarCollapsed = String(!collapsed);
+    try {
+      localStorage.setItem("soc.sidebar.collapsed", String(!collapsed));
+    } catch {
+      // Storage may be blocked; keep the current in-memory preference.
+    }
+    setPeeking(false);
+    if (!collapsed) requestAnimationFrame(() => main.current?.focus());
+  }, [collapsed]);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (isSidebarShortcut(event)) {
+        event.preventDefault();
+        toggleSidebar();
+      }
+      if (event.key === "Escape" && collapsed) {
+        setPeeking(false);
+        if (
+          sidebar.current?.contains(document.activeElement) ||
+          document.activeElement?.id === "sidebar-reveal"
+        )
+          main.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [collapsed, toggleSidebar]);
   const main = useRef<HTMLElement>(null);
   const [announcement, setAnnouncement] = useState("");
   const shownPath = useRef(pathname);
@@ -98,28 +157,34 @@ export function AppShell({
     enabled: working,
   });
   const [searchOpen, setSearchOpen] = useState(false);
+  const searchOpener = useRef<HTMLElement | null>(null);
+  const searchFromSidebar = useRef(false);
+  const openSearch = useCallback(() => {
+    if (searchOpen) return;
+    const active = document.activeElement;
+    searchOpener.current = active instanceof HTMLElement ? active : null;
+    searchFromSidebar.current = sidebar.current?.contains(active) ?? false;
+    setMenuOpen(false);
+    setSearchOpen(true);
+  }, [searchOpen]);
   const shortcut = useShortcutLabel();
   useEffect(() => {
     if (!working) return;
     const onKey = (event: KeyboardEvent) => {
       if (!isSearchShortcut(event)) return;
       event.preventDefault();
-      setMenuOpen(false);
-      setSearchOpen(true);
+      openSearch();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [working]);
+  }, [working, openSearch]);
   const searchButton = working && (
     <button
       type="button"
       className="app-search-button"
       aria-haspopup="dialog"
       aria-keyshortcuts="Meta+K Control+K"
-      onClick={() => {
-        setMenuOpen(false);
-        setSearchOpen(true);
-      }}
+      onClick={openSearch}
     >
       <Icon name="search" className="shrink-0" />
       <span>검색</span>
@@ -231,6 +296,7 @@ export function AppShell({
               onClick={() => setMenuOpen(false)}
               className="ui-nav-link flex min-w-0 items-center"
             >
+              <ProjectAvatar project={project} />
               <span className="truncate" title={project.key}>
                 {project.name}
               </span>
@@ -241,20 +307,80 @@ export function AppShell({
     </nav>
   );
   return (
-    <div className="app-shell min-h-dvh min-[60rem]:grid min-[60rem]:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]">
+    <div
+      className="app-shell min-h-dvh"
+      data-collapsed={collapsed || undefined}
+      data-peeking={peeking || undefined}
+    >
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-surface focus:p-3"
       >
         본문으로 건너뛰기
       </a>
-      <aside className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col">
-        <Link
-          href={routes.home}
-          className="flex min-w-0 items-center gap-2 text-sm font-semibold"
-        >
-          <BrandMark size={28} label />
-        </Link>
+      {collapsed && (
+        <button
+          id="sidebar-reveal"
+          type="button"
+          className="sidebar-reveal"
+          aria-label="사이드바 미리 보기"
+          aria-controls="desktop-sidebar"
+          aria-expanded={peeking}
+          onPointerEnter={() => {
+            cancelHover();
+            hoverTimer.current = setTimeout(() => {
+              keyboardPeek.current = false;
+              setPeeking(true);
+            }, 150);
+          }}
+          onPointerLeave={cancelHover}
+          onFocus={(event) => {
+            keyboardPeek.current =
+              event.currentTarget.matches(":focus-visible");
+            setPeeking(true);
+          }}
+          onBlur={(event) => {
+            if (!sidebar.current?.contains(event.relatedTarget))
+              setPeeking(false);
+          }}
+          onClick={() => setPeeking(true)}
+        />
+      )}
+      <aside
+        ref={sidebar}
+        id="desktop-sidebar"
+        inert={collapsed && !peeking}
+        className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col"
+        onPointerLeave={() => {
+          if (
+            !keyboardPeek.current ||
+            !sidebar.current?.contains(document.activeElement)
+          )
+            setPeeking(false);
+        }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget))
+            setPeeking(false);
+        }}
+      >
+        <div className="sidebar-brand">
+          <Link
+            href={routes.home}
+            className="flex min-w-0 items-center gap-2 text-sm font-semibold"
+          >
+            <BrandMark size={28} label />
+          </Link>
+          <IconButton
+            variant="ghost"
+            aria-label={collapsed ? "사이드바 고정" : "사이드바 접기"}
+            aria-expanded={!collapsed || peeking}
+            aria-controls="desktop-sidebar"
+            aria-keyshortcuts={"Meta+\\ Control+\\"}
+            onClick={toggleSidebar}
+          >
+            <Icon name={collapsed ? "menu" : "chevronLeft"} />
+          </IconButton>
+        </div>
         {searchButton}
         {navigation}
         {projectNavigation}
@@ -266,6 +392,17 @@ export function AppShell({
         </div>
       </aside>
       <div className="min-w-0">
+        <div className="sidebar-expand-bar">
+          <IconButton
+            variant="ghost"
+            aria-label="사이드바 열기"
+            aria-controls="desktop-sidebar"
+            aria-expanded={!collapsed}
+            onClick={toggleSidebar}
+          >
+            <Icon name="menu" />
+          </IconButton>
+        </div>
         <header className="app-topbar flex min-h-16 items-center gap-3 border-b border-border px-4 min-[60rem]:hidden">
           <IconButton
             aria-label="메뉴 열기"
@@ -290,7 +427,7 @@ export function AppShell({
                 aria-label="검색"
                 aria-haspopup="dialog"
                 variant="ghost"
-                onClick={() => setSearchOpen(true)}
+                onClick={openSearch}
               >
                 <Icon name="search" />
               </IconButton>
@@ -302,7 +439,13 @@ export function AppShell({
           ref={main}
           id="main-content"
           tabIndex={-1}
-          className="app-main mx-auto w-full max-w-[90rem] min-w-0 p-4 outline-none min-[60rem]:p-[var(--page-inset)]"
+          className="app-main mx-auto w-full min-w-0 p-4 outline-none min-[60rem]:p-[var(--page-inset)]"
+          data-layout={
+            /^\/(account|culture|guide)(\/|$)/.test(pathname) ||
+            /^\/docs\/[^/]+/.test(pathname)
+              ? "reading"
+              : "data"
+          }
         >
           {children}
         </main>
@@ -323,7 +466,20 @@ export function AppShell({
         <div className="mt-6 border-t border-border pt-4">{userSlot}</div>
       </Dialog>
       {working && (
-        <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
+        <SearchPalette
+          open={searchOpen}
+          onClose={() => {
+            setSearchOpen(false);
+            const target =
+              collapsed && searchFromSidebar.current
+                ? main.current
+                : searchOpener.current;
+            if (collapsed) {
+              setPeeking(false);
+            }
+            requestAnimationFrame(() => restoreFocus(target));
+          }}
+        />
       )}
     </div>
   );

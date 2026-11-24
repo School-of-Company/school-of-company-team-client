@@ -15,7 +15,7 @@ export const tierLabels: Readonly<Record<ServiceTier, string>> = {
 export const tierDescriptions: Readonly<Record<ServiceTier, string>> = {
   TIER1: "핵심 사용자 영향",
   TIER2: "내부 영향",
-  TIER3: "실험·도구",
+  TIER3: "실험, 도구",
 };
 export const dependencyKinds: readonly DependencyKind[] = [
   "API",

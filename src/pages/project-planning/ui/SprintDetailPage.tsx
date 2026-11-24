@@ -205,7 +205,7 @@ function SprintScreen({
         )}
         {!manages && sprint.status !== "CLOSED" && !project.archived && (
           <p className="text-sm text-muted">
-            스프린트 범위와 시작·종료는 PM 또는 헤드 어드민이 정합니다.
+            스프린트 범위와 시작, 종료는 PM 또는 헤드 어드민이 정합니다.
           </p>
         )}
       </section>

@@ -176,7 +176,7 @@ function DocumentWorkspace({
             </dl>
             {!document.canEdit && (
               <p className="text-xs text-muted">
-                작성자·연결된 서비스 소유자·헤드 어드민이 수정할 수 있습니다.
+                작성자, 연결된 서비스 소유자, 헤드 어드민이 수정할 수 있습니다.
               </p>
             )}
             <DocumentLinks document={document} />

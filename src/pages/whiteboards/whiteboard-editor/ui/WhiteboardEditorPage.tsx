@@ -223,7 +223,7 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
         title="화이트보드 지우기"
       >
         <p className="text-sm">
-          「{meta.title}」와 변경 이력·댓글이 모두 지워집니다. 되돌릴 수
+          「{meta.title}」와 변경 이력, 댓글이 모두 지워집니다. 되돌릴 수
           없습니다.
         </p>
         <div className="mt-4 flex justify-end gap-2">

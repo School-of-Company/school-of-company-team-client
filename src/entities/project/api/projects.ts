@@ -14,6 +14,22 @@ export const projectKeys = {
   buckets: (id: string) => ["projects", id, "planning-buckets"] as const,
 };
 export const projectApi = {
+  image: async (id: string, url: string) => {
+    const query = new URL(url, "http://localhost").search;
+    const { data } = await api.get<Blob>(
+      `/api/v1/projects/${encodeURIComponent(id)}/image${query}`,
+      { responseType: "blob" },
+    );
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () =>
+        typeof reader.result === "string"
+          ? resolve(reader.result)
+          : reject(new Error("Image decoding failed"));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(data);
+    });
+  },
   list: async (includeArchived = false, stage?: ProjectStage) =>
     (
       await api.get<readonly Project[]>("/api/v1/projects", {

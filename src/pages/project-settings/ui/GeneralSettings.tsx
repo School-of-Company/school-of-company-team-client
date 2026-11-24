@@ -17,6 +17,7 @@ import {
 import { Button, Field, Input, Select, Textarea } from "@/shared/ui";
 import type { SettingsProps } from "../model/props";
 import { MutationFeedback } from "./MutationFeedback";
+import { ProjectImageSettings } from "./ProjectImageSettings";
 
 export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
   const update = useUpdateProject(project.id, onSaved);
@@ -26,6 +27,11 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
   if (!editing)
     return (
       <div className="grid gap-5">
+        <ProjectImageSettings
+          project={project}
+          onSaved={onSaved}
+          canManage={permissions.manage}
+        />
         <dl className="grid gap-5 text-sm">
           <div>
             <dt className="text-muted">프로젝트 키</dt>
@@ -124,7 +130,7 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
         <Field
           id="project-visibility"
           label="공개 범위"
-          hint="참여자만 공개로 바꾸면 Discord 연결이 비활성화됩니다. 관리자가 채널·기존 스레드 권한을 점검한 뒤 다시 연결해야 합니다."
+          hint="참여자만 공개로 바꾸면 Discord 연결이 비활성화됩니다. 관리자가 채널, 기존 스레드 권한을 점검한 뒤 다시 연결해야 합니다."
         >
           <Select
             id="project-visibility"

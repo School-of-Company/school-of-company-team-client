@@ -46,7 +46,7 @@ export function SettingsPanels(props: SettingsProps) {
         {(
           [
             ["general", "기본 정보"],
-            ["members", "멤버·권한"],
+            ["members", "멤버와 권한"],
             ["integrations", "연동"],
             ["buckets", "계획 버킷"],
             ["notifications", "알림"],

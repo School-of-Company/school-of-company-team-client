@@ -198,7 +198,7 @@ function Highlights({
 
 function reviewOverdue(data: Home) {
   const overdue = data.reviewRequests.filter((item) => item.overdue).length;
-  return overdue > 0 ? ` · 24시간 넘음 ${overdue}건` : "";
+  return overdue > 0 ? ` (24시간 넘음 ${overdue}건)` : "";
 }
 
 /** 완료는 최근 것만 짧게, 빈 단계는 한 줄로 접는다. */
@@ -297,9 +297,13 @@ function MyTasks({
         );
       })}
       {empty.length > 0 && (
-        <p className="task-group-empty">
-          {empty.map((status) => `${statusLabels[status]} 0`).join(" · ")}
-        </p>
+        <div className="task-group-empty flex flex-wrap gap-2">
+          {empty.map((status) => (
+            <span key={status} className="ui-badge">
+              {statusLabels[status]} 0
+            </span>
+          ))}
+        </div>
       )}
     </section>
   );
@@ -317,18 +321,18 @@ function TaskListRow({
   const source =
     task.projectName ?? (task.scope === "PERSONAL" ? "개인" : "팀 공용");
   return (
-    <li className="list-row">
+    <li className="list-row my-task-row">
       <Link
         href={routes.task(task.id)}
         className="list-row-main"
         onClick={onOpen}
       >
-        <span className="list-row-key" title={source}>
-          {task.key ?? source}
-        </span>
         <span className="list-row-title">{task.title}</span>
       </Link>
       <span className="list-row-meta">
+        <span className="list-row-key" title={source}>
+          {task.key ?? source}
+        </span>
         {task.blocked && <span className="ui-badge badge-red">막힘</span>}
         {task.issue && (
           <span

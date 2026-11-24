@@ -243,7 +243,7 @@ function Requester({
         <div>
           <dt className="sr-only">이름</dt>
           <dd>
-            {requester.name} · {requester.organization}
+            {requester.name}, {requester.organization}
           </dd>
         </div>
         <div>
@@ -263,12 +263,12 @@ function Requester({
         <div>
           <dt className="sr-only">동의 시각</dt>
           <dd className="text-xs text-muted">
-            {formatDate(requester.consentedAt, dateTime)} 수집·이용 동의
+            {formatDate(requester.consentedAt, dateTime)} 수집, 이용 동의
           </dd>
         </div>
       </dl>
       <p className="text-xs text-muted">
-        연락처는 업무·메모·Discord에 옮겨 적지 마세요.
+        연락처는 업무, 메모, Discord에 옮겨 적지 마세요.
       </p>
     </section>
   );
@@ -437,7 +437,7 @@ function Events({ requirement }: { readonly requirement: RequirementDetail }) {
               </span>
             )}
             <span className="text-muted">
-              {event.actor?.name ?? "요청자·시스템"}
+              {event.actor?.name ?? "요청자, 시스템"}
             </span>
           </li>
         ))}

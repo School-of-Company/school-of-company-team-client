@@ -188,9 +188,9 @@ function CommentItem({
       className="whiteboard-comment grid gap-1"
       data-resolved={comment.resolved || undefined}
     >
-      <p className="text-sm text-muted">
-        {comment.author?.name ?? "알 수 없음"} ·{" "}
-        {formatDate(comment.createdAt, { year: undefined })}
+      <p className="flex flex-wrap gap-x-2 text-sm text-muted">
+        <span>{comment.author?.name ?? "알 수 없음"}</span>
+        <span>{formatDate(comment.createdAt, { year: undefined })}</span>
       </p>
       <p className="[overflow-wrap:anywhere] whitespace-pre-wrap">
         {comment.body}

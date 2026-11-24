@@ -54,7 +54,7 @@ export function DeploymentsState({
       : !visible
         ? "이 서비스의 저장소는 모두 비공개입니다. GitHub 원본 권한이 있어야 배포가 보입니다."
         : workflowSet
-          ? "연결 이후의 배포부터 기록합니다. GitHub App이 deployment_status·workflow_run 이벤트를 구독하기 전에는 수집 대기 상태입니다."
+          ? "연결 이후의 배포부터 기록합니다. GitHub App이 deployment_status, workflow_run 이벤트를 구독하기 전에는 수집 대기 상태입니다."
           : "GitHub deployment 이벤트를 받거나, 저장소 배포 설정에 워크플로 이름을 정하면 그 실행을 배포로 기록합니다.";
   return (
     <>

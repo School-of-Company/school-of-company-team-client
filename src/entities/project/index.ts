@@ -1,4 +1,5 @@
 export { projectApi, projectKeys, projectQueries } from "./api/projects";
+export { ProjectAvatar } from "./ui/ProjectAvatar";
 export {
   kindLabels,
   projectAccess,

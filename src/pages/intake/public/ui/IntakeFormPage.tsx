@@ -208,7 +208,7 @@ function IntakeFormBody({
           id={`${id}-consent`}
           className="flex items-center gap-2 text-lg font-semibold"
         >
-          개인정보 수집·이용 동의
+          개인정보 수집, 이용 동의
           {form.consentReviewRequired && (
             <Badge className="badge-red">검토 필요</Badge>
           )}
@@ -248,7 +248,7 @@ function IntakeFormBody({
         )}
       </section>
 
-      {/* 숨은 입력란(봇 판정, D12-9). 사람에게는 보이지 않고 보조기기·Tab 순서에서도 빠진다. */}
+      {/* 숨은 입력란(봇 판정, D12-9). 사람에게는 보이지 않고 보조기기, Tab 순서에서도 빠진다. */}
       <div className="intake-trap" aria-hidden="true">
         <label htmlFor={`${id}-website`}>Website</label>
         <input

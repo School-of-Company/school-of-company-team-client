@@ -113,7 +113,7 @@ export function IntakeFormSettings({
       {forms.data.length === 0 ? (
         <EmptyState
           title="접수 양식이 없습니다"
-          description="외주 문의·요구사항을 받을 링크를 만들어 요청자에게 전달하세요."
+          description="외주 문의, 요구사항을 받을 링크를 만들어 요청자에게 전달하세요."
         />
       ) : (
         <ul className="grid gap-3" aria-label="접수 양식">
@@ -137,12 +137,12 @@ export function IntakeFormSettings({
                   )}
               </div>
               <p className="text-sm text-muted">
-                하루 {form.dailyLimit}건 ·{" "}
+                하루 {form.dailyLimit}건, {" "}
                 {form.expiresAt
                   ? `${formatDate(form.expiresAt, { hour: "2-digit", minute: "2-digit" })} 마감`
                   : "마감 없음"}
                 {form.rotatedAt &&
-                  ` · ${formatDate(form.rotatedAt)} 링크 재발급`}
+                  `, ${formatDate(form.rotatedAt)} 링크 재발급`}
               </p>
               <div className="flex flex-wrap gap-2">
                 <Input

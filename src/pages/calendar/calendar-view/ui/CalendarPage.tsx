@@ -58,7 +58,7 @@ export function CalendarPage({ projectId }: { readonly projectId?: string }) {
               <div className="min-w-0">
                 <h1>달력</h1>
                 <p className="page-subtitle">
-                  팀 일정과 업무 마감·마일스톤·스프린트·실험을 한곳에 모아
+                  팀 일정과 업무 마감, 마일스톤, 스프린트, 실험을 한곳에 모아
                   봅니다. 볼 수 있는 프로젝트 것만 나옵니다.
                 </p>
               </div>

@@ -121,7 +121,7 @@ export function ServiceRepositories({
       {hidden > 0 && (
         <p className="text-xs text-muted">
           비공개 저장소 {hidden}개는 GitHub 원본 권한이 있는 사람에게만
-          이름·릴리스·배포가 보입니다.
+          이름, 릴리스, 배포가 보입니다.
         </p>
       )}
       {linking && (
@@ -140,7 +140,7 @@ export function ServiceRepositories({
       <ConfirmDialog
         open={unlinking !== null}
         title="저장소 연결 해제"
-        description={`이 서비스에서 ${unlinking?.fullName ?? "비공개 저장소"} 연결을 해제합니다. 쌓인 릴리스·배포 기록은 지우지 않고, 다시 연결하면 보입니다.`}
+        description={`이 서비스에서 ${unlinking?.fullName ?? "비공개 저장소"} 연결을 해제합니다. 쌓인 릴리스, 배포 기록은 지우지 않고, 다시 연결하면 보입니다.`}
         confirmLabel="연결 해제"
         pending={unlink.isPending}
         error={unlink.error ? serviceErrorMessage(unlink.error) : undefined}

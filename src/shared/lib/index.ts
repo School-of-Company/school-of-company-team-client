@@ -62,6 +62,7 @@ export {
   type Theme,
   type ThemePreference,
 } from "./theme";
+export { sidebarBootScript } from "./sidebar-preference";
 
 export { keepsLastData, useLastData, LAST_DATA_LIMIT } from "./last-data";
 export {
