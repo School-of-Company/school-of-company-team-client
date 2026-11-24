@@ -19,7 +19,7 @@ import {
   useExperimentMutation,
 } from "@/features/manage-experiment";
 import { routes } from "@/shared/config";
-import { Button, ErrorState, Skeleton, Spinner } from "@/shared/ui";
+import { Button, ErrorState, StaleNotice } from "@/shared/ui";
 
 import { Section, EditableSection } from "./LabSections";
 import { FinishDialog } from "./LabFinishDialog";
@@ -32,13 +32,59 @@ export function LabDetailPage({
   readonly experimentId: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<LabDetailSkeleton />}>
       {(user) => (
-        <Suspense fallback={<Spinner label="실험 불러오는 중" />}>
+        <Suspense fallback={<LabDetailSkeleton />}>
           <LabDetailContent experimentId={experimentId} user={user} />
         </Suspense>
       )}
     </AuthGuard>
+  );
+}
+
+/** 머리글(경로, 제목, 상태 줄, 동작 버튼), 속성 줄, 본문 칸을 실제와 같은 클래스로 잡는다. */
+export function LabDetailSkeleton() {
+  return (
+    <div role="status" aria-label="실험을 불러오는 중" className="lab-detail">
+      <header aria-hidden="true" className="page-header">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <span className="ui-skeleton-text">실험실</span>
+          </p>
+          <h1>
+            <span className="ui-skeleton-text">실험 제목을 불러오는 중</span>
+          </h1>
+          <p className="page-subtitle">
+            <span className="ui-skeleton-text">진행 중</span>
+          </p>
+        </div>
+        <div className="page-actions">
+          <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">결과 정리하기</span>
+          </span>
+          <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">더 보기</span>
+          </span>
+        </div>
+      </header>
+      <section aria-hidden="true" className="lab-properties">
+        <dl>
+          {["담당자", "기간", "프로젝트"].map((label) => (
+            <div key={label}>
+              <dt>
+                <span className="ui-skeleton-text">{label}</span>
+              </dt>
+              <dd>
+                <span className="ui-skeleton-text">불러오는 중</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+      <div aria-hidden="true" className="lab-sections">
+        <div className="ui-skeleton-list" />
+      </div>
+    </div>
   );
 }
 
@@ -50,14 +96,7 @@ function LabDetailContent({
   readonly user: User;
 }) {
   const query = useQuery(experimentQueries.detail(experimentId));
-  if (query.isPending)
-    return (
-      <div role="status" aria-label="실험을 불러오는 중" className="grid gap-4">
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-9 w-2/3" />
-        <Skeleton className="h-64" />
-      </div>
-    );
+  if (query.isPending) return <LabDetailSkeleton />;
   if (!query.data)
     return (
       <ErrorState
@@ -65,7 +104,12 @@ function LabDetailContent({
         onRetry={() => void query.refetch()}
       />
     );
-  return <ExperimentView experiment={query.data} user={user} />;
+  return (
+    <>
+      <StaleNotice query={query} />
+      <ExperimentView experiment={query.data} user={user} />
+    </>
+  );
 }
 
 function ExperimentView({

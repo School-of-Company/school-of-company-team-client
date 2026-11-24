@@ -1,1 +1,1 @@
-export { LabDetailPage } from "./ui/LabDetailPage";
+export { LabDetailPage, LabDetailSkeleton } from "./ui/LabDetailPage";
