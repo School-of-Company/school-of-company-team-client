@@ -74,6 +74,17 @@ export function IncidentDetailSkeleton() {
             <span className="ui-skeleton-text text-xs">대응 중</span>
           </p>
         </div>
+        {/* 좁은 화면에서는 동작 버튼이 제목 아래 줄로 내려가므로 같은 줄을 잡는다. */}
+        <div className="flex flex-wrap items-center gap-2">
+          {["완화로 표시", "상태 변경", "수정"].map((label) => (
+            <span
+              key={label}
+              className="ui-button ui-button-secondary ui-button-sm"
+            >
+              <span className="ui-skeleton-text">{label}</span>
+            </span>
+          ))}
+        </div>
       </header>
       <div aria-hidden="true" className="project-nav flex border-b">
         {tabs.map((item) => (
