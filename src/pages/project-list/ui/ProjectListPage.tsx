@@ -39,14 +39,17 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
     placeholderData: keepPreviousData,
   });
   const count = settledData(projects)?.length;
+  const scope = stage ? `${stageLabels[stage]} 단계 ` : "";
   return (
     <div className="grid gap-5">
       <PageHeader
         title="프로젝트"
         subtitle={
-          count === undefined
-            ? ""
-            : `${stage ? `${stageLabels[stage]} 단계 ` : ""}${count}개`
+          count !== undefined
+            ? `${scope}${count}개`
+            : projects.isError && !projects.data
+              ? "프로젝트 집계를 불러오지 못했습니다"
+              : `${scope}프로젝트 집계 중`
         }
         actions={
           canCreate && (
