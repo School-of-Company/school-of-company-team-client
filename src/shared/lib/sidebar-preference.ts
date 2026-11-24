@@ -1,0 +1,1 @@
+export const sidebarBootScript = `(function(){try{document.documentElement.dataset.sidebarCollapsed=String(localStorage.getItem("soc.sidebar.collapsed")==="true")}catch(e){document.documentElement.dataset.sidebarCollapsed="false"}})();`;

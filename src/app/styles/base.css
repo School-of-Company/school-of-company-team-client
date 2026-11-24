@@ -9,6 +9,7 @@
     overflow-x: clip;
   }
   html {
+    scrollbar-gutter: stable;
     scrollbar-color: var(--gray-7) transparent;
   }
   body {

@@ -561,15 +561,20 @@ select.ui-input {
 .sidebar-reveal {
   display: none;
 }
+.sidebar-expand-bar {
+  display: none;
+}
 @media (min-width: 60rem) {
   .app-shell {
     display: grid;
     grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   }
-  .app-shell[data-collapsed] {
+  .app-shell[data-collapsed],
+  html[data-sidebar-collapsed="true"] .app-shell {
     grid-template-columns: minmax(0, 1fr);
   }
-  .app-shell[data-collapsed] .app-sidebar {
+  .app-shell[data-collapsed] .app-sidebar,
+  html[data-sidebar-collapsed="true"] .app-sidebar {
     position: fixed;
     left: 0;
     top: 0;
@@ -580,6 +585,11 @@ select.ui-input {
   }
   .app-shell[data-peeking] .app-sidebar {
     visibility: visible;
+  }
+  .app-shell[data-collapsed] .sidebar-expand-bar,
+  html[data-sidebar-collapsed="true"] .sidebar-expand-bar {
+    display: flex;
+    padding: var(--space-3) var(--page-inset) 0;
   }
   .sidebar-reveal {
     display: block;
@@ -601,9 +611,8 @@ select.ui-input {
   border-color: var(--border);
   background: var(--surface-sidebar);
 }
-.app-sidebar > a:first-child {
+.sidebar-brand > a {
   min-height: var(--control-md);
-  margin-bottom: var(--space-4);
   padding-inline: var(--space-2);
 }
 .app-topbar {
@@ -761,7 +770,7 @@ select.ui-input {
   box-shadow: 0 1px 3px rgb(0 27 55 / 0.1);
 }
 
-/* Settings and other single-column pages share the board's left edge. */
+/* Project headers stay fluid; only the settings form is centered. */
 .settings-page {
   max-width: var(--content-narrow);
   margin-inline: 0;

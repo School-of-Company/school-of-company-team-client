@@ -15,6 +15,7 @@ import { ProjectAvatar, projectQueries } from "@/entities/project";
 import { useMe, userDestination } from "@/entities/user";
 import { isSearchShortcut } from "../model/search";
 import { SearchPalette } from "./SearchPalette";
+import { isSidebarShortcut } from "../model/sidebar";
 import { routes } from "@/shared/config";
 import {
   BrandMark,
@@ -66,9 +67,22 @@ export function AppShell({
   const [collapsedOverride, setCollapsed] = useState<boolean | null>(null);
   const collapsed = collapsedOverride ?? storedCollapsed;
   const [peeking, setPeeking] = useState(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const keyboardPeek = useRef(false);
+  const cancelHover = () => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    hoverTimer.current = null;
+  };
+  useEffect(
+    () => () => {
+      if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    },
+    [],
+  );
   const sidebar = useRef<HTMLElement>(null);
   const toggleSidebar = useCallback(() => {
     setCollapsed(!collapsed);
+    document.documentElement.dataset.sidebarCollapsed = String(!collapsed);
     try {
       localStorage.setItem("soc.sidebar.collapsed", String(!collapsed));
     } catch {
@@ -79,12 +93,7 @@ export function AppShell({
   }, [collapsed]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (
-        event.key === "\\" &&
-        (event.metaKey || event.ctrlKey) &&
-        !event.altKey &&
-        !event.repeat
-      ) {
+      if (isSidebarShortcut(event)) {
         event.preventDefault();
         toggleSidebar();
       }
@@ -310,8 +319,23 @@ export function AppShell({
           aria-label="사이드바 미리 보기"
           aria-controls="desktop-sidebar"
           aria-expanded={peeking}
-          onPointerEnter={() => setPeeking(true)}
-          onFocus={() => setPeeking(true)}
+          onPointerEnter={() => {
+            cancelHover();
+            hoverTimer.current = setTimeout(() => {
+              keyboardPeek.current = false;
+              setPeeking(true);
+            }, 150);
+          }}
+          onPointerLeave={cancelHover}
+          onFocus={(event) => {
+            keyboardPeek.current =
+              event.currentTarget.matches(":focus-visible");
+            setPeeking(true);
+          }}
+          onBlur={(event) => {
+            if (!sidebar.current?.contains(event.relatedTarget))
+              setPeeking(false);
+          }}
           onClick={() => setPeeking(true)}
         />
       )}
@@ -321,7 +345,10 @@ export function AppShell({
         inert={collapsed && !peeking}
         className="app-sidebar sticky top-0 hidden h-dvh min-w-0 overflow-y-auto border-r border-border p-3 min-[60rem]:flex min-[60rem]:flex-col"
         onPointerLeave={() => {
-          if (!sidebar.current?.contains(document.activeElement))
+          if (
+            !keyboardPeek.current ||
+            !sidebar.current?.contains(document.activeElement)
+          )
             setPeeking(false);
         }}
         onBlur={(event) => {
@@ -341,7 +368,7 @@ export function AppShell({
             aria-label={collapsed ? "사이드바 고정" : "사이드바 접기"}
             aria-expanded={!collapsed || peeking}
             aria-controls="desktop-sidebar"
-            aria-keyshortcuts="Meta+Backslash Control+Backslash"
+            aria-keyshortcuts={"Meta+\\ Control+\\"}
             onClick={toggleSidebar}
           >
             <Icon name={collapsed ? "menu" : "chevronLeft"} />
@@ -358,6 +385,17 @@ export function AppShell({
         </div>
       </aside>
       <div className="min-w-0">
+        <div className="sidebar-expand-bar">
+          <IconButton
+            variant="ghost"
+            aria-label="사이드바 열기"
+            aria-controls="desktop-sidebar"
+            aria-expanded={!collapsed}
+            onClick={toggleSidebar}
+          >
+            <Icon name="menu" />
+          </IconButton>
+        </div>
         <header className="app-topbar flex min-h-16 items-center gap-3 border-b border-border px-4 min-[60rem]:hidden">
           <IconButton
             aria-label="메뉴 열기"
@@ -397,7 +435,6 @@ export function AppShell({
           className="app-main mx-auto w-full min-w-0 p-4 outline-none min-[60rem]:p-[var(--page-inset)]"
           data-layout={
             /^\/(account|culture|guide)(\/|$)/.test(pathname) ||
-            /^\/projects\/[^/]+\/settings/.test(pathname) ||
             /^\/docs\/[^/]+/.test(pathname)
               ? "reading"
               : "data"
@@ -422,7 +459,16 @@ export function AppShell({
         <div className="mt-6 border-t border-border pt-4">{userSlot}</div>
       </Dialog>
       {working && (
-        <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
+        <SearchPalette
+          open={searchOpen}
+          onClose={() => {
+            setSearchOpen(false);
+            if (collapsed) {
+              setPeeking(false);
+              requestAnimationFrame(() => main.current?.focus());
+            }
+          }}
+        />
       )}
     </div>
   );
