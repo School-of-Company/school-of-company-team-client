@@ -58,7 +58,6 @@ function AdminContent({ user }: { readonly user: User }) {
         <nav className="settings-nav" aria-label="관리자 설정 구역">
           {[
             { id: "users", label: "사용자 관리" },
-            { id: "projects", label: "프로젝트" },
             { id: "integrations", label: "연동" },
             { id: "templates", label: "문서 템플릿" },
           ].map((item) => (
@@ -76,19 +75,6 @@ function AdminContent({ user }: { readonly user: User }) {
         <CreateProjectForm onSaved={refresh} />
       ) : tab === "templates" ? (
         <DocumentTemplates />
-      ) : tab === "projects" ? (
-        <section className="settings-card grid gap-4">
-          <h2>프로젝트</h2>
-          <p className="text-sm text-muted">
-            프로젝트 목록에서 참여 현황과 설정을 확인합니다.
-          </p>
-          <Link
-            href="/projects"
-            className="ui-button ui-button-secondary justify-self-start"
-          >
-            모든 프로젝트 보기
-          </Link>
-        </section>
       ) : (
         <AdminSettings
           user={user}

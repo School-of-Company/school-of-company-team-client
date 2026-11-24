@@ -160,16 +160,11 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
             ))}
           </Select>
         </Field>
-        <Field
-          id="project-workflow"
-          label="진행 방식"
-          hint="Kanban 프로젝트는 프로젝트 메뉴에 스프린트 탭을 두지 않습니다."
-        >
+        <Field id="project-workflow" label="진행 방식">
           <Select
             id="project-workflow"
             name="workflow"
             defaultValue={project.workflow}
-            aria-describedby="project-workflow-hint"
           >
             {Object.entries(workflowLabels).map(([value, label]) => (
               <option key={value} value={value}>

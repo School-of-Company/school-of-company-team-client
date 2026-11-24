@@ -1,12 +1,9 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import {
-  fromLocalInput,
-  incidentApi,
-  incidentErrorMessage,
-} from "@/entities/incident";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { incidentApi, incidentErrorMessage } from "@/entities/incident";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
+import { Button, DateTimePicker, Textarea } from "@/shared/ui";
 import { useIncidentMutation } from "../api/mutations";
 
 /** 대응 중 기록은 여러 사람이 남긴다: 메모는 활성 팀원 누구나 쓴다(D7-5). 지난 일을 나중에 적을 때만 시각을 고른다. */
@@ -22,7 +19,7 @@ export function TimelineNoteForm({
   const add = useIncidentMutation(incidentId, () =>
     incidentApi.addNote(incidentId, {
       body: body.trim(),
-      occurredAt: backdated ? fromLocalInput(at) : undefined,
+      occurredAt: backdated ? at || undefined : undefined,
     }),
   );
   const submit = (event: FormEvent) => {
@@ -36,6 +33,13 @@ export function TimelineNoteForm({
       },
     });
   };
+  const server = add.error
+    ? fieldErrors(
+        normalizeApiError(add.error),
+        ["occurredAt"],
+        incidentErrorMessage(add.error),
+      )
+    : {};
   return (
     <form className="incident-note-form" onSubmit={submit}>
       <label htmlFor={`${id}-body`} className="sr-only">
@@ -60,13 +64,15 @@ export function TimelineNoteForm({
             <label htmlFor={`${id}-at`} className="text-sm text-muted">
               일어난 시각
             </label>
-            <Input
-              id={`${id}-at`}
-              type="datetime-local"
-              className="incident-note-time"
-              value={at}
-              onChange={(event) => setAt(event.target.value)}
-            />
+            <span className="incident-note-time">
+              <DateTimePicker
+                id={`${id}-at`}
+                label="일어난 시각"
+                value={at}
+                invalid={!!server.occurredAt}
+                onChange={setAt}
+              />
+            </span>
             <Button
               variant="ghost"
               className="ui-button-sm"
@@ -97,9 +103,14 @@ export function TimelineNoteForm({
           메모 추가
         </Button>
       </div>
-      {add.error ? (
+      {server.occurredAt ? (
+        <p id={`${id}-at-error`} role="alert" className="text-sm text-danger">
+          {server.occurredAt}
+        </p>
+      ) : null}
+      {server.form ? (
         <p role="alert" className="text-sm text-danger">
-          {incidentErrorMessage(add.error)}
+          {server.form}
         </p>
       ) : null}
     </form>

@@ -383,6 +383,11 @@ select.ui-input {
   position: relative;
   min-width: 0;
 }
+.ui-date-time {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--time-input-width);
+  gap: var(--space-2);
+}
 .ui-date-trigger {
   display: flex;
   align-items: center;
@@ -402,20 +407,15 @@ select.ui-input {
   opacity: 0.6;
 }
 .ui-date-popover {
-  position: absolute;
+  /* 위치(top, left)는 DatePicker 가 화면 기준으로 정한다. */
+  position: fixed;
   z-index: var(--z-dropdown);
-  top: calc(100% + 6px);
-  left: 0;
   width: 18.5rem;
   max-width: calc(100vw - 2rem);
   padding: var(--space-3);
   border-radius: var(--radius-xl);
   background: var(--surface-raised);
   box-shadow: var(--shadow-overlay);
-}
-.ui-date-popover[data-align="end"] {
-  right: 0;
-  left: auto;
 }
 .ui-date-head {
   display: flex;
@@ -771,10 +771,30 @@ select.ui-input {
     width: var(--sidebar-width);
     z-index: 40;
     visibility: hidden;
+    opacity: 0;
+    transform: translateX(-100%);
     box-shadow: var(--shadow-overlay);
+    /* 닫힐 때는 미끄러지고 흐려진 뒤에 숨긴다. 고정 위치라 본문은 움직이지 않는다. */
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      opacity var(--dur-2) var(--ease-out),
+      visibility 0s linear var(--dur-2);
   }
   .app-shell[data-peeking] .app-sidebar {
     visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      opacity var(--dur-2) var(--ease-out),
+      visibility 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app-shell[data-collapsed] .app-sidebar,
+    html[data-sidebar-collapsed="true"] .app-sidebar {
+      transform: none;
+      transition: none;
+    }
   }
   .app-shell[data-collapsed] .sidebar-expand-bar,
   html[data-sidebar-collapsed="true"] .sidebar-expand-bar {
@@ -2098,6 +2118,69 @@ select.ui-input {
   line-height: 1.5rem;
   text-align: center;
 }
+.ui-identity-login {
+  isolation: isolate;
+  background: var(--surface-box);
+}
+.ui-login-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: var(--login-grid-size) var(--login-grid-size);
+  mask-image: radial-gradient(ellipse at center, black, transparent 75%);
+}
+.ui-login-backdrop::before,
+.ui-login-backdrop::after {
+  content: "";
+  position: absolute;
+  width: var(--login-ambient-size);
+  height: var(--login-ambient-size);
+  border-radius: var(--radius-pill);
+  background: radial-gradient(closest-side, var(--surface-active), transparent);
+}
+.ui-login-backdrop::before {
+  top: -25%;
+  left: -15%;
+}
+.ui-login-backdrop::after {
+  bottom: -25%;
+  right: -15%;
+}
+.ui-identity.ui-identity-login main {
+  animation: none;
+  max-width: var(--login-width);
+  padding: var(--space-10) var(--space-8);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-2xl);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-overlay);
+}
+.ui-identity-login main > p {
+  color: var(--foreground-2);
+}
+.ui-identity-login main > div {
+  margin-top: var(--space-8);
+  gap: var(--space-5);
+}
+.ui-identity-login main .ui-button {
+  min-height: var(--control-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.ui-login-note {
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+.ui-identity-login .ui-button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: var(--space-1);
+}
 .ui-brand-tile {
   display: inline-grid;
   flex: none;
@@ -2131,7 +2214,43 @@ select.ui-input {
     opacity: 0.45;
   }
 }
+@keyframes ui-login-drift {
+  50% {
+    transform: translate3d(var(--login-drift), var(--login-drift), 0);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
+  .ui-login-backdrop::before,
+  .ui-login-backdrop::after {
+    animation: ui-login-drift var(--login-ambient-duration) ease-in-out infinite;
+  }
+  .ui-login-backdrop::after {
+    animation-direction: reverse;
+    animation-delay: calc(var(--login-ambient-duration) / -2);
+  }
+  .ui-identity-login main > * {
+    animation: ui-fade-up var(--login-enter-duration) var(--ease-out) both;
+  }
+  .ui-identity-login main > p {
+    animation-delay: calc(var(--dur-1) / 2);
+  }
+  .ui-identity-login main > h1 {
+    animation-delay: var(--dur-1);
+  }
+  .ui-identity-login main > div {
+    animation-delay: var(--dur-2);
+  }
+  .ui-identity-login main .ui-button {
+    transition:
+      background var(--dur-2),
+      transform var(--dur-2) var(--ease-out);
+  }
+  .ui-identity-login main .ui-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .ui-identity-login main .ui-button:active:not(:disabled) {
+    transform: translateY(1px);
+  }
   .ui-dialog[open]:not(.ui-drawer) {
     animation: ui-fade-up var(--dur-2) var(--ease-out);
   }
@@ -4335,7 +4454,8 @@ a.search-option:hover {
   gap: var(--space-2);
 }
 .incident-note-time {
-  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 /* 속성 열의 칸(Discord·Runbook·관련 문서·관계). 속성 목록 아래 구분선으로 나눈다. */
 .incident-prop-section,

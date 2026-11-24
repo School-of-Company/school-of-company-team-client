@@ -22,6 +22,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  DatePicker,
   ErrorState,
   Field,
   IconButton,
@@ -387,11 +388,13 @@ function TemplateInput({
           ))}
         </Select>
       ) : field.type === "DATE" ? (
-        <Input
-          {...common}
-          type="date"
+        <DatePicker
+          id={id}
+          label={field.label}
           value={text}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={onChange}
+          invalid={!!error}
+          describedBy={field.help ? `${id}-hint` : undefined}
         />
       ) : field.type === "LONG_TEXT" ? (
         <Textarea

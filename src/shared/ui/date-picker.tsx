@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+} from "react";
 import {
   addDays,
   addMonths,
   clampDate,
+  fromSeoulDateTime,
   isOutOfRange,
   monthGrid,
   todayIso,
+  toSeoulDateTime,
   weekday,
 } from "@/shared/lib";
 import { Icon } from "./icons";
@@ -43,6 +53,7 @@ export function DatePicker({
   placeholder = "날짜 선택",
   disabled = false,
   invalid = false,
+  describedBy,
 }: {
   readonly id: string;
   readonly name?: string;
@@ -55,10 +66,12 @@ export function DatePicker({
   readonly placeholder?: string;
   readonly disabled?: boolean;
   readonly invalid?: boolean;
+  /** 안내 문구 등 함께 읽을 요소 id. 오류(`${id}-error`)는 invalid 일 때 알아서 붙는다. */
+  readonly describedBy?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [focus, setFocus] = useState(value || todayIso());
-  const [alignEnd, setAlignEnd] = useState(false);
+  const [place, setPlace] = useState<CSSProperties>({ visibility: "hidden" });
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const popover = useRef<HTMLDivElement>(null);
@@ -75,6 +88,40 @@ export function DatePicker({
     document.addEventListener("pointerdown", onPointer);
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [open]);
+  // 달력은 화면 기준(fixed)으로 띄워 대화상자 스크롤 영역에 잘리지 않고, 대화상자를 스크롤하지도 않는다.
+  // 아래 공간이 모자라면 위로, 오른쪽이 모자라면 화면 안쪽으로 붙인다. 스크롤하거나 창 크기가 바뀌면 다시 맞춘다.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const gap = 6;
+    const edge = 16;
+    const reposition = () => {
+      const box = trigger.current?.getBoundingClientRect();
+      const panel = popover.current;
+      if (!box || !panel) return;
+      const { innerWidth, innerHeight } = window;
+      const left = Math.max(
+        edge,
+        Math.min(box.left, innerWidth - edge - panel.offsetWidth),
+      );
+      const fitsBelow =
+        box.bottom + gap + panel.offsetHeight <= innerHeight - edge;
+      const fitsAbove = box.top - gap - panel.offsetHeight >= edge;
+      setPlace({
+        left,
+        top:
+          fitsBelow || !fitsAbove
+            ? box.bottom + gap
+            : box.top - gap - panel.offsetHeight,
+      });
+    };
+    reposition();
+    window.addEventListener("resize", reposition);
+    window.addEventListener("scroll", reposition, true);
+    return () => {
+      window.removeEventListener("resize", reposition);
+      window.removeEventListener("scroll", reposition, true);
+    };
+  }, [open]);
   useEffect(() => {
     if (!open || !moveFocus.current) return;
     moveFocus.current = false;
@@ -84,12 +131,7 @@ export function DatePicker({
   }, [open, focus]);
 
   function show() {
-    // 오른쪽 칸(예: 대화상자의 마감일)에서 달력이 밖으로 나가면 오른쪽 끝에 맞춘다.
-    const box = trigger.current?.getBoundingClientRect();
-    const edge = (
-      root.current?.closest("dialog") ?? document.documentElement
-    ).getBoundingClientRect().right;
-    setAlignEnd(!!box && box.left + 18.5 * 16 > edge - 16);
+    setPlace({ visibility: "hidden" });
     moveFocus.current = true;
     setFocus(clampDate(value || today, bounds));
     setOpen(true);
@@ -168,7 +210,7 @@ export function DatePicker({
         aria-haspopup="dialog"
         aria-expanded={open}
         data-invalid={invalid || undefined}
-        aria-describedby={invalid ? `${id}-error` : undefined}
+        aria-describedby={describe(id, invalid, describedBy)}
         disabled={disabled}
         onClick={() => (open ? setOpen(false) : show())}
         onKeyDown={(event) => {
@@ -191,7 +233,7 @@ export function DatePicker({
           aria-modal="true"
           aria-label={`${label} 선택`}
           className="ui-date-popover"
-          data-align={alignEnd ? "end" : undefined}
+          style={place}
           onKeyDown={onPopoverKey}
         >
           <div className="ui-date-head">
@@ -300,6 +342,86 @@ export function DatePicker({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const describe = (id: string, invalid: boolean, extra?: string) =>
+  [invalid && `${id}-error`, extra].filter(Boolean).join(" ") || undefined;
+
+/**
+ * 날짜는 DatePicker, 시각은 시각 칸으로 고르는 입력. 값과 `min`, `max` 는 ISO 시각(UTC)이고 비었으면 "" 이다.
+ * 화면의 날짜와 시각은 다른 화면과 같이 Asia/Seoul 기준이라 브라우저 시간대가 달라도 같은 값을 보이고 보낸다.
+ * 날짜를 고르면 `defaultTime`(기본은 지금 서울 시각)을 붙이고, 날짜를 지우면 시각도 지운다. 시각 칸은 날짜가 있어야 쓸 수 있다.
+ */
+export function DateTimePicker({
+  id,
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  defaultTime,
+  invalid = false,
+  describedBy,
+}: {
+  readonly id: string;
+  /** 칸 이름(예: "변경 시각"). 끝의 "시각"은 떼고 "날짜", "시각"을 붙여 두 칸의 이름으로 쓴다. */
+  readonly label: string;
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  readonly min?: string;
+  readonly max?: string;
+  readonly defaultTime?: string;
+  readonly invalid?: boolean;
+  /** 안내 문구 등 함께 읽을 요소 id. */
+  readonly describedBy?: string;
+}) {
+  const local = toSeoulDateTime(value);
+  const date = local.slice(0, 10);
+  const time = local.slice(11, 16);
+  const minLocal = toSeoulDateTime(min);
+  const maxLocal = toSeoulDateTime(max);
+  const name = label.replace(/\s*시각$/, "");
+  const fallback = () =>
+    defaultTime ?? toSeoulDateTime(new Date().toISOString()).slice(11, 16);
+  return (
+    <div className="ui-date-time">
+      <DatePicker
+        id={id}
+        label={`${name} 날짜`}
+        value={date}
+        min={minLocal.slice(0, 10) || undefined}
+        max={maxLocal.slice(0, 10) || undefined}
+        invalid={invalid}
+        describedBy={describedBy}
+        onChange={(next) =>
+          onChange(next ? fromSeoulDateTime(next, time || fallback()) : "")
+        }
+      />
+      <input
+        id={`${id}-time`}
+        type="time"
+        className="ui-input"
+        aria-label={`${name} 시각`}
+        aria-invalid={invalid || undefined}
+        aria-describedby={describe(id, invalid, describedBy)}
+        disabled={!date}
+        value={time}
+        min={
+          date && date === minLocal.slice(0, 10)
+            ? minLocal.slice(11)
+            : undefined
+        }
+        max={
+          date && date === maxLocal.slice(0, 10)
+            ? maxLocal.slice(11)
+            : undefined
+        }
+        onChange={(event) =>
+          onChange(fromSeoulDateTime(date, event.target.value || fallback()))
+        }
+      />
     </div>
   );
 }

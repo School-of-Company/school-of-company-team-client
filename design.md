@@ -32,6 +32,12 @@
 - 그림자는 카드(아주 옅게)와 떠 있는 것(메뉴, 다이얼로그)에만 씁니다.
 - 모션은 상태 변화에만 씁니다(120ms, 200ms).
 
+### Identity screen exception
+
+- 로그인 화면의 중앙 카드는 주변 배경과 구분하기 위해 `--border-strong` 테두리와 `--shadow-overlay` 그림자를 사용할 수 있습니다.
+- 로그인 배경에는 `transform`으로만 움직이는 느린 무한 반복 조명을 허용합니다. 색은 의미 토큰을 사용하며 새 애니메이션 라이브러리나 JavaScript 반복 루프를 추가하지 않습니다.
+- `prefers-reduced-motion: reduce`에서는 배경을 정적으로 유지하고, 공통 `base.css`의 동작 감소 규칙을 따릅니다. 콘텐츠는 0.5초 안에 나타나야 하며 부모와 자식의 등장 애니메이션을 중첩하지 않습니다.
+
 ## 컴포넌트 (`src/shared/ui`, 스타일은 `globals.css`)
 
 - 버튼: `primary`(채움, 화면당 하나), `secondary`(회색 채움), `ghost`(글자), `danger`(연한 빨강 채움). 테두리 버튼은 쓰지 않습니다. 작은 버튼은 `ui-button-sm`.
