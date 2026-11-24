@@ -19,7 +19,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 제품 명세의 원본은 서버 저장소 [School-of-Company/school-of-company-team-server의 제품 명세](https://github.com/School-of-Company/school-of-company-team-server/blob/main/docs/mvp.spec.md)입니다. API 계약은 같은 서버 저장소의 명세를 따릅니다.
 - 클라이언트 IA 규칙은 이 절과 `design.md`의 화면 구조를 따릅니다. 로컬 문서와 디자인 작업 산출물은 Git으로 공유하지 않습니다.
 - 사이드바는 내 일, 조직, 프로젝트 순서이며 관리자와 설정은 맨 아래에 둡니다. 검색은 맨 위 버튼과 단축키로 엽니다. 데스크톱과 모바일 메뉴 순서를 맞춥니다.
-- 프로젝트 탭은 보드, 스프린트(Sprint 방식만), 마일스톤, 달력, 링크, 화이트보드, 요구사항, 설정 순서입니다. 설정은 PM과 헤드 어드민에게만 보입니다.
+- 프로젝트 탭은 보드, 스프린트, 마일스톤, 달력, 링크, 화이트보드, 요구사항, 설정 순서입니다. 진행 방식(Sprint, Kanban)은 표시용 이름이라 탭을 숨기지 않습니다. 설정은 PM과 헤드 어드민에게만 보입니다.
 - 마일스톤 상세는 목록 위 대화상자로 엽니다. 문서는 종류 필터가 있는 한 목록이며 종류와 상태는 URL에 둡니다.
 - 새 메뉴는 실제 API와 함께 화면이 완성될 때 추가합니다. 준비 중 메뉴, 비활성 링크, 빈 페이지는 만들지 않습니다. 필터, 탭, 선택 상태는 URL에 둡니다.
 - 개인 업무는 본인만 보고, 비공개 원본 업무는 프로젝트 권한과 현재 GitHub 권한을 모두 가진 사람만 봅니다.
