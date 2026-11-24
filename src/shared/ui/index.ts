@@ -27,3 +27,4 @@ export { BrandMark } from "./brand-mark";
 export { ThemeSelect } from "./theme-select";
 export { ChipSelect } from "./chip-select";
 export type { ChipOption } from "./chip-select";
+export { DatePicker } from "./date-picker";
