@@ -1,6 +1,7 @@
 import {
   incidentStatusLabels,
   severityDescriptions,
+  severityLabels,
   type IncidentSeverity,
   type IncidentStatus,
 } from "../model/types";
@@ -17,7 +18,7 @@ export function SeverityLabel({
       data-severity={severity}
       title={severityDescriptions[severity]}
     >
-      {severity}
+      {severityLabels[severity]}
     </span>
   );
 }

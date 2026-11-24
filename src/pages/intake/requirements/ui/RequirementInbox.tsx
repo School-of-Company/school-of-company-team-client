@@ -60,7 +60,7 @@ export function RequirementInbox({
   return (
     <div className="grid min-w-0 gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="flex max-w-full min-w-0 items-center gap-2">
+        <span className="requirement-status-filter">
           <label
             htmlFor={`${id}-status`}
             className="shrink-0 text-sm whitespace-nowrap text-muted"

@@ -9,6 +9,7 @@ import {
   incidentQueries,
   isNotFound,
   postmortemStatusLabels,
+  postmortemDisplaySections,
   type IncidentDetail,
   type Postmortem,
   type PostmortemSections,
@@ -67,8 +68,8 @@ export function PostmortemPanel({
         title="사후 검토가 아직 없습니다"
         description={
           incident.canEdit
-            ? "시작하면 사고 시각, 영향 서비스, 타임라인으로 요약, 영향, 타임라인 초안을 채웁니다. 원인은 직접 씁니다."
-            : "사고 작성자, 커맨더, 영향 서비스 소유자, 헤드 어드민이 시작할 수 있습니다."
+            ? "시작하면 장애 시각, 영향 서비스, 타임라인으로 요약, 영향, 타임라인 초안을 채웁니다. 원인은 직접 씁니다."
+            : "장애 작성자, 대응 책임자, 영향 서비스 소유자, 헤드 어드민이 시작할 수 있습니다."
         }
         action={
           incident.canEdit && (
@@ -98,7 +99,15 @@ export function PostmortemPanel({
         onRetry={() => void postmortem.refetch()}
       />
     );
-  return <PostmortemBody incident={incident} postmortem={postmortem.data} />;
+  return (
+    <PostmortemBody
+      incident={incident}
+      postmortem={{
+        ...postmortem.data,
+        ...postmortemDisplaySections(postmortem.data, incident),
+      }}
+    />
+  );
 }
 
 function PostmortemBody({
@@ -160,7 +169,7 @@ function PostmortemBody({
       ) : null}
       {editing ? (
         <PostmortemEditor
-          incidentId={incident.id}
+          incident={incident}
           postmortem={postmortem}
           onDone={() => setEditing(false)}
         />
@@ -184,15 +193,16 @@ function PostmortemBody({
 }
 
 function PostmortemEditor({
-  incidentId,
+  incident,
   postmortem,
   onDone,
 }: {
-  readonly incidentId: string;
+  readonly incident: IncidentDetail;
   readonly postmortem: Postmortem;
   readonly onDone: () => void;
 }) {
   const id = useId();
+  const incidentId = incident.id;
   const [values, setValues] = useState<PostmortemSections>({
     summary: postmortem.summary,
     impact: postmortem.impact,
@@ -220,7 +230,10 @@ function PostmortemEditor({
     setRefill({ pending: true, error: "" });
     try {
       const draft = await incidentApi.draft(incidentId);
-      setValues((current) => ({ ...current, timeline: draft.timeline }));
+      setValues((current) => ({
+        ...current,
+        timeline: postmortemDisplaySections(draft, incident).timeline,
+      }));
       setRefill({ pending: false, error: "" });
     } catch (cause) {
       setRefill({ pending: false, error: incidentErrorMessage(cause) });

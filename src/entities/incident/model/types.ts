@@ -20,11 +20,16 @@ export const incidentStatuses: readonly IncidentStatus[] = [
   "RESOLVED",
 ];
 /** 해석 D7-2: 생성 때 고르게 하는 설명. 기본값은 두지 않는다. */
+export const severityLabels: Readonly<Record<IncidentSeverity, string>> = {
+  SEV1: "치명",
+  SEV2: "높음",
+  SEV3: "보통",
+};
 export const severityDescriptions: Readonly<Record<IncidentSeverity, string>> =
   {
-    SEV1: "핵심 사용자 기능 중단",
-    SEV2: "일부 기능, 일부 사용자 영향",
-    SEV3: "경미하거나 우회 가능",
+    SEV1: "치명: 핵심 사용자 기능이 멈춤",
+    SEV2: "높음: 일부 기능이나 일부 사용자에게 영향",
+    SEV3: "보통: 경미하거나 우회 가능",
   };
 export const incidentStatusLabels: Readonly<Record<IncidentStatus, string>> = {
   OPEN: "대응 중",
@@ -35,7 +40,7 @@ export const timelineKindLabels: Readonly<Record<TimelineKind, string>> = {
   CREATED: "등록",
   STATUS: "상태",
   SEVERITY: "심각도",
-  COMMANDER: "커맨더",
+  COMMANDER: "대응 책임자",
   NOTE: "메모",
 };
 export const postmortemStatusLabels: Readonly<

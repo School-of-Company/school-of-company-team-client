@@ -4,6 +4,7 @@ import {
   formatDateTime,
   incidentErrorMessage,
   timelineKindLabels,
+  timelineEntryText,
   type IncidentDetail,
 } from "@/entities/incident";
 import { TimelineNoteForm, useRemoveNote } from "@/features/manage-incident";
@@ -56,7 +57,7 @@ export function IncidentTimeline({
                   </span>
                 </p>
                 <p className="mt-1 break-words whitespace-pre-wrap">
-                  {entry.body}
+                  {timelineEntryText(entry)}
                 </p>
               </div>
               {entry.canDelete && (
