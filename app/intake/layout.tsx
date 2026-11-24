@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function IntakeLayout({ children }: LayoutProps<"/intake">) {
   return (
-    <main className="mx-auto grid w-full max-w-2xl min-w-0 gap-8 px-4 py-10 [overflow-wrap:anywhere] break-keep">
+    <main className="mx-auto grid w-full max-w-2xl min-w-0 gap-8 px-4 py-8 [overflow-wrap:anywhere] break-keep">
       {children}
     </main>
   );

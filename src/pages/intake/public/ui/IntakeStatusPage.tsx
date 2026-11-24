@@ -17,12 +17,16 @@ import { formatDate } from "@/shared/lib";
 import {
   Button,
   Dialog,
+  EmptyState,
   ErrorState,
   Field,
   Input,
-  Spinner,
+  Skeleton,
   Textarea,
 } from "@/shared/ui";
+
+// statusTokenFromHash 와 같은 형식(# 뒤 20~128자 base64url).
+const statusBootScript = `document.documentElement.toggleAttribute("data-status-token",/^#\\s*[A-Za-z0-9_-]{20,128}\\s*$/.test(location.hash))`;
 
 const statusKey = (token: string) => ["public-intake-status", token] as const;
 
@@ -42,7 +46,27 @@ export function IntakeStatusPage() {
     window.addEventListener("hashchange", read);
     return () => window.removeEventListener("hashchange", read);
   }, []);
-  if (!checked) return <Spinner label="상태 링크 확인 중" />;
+  // 서버는 fragment(#토큰)를 모른다. 첫 그림 전에 boot script가 토큰 유무를 <html>에 표시하고,
+  // 두 대기 모양 중 맞는 하나만 CSS로 보여 준다(토큰 없는 주소에서 상태 스켈레톤이 한 번 비치지 않게).
+  if (!checked)
+    return (
+      <>
+        <script
+          id="intake-status-boot"
+          type={
+            typeof window === "undefined" ? "text/javascript" : "text/plain"
+          }
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: statusBootScript }}
+        />
+        <div className="intake-boot-token">
+          <StatusSkeleton label="상태 링크 확인 중" />
+        </div>
+        <div className="intake-boot-entry">
+          <TokenEntry onToken={setToken} />
+        </div>
+      </>
+    );
   if (!token) return <TokenEntry onToken={setToken} />;
   return <StatusView token={token} onReset={() => setToken(null)} />;
 }
@@ -71,7 +95,7 @@ function TokenEntry({
   return (
     <form noValidate onSubmit={onSubmit} className="grid gap-5">
       <header className="grid gap-2">
-        <h1 className="text-2xl font-bold">요구사항 진행 상황</h1>
+        <h1 className="public-title">요구사항 진행 상황</h1>
         <p className="text-sm text-foreground-2">
           제출할 때 받은 상태 링크를 붙여 넣으세요.
         </p>
@@ -107,7 +131,7 @@ function StatusView({
     gcTime: 0,
     refetchInterval: 60_000,
   });
-  if (status.isPending) return <Spinner label="진행 상황 불러오는 중" />;
+  if (status.isPending) return <StatusSkeleton label="진행 상황 불러오는 중" />;
   if (status.isError) {
     const problem = normalizeApiError(status.error);
     if (problem.status === 404)
@@ -165,7 +189,7 @@ function StatusDetail({
         {data.formTitle && (
           <p className="text-sm text-muted">{data.formTitle}</p>
         )}
-        <h1 className="text-2xl font-bold break-words">{data.title}</h1>
+        <h1 className="public-title break-words">{data.title}</h1>
         <p className="flex flex-wrap items-center gap-3 text-sm text-muted">
           <RequirementStatusBadge
             status={data.status}
@@ -234,7 +258,10 @@ function StatusDetail({
           답변
         </h2>
         {data.messages.length === 0 ? (
-          <p className="text-sm text-muted">아직 답변이 없습니다.</p>
+          <EmptyState
+            title="아직 답변이 없습니다"
+            description="팀이 검토한 뒤 이곳에 답변을 남깁니다."
+          />
         ) : (
           <ol className="grid gap-3">
             {data.messages.map((message, index) => (
@@ -243,7 +270,7 @@ function StatusDetail({
                 className={`grid gap-1 rounded-xl p-4 ${message.author === "TEAM" ? "bg-surface-box" : "bg-brand-soft"}`}
               >
                 <p className="text-xs text-muted">
-                  {message.author === "TEAM" ? "팀" : "나"}, {" "}
+                  {message.author === "TEAM" ? "팀" : "나"},{" "}
                   {formatDate(message.createdAt, {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -343,6 +370,31 @@ function StatusDetail({
           </Button>
         </div>
       </Dialog>
+    </div>
+  );
+}
+
+/** 진행 상황 첫 로딩 자리: 상세 머리글(양식 이름, 제목, 상태 줄)과 같은 줄 높이를 잡는다. */
+function StatusSkeleton({ label }: { readonly label: string }) {
+  return (
+    <div role="status" aria-label={label} className="grid gap-8">
+      <header aria-hidden="true" className="grid gap-3">
+        <p className="text-sm">
+          <span className="ui-skeleton-text">요구사항 양식</span>
+        </p>
+        <h1 className="public-title">
+          <span className="ui-skeleton-text">요구사항 진행 상황</span>
+        </h1>
+        <p className="text-sm">
+          <span className="ui-skeleton-text">
+            접수 2026. 1. 1. 보통 우선순위
+          </span>
+        </p>
+      </header>
+      <div aria-hidden="true" className="grid gap-4">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-24" />
+      </div>
     </div>
   );
 }

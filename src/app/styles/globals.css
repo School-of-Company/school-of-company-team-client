@@ -5267,6 +5267,19 @@ a.search-option:hover {
 
 /* ───────────────────────── Intake (public) ───────────────────────── */
 
+/* 공개 화면 제목: 앱 머리글(.page-header h1)과 같은 크기와 굵기. 레이아웃 위 여백도 앱 본문(--page-inset)과 같다. */
+.public-title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* 상태 페이지 첫 그림: boot script가 표시한 토큰 유무에 맞는 대기 모양만 보인다. */
+html[data-status-token] .intake-boot-entry,
+html:not([data-status-token]) .intake-boot-token {
+  display: none;
+}
+
 /* 봇 판정용 숨은 입력란: 화면 밖에 두고 보조기기·Tab 순서에서도 뺀다(display:none 은 일부 봇이 건너뛴다). */
 .intake-trap {
   position: absolute;
