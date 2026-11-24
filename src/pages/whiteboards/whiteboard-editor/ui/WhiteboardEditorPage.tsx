@@ -24,8 +24,10 @@ import {
   Icon,
   Input,
   Skeleton,
+  StaleNotice,
   useToast,
 } from "@/shared/ui";
+import { normalizeApiError } from "@/shared/api";
 import type { CanvasControls, SaveState } from "./Canvas";
 import { CommentsPanel } from "./CommentsPanel";
 import { RevisionsDialog } from "./RevisionsDialog";
@@ -82,6 +84,12 @@ export function WhiteboardEditorSkeleton() {
           <span className="ui-button ui-button-secondary">
             <span className="ui-skeleton-text">변경 이력</span>
           </span>
+          <span className="ui-button ui-button-ghost">
+            <span className="ui-skeleton-text">이름 바꾸기</span>
+          </span>
+          <span className="ui-button ui-button-ghost">
+            <span className="ui-skeleton-text">X 지우기</span>
+          </span>
         </div>
       </header>
       <div aria-hidden="true" className="whiteboard-layout">
@@ -94,15 +102,22 @@ export function WhiteboardEditorSkeleton() {
 function Editor({ whiteboardId }: { readonly whiteboardId: string }) {
   const board = useQuery(whiteboardQueries.detail(whiteboardId));
   if (board.isPending) return <WhiteboardEditorSkeleton />;
-  // 캐시가 있으면 재조회 실패에도 편집기를 내리지 않는다(편집 중인 캔버스를 지우지 않게).
-  if (!board.data)
+  // 5xx·네트워크 실패는 편집기를 두고 위에 안내만 띄운다. 403·404(권한 잃음, 삭제)는 편집기를 내린다.
+  const lost =
+    board.isError && [403, 404].includes(normalizeApiError(board.error).status);
+  if (!board.data || lost)
     return (
       <ErrorState
         description={whiteboardErrorMessage(board.error)}
         onRetry={() => void board.refetch()}
       />
     );
-  return <EditorContent key={board.data.id} initial={board.data} />;
+  return (
+    <>
+      <StaleNotice query={board} />
+      <EditorContent key={board.data.id} initial={board.data} />
+    </>
+  );
 }
 
 function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
