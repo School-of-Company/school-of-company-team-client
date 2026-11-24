@@ -771,10 +771,30 @@ select.ui-input {
     width: var(--sidebar-width);
     z-index: 40;
     visibility: hidden;
+    opacity: 0;
+    transform: translateX(-100%);
     box-shadow: var(--shadow-overlay);
+    /* 닫힐 때는 미끄러지고 흐려진 뒤에 숨긴다. 고정 위치라 본문은 움직이지 않는다. */
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      opacity var(--dur-2) var(--ease-out),
+      visibility 0s linear var(--dur-2);
   }
   .app-shell[data-peeking] .app-sidebar {
     visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      opacity var(--dur-2) var(--ease-out),
+      visibility 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app-shell[data-collapsed] .app-sidebar,
+    html[data-sidebar-collapsed="true"] .app-sidebar {
+      transform: none;
+      transition: none;
+    }
   }
   .app-shell[data-collapsed] .sidebar-expand-bar,
   html[data-sidebar-collapsed="true"] .sidebar-expand-bar {
