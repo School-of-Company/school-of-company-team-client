@@ -44,7 +44,7 @@ export function MilestoneListPage({
   );
 }
 
-/** 목록 + 위에 뜨는 패널(`?milestone=`). 상세 경로는 만들지 않는다(docs/ia.md). */
+/** 목록 + 위에 뜨는 패널(`?milestone=`). 상세 경로는 만들지 않는다(AGENTS.md). */
 function Milestones({ project, manages }: PlanningContext) {
   const router = useRouter();
   const pathname = usePathname();
