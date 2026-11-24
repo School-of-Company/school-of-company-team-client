@@ -27,9 +27,9 @@ export const severityLabels: Readonly<Record<IncidentSeverity, string>> = {
 };
 export const severityDescriptions: Readonly<Record<IncidentSeverity, string>> =
   {
-    SEV1: "치명: 서비스 전체가 멈춤",
-    SEV2: "높음: 일부 기능이나 사용자에게 큰 영향",
-    SEV3: "보통: 영향이 작거나 우회 가능",
+    SEV1: "치명: 핵심 사용자 기능이 멈춤",
+    SEV2: "높음: 일부 기능이나 일부 사용자에게 영향",
+    SEV3: "보통: 경미하거나 우회 가능",
   };
 export const incidentStatusLabels: Readonly<Record<IncidentStatus, string>> = {
   OPEN: "대응 중",

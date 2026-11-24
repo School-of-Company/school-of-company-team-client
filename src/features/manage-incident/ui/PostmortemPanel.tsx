@@ -9,6 +9,7 @@ import {
   incidentQueries,
   isNotFound,
   postmortemStatusLabels,
+  postmortemDisplaySections,
   type IncidentDetail,
   type Postmortem,
   type PostmortemSections,
@@ -98,7 +99,15 @@ export function PostmortemPanel({
         onRetry={() => void postmortem.refetch()}
       />
     );
-  return <PostmortemBody incident={incident} postmortem={postmortem.data} />;
+  return (
+    <PostmortemBody
+      incident={incident}
+      postmortem={{
+        ...postmortem.data,
+        ...postmortemDisplaySections(postmortem.data, incident),
+      }}
+    />
+  );
 }
 
 function PostmortemBody({
@@ -160,7 +169,7 @@ function PostmortemBody({
       ) : null}
       {editing ? (
         <PostmortemEditor
-          incidentId={incident.id}
+          incident={incident}
           postmortem={postmortem}
           onDone={() => setEditing(false)}
         />
@@ -184,15 +193,16 @@ function PostmortemBody({
 }
 
 function PostmortemEditor({
-  incidentId,
+  incident,
   postmortem,
   onDone,
 }: {
-  readonly incidentId: string;
+  readonly incident: IncidentDetail;
   readonly postmortem: Postmortem;
   readonly onDone: () => void;
 }) {
   const id = useId();
+  const incidentId = incident.id;
   const [values, setValues] = useState<PostmortemSections>({
     summary: postmortem.summary,
     impact: postmortem.impact,
@@ -220,7 +230,10 @@ function PostmortemEditor({
     setRefill({ pending: true, error: "" });
     try {
       const draft = await incidentApi.draft(incidentId);
-      setValues((current) => ({ ...current, timeline: draft.timeline }));
+      setValues((current) => ({
+        ...current,
+        timeline: postmortemDisplaySections(draft, incident).timeline,
+      }));
       setRefill({ pending: false, error: "" });
     } catch (cause) {
       setRefill({ pending: false, error: incidentErrorMessage(cause) });

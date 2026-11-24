@@ -19,3 +19,4 @@ export {
 export type * from "./model/types";
 export { formatDateTime, fromLocalInput, toLocalInput } from "./model/time";
 export { IncidentStatusLabel, SeverityLabel } from "./ui/labels";
+export { timelineEntryText, postmortemDisplaySections } from "./model/timeline";
