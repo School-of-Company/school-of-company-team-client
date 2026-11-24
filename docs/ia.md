@@ -105,6 +105,16 @@
 | Planning Bucket·Reviewer | 보드 그룹·필터, 상세 속성 열, 설정 `계획 버킷` 탭 | 3    |
 | 자동화 규칙              | 프로젝트 설정 `자동화` 탭(규칙 목록 · 실행 기록)  | 8    |
 | 요구사항 접수 양식       | 프로젝트 설정 `접수 양식` 탭, 조직 단위는 관리자  | 12   |
+| 개인 API 토큰(MCP)       | 설정(`/account`) `API 토큰 (MCP)` 구역            | 13   |
+
+## 개인 API 토큰 · MCP (단계 13)
+
+설정(`/account`) 안의 `API 토큰 (MCP)` 구역입니다. 새 메뉴·경로는 없고, 업무 권한(WORK)이 있는 본인에게만 보입니다(서버 `docs/spec/s13-mcp.md`).
+
+- 목록: 이름 · 권한(읽기/쓰기) · 앞자리(`prefix…`) · 만든 날 · 만료일(`만료됨` 배지) · 마지막 사용, 행마다 폐기(확인 Dialog).
+- 만들기 Dialog: 이름(1~50자) · 권한(기본 읽기, 쓰기는 업무 상태 변경·생성 가능) · 만료(7/30/90일, 기본 30). 활성 토큰은 10개까지(`TOKEN_LIMIT`).
+- 만든 직후 같은 Dialog 에서 평문 토큰을 한 번만 보여 주고 복사 버튼·경고와 Claude Code·Codex 설정 예시(토큰 포함)를 함께 둔다. 토큰은 Dialog 상태에만 두고 닫으면 버린다(local/session storage·query cache·로그 금지).
+- MCP 주소는 `${NEXT_PUBLIC_API_URL}/mcp`, 헤더 `Authorization: Bearer <token>`.
 
 ## 규칙
 

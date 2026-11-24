@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { boardTotal, type Board, type TaskScope } from "@/entities/task";
 import type { ProjectDetail } from "@/entities/project";
-import { ImportIssue } from "@/features/link-github-issue";
+import { routes } from "@/shared/config";
 import { Button, Icon, SegmentedLinks } from "@/shared/ui";
 
 export function BoardHeader({
@@ -12,7 +12,6 @@ export function BoardHeader({
   editable,
   signedIn,
   onCreate,
-  onImport,
 }: {
   readonly scope: TaskScope;
   readonly project?: ProjectDetail;
@@ -21,7 +20,6 @@ export function BoardHeader({
   readonly editable: boolean;
   readonly signedIn: boolean;
   readonly onCreate: () => void;
-  readonly onImport: (id: string) => void;
 }) {
   return (
     <>
@@ -44,26 +42,22 @@ export function BoardHeader({
             </p>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        {/* 내 업무 목록(/)과 같은 자리, 같은 폭의 버튼이라 보기 전환이 움직이지 않는다. Issue 가져오기는 업무 등록 창 안에 있다. */}
+        <div className="page-actions">
           {scope === "PERSONAL" && (
             <SegmentedLinks
               label="보기"
               items={[
-                { href: "/", label: "목록", active: false },
-                { href: "/me", label: "보드", active: true },
+                { href: routes.home, label: "목록", active: false },
+                { href: routes.me, label: "보드", active: true },
               ]}
             />
           )}
           {canCreate && (
-            <>
-              {scope !== "TEAM" && (
-                <ImportIssue projectId={project?.id} onImported={onImport} />
-              )}
-              <Button onClick={onCreate}>
-                <Icon name="plus" className="inline-block" />{" "}
-                {scope === "PERSONAL" ? "개인 업무 등록" : "업무 등록"}
-              </Button>
-            </>
+            <Button onClick={onCreate}>
+              <Icon name="plus" />
+              업무 등록
+            </Button>
           )}
         </div>
       </header>
@@ -74,7 +68,7 @@ export function BoardHeader({
       )}
       {scope === "PROJECT" && signedIn && !editable && !project?.archived && (
         <p className="text-sm text-muted">
-          참여자만 업무를 등록·수정할 수 있습니다.
+          참여자만 업무를 등록하거나 수정할 수 있습니다.
         </p>
       )}
     </>

@@ -72,7 +72,7 @@ export function KanbanBoard({
 }: {
   readonly board: Board;
   readonly sort: BoardSort;
-  /** 그룹 축. 있으면 레인 헤더(이름·개수·접기)를 그린다. */
+  /** 그룹 축. 있으면 레인 헤더(이름, 개수, 접기)를 그린다. */
   readonly groupBy?: string | null;
   /** 레인 접힘을 기억하는 범위(보드 경로 + 그룹 축). */
   readonly laneScope?: string;
@@ -111,7 +111,8 @@ export function KanbanBoard({
     writeCollapsed(collapseKey, lanes);
     setCollapsed({ key: collapseKey, lanes });
   }
-  const lanes = !!groupBy;
+  // 레인이 하나뿐이면(예: 모두 "파트 없음") 머리글 없이 보드만 보인다. 그룹을 골라도 보드가 밀리지 않는다.
+  const lanes = !!groupBy && board.groups.length > 1;
   // 업무가 하나도 없으면 빈 컬럼 다섯 개 대신 무엇을 할지 알려 준다.
   if (board.groups.length === 0 || boardTotal(board) === 0)
     return filtered ? (
@@ -138,8 +139,8 @@ export function KanbanBoard({
       />
     );
   return (
-    <div className="grid gap-6">
-      <label className="grid gap-2 text-sm md:hidden">
+    <div className={lanes ? "grid gap-5" : "grid"}>
+      <label className="mb-3 grid gap-2 text-sm md:hidden">
         표시할 상태
         <Select
           value={visibleStatus}
@@ -200,7 +201,7 @@ export function KanbanBoard({
                 </button>
                 {archivedLane && (
                   <span className="board-lane-note">
-                    보관됨 · 새로 넣을 수 없음
+                    보관됨, 새로 넣을 수 없음
                   </span>
                 )}
               </h2>
@@ -350,9 +351,7 @@ export function KanbanBoard({
                       ))}
                     </div>
                     {cards.length === 0 && (
-                      <div className="board-empty">
-                        <span className="sr-only">업무 없음</span>
-                      </div>
+                      <p className="board-empty">업무 없음</p>
                     )}
                     {status === "DONE" &&
                       (serverCount === undefined

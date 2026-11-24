@@ -51,6 +51,8 @@ export type TaskCard = {
   /** 단계 3: 서버가 아직 보내지 않으면 없을 수 있다. */
   readonly planningBucket?: TaskBucket | null;
   readonly reviewers?: readonly TaskPerson[];
+  /** YYYY-MM-DD, 마감일 이하. 서버가 아직 보내지 않으면 없을 수 있다. */
+  readonly startDate?: string | null;
   readonly deadline: string | null;
   readonly blocked: boolean;
   readonly blockedReason: string | null;
@@ -108,6 +110,7 @@ export type CreateTask = {
   readonly type: TaskType;
   readonly priority: TaskPriority;
   readonly status: TaskStatus;
+  readonly startDate?: string;
   readonly deadline?: string;
   readonly planningBucketId?: string;
   readonly reviewerIds?: readonly string[];
@@ -123,6 +126,8 @@ export type UpdateTask = DeadlineUpdate & {
   readonly priority?: TaskPriority;
   readonly partId?: string;
   readonly assigneeIds?: readonly string[];
+  /** null 은 시작일 해제. */
+  readonly startDate?: string | null;
   /** 빈 문자열은 버킷 해제. */
   readonly planningBucketId?: string;
   /** 배열은 전체 교체, `[]`는 모두 해제. */

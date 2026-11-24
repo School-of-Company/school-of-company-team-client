@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   statusLabels,
@@ -8,7 +8,8 @@ import {
   type TaskCard,
   type TaskStatus,
 } from "@/entities/task";
-import { IconButton } from "@/shared/ui";
+import { Icon, IconButton } from "@/shared/ui";
+import { menuPosition } from "../model/menu-position";
 
 export function BoardCardMenu({
   task,
@@ -31,10 +32,36 @@ export function BoardCardMenu({
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const menuEdge = useRef<"first" | "last">("first");
+  // 메뉴는 popover(top layer)로 띄워 보드의 가로 스크롤 영역에 잘리지 않는다.
+  // DOM 위치는 그대로라 포커스, 바깥 클릭, Tab 닫기는 지금처럼 root 기준으로 동작한다.
+  useLayoutEffect(() => {
+    const element = menu.current;
+    const button = trigger.current;
+    if (!open || !element || !button) return;
+    if (typeof element.showPopover === "function") element.showPopover();
+    function place() {
+      if (!element || !button) return;
+      const anchor = button.getBoundingClientRect();
+      const size = element.getBoundingClientRect();
+      const { top, left } = menuPosition(anchor, size, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      element.style.top = `${top}px`;
+      element.style.left = `${left}px`;
+    }
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [open]);
   useEffect(() => {
     if (!open) return;
     const items = menu.current?.querySelectorAll<HTMLElement>(
-      "[role='menuitem']:not(:disabled)",
+      "[role^='menuitem']:not(:disabled)",
     );
     items?.[menuEdge.current === "last" ? items.length - 1 : 0]?.focus();
     function dismiss(event: PointerEvent) {
@@ -92,8 +119,9 @@ export function BoardCardMenu({
           ref={menu}
           id={menuId}
           role="menu"
+          popover="manual"
           aria-label={task.title + " 작업"}
-          className="absolute top-full right-0 z-20 grid w-52 rounded-xl bg-surface-raised p-1 shadow-[var(--shadow-overlay)]"
+          className="board-menu"
           onKeyDown={(event) => {
             if (event.key === "Tab") {
               close();
@@ -110,7 +138,7 @@ export function BoardCardMenu({
             event.preventDefault();
             const items = Array.from(
               event.currentTarget.querySelectorAll<HTMLElement>(
-                "[role='menuitem']:not(:disabled)",
+                "[role^='menuitem']:not(:disabled)",
               ),
             );
             const index = items.findIndex(
@@ -130,26 +158,46 @@ export function BoardCardMenu({
         >
           {editable && (
             <>
-              {taskStatuses.map((status) => (
-                <button
-                  key={status}
-                  type="button"
-                  role="menuitem"
-                  tabIndex={-1}
-                  disabled={
-                    pending ||
-                    task.status === status ||
-                    (task.type === "TASK" && status === "REVIEW")
-                  }
-                  className="min-h-11 rounded-sm px-3 text-left text-sm hover:bg-surface-hover disabled:cursor-not-allowed disabled:text-muted"
-                  onClick={() => {
-                    onMove(status);
-                    close();
-                  }}
-                >
-                  상태 변경: {statusLabels[status]}
-                </button>
-              ))}
+              <p className="board-menu-label" aria-hidden="true">
+                상태 바꾸기
+              </p>
+              <div role="group" aria-label="상태 바꾸기">
+                {taskStatuses.map((status) => {
+                  const current = task.status === status;
+                  const blocked = task.type === "TASK" && status === "REVIEW";
+                  return (
+                    <button
+                      key={status}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={current}
+                      tabIndex={-1}
+                      disabled={pending || current || blocked}
+                      title={
+                        blocked
+                          ? "개발 업무만 리뷰로 옮길 수 있어요"
+                          : undefined
+                      }
+                      className="board-menu-item"
+                      onClick={() => {
+                        onMove(status);
+                        close();
+                      }}
+                    >
+                      <span
+                        className="status-icon"
+                        data-status={status}
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 flex-1 truncate">
+                        {statusLabels[status]}
+                      </span>
+                      {current && <Icon name="check" width={16} height={16} />}
+                    </button>
+                  );
+                })}
+              </div>
+              <hr className="board-menu-divider" />
               {(["up", "down"] as const).map((direction) => (
                 <button
                   key={direction}
@@ -160,15 +208,22 @@ export function BoardCardMenu({
                   title={
                     !manual ? "수동 순서에서 사용할 수 있습니다" : undefined
                   }
-                  className="min-h-11 rounded-sm px-3 text-left text-sm hover:bg-surface-hover disabled:cursor-not-allowed disabled:text-muted"
+                  className="board-menu-item"
                   onClick={() => {
                     onOrder(direction);
                     close();
                   }}
                 >
-                  {direction === "up" ? "위로 이동" : "아래로 이동"}
+                  <Icon
+                    name="chevronDown"
+                    width={16}
+                    height={16}
+                    className={direction === "up" ? "rotate-180" : undefined}
+                  />
+                  {direction === "up" ? "위로 올리기" : "아래로 내리기"}
                 </button>
               ))}
+              <hr className="board-menu-divider" />
             </>
           )}
           <Link
@@ -181,10 +236,15 @@ export function BoardCardMenu({
                   ? "/me?source=PERSONAL"
                   : "/team"
             }
-            className="flex min-h-11 items-center rounded-sm px-3 text-sm hover:bg-surface-hover"
+            className="board-menu-item"
             onClick={close}
           >
-            출처로 이동
+            <Icon
+              name={task.projectId ? "project" : "board"}
+              width={16}
+              height={16}
+            />
+            {task.projectId ? "프로젝트 보드 열기" : "출처 보드 열기"}
           </Link>
         </div>
       )}

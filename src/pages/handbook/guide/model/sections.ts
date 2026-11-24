@@ -58,7 +58,7 @@ export const guideSections: readonly {
 - 업무에 **발행 저장소**를 고르면 그 저장소에 Issue가 만들어집니다.
 - 이미 있는 Issue, PR은 업무 상세의 **GitHub** 칸에 주소를 붙여넣어 연결합니다. 업무를 대표하는 Issue 하나를 **대표 Issue**로 지정할 수 있습니다.
 - 연결된 PR의 리뷰, CI 상태가 업무에 표시됩니다.
-- 하나의 Issue만 따로 가져오려면 보드 위의 **Issue 가져오기**를 씁니다.`,
+- 하나의 Issue만 따로 가져오려면 **업무 등록** 창의 **GitHub Issue 가져오기** 탭을 씁니다.`,
   },
   {
     id: "discord",
