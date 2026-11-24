@@ -24,6 +24,11 @@ export function ProjectNav({ project, user }: ProjectNavProps) {
     pathname === href || pathname.startsWith(`${href}/`);
   const links = [
     { href: board, label: "보드", active: pathname === board },
+    {
+      href: routes.projectDocs(project.id),
+      label: "문서",
+      active: within(routes.projectDocs(project.id)),
+    },
     // Kanban 프로젝트는 스프린트로 이끌지 않는다. 주소로 들어오면 현재 위치를 보이게 탭은 남긴다.
     ...(project.workflow !== "KANBAN" ||
     within(routes.projectSprints(project.id))

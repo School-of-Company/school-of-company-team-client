@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { normalizeApiError } from "@/shared/api";
@@ -19,6 +20,7 @@ import {
   DocumentEditor,
   DocumentLinks,
   DocumentStatusSelect,
+  DocumentProjectSelect,
 } from "@/features/manage-knowledge";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
@@ -77,6 +79,14 @@ function DocumentWorkspace({
   readonly document: KnowledgeDetail;
 }) {
   const [editing, setEditing] = useState(false);
+  const router = useRouter();
+  const search = useSearchParams();
+  const isEditing =
+    document.canEdit && (editing || search?.get("edit") === "true");
+  const finishEditing = () => {
+    setEditing(false);
+    router.replace(routes.doc(document.id), { scroll: false });
+  };
   const replacements = supersededBy(document.links);
   return (
     <div className="knowledge-detail grid gap-5">
@@ -96,7 +106,7 @@ function DocumentWorkspace({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {document.canEdit && !editing && (
+          {document.canEdit && !isEditing && (
             <Button
               variant="secondary"
               className="ui-button-sm"
@@ -124,11 +134,8 @@ function DocumentWorkspace({
       <div className="task-detail">
         <div className="task-detail-grid">
           <div className="task-main">
-            {editing ? (
-              <DocumentEditor
-                document={document}
-                onDone={() => setEditing(false)}
-              />
+            {isEditing ? (
+              <DocumentEditor document={document} onDone={finishEditing} />
             ) : document.body.trim() ? (
               <article aria-label="본문">
                 <Markdown>{document.body}</Markdown>
@@ -139,6 +146,20 @@ function DocumentWorkspace({
           </div>
           <aside className="task-props" aria-label="문서 속성">
             <dl>
+              <div>
+                <dt>프로젝트</dt>
+                <dd>
+                  {document.canEdit ? (
+                    <DocumentProjectSelect document={document} />
+                  ) : document.project ? (
+                    <Link href={routes.projectDocs(document.project.id)}>
+                      {document.project.name}
+                    </Link>
+                  ) : (
+                    "조직"
+                  )}
+                </dd>
+              </div>
               <div>
                 <dt>상태</dt>
                 <dd>

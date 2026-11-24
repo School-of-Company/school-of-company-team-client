@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
+import { keepPreviousKey } from "@/shared/lib";
 import type {
   AddKnowledgeLink,
   CreateKnowledge,
@@ -7,6 +8,8 @@ import type {
   KnowledgeFilter,
   KnowledgeSummary,
   UpdateKnowledge,
+  KnowledgeTemplate,
+  KnowledgeKind,
 } from "../model/types";
 
 const path = (id: string) => `/api/v1/knowledge/${encodeURIComponent(id)}`;
@@ -22,11 +25,23 @@ export const knowledgeKeys = {
       filter.serviceId ?? "",
       filter.taskId ?? "",
       filter.incidentId ?? "",
+      filter.projectId ?? "",
+      filter.scope ?? "",
     ] as const,
   detail: (id: string) => ["knowledge", "detail", id] as const,
+  templates: ["knowledge", "templates"] as const,
 };
 
 export const knowledgeApi = {
+  templates: async () =>
+    (await api.get<readonly KnowledgeTemplate[]>("/api/v1/knowledge/templates"))
+      .data,
+  saveTemplate: async (kind: KnowledgeKind, body: string) =>
+    (
+      await api.put<KnowledgeTemplate>(`/api/v1/knowledge/templates/${kind}`, {
+        body,
+      })
+    ).data,
   list: async (filter: KnowledgeFilter) =>
     (
       await api.get<readonly KnowledgeSummary[]>("/api/v1/knowledge", {
@@ -53,11 +68,20 @@ export const knowledgeApi = {
 
 // 문서는 열 때 한 번 받는다(계약 6절: 폴링은 사고 목록·상세만). 창으로 돌아오면 TanStack 기본 재조회.
 export const knowledgeQueries = {
-  list: (filter: KnowledgeFilter) =>
-    queryOptions({
-      queryKey: knowledgeKeys.list(filter),
+  list: (filter: KnowledgeFilter) => {
+    const queryKey = knowledgeKeys.list(filter);
+    return queryOptions({
+      queryKey,
       queryFn: () => knowledgeApi.list(filter),
-    }),
+      placeholderData: (previous, previousQuery) =>
+        previousQuery?.state.status === "success" &&
+        previousQuery.queryKey
+          .slice(4)
+          .every((value, index) => value === queryKey[index + 4])
+          ? keepPreviousKey(queryKey)(previous, previousQuery)
+          : undefined,
+    });
+  },
   detail: (id: string) =>
     queryOptions({
       queryKey: knowledgeKeys.detail(id),

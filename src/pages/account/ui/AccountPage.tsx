@@ -234,14 +234,17 @@ function AccountContent({ user }: { readonly user: User }) {
     },
   });
   return (
-    <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
+    <div className="settings-page mx-auto grid w-full min-w-0 gap-6 break-keep">
       <header className="grid gap-2">
         <h1 className="text-2xl font-semibold">설정</h1>
         <p className="text-sm text-muted">
           프로필과 로그인 계정, 알림 계정, AI 도구용 API 토큰을 관리합니다.
         </p>
       </header>
-      <section aria-labelledby="profile-title" className="grid gap-5">
+      <section
+        aria-labelledby="profile-title"
+        className="settings-card grid gap-5"
+      >
         <h2 id="profile-title" className="text-lg font-semibold">
           프로필
         </h2>
@@ -250,10 +253,10 @@ function AccountContent({ user }: { readonly user: User }) {
       </section>
       <section
         aria-labelledby="github-title"
-        className="grid gap-4 border-t border-border pt-8"
+        className="settings-card grid gap-4"
       >
         <h2 id="github-title" className="text-lg font-semibold">
-          GitHub 계정
+          로그인 계정 (GitHub)
         </h2>
         <p className="text-sm text-muted">
           GitHub 계정은 로그인에 사용합니다. 프로젝트 저장소 접근은 별도의
@@ -274,10 +277,10 @@ function AccountContent({ user }: { readonly user: User }) {
       </section>
       <section
         aria-labelledby="discord-title"
-        className="grid gap-4 border-t border-border pt-8"
+        className="settings-card grid gap-4"
       >
         <h2 id="discord-title" className="text-lg font-semibold">
-          Discord 계정
+          알림 (Discord)
         </h2>
         <div>
           <Badge>
@@ -307,7 +310,7 @@ function AccountContent({ user }: { readonly user: User }) {
       {userDestination(user) === "/" && (
         <section
           aria-labelledby="api-tokens-title"
-          className="grid gap-4 border-t border-border pt-8"
+          className="settings-card grid gap-4"
         >
           <h2 id="api-tokens-title" className="text-lg font-semibold">
             API 토큰 (MCP)
@@ -317,7 +320,7 @@ function AccountContent({ user }: { readonly user: User }) {
       )}
       <section
         aria-labelledby="appearance-title"
-        className="grid gap-4 border-t border-border pt-8"
+        className="settings-card grid gap-4"
       >
         <h2 id="appearance-title" className="text-lg font-semibold">
           화면 테마

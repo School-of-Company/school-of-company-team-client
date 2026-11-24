@@ -24,6 +24,8 @@ export const routes = {
     `/projects/${encodeURIComponent(projectId)}/calendar`,
   projectRequirements: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/requirements`,
+  projectDocs: (projectId: string) =>
+    `/projects/${encodeURIComponent(projectId)}/docs`,
   requirements: "/requirements",
   requirement: (id: string) => `/requirements/${encodeURIComponent(id)}`,
   calendar: "/calendar",

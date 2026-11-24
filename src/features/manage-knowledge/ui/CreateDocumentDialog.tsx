@@ -1,6 +1,8 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { routes } from "@/shared/config";
 import {
   kindDescriptions,
   kindLabels,
@@ -24,6 +26,7 @@ export function CreateDocumentDialog({
   kind: fixedKind,
   serviceIds,
   incidentId,
+  projectId,
   context,
 }: {
   readonly open: boolean;
@@ -33,6 +36,7 @@ export function CreateDocumentDialog({
   readonly kind?: KnowledgeKind;
   readonly serviceIds?: readonly string[];
   readonly incidentId?: string;
+  readonly projectId?: string;
   /** 만들면서 연결할 대상 설명. 예: "팀 서버 서비스에 연결합니다." */
   readonly context?: string;
 }) {
@@ -48,6 +52,7 @@ export function CreateDocumentDialog({
           fixedKind={fixedKind}
           serviceIds={serviceIds}
           incidentId={incidentId}
+          projectId={projectId}
           context={context}
           onClose={onClose}
           onCreated={onCreated}
@@ -61,6 +66,7 @@ function CreateForm({
   fixedKind,
   serviceIds,
   incidentId,
+  projectId,
   context,
   onClose,
   onCreated,
@@ -68,10 +74,12 @@ function CreateForm({
   readonly fixedKind?: KnowledgeKind;
   readonly serviceIds?: readonly string[];
   readonly incidentId?: string;
+  readonly projectId?: string;
   readonly context?: string;
   readonly onClose: () => void;
   readonly onCreated: (document: KnowledgeDetail) => void;
 }) {
+  const router = useRouter();
   const id = useId();
   const [kind, setKind] = useState<KnowledgeKind | "">(fixedKind ?? "");
   const [title, setTitle] = useState("");
@@ -82,6 +90,7 @@ function CreateForm({
       title: title.trim(),
       serviceIds: serviceIds ?? [],
       incidentId,
+      projectId,
     }),
   );
   const submit = (event: FormEvent) => {
@@ -94,7 +103,12 @@ function CreateForm({
       next.title = "제목은 200자까지 쓸 수 있습니다.";
     setErrors(next);
     if (Object.keys(next).length) return;
-    create.mutate(undefined, { onSuccess: onCreated });
+    create.mutate(undefined, {
+      onSuccess: (document) => {
+        onCreated(document);
+        router.push(`${routes.doc(document.id)}?edit=true`);
+      },
+    });
   };
   return (
     <form className="grid gap-5" onSubmit={submit} noValidate>

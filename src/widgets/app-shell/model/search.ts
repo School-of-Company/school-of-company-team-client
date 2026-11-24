@@ -1,4 +1,9 @@
-import { incidentStatusLabels, type IncidentStatus } from "@/entities/incident";
+import {
+  incidentSeverities,
+  incidentStatusLabels,
+  severityLabels,
+  type IncidentStatus,
+} from "@/entities/incident";
 import {
   kindLabels as documentKindLabels,
   knowledgeStatusLabels,
@@ -46,7 +51,7 @@ export type SupportedSearchType = (typeof searchTypes)[number];
 export const searchTypeLabels: Readonly<Record<SupportedSearchType, string>> = {
   TASK: "업무",
   DOCUMENT: "문서",
-  INCIDENT: "사고",
+  INCIDENT: "장애",
   SERVICE: "서비스",
   SPRINT: "스프린트",
   WHITEBOARD: "화이트보드",
@@ -130,13 +135,15 @@ export function itemMeta(item: SearchItem): readonly string[] {
         ? (documentKindLabels[item.context as KnowledgeKind] ?? item.context)
         : null,
     ].filter((value): value is string => !!value);
-  if (item.type === "INCIDENT")
+  if (item.type === "INCIDENT") {
+    const severity = incidentSeverities.find((value) => value === item.context);
     return [
-      item.context,
+      severity ? severityLabels[severity] : item.context,
       item.status
         ? (incidentStatusLabels[item.status as IncidentStatus] ?? item.status)
         : null,
     ].filter((value): value is string => !!value);
+  }
   if (item.type === "SERVICE")
     return item.context
       ? [tierLabels[item.context as ServiceTier] ?? item.context]

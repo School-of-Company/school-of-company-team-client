@@ -13,7 +13,7 @@ const messages: Readonly<Record<string, string>> = {
     "업무를 찾을 수 없거나 볼 권한이 없습니다. 업무 주소나 ID를 확인하세요.",
   SERVICE_NOT_FOUND: "서비스가 없습니다. 다시 고르세요.",
   SERVICE_ARCHIVED: "아카이브된 서비스에는 새로 연결할 수 없습니다.",
-  INCIDENT_NOT_FOUND: "사고가 없습니다. 다시 고르세요.",
+  INCIDENT_NOT_FOUND: "장애가 없습니다. 다시 고르세요.",
   ONBOARDING_REQUIRED: "가입 승인과 Discord 연결을 완료한 뒤 이용해 주세요.",
 };
 

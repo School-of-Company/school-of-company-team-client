@@ -136,15 +136,21 @@ test("documents and incidents show their own status, kind and severity", () => {
     }),
     ["게시", "Runbook"],
   );
-  assert.deepEqual(
-    itemMeta({
-      ...base,
-      type: "INCIDENT",
-      status: "MITIGATED",
-      context: "SEV1",
-    }),
-    ["SEV1", "완화됨"],
-  );
+  for (const [severity, label] of [
+    ["SEV1", "치명"],
+    ["SEV2", "높음"],
+    ["SEV3", "보통"],
+  ]) {
+    assert.deepEqual(
+      itemMeta({
+        ...base,
+        type: "INCIDENT",
+        status: "MITIGATED",
+        context: severity,
+      }),
+      [label, "완화됨"],
+    );
+  }
 });
 
 test("arrow keys move through all results and wrap", () => {

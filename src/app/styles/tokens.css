@@ -122,6 +122,8 @@
   --page-inset: 32px;
   --content-narrow: 44rem;
   --content-reading: 64rem;
+  --sidebar-shortcuts-height: 30dvh;
+  --admin-user-table-min: 32rem;
   --detail-sidebar-width: 17.5rem;
   --plan-list-height: 24rem;
   --plan-row-height: 4.5rem;

@@ -104,7 +104,7 @@ function CreatedToken({ token }: { readonly token: CreatedApiToken }) {
         className="rounded-xl bg-surface-box p-4 text-sm leading-6 font-semibold"
       >
         이 토큰은 지금 한 번만 보여 드립니다. 창을 닫으면 다시 볼 수 없습니다.
-        레포·이슈·PR·Discord 에 붙여 넣지 마세요.
+        레포, 이슈, PR, Discord에 붙여 넣지 마세요.
       </p>
       <CopyField id="api-token-value" label="토큰" value={token.token} />
       <CopyField
@@ -120,7 +120,7 @@ function CreatedToken({ token }: { readonly token: CreatedApiToken }) {
         multiline
       />
       <p className="text-sm text-muted">
-        만료일 {formatDate(token.expiresAt)} · 권한 {scopeLabels[token.scope]}
+        만료일 {formatDate(token.expiresAt)}, 권한 {scopeLabels[token.scope]}
       </p>
     </div>
   );
@@ -179,7 +179,7 @@ function CreateTokenForm({
       <Field
         id="api-token-scope"
         label="권한"
-        hint="읽기는 업무·프로젝트 조회만, 쓰기는 업무 상태 변경·생성도 할 수 있습니다."
+        hint="읽기는 업무와 프로젝트 조회만, 쓰기는 업무 상태 변경과 생성도 할 수 있습니다."
       >
         <Select
           id="api-token-scope"
@@ -189,7 +189,7 @@ function CreateTokenForm({
           disabled={pending}
         >
           <option value="READ">읽기</option>
-          <option value="WRITE">쓰기 (업무 상태 변경·생성 가능)</option>
+          <option value="WRITE">쓰기 (업무 상태 변경, 생성 가능)</option>
         </Select>
       </Field>
       <Field id="api-token-expiry" label="만료">
@@ -241,8 +241,8 @@ function TokenRow({
           {token.expired && <Badge className="badge-red">만료됨</Badge>}
         </div>
         <p className="text-xs text-muted">
-          <span className="font-mono">{token.prefix}…</span> · 만든 날{" "}
-          {formatDate(token.createdAt)} · 만료일 {formatDate(token.expiresAt)} ·
+          <span className="font-mono">{token.prefix}…</span>, 만든 날{" "}
+          {formatDate(token.createdAt)}, 만료일 {formatDate(token.expiresAt)},
           마지막 사용 {token.lastUsedAt ? formatDate(token.lastUsedAt) : "없음"}
         </p>
       </div>
@@ -274,9 +274,10 @@ export function ApiTokens() {
   return (
     <div className="grid gap-4">
       <p className="text-sm text-muted">
-        Claude Code·Codex 같은 AI 도구가 MCP 로 내 업무를 읽고 고칠 때 쓰는 개인
-        토큰입니다. 토큰은 내 권한으로 동작하니 다른 사람과 공유하지 마세요. MCP
-        주소는 <span className="font-mono break-all">{endpoint}</span> 입니다.
+        Claude Code와 Codex 같은 AI 도구가 MCP로 내 업무를 읽고 고칠 때 쓰는
+        개인 토큰입니다. 토큰은 내 권한으로 동작하니 다른 사람과 공유하지
+        마세요. MCP 주소는{" "}
+        <span className="font-mono break-all">{endpoint}</span> 입니다.
       </p>
       <Button
         className="justify-self-start"

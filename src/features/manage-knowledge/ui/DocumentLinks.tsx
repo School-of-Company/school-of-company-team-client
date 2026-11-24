@@ -7,6 +7,7 @@ import {
   incidentQueries,
   IncidentStatusLabel,
   SeverityLabel,
+  severityLabels,
 } from "@/entities/incident";
 import {
   KindLabel,
@@ -37,7 +38,7 @@ import { parseTaskRef } from "../model/task-ref";
 type Target = "service" | "incident" | "task" | "document";
 const targetLabels: Readonly<Record<Target, string>> = {
   service: "서비스",
-  incident: "사고",
+  incident: "장애",
   task: "업무",
   document: "문서",
 };
@@ -92,7 +93,7 @@ export function DocumentLinks({
       </div>
       {total === 0 && links.referencedBy.length === 0 && (
         <p className="text-sm text-muted">
-          연결된 서비스, 사고, 업무, 문서가 없습니다.
+          연결된 서비스, 장애, 업무, 문서가 없습니다.
         </p>
       )}
       <LinkGroup title="서비스" count={links.services.length}>
@@ -109,7 +110,7 @@ export function DocumentLinks({
           </li>
         ))}
       </LinkGroup>
-      <LinkGroup title="사고" count={links.incidents.length}>
+      <LinkGroup title="장애" count={links.incidents.length}>
         {links.incidents.map((incident) => (
           <li key={incident.linkId}>
             <Link
@@ -261,7 +262,7 @@ function AddLinkForm({
             .filter((incident) => !linked.incident.has(incident.id))
             .map((incident) => ({
               id: incident.id,
-              label: `[${incident.severity}] ${incident.title}`,
+              label: `[${severityLabels[incident.severity]}] ${incident.title}`,
             }))
         : target === "document"
           ? (documents.data ?? [])
