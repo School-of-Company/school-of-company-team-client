@@ -1,6 +1,8 @@
 import type { ComponentProps } from "react";
 
 const paths = {
+  expand: "M14 3h7v7 M21 3l-9 9 M10 3H3v18h18v-7",
+  info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 11v6 M12 7v.5",
   plus: "M12 5v14 M5 12h14",
   priorityHigh: "M4 20V12h3v8z M10 20V8h3v12z M16 20V4h3v16z",
   priorityMedium: "M4 20V12h3v8z M10 20V8h3v12z M16 20h3",
