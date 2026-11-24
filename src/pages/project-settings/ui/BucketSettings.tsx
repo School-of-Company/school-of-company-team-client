@@ -14,7 +14,8 @@ import {
   Icon,
   IconButton,
   Input,
-  Skeleton,
+  ListSkeleton,
+  StaleNotice,
 } from "@/shared/ui";
 import { normalizeApiError } from "@/shared/api";
 import { settingsErrorMessage } from "@/features/project-settings";
@@ -38,14 +39,22 @@ export function BucketSettings({ project, user }: SettingsProps) {
   const [deleting, setDeleting] = useState<PlanningBucket | null>(null);
   const [validation, setValidation] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
+  const intro = (
+    <p className="text-sm text-muted">
+      버킷은 상태와 별개로 업무를 계획 단위(이번 주기, 다음, 보류 등)로
+      나눕니다. 보드에서 버킷별로 묶어 보고, 레인 사이로 끌어 옮깁니다.
+      {!manage && " 버킷 관리는 헤드 어드민 또는 PM이 합니다."}
+    </p>
+  );
+  // 안내 문단은 바로 그리고 목록 자리만 빈 상태 높이로 잡아, 버킷이 와도 아래가 밀리지 않는다.
   if (buckets.isPending)
     return (
-      <div role="status" aria-label="버킷 불러오는 중" className="grid gap-2">
-        <Skeleton className="h-10" />
-        <Skeleton className="h-10" />
+      <div className="grid gap-5">
+        {intro}
+        <ListSkeleton label="버킷 불러오는 중" rows={2} rowClassName="h-10" />
       </div>
     );
-  if (buckets.isError)
+  if (!buckets.data)
     return (
       <ErrorState
         title="버킷을 불러오지 못했습니다"
@@ -191,11 +200,8 @@ export function BucketSettings({ project, user }: SettingsProps) {
   }
   return (
     <div className="grid gap-5">
-      <p className="text-sm text-muted">
-        버킷은 상태와 별개로 업무를 계획 단위(이번 주기, 다음, 보류 등)로
-        나눕니다. 보드에서 버킷별로 묶어 보고, 레인 사이로 끌어 옮깁니다.
-        {!manage && " 버킷 관리는 헤드 어드민 또는 PM이 합니다."}
-      </p>
+      {intro}
+      <StaleNotice query={buckets} />
       {list.length === 0 ? (
         <EmptyState
           title="버킷이 없습니다"

@@ -1,1 +1,4 @@
-export { ProjectSettingsPage } from "./ui/ProjectSettingsPage";
+export {
+  ProjectSettingsPage,
+  ProjectSettingsSkeleton,
+} from "./ui/ProjectSettingsPage";

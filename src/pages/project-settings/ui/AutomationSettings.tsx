@@ -12,7 +12,7 @@ import {
   EmptyState,
   ErrorState,
   Icon,
-  Skeleton,
+  ListSkeleton,
   StaleNotice,
 } from "@/shared/ui";
 import { ruleQueries, useRuleChange } from "../api/rules";
@@ -59,11 +59,20 @@ export function AutomationSettings({
     .filter((member) => activeUserIds.has(member.userId))
     .map((member) => ({ value: member.userId, label: member.name }));
 
+  const intro = (
+    <p className="max-w-xl text-sm text-muted">
+      업무 이벤트나 장애가 생기면 조건에 맞을 때 동작 하나를 실행합니다. 업무
+      상태는 바꾸지 않고, 개인, 팀 공용 업무에는 걸리지 않습니다.
+    </p>
+  );
+  // 안내 문단은 바로 그리고 목록 자리만 빈 상태 높이로 잡는다.
   if (rules.isPending)
     return (
-      <div role="status" aria-label="규칙 불러오는 중" className="grid gap-2">
-        <Skeleton className="h-14" />
-        <Skeleton className="h-14" />
+      <div className="grid gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          {intro}
+        </div>
+        <ListSkeleton label="규칙 불러오는 중" rows={2} rowClassName="h-14" />
       </div>
     );
   if (rules.isError && !rules.data)
@@ -85,10 +94,7 @@ export function AutomationSettings({
     <div className="grid gap-8">
       <div className="grid gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <p className="max-w-xl text-sm text-muted">
-            업무 이벤트나 장애가 생기면 조건에 맞을 때 동작 하나를 실행합니다.
-            업무 상태는 바꾸지 않고, 개인, 팀 공용 업무에는 걸리지 않습니다.
-          </p>
+          {intro}
           {list.length > 0 && create}
         </div>
         <StaleNotice query={rules} />

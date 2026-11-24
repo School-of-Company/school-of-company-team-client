@@ -12,7 +12,7 @@ import {
   ErrorState,
   Icon,
   Select,
-  Skeleton,
+  ListSkeleton,
   type IconName,
   StaleNotice,
 } from "@/shared/ui";
@@ -105,15 +105,7 @@ export function RuleRuns({
         </div>
       </div>
       {runs.isPending ? (
-        <div
-          role="status"
-          aria-label="실행 기록 불러오는 중"
-          className="grid gap-2"
-        >
-          <Skeleton className="h-12" />
-          <Skeleton className="h-12" />
-          <Skeleton className="h-12" />
-        </div>
+        <ListSkeleton label="실행 기록 불러오는 중" rows={3} />
       ) : runs.isError && !runs.data ? (
         <ErrorState
           title="실행 기록을 불러오지 못했습니다"
