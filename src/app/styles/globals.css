@@ -1380,13 +1380,18 @@ select.ui-input {
 }
 
 /* 카드 더보기 메뉴: 아이콘 + 동사 한 줄씩. 상태는 현재 단계에 체크. */
+/* top layer(popover)에 떠서 보드 스크롤 영역에 잘리지 않는다. 좌표는 BoardCardMenu 가 버튼 기준으로 정한다. */
 .board-menu {
-  position: absolute;
+  position: fixed;
   z-index: var(--z-dropdown);
-  top: 100%;
-  right: 0;
+  inset: auto;
   display: grid;
   width: 13rem;
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+  margin: 0;
+  border: 0;
+  color: var(--foreground);
   padding: 6px;
   border-radius: 14px;
   background: var(--surface-raised);

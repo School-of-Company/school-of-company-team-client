@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   statusLabels,
@@ -9,6 +9,7 @@ import {
   type TaskStatus,
 } from "@/entities/task";
 import { Icon, IconButton } from "@/shared/ui";
+import { menuPosition } from "../model/menu-position";
 
 export function BoardCardMenu({
   task,
@@ -31,6 +32,32 @@ export function BoardCardMenu({
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const menuEdge = useRef<"first" | "last">("first");
+  // 메뉴는 popover(top layer)로 띄워 보드의 가로 스크롤 영역에 잘리지 않는다.
+  // DOM 위치는 그대로라 포커스, 바깥 클릭, Tab 닫기는 지금처럼 root 기준으로 동작한다.
+  useLayoutEffect(() => {
+    const element = menu.current;
+    const button = trigger.current;
+    if (!open || !element || !button) return;
+    if (typeof element.showPopover === "function") element.showPopover();
+    function place() {
+      if (!element || !button) return;
+      const anchor = button.getBoundingClientRect();
+      const size = element.getBoundingClientRect();
+      const { top, left } = menuPosition(anchor, size, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      element.style.top = `${top}px`;
+      element.style.left = `${left}px`;
+    }
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [open]);
   useEffect(() => {
     if (!open) return;
     const items = menu.current?.querySelectorAll<HTMLElement>(
@@ -92,6 +119,7 @@ export function BoardCardMenu({
           ref={menu}
           id={menuId}
           role="menu"
+          popover="manual"
           aria-label={task.title + " 작업"}
           className="board-menu"
           onKeyDown={(event) => {
