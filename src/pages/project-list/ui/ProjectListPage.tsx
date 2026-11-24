@@ -62,7 +62,7 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           </Field>
         </div>
         <span role="status" className="text-sm text-muted">
-          {projects.isFetching && !projects.isPending ? "조회 중…" : ""}
+          {projects.isFetching && !projects.isPending ? "불러오는 중…" : ""}
         </span>
       </div>
       {projects.isPending ? (
@@ -80,18 +80,18 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           error={projects.error}
           onRetry={() => void projects.refetch()}
         />
-      ) : projects.data.length === 0 && stage ? (
+      ) : !projects.isPlaceholderData && projects.data.length === 0 && stage ? (
         <EmptyState
           title={`${stageLabels[stage]} 단계 프로젝트가 없습니다`}
           description="다른 단계를 선택해 보세요."
         />
-      ) : projects.data.length === 0 ? (
+      ) : !projects.isPlaceholderData && projects.data.length === 0 ? (
         <EmptyState
           title="참여할 수 있는 프로젝트가 없습니다"
           description="프로젝트 관리자에게 참여를 요청해 주세요."
         />
       ) : (
-        <ul className="list">
+        <ul className="list" aria-busy={projects.isFetching}>
           {projects.data.map((project) => (
             <li key={project.id} className="list-row">
               <Link
