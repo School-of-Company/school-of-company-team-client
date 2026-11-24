@@ -126,6 +126,20 @@ function KnowledgeListContent({
     const query = params.toString();
     return query ? `${pathname}?${query}` : pathname;
   };
+  // 목록이 오기 전에도 선택된 프로젝트 이름을 칩에 바로 보인다(상세 조회나 문서의 프로젝트에서 읽음).
+  const projectOptions = (projects.data ?? []).map((project) => ({
+    value: project.id,
+    label: project.name,
+  }));
+  if (projectId && !projectOptions.some((option) => option.value === projectId))
+    projectOptions.push({
+      value: projectId,
+      label:
+        selectedProject.data?.name ??
+        documents.data?.find((document) => document.project?.id === projectId)
+          ?.project?.name ??
+        "프로젝트 불러오는 중",
+    });
   const count = settledData(documents)?.length;
   const kindLabel = kind ? kindLabels[kind] : "전체";
   return (
@@ -166,10 +180,7 @@ function KnowledgeListContent({
             options={[
               { value: "", label: "모든 프로젝트" },
               { value: "ORG", label: "조직 문서" },
-              ...(projects.data ?? []).map((project) => ({
-                value: project.id,
-                label: project.name,
-              })),
+              ...projectOptions,
             ]}
             onChange={(value) =>
               router.replace(
