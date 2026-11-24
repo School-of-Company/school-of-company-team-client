@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, type FormEvent } from "react";
+import { useId, useLayoutEffect, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   publicIntakeApi,
@@ -37,14 +37,21 @@ const statusKey = (token: string) => ["public-intake-status", token] as const;
 export function IntakeStatusPage() {
   const [token, setToken] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
-  useEffect(() => {
+  // 토큰 유무는 클라이언트에서 직접 읽는다. 레이아웃 effect라 클라이언트 이동(Link)으로 들어와 boot script가
+  // 돌지 않아도 첫 그림 전에 맞는 화면으로 바뀐다. 읽은 뒤에는 boot 표시를 지워 다음 화면에 남지 않게 한다.
+  useLayoutEffect(() => {
+    const root = document.documentElement;
     const read = () => {
       setToken(statusTokenFromHash(window.location.hash));
       setChecked(true);
+      root.removeAttribute("data-status-token");
     };
     read();
     window.addEventListener("hashchange", read);
-    return () => window.removeEventListener("hashchange", read);
+    return () => {
+      window.removeEventListener("hashchange", read);
+      root.removeAttribute("data-status-token");
+    };
   }, []);
   // 서버는 fragment(#토큰)를 모른다. 첫 그림 전에 boot script가 토큰 유무를 <html>에 표시하고,
   // 두 대기 모양 중 맞는 하나만 CSS로 보여 준다(토큰 없는 주소에서 상태 스켈레톤이 한 번 비치지 않게).
