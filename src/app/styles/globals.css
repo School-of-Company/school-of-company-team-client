@@ -4684,16 +4684,6 @@ a.search-option:hover {
 .incident-workspace .task-props > dl {
   gap: var(--space-3);
 }
-.requirement-status-filter {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--space-2);
-  max-width: 100%;
-}
-.requirement-status-filter select {
-  width: auto;
-}
 .requirement-detail {
   max-width: var(--content-reading);
   margin-inline: auto;
