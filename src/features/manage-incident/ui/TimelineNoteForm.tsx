@@ -1,11 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import {
-  fromLocalInput,
-  incidentApi,
-  incidentErrorMessage,
-} from "@/entities/incident";
+import { incidentApi, incidentErrorMessage } from "@/entities/incident";
 import { fieldErrors, normalizeApiError } from "@/shared/api";
 import { Button, DateTimePicker, Textarea } from "@/shared/ui";
 import { useIncidentMutation } from "../api/mutations";
@@ -23,7 +19,7 @@ export function TimelineNoteForm({
   const add = useIncidentMutation(incidentId, () =>
     incidentApi.addNote(incidentId, {
       body: body.trim(),
-      occurredAt: backdated ? fromLocalInput(at) : undefined,
+      occurredAt: backdated ? at || undefined : undefined,
     }),
   );
   const submit = (event: FormEvent) => {
@@ -107,13 +103,14 @@ export function TimelineNoteForm({
           메모 추가
         </Button>
       </div>
-      {(server.form ?? server.occurredAt) ? (
-        <p
-          id={server.occurredAt ? `${id}-at-error` : undefined}
-          role="alert"
-          className="text-sm text-danger"
-        >
-          {server.form ?? server.occurredAt}
+      {server.occurredAt ? (
+        <p id={`${id}-at-error`} role="alert" className="text-sm text-danger">
+          {server.occurredAt}
+        </p>
+      ) : null}
+      {server.form ? (
+        <p role="alert" className="text-sm text-danger">
+          {server.form}
         </p>
       ) : null}
     </form>

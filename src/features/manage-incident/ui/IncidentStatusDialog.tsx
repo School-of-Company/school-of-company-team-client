@@ -2,12 +2,10 @@
 
 import { useId, useState, type FormEvent } from "react";
 import {
-  fromLocalInput,
   incidentApi,
   incidentErrorMessage,
   incidentStatuses,
   incidentStatusLabels,
-  toLocalInput,
   type IncidentDetail,
   type IncidentStatus,
 } from "@/entities/incident";
@@ -68,7 +66,7 @@ function StatusForm({
   const change = useIncidentMutation(incident.id, () =>
     incidentApi.changeStatus(incident.id, {
       status,
-      at: fromLocalInput(at),
+      at: at || undefined,
       note: note.trim() || undefined,
     }),
   );
@@ -115,7 +113,7 @@ function StatusForm({
           id={`${id}-at`}
           label="변경 시각"
           value={at}
-          min={toLocalInput(incident.startedAt)}
+          min={incident.startedAt}
           invalid={!!server.at}
           describedBy={`${id}-at-hint`}
           onChange={setAt}

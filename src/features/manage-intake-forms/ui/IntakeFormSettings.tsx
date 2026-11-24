@@ -224,8 +224,9 @@ export function IntakeFormSettings({
                   ],
                   requirementErrorMessage(error),
                 );
-                if (found.form) toast(found.form, "error");
-                else setServerErrors(found);
+                const { form, ...fields } = found;
+                setServerErrors(fields);
+                if (form) toast(form, "error");
               },
             },
           );
@@ -286,15 +287,6 @@ export function IntakeFormSettings({
   );
 }
 
-/** datetime-local 값(브라우저 시간대) ↔ ISO-8601. */
-const toLocalInput = (iso: string | null) => {
-  if (!iso) return "";
-  const date = new Date(iso);
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
-    .toISOString()
-    .slice(0, 16);
-};
-
 function FormDialog({
   form,
   pending,
@@ -316,9 +308,7 @@ function FormDialog({
     existing?.publicDescription ?? "",
   );
   const [active, setActive] = useState(existing?.active ?? true);
-  const [expiresAt, setExpiresAt] = useState(
-    toLocalInput(existing?.expiresAt ?? null),
-  );
+  const [expiresAt, setExpiresAt] = useState(existing?.expiresAt ?? "");
   const [dailyLimit, setDailyLimit] = useState(
     String(existing?.dailyLimit ?? 50),
   );
@@ -350,7 +340,7 @@ function FormDialog({
       active,
       dailyLimit: limit,
       ...(expiresAt
-        ? { expiresAt: new Date(expiresAt).toISOString() }
+        ? { expiresAt }
         : existing?.expiresAt
           ? { clearExpiresAt: true }
           : {}),

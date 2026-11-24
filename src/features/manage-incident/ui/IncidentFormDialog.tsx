@@ -3,13 +3,11 @@
 import { useId, useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  fromLocalInput,
   incidentApi,
   incidentErrorMessage,
   incidentSeverities,
   severityDescriptions,
   severityLabels,
-  toLocalInput,
   type IncidentDetail,
   type IncidentSeverity,
 } from "@/entities/incident";
@@ -80,7 +78,7 @@ function IncidentForm({
     severity: incident?.severity ?? "",
     commanderId: incident?.commander?.id ?? "",
     serviceIds: incident?.services.map((service) => service.id) ?? [],
-    startedAt: incident ? toLocalInput(incident.startedAt) : "",
+    startedAt: incident?.startedAt ?? "",
   };
   const [values, setValues] = useState<Values>(initial);
   const [errors, setErrors] = useState<{ title?: string; severity?: string }>(
@@ -89,7 +87,7 @@ function IncidentForm({
   const users = useQuery(activeUsersQueryOptions());
   const services = useQuery(serviceQueries.list(false));
   const save = useIncidentMutation(incident?.id ?? "", (body: Values) => {
-    const startedAt = fromLocalInput(body.startedAt);
+    const startedAt = body.startedAt || undefined;
     const severity = body.severity || undefined;
     if (!incident)
       return incidentApi.create({
