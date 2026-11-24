@@ -9,11 +9,11 @@ import {
   Button,
   Dialog,
   EmptyState,
-  ErrorState,
   Field,
   Input,
+  ListSkeleton,
+  QueryState,
   Select,
-  Skeleton,
   Textarea,
 } from "@/shared/ui";
 import {
@@ -285,29 +285,33 @@ export function ApiTokens() {
       >
         토큰 만들기
       </Button>
-      {tokens.isPending ? (
-        <Skeleton className="h-16" />
-      ) : tokens.isError ? (
-        <ErrorState
-          description={normalizeApiError(tokens.error).message}
-          onRetry={() => void tokens.refetch()}
-        />
-      ) : tokens.data.length === 0 ? (
-        <EmptyState title="만든 토큰이 없습니다." />
-      ) : (
-        <ul className="list" aria-label="API 토큰 목록">
-          {tokens.data.map((token) => (
-            <TokenRow
-              key={token.id}
-              token={token}
-              onRevoke={() => {
-                revoke.reset();
-                setRevoking(token);
-              }}
-            />
-          ))}
-        </ul>
-      )}
+      <QueryState
+        query={tokens}
+        skeleton={
+          <ListSkeleton
+            label="API 토큰 불러오는 중"
+            rows={2}
+            rowClassName="h-16"
+          />
+        }
+        errorMessage={(error) => normalizeApiError(error).message}
+        empty={<EmptyState title="만든 토큰이 없습니다" />}
+      >
+        {(data) => (
+          <ul className="list" aria-label="API 토큰 목록">
+            {data.map((token) => (
+              <TokenRow
+                key={token.id}
+                token={token}
+                onRevoke={() => {
+                  revoke.reset();
+                  setRevoking(token);
+                }}
+              />
+            ))}
+          </ul>
+        )}
+      </QueryState>
       <Dialog
         open={dialog.open}
         onClose={() => dispatch({ type: "close" })}
