@@ -96,12 +96,14 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
             <li key={project.id} className="list-row">
               <Link
                 href={`/projects/${encodeURIComponent(project.id)}`}
-                className="list-row-main"
+                className="list-row-main project-list-main"
               >
                 <ProjectAvatar project={project} />
-                <Badge className="font-mono">{project.key}</Badge>
                 <div className="grid min-w-0 gap-0.5">
-                  <h2 className="list-row-title">{project.name}</h2>
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <h2 className="list-row-title">{project.name}</h2>
+                    <Badge className="font-mono">{project.key}</Badge>
+                  </div>
                   {project.description && (
                     <span className="truncate text-sm text-muted">
                       {project.description}

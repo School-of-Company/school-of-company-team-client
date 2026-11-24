@@ -1027,6 +1027,12 @@ select.ui-input {
   }
 }
 
+.list-row-main.project-list-main {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 /* Soft badge colours. */
 .badge-red {
   background: var(--hue-red-soft);
