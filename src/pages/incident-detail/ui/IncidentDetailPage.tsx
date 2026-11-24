@@ -24,13 +24,7 @@ import {
   PostmortemPanel,
 } from "@/features/manage-incident";
 import { routes } from "@/shared/config";
-import {
-  Button,
-  ErrorState,
-  Skeleton,
-  Spinner,
-  StaleNotice,
-} from "@/shared/ui";
+import { Button, ErrorState, StaleNotice } from "@/shared/ui";
 import { IncidentProperties } from "./IncidentProperties";
 import { IncidentTimeline } from "./IncidentTimeline";
 
@@ -45,9 +39,9 @@ export function IncidentDetailPage({
   readonly incidentId: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<IncidentDetailSkeleton />}>
       {(user) => (
-        <Suspense fallback={<Spinner label="장애 불러오는 중" />}>
+        <Suspense fallback={<IncidentDetailSkeleton />}>
           <IncidentDetailContent
             key={incidentId}
             incidentId={incidentId}
@@ -56,6 +50,65 @@ export function IncidentDetailPage({
         </Suspense>
       )}
     </AuthGuard>
+  );
+}
+
+/** 상세 머리글(경로, 제목, 심각도 줄), 탭 줄, 타임라인과 속성 열을 실제와 같은 클래스로 잡는다. */
+export function IncidentDetailSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="장애를 불러오는 중"
+      className="incident-detail incident-workspace grid gap-4"
+    >
+      <header aria-hidden="true" className="page-header">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <span className="ui-skeleton-text">장애 / 진행 중</span>
+          </p>
+          <h1 className="task-title font-semibold">
+            <span className="ui-skeleton-text">장애 제목을 불러오는 중</span>
+          </h1>
+          <p className="mt-2 flex flex-wrap items-center gap-3">
+            <span className="ui-skeleton-text text-xs">심각도 높음</span>
+            <span className="ui-skeleton-text text-xs">대응 중</span>
+          </p>
+        </div>
+      </header>
+      <div aria-hidden="true" className="project-nav flex border-b">
+        {tabs.map((item) => (
+          <span
+            key={item.value}
+            className="ui-nav-link flex items-center border-b-2 border-transparent"
+          >
+            <span className="ui-skeleton-text">{item.label}</span>
+          </span>
+        ))}
+      </div>
+      <div aria-hidden="true" className="task-detail">
+        <div className="task-detail-grid">
+          <div className="task-main">
+            <div className="ui-skeleton-list" />
+          </div>
+          <div className="task-props">
+            <dl>
+              {["심각도", "상태", "대응 책임자", "영향 서비스", "시작"].map(
+                (label) => (
+                  <div key={label}>
+                    <dt>
+                      <span className="ui-skeleton-text">{label}</span>
+                    </dt>
+                    <dd>
+                      <span className="ui-skeleton-text">불러오는 중</span>
+                    </dd>
+                  </div>
+                ),
+              )}
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -81,14 +134,7 @@ function IncidentDetailContent({
         onRetry={() => void detail.refetch()}
       />
     );
-  if (!detail.data)
-    return (
-      <div role="status" aria-label="장애를 불러오는 중" className="grid gap-4">
-        <Skeleton className="w-24" />
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-64" />
-      </div>
-    );
+  if (!detail.data) return <IncidentDetailSkeleton />;
   return (
     <>
       <StaleNotice query={detail} />
