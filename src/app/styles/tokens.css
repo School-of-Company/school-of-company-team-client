@@ -122,6 +122,8 @@
   --content-narrow: 44rem;
   --content-reading: 64rem;
   --detail-sidebar-width: 17.5rem;
+  --content-prose: 68ch;
+  --toast-width: 24rem;
   --sidebar-edge-width: 24px;
 
   /* Elevation: borders separate, shadows only lift overlays. */

@@ -1,27 +1,21 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import Link from "next/link";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  forgetTask,
-  isGoneError,
-  taskApi,
-  taskKeys,
-  taskQueries,
-  TaskError,
-} from "@/entities/task";
-import { projectAccess, projectQueries } from "@/entities/project";
-import { milestoneQueries } from "@/entities/milestone";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { taskApi, taskKeys, TaskError } from "@/entities/task";
+import { projectAccess } from "@/entities/project";
 import { TaskEditor } from "@/features/edit-task";
-import { activeUsersQueryOptions } from "@/entities/user";
 import { TaskGithubPanel } from "@/features/link-github-issue";
 import { TaskDiscussion } from "./TaskDiscussion";
 import { TaskDocuments } from "./TaskDocuments";
 import { normalizeApiError } from "@/shared/api";
-import { Button, Dialog, Icon, Skeleton } from "@/shared/ui";
-import { TaskDescription, TaskProperties } from "./TaskContent";
+import { formatDate } from "@/shared/lib";
+import { Button, Dialog, Skeleton, useToast } from "@/shared/ui";
+import { TaskProperties } from "./TaskContent";
+import { TaskDescription } from "./TaskDescription";
+import { TaskDetailHeader } from "./TaskDetailHeader";
+import { useTaskDetail } from "../model/useTaskDetail";
 
 export function TaskDetailWorkspace({
   taskId,
@@ -38,119 +32,32 @@ export function TaskDetailWorkspace({
 }) {
   const client = useQueryClient();
   const router = useRouter();
+  const toast = useToast();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [denied, setDenied] = useState<unknown>(null);
-  const [message, setMessage] = useState("");
-  // 404·403을 받은 상세는 다시 받지 않는다(10초 폴링·재마운트가 같은 404를 되풀이하지 않게). 다시 시도는 수동 refetch.
-  const lastError = client.getQueryState(taskKeys.detail(taskId))?.error;
-  const gone = !!lastError && isGoneError(lastError);
-  const task = useQuery({
-    ...taskQueries.detail(taskId),
-    enabled: !denied && !gone,
-  });
-  // 프로젝트 상세도 404·403이면 다시 받지 않는다(업무는 200인데 프로젝트만 404인 경우의 폴링·정리 반복 방지).
-  const projectError = client.getQueryState(
-    projectQueries.detail(task.data?.projectId ?? "").queryKey,
-  )?.error;
-  const project = useQuery({
-    ...projectQueries.detail(task.data?.projectId ?? ""),
-    enabled:
-      !denied &&
-      !!task.data?.projectId &&
-      !(projectError && isGoneError(projectError)),
-  });
-  const buckets = useQuery({
-    ...projectQueries.buckets(task.data?.projectId ?? ""),
-    enabled: !denied && task.data?.scope === "PROJECT" && !!task.data.projectId,
-  });
-  const milestones = useQuery({
-    ...milestoneQueries.list(task.data?.projectId ?? ""),
-    enabled: !denied && task.data?.scope === "PROJECT" && !!task.data.projectId,
-  });
-  const changeBucket = useMutation({
-    mutationFn: (planningBucketId: string) =>
-      taskApi.update(taskId, { planningBucketId }),
-    onSuccess: async () => {
-      setMessage("계획 버킷을 변경했습니다.");
-      await client.invalidateQueries({ queryKey: taskKeys.all });
-    },
-    onError: (cause) => {
-      const problem = normalizeApiError(cause);
-      setMessage(problem.message);
-      if (problem.status === 403 || problem.status === 404) setDenied(cause);
-    },
-  });
-  const changeMilestone = useMutation({
-    mutationFn: (milestoneId: string) =>
-      taskApi.update(taskId, { milestoneId }),
-    onSuccess: async () => {
-      setMessage("마일스톤을 변경했습니다.");
-      await Promise.all([
-        client.invalidateQueries({ queryKey: taskKeys.all }),
-        // 진행률이 바뀐다.
-        client.invalidateQueries({
-          queryKey: milestoneQueries.list(task.data?.projectId ?? "").queryKey,
-        }),
-      ]);
-    },
-    onError: (cause) => {
-      const problem = normalizeApiError(cause);
-      setMessage(problem.message);
-      if (problem.status === 403 || problem.status === 404) setDenied(cause);
-    },
-  });
-  const assignees = useQuery({
-    ...activeUsersQueryOptions(),
-    enabled: task.data?.scope === "TEAM" && !denied,
-  });
-  const projectProblem = project.error
-    ? normalizeApiError(project.error)
-    : null;
-  const taskError =
-    denied ||
-    task.error ||
-    (projectProblem &&
-    (projectProblem.status === 403 || projectProblem.status === 404)
-      ? project.error
-      : null);
-  // 404 응답 하나에 정리 한 번(forgetTask가 QueryClient 단위로 응답 시각을 기억). 목록 제외는 매번 한다.
-  // 기준 시각은 오류가 난 쪽의 응답 시각이다(업무·프로젝트). 거부(denied)는 effect가 도는 시각.
-  const errorAt =
-    taskError && taskError === task.error
-      ? task.errorUpdatedAt
-      : taskError && taskError === project.error
-        ? project.errorUpdatedAt
-        : 0;
-  useEffect(() => {
-    if (!taskError) return;
-    const problem = normalizeApiError(taskError);
-    if (problem.status === 403 || problem.status === 404)
-      forgetTask(client, taskId, errorAt || Date.now());
-  }, [taskError, errorAt, client, taskId]);
-  const changeStatus = useMutation({
-    mutationFn: (status: Parameters<typeof taskApi.move>[1]["status"]) =>
-      taskApi.move(taskId, { status, prevId: null, nextId: null }),
-    onSuccess: async () => {
-      setMessage("상태를 변경했습니다.");
-      await client.invalidateQueries({ queryKey: taskKeys.all });
-    },
-    onError: (cause) => {
-      const problem = normalizeApiError(cause);
-      setMessage(problem.message);
-      if (problem.status === 403 || problem.status === 404) setDenied(cause);
-    },
-  });
+  const {
+    task,
+    project,
+    buckets,
+    milestones,
+    assignees,
+    taskError,
+    setDenied,
+    changeStatus,
+    changeBucket,
+    changeMilestone,
+  } = useTaskDetail(taskId);
   const remove = useMutation({
     mutationFn: () => taskApi.delete(taskId),
     onSuccess: async () => {
       client.removeQueries({ queryKey: taskKeys.detail(taskId) });
       await client.invalidateQueries({ queryKey: taskKeys.all });
+      toast("업무를 삭제했습니다.", "success");
       router.push("/me");
     },
     onError: (cause) => {
-      setMessage(normalizeApiError(cause).message);
+      toast(normalizeApiError(cause).message, "error");
       setDeleting(false);
     },
   });
@@ -178,8 +85,6 @@ export function TaskDetailWorkspace({
     );
   if (!task.data) return null;
   const data = task.data;
-  const boardName =
-    data.projectName ?? (data.scope === "TEAM" ? "팀 공용" : "내 업무");
   const access =
     project.data && user ? projectAccess(project.data, user) : null;
   const editable = !!user && (data.scope !== "PROJECT" || !!access?.editable);
@@ -195,52 +100,16 @@ export function TaskDetailWorkspace({
     : (assignees.data ?? data.assignees);
   return (
     <div className="task-detail">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        {headerAction}
-        <Link
-          href={
-            data.projectId
-              ? `/projects/${encodeURIComponent(data.projectId)}`
-              : data.scope === "TEAM"
-                ? "/team"
-                : "/me"
-          }
-          className="ui-button ui-button-ghost ui-button-sm -ml-2 gap-1"
-          aria-label={`${boardName} 보드로 돌아가기`}
-        >
-          <Icon name="chevronLeft" aria-hidden />
-          {boardName}
-        </Link>
-        <span className="ml-auto flex flex-wrap gap-2">
-          {editable && (
-            <Button
-              variant="secondary"
-              className="ui-button-sm"
-              onClick={() => setEditing(true)}
-            >
-              수정
-            </Button>
-          )}
-          {canDelete && (
-            <Button
-              variant="ghost"
-              className="ui-button-sm"
-              onClick={() => setDeleting(true)}
-            >
-              삭제
-            </Button>
-          )}
-        </span>
-      </div>
+      <TaskDetailHeader
+        task={data}
+        headerAction={headerAction}
+        editable={editable}
+        canDelete={canDelete}
+        onEdit={() => setEditing(true)}
+        onDelete={() => setDeleting(true)}
+      />
       <div className="task-detail-grid">
         <div className="task-main">
-          <header className="grid gap-1">
-            <p className="font-mono text-xs text-muted">
-              {data.key ??
-                (data.scope === "PERSONAL" ? "개인 업무" : "팀 공용 업무")}
-            </p>
-            <h1 className="task-title">{data.title}</h1>
-          </header>
           {project.data?.archived && (
             <p className="text-sm text-muted">
               아카이브된 프로젝트입니다. 조회만 가능합니다.
@@ -252,11 +121,25 @@ export function TaskDetailWorkspace({
               onRetry={() => void project.refetch()}
             />
           )}
-          {message && (
-            <p role="status" className="text-sm">
-              {message}
-            </p>
-          )}
+          <TaskProperties
+            task={data}
+            editable={editable}
+            pending={changeStatus.isPending}
+            onStatus={(status) => {
+              if (!changeStatus.isPending) changeStatus.mutate(status);
+            }}
+            buckets={buckets.data}
+            bucketPending={changeBucket.isPending}
+            onBucket={(bucketId) => {
+              if (!changeBucket.isPending) changeBucket.mutate(bucketId);
+            }}
+            milestones={milestones.data}
+            milestonePending={changeMilestone.isPending}
+            onMilestone={(milestoneId) => {
+              if (!changeMilestone.isPending)
+                changeMilestone.mutate(milestoneId);
+            }}
+          />
           <TaskDescription task={data} />
           <TaskGithubPanel
             task={data}
@@ -267,6 +150,19 @@ export function TaskDetailWorkspace({
             }}
             completing={changeStatus.isPending}
           />
+          <section>
+            <h2 className="task-section-title">활동</h2>
+            <dl className="task-activity">
+              <div>
+                <dt>생성</dt>
+                <dd>{formatDate(data.createdAt)}</dd>
+              </div>
+              <div>
+                <dt>최근 수정</dt>
+                <dd>{formatDate(data.updatedAt)}</dd>
+              </div>
+            </dl>
+          </section>
           {data.scope !== "PERSONAL" && (
             <TaskDiscussion
               taskId={data.id}
@@ -276,24 +172,6 @@ export function TaskDetailWorkspace({
           )}
           {data.scope !== "PERSONAL" && <TaskDocuments taskId={data.id} />}
         </div>
-        <TaskProperties
-          task={data}
-          editable={editable}
-          pending={changeStatus.isPending}
-          onStatus={(status) => {
-            if (!changeStatus.isPending) changeStatus.mutate(status);
-          }}
-          buckets={buckets.data}
-          bucketPending={changeBucket.isPending}
-          onBucket={(bucketId) => {
-            if (!changeBucket.isPending) changeBucket.mutate(bucketId);
-          }}
-          milestones={milestones.data}
-          milestonePending={changeMilestone.isPending}
-          onMilestone={(milestoneId) => {
-            if (!changeMilestone.isPending) changeMilestone.mutate(milestoneId);
-          }}
-        />
       </div>
       <Dialog
         open={editing}
@@ -317,6 +195,7 @@ export function TaskDetailWorkspace({
                 await taskApi.update(taskId, body);
                 await client.invalidateQueries({ queryKey: taskKeys.all });
                 setEditing(false);
+                toast("업무를 수정했습니다.", "success");
               } catch (cause) {
                 const problem = normalizeApiError(cause);
                 if (problem.status === 403 || problem.status === 404)

@@ -41,12 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# hallmark run artifacts
-.hallmark/before/
-.hallmark/after/
-.hallmark/*.json
-.hallmark/*.txt
-.hallmark/compare.html
+# local documentation and design artifacts
+/docs/
+/.hallmark/
 
 # e2e
 /e2e/.auth/
