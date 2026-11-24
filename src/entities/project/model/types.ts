@@ -1,3 +1,34 @@
+export type ProjectStage =
+  | "REVIEW"
+  | "PREPARATION"
+  | "DEVELOPMENT"
+  | "VERIFICATION"
+  | "OPERATION"
+  | "CLOSED"
+  | "ON_HOLD";
+export type ProjectKind = "OUTSOURCING" | "INTERNAL" | "RND";
+export type ProjectWorkflow = "SPRINT" | "KANBAN";
+
+// 팀 운영 문서 v3 제3장(단계)·제5장(진행 방식). 객체 순서가 선택지 순서다.
+export const stageLabels: Record<ProjectStage, string> = {
+  REVIEW: "검토",
+  PREPARATION: "준비",
+  DEVELOPMENT: "개발",
+  VERIFICATION: "검증",
+  OPERATION: "운영",
+  CLOSED: "종료",
+  ON_HOLD: "보류",
+};
+export const kindLabels: Record<ProjectKind, string> = {
+  OUTSOURCING: "외주",
+  INTERNAL: "내부",
+  RND: "R&D",
+};
+export const workflowLabels: Record<ProjectWorkflow, string> = {
+  SPRINT: "Sprint",
+  KANBAN: "Kanban",
+};
+
 export type Project = {
   readonly id: string;
   readonly key: string;
@@ -6,6 +37,9 @@ export type Project = {
   readonly archived: boolean;
   readonly visibility: "TEAM" | "MEMBERS";
   readonly pmUserId: string | null;
+  readonly stage: ProjectStage;
+  readonly kind: ProjectKind;
+  readonly workflow: ProjectWorkflow;
   readonly createdAt: string;
 };
 export type ProjectDetail = Project & {
@@ -17,7 +51,6 @@ export type ProjectDetail = Project & {
   readonly parts: readonly {
     readonly id: string;
     readonly name: string;
-    readonly leaderUserId: string | null;
     readonly memberUserIds: readonly string[];
   }[];
 };

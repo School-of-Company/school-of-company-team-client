@@ -14,6 +14,9 @@ const project = {
   visibility: "TEAM",
   archived: false,
   pmUserId: "pm",
+  stage: "DEVELOPMENT",
+  kind: "INTERNAL",
+  workflow: "SPRINT",
   createdAt: "2026-11-18",
   members: [{ userId: "member", name: "Member", pm: false }],
   parts: [],
@@ -56,6 +59,22 @@ test("sprint detail keeps the Sprint tab current", () => {
   );
   assert.equal(current.length, 1);
   assert.match(current[0], /href="\/projects\/project\/sprints"/);
+});
+
+test("kanban projects hide the Sprint tab unless the user is already there", () => {
+  const kanban = { ...project, workflow: "KANBAN" };
+  const render = () =>
+    renderToStaticMarkup(
+      createElement(ProjectNav, {
+        project: kanban,
+        user: { id: "member", role: "MEMBER" },
+      }),
+    );
+  pathname = "/projects/project";
+  assert.doesNotMatch(render(), /href="\/projects\/project\/sprints"/);
+  assert.match(render(), /href="\/projects\/project\/milestones"/);
+  pathname = "/projects/project/sprints/01SPRINT";
+  assert.match(render(), /href="\/projects\/project\/sprints"/);
 });
 
 test("project settings route identifies its current destination", () => {
