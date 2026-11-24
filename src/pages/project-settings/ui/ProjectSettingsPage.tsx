@@ -13,12 +13,32 @@ import { activeUsersQueryOptions, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { settingsErrorMessage } from "@/features/project-settings";
 import { SettingsPanels } from "./SettingsPanels";
+import { isAccessLost } from "../model/access-lost";
 import { normalizeApiError } from "@/shared/api";
 import { ProjectNav } from "@/widgets/project-nav";
 import { ErrorState, ListSkeleton, StaleNotice } from "@/shared/ui";
 
-const settingsTabs = ["기본 정보", "멤버와 권한", "연동", "계획 버킷", "알림"];
-const projectTabs = ["보드", "문서", "스프린트", "마일스톤", "달력", "링크"];
+// 설정은 PM과 헤드 어드민이 여는 화면이라 그 사람들이 보는 탭 수(자동화, 접수 양식 포함)로 잡는다.
+const settingsTabs = [
+  "기본 정보",
+  "멤버와 권한",
+  "연동",
+  "계획 버킷",
+  "알림",
+  "자동화",
+  "접수 양식",
+];
+const projectTabs = [
+  "보드",
+  "문서",
+  "스프린트",
+  "마일스톤",
+  "달력",
+  "링크",
+  "화이트보드",
+  "요구사항",
+  "설정",
+];
 
 /** 설정 탭 줄과 본문 자리. 탭을 바꾸거나 설정이 늦게 와도 탭 줄 아래가 같은 높이에서 시작한다. */
 function SettingsBodySkeleton() {
@@ -103,8 +123,8 @@ function ProjectSettingsContent({
     enabled: manages && !project.isError,
   });
   if (project.isPending) return <ProjectSettingsSkeleton />;
-  // 캐시가 있으면 재조회 실패에도 설정을 내리지 않고 위에 안내만 띄운다.
-  if (!project.data)
+  // 5xx·네트워크 실패는 캐시를 두고 위에 안내만 띄운다. 403·404(권한 잃음, 삭제)는 편집 화면을 내린다.
+  if (!project.data || (project.isError && isAccessLost(project.error)))
     return (
       <ErrorState
         title="프로젝트를 표시할 수 없습니다"

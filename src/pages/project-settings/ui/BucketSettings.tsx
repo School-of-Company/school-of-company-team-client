@@ -23,6 +23,7 @@ import { usePlanningBuckets } from "../api/buckets";
 import { bucketOrderAfterMove } from "../model/bucket-order";
 import { validatePartName } from "../model/part-validation";
 import type { SettingsProps } from "../model/props";
+import { isAccessLost } from "../model/access-lost";
 import { MutationFeedback } from "./MutationFeedback";
 
 function validateBucketName(name: string) {
@@ -54,7 +55,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
         <ListSkeleton label="버킷 불러오는 중" rows={2} rowClassName="h-10" />
       </div>
     );
-  if (!buckets.data)
+  if (!buckets.data || (buckets.isError && isAccessLost(buckets.error)))
     return (
       <ErrorState
         title="버킷을 불러오지 못했습니다"
