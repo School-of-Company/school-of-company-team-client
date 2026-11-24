@@ -1676,6 +1676,8 @@ select.ui-input {
   width: min(var(--content-reading), calc(100% - 2rem));
 }
 .task-detail {
+  /* 크기 격리(inline-size) 요소는 내용 폭이 0이라, grid 안에서 margin auto 로 가운데 둘 때 폭을 직접 채운다. */
+  width: 100%;
   container-type: inline-size;
   max-width: var(--content-reading);
   margin-inline: auto;
