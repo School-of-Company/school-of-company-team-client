@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Suspense, useId, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { projectQueries } from "@/entities/project";
+import { projectAccess, projectQueries } from "@/entities/project";
 import type { User } from "@/entities/user";
 import { ProjectHeading } from "@/widgets/project-nav";
 import {
@@ -37,9 +37,9 @@ import {
 export function KnowledgeListPage() {
   return (
     <AuthGuard require="work">
-      {() => (
+      {(user) => (
         <Suspense fallback={<Spinner label="문서 불러오는 중" />}>
-          <KnowledgeListContent />
+          <KnowledgeListContent user={user} />
         </Suspense>
       )}
     </AuthGuard>
@@ -78,10 +78,7 @@ function ProjectDocuments({
     <div className="grid min-w-0 gap-6">
       <ProjectHeading project={project.data} user={user} />
       <Suspense fallback={<Spinner label="문서 불러오는 중" />}>
-        <KnowledgeListContent
-          projectId={projectId}
-          archived={project.data.archived}
-        />
+        <KnowledgeListContent projectId={projectId} user={user} />
       </Suspense>
     </div>
   );
@@ -89,10 +86,10 @@ function ProjectDocuments({
 
 function KnowledgeListContent({
   projectId: fixedProjectId,
-  archived = false,
+  user,
 }: {
   readonly projectId?: string;
-  readonly archived?: boolean;
+  readonly user: User;
 }) {
   const id = useId();
   const router = useRouter();
@@ -107,6 +104,15 @@ function KnowledgeListContent({
   const scope =
     !projectId && search?.get("scope") === "ORG" ? "ORG" : undefined;
   const projects = useQuery(projectQueries.list());
+  const selectedProject = useQuery({
+    ...projectQueries.detail(projectId ?? ""),
+    enabled: Boolean(projectId),
+  });
+  const canCreate =
+    !projectId ||
+    (selectedProject.isSuccess &&
+      !selectedProject.isError &&
+      projectAccess(selectedProject.data, user).editable);
   const documents = useQuery(
     knowledgeQueries.list({ kind, status, projectId, scope }),
   );
@@ -129,7 +135,7 @@ function KnowledgeListContent({
             </p>
           )}
         </div>
-        {!archived && (
+        {canCreate && (
           <Button onClick={() => setCreating(true)}>
             <Icon name="plus" className="inline-block" /> 문서 만들기
           </Button>
@@ -213,6 +219,11 @@ function KnowledgeListContent({
           </Button>
         </p>
       )}
+      {documents.isFetching && !documents.isPending && (
+        <p role="status" className="text-sm text-muted">
+          문서 갱신 중
+        </p>
+      )}
       {documents.isPending ? (
         <div
           role="status"
@@ -223,7 +234,7 @@ function KnowledgeListContent({
             <Skeleton key={index} className="h-12" />
           ))}
         </div>
-      ) : !documents.data ? (
+      ) : documents.isError || !documents.data ? (
         <ErrorState
           description={knowledgeErrorMessage(documents.error)}
           onRetry={() => void documents.refetch()}
@@ -241,7 +252,8 @@ function KnowledgeListContent({
         <DocumentTable documents={documents.data} />
       )}
       <CreateDocumentDialog
-        open={creating}
+        key={projectId ?? "org"}
+        open={creating && canCreate}
         projectId={projectId}
         onClose={() => setCreating(false)}
         onCreated={() => {
