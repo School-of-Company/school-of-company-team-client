@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
-import { Providers } from "@/app/providers";
-import { sidebarBootScript, themeBootScript } from "@/shared/lib";
+import { AppearanceBootScript, Providers } from "@/app/providers";
 import "@/app/styles/globals.css";
 
 const bodyFont = localFont({
@@ -30,9 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${bodyFont.variable} ${monoFont.variable} h-full overflow-x-clip antialiased`}
     >
       <head>
-        {/* Pre-paint: stored theme or system preference, before the first frame. */}
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-        <script dangerouslySetInnerHTML={{ __html: sidebarBootScript }} />
+        <AppearanceBootScript />
       </head>
       <body className="flex min-h-full flex-col overflow-x-clip">
         <Providers>{children}</Providers>

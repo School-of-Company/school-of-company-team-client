@@ -6,6 +6,8 @@ import { ToastProvider } from "@/shared/ui";
 import { createQueryClient } from "./query-client";
 import { IdentityProvider } from "@/features/auth";
 
+export { AppearanceBootScript } from "./AppearanceBootScript";
+
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
   return (
