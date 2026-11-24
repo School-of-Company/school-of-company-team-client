@@ -81,6 +81,8 @@ export function DatePicker({
   useEffect(() => {
     if (!open || !moveFocus.current) return;
     moveFocus.current = false;
+    // 대화상자 아래쪽에서 열리면 달력 전체가 보이게 스크롤한다.
+    popover.current?.scrollIntoView?.({ block: "nearest" });
     popover.current
       ?.querySelector<HTMLElement>(`[data-date="${focus}"]`)
       ?.focus();
