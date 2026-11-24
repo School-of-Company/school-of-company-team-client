@@ -4172,3 +4172,14 @@ a.search-option:hover {
     font-size: 0.625rem;
   }
 }
+
+/* ───────────────────────── Intake (public) ───────────────────────── */
+
+/* 봇 판정용 숨은 입력란: 화면 밖에 두고 보조기기·Tab 순서에서도 뺀다(display:none 은 일부 봇이 건너뛴다). */
+.intake-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
