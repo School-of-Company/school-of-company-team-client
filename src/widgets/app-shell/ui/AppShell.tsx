@@ -24,6 +24,7 @@ import {
   IconButton,
   Icon,
   Skeleton,
+  restoreFocus,
   type IconName,
 } from "@/shared/ui";
 import { headingAnnouncement, shouldFocusMain } from "../model/route-focus";
@@ -156,28 +157,34 @@ export function AppShell({
     enabled: working,
   });
   const [searchOpen, setSearchOpen] = useState(false);
+  const searchOpener = useRef<HTMLElement | null>(null);
+  const searchFromSidebar = useRef(false);
+  const openSearch = useCallback(() => {
+    if (searchOpen) return;
+    const active = document.activeElement;
+    searchOpener.current = active instanceof HTMLElement ? active : null;
+    searchFromSidebar.current = sidebar.current?.contains(active) ?? false;
+    setMenuOpen(false);
+    setSearchOpen(true);
+  }, [searchOpen]);
   const shortcut = useShortcutLabel();
   useEffect(() => {
     if (!working) return;
     const onKey = (event: KeyboardEvent) => {
       if (!isSearchShortcut(event)) return;
       event.preventDefault();
-      setMenuOpen(false);
-      setSearchOpen(true);
+      openSearch();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [working]);
+  }, [working, openSearch]);
   const searchButton = working && (
     <button
       type="button"
       className="app-search-button"
       aria-haspopup="dialog"
       aria-keyshortcuts="Meta+K Control+K"
-      onClick={() => {
-        setMenuOpen(false);
-        setSearchOpen(true);
-      }}
+      onClick={openSearch}
     >
       <Icon name="search" className="shrink-0" />
       <span>검색</span>
@@ -420,7 +427,7 @@ export function AppShell({
                 aria-label="검색"
                 aria-haspopup="dialog"
                 variant="ghost"
-                onClick={() => setSearchOpen(true)}
+                onClick={openSearch}
               >
                 <Icon name="search" />
               </IconButton>
@@ -463,10 +470,14 @@ export function AppShell({
           open={searchOpen}
           onClose={() => {
             setSearchOpen(false);
+            const target =
+              collapsed && searchFromSidebar.current
+                ? main.current
+                : searchOpener.current;
             if (collapsed) {
               setPeeking(false);
-              requestAnimationFrame(() => main.current?.focus());
             }
+            requestAnimationFrame(() => restoreFocus(target));
           }}
         />
       )}

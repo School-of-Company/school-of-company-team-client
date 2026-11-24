@@ -58,7 +58,7 @@ export function RequirementInbox({
   };
   const rows = list.data?.pages.flat() ?? [];
   return (
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <span className="flex max-w-full min-w-0 items-center gap-2">
           <label
@@ -123,9 +123,9 @@ export function RequirementInbox({
         )
       ) : (
         <>
-          <ul className="list" aria-label="요구사항 목록">
+          <ul className="list min-w-0" aria-label="요구사항 목록">
             {rows.map((row) => (
-              <li key={row.id}>
+              <li key={row.id} className="min-w-0">
                 <Link href={routes.requirement(row.id)} className="list-row">
                   <span className="shrink-0 text-xs text-muted">
                     {row.projectKey ?? "조직"}
@@ -135,7 +135,12 @@ export function RequirementInbox({
                       {row.title}
                     </span>
                     <span className="flex flex-wrap gap-x-2 text-xs text-muted">
-                      <span>{row.formTitle ?? "삭제된 양식"}</span>
+                      <span
+                        className="max-w-full min-w-0 truncate"
+                        title={row.formTitle ?? "삭제된 양식"}
+                      >
+                        {row.formTitle ?? "삭제된 양식"}
+                      </span>
                       <RequesterPriorityLabel
                         priority={row.requesterPriority}
                       />
