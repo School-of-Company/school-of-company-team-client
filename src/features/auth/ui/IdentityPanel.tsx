@@ -9,13 +9,21 @@ import { PointerGlow } from "./PointerGlow";
 export function IdentityPanel({
   title,
   children,
+  variant = "default",
 }: {
   readonly title: string;
   readonly children: ReactNode;
+  readonly variant?: "default" | "login";
 }) {
   return (
-    <div className="ui-identity relative grid min-h-dvh place-items-center px-5 py-10">
-      <PointerGlow />
+    <div
+      className={`ui-identity ui-identity-${variant} relative grid min-h-dvh place-items-center px-5 py-10`}
+    >
+      {variant === "login" ? (
+        <div className="ui-login-backdrop" aria-hidden="true" />
+      ) : (
+        <PointerGlow />
+      )}
       <div className="absolute top-4 right-4 z-10 sm:top-5 sm:right-6">
         <ThemeToggle />
       </div>

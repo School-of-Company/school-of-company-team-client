@@ -22,8 +22,7 @@ export function OAuthButton({
         </p>
       )}
       <Button
-        loading={mutation.isPending}
-        disabled={mutation.isSuccess}
+        loading={mutation.isPending || mutation.isSuccess}
         onClick={() => mutation.mutate()}
       >
         {provider === "github" ? "GitHub로 로그인" : "Discord 계정 연결"}

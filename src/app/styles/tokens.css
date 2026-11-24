@@ -76,6 +76,12 @@
     var(--color-brand-logo) 30%,
     transparent
   );
+  --login-width: 26rem;
+  --login-ambient-size: 52rem;
+  --login-grid-size: 48px;
+  --login-drift: 64px;
+  --login-ambient-duration: 24s;
+  --login-enter-duration: 200ms;
 
   /* Type: Pretendard for everything, mono for machine values. */
   --font-body: var(--font-pretendard), "Pretendard", system-ui, sans-serif;
