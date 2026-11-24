@@ -25,7 +25,6 @@ import {
   Dialog,
   IconButton,
   Icon,
-  Skeleton,
   restoreFocus,
   type IconName,
 } from "@/shared/ui";
@@ -195,10 +194,12 @@ export function AppShell({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [working, openSearch]);
-  const searchButton = working && (
+  // 계정 확인 중에도 같은 자리에 검색 버튼을 그려 둔다(확인 뒤 버튼이 끼어 메뉴 전체가 밀리지 않게).
+  const searchButton = (working || me.isPending) && (
     <button
       type="button"
       className="app-search-button"
+      disabled={!working}
       aria-haspopup="dialog"
       aria-keyshortcuts="Meta+K Control+K"
       onClick={openSearch}
@@ -284,10 +285,19 @@ export function AppShell({
         <div
           role="status"
           aria-label="프로젝트 불러오는 중"
-          className="grid gap-2 px-3"
+          className="grid min-w-0 gap-2"
         >
-          <Skeleton className="h-8" />
-          <Skeleton className="h-8" />
+          {/* 목록(프로젝트 줄 + 모든 프로젝트 보기)과 같은 줄 높이로 자리를 잡는다. */}
+          <div aria-hidden="true" className="grid">
+            {["프로젝트 이름", "프로젝트"].map((label) => (
+              <span key={label} className="ui-nav-link flex items-center">
+                <span className="ui-skeleton-text">{label}</span>
+              </span>
+            ))}
+          </div>
+          <span aria-hidden="true" className="ui-nav-link flex items-center">
+            <span className="ui-skeleton-text">모든 프로젝트 보기</span>
+          </span>
         </div>
       ) : projects.isError ? (
         <div role="alert" className="grid gap-2 px-3 text-sm">

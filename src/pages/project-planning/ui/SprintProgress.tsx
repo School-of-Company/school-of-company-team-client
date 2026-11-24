@@ -13,7 +13,7 @@ import { statusLabels, taskQueries, taskStatuses } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
-import { EmptyState, ErrorState, Skeleton } from "@/shared/ui";
+import { EmptyState, ErrorState, ListSkeleton } from "@/shared/ui";
 import { boardTasks } from "../model/sprint-tasks";
 import { TaskRow } from "./TaskRow";
 
@@ -83,14 +83,11 @@ function ScopedTasks({
         </Link>
       </div>
       {board.isPending ? (
-        <div
-          role="status"
-          aria-label="스프린트 업무 불러오는 중"
-          className="grid gap-2"
-        >
-          <Skeleton className="h-11" />
-          <Skeleton className="h-11" />
-        </div>
+        <ListSkeleton
+          label="스프린트 업무 불러오는 중"
+          rows={3}
+          rowClassName="h-11"
+        />
       ) : board.isError ? (
         <ErrorState
           description={sprintErrorMessage(normalizeApiError(board.error))}
@@ -136,7 +133,11 @@ function CarryOvers({
         종료할 때 남은 업무를 어디로 옮겼는지 남긴 기록입니다.
       </p>
       {records.isPending ? (
-        <Skeleton className="h-24" />
+        <ListSkeleton
+          label="이월 기록 불러오는 중"
+          rows={2}
+          rowClassName="h-11"
+        />
       ) : records.isError ? (
         <ErrorState
           description={sprintErrorMessage(normalizeApiError(records.error))}

@@ -7,7 +7,7 @@ import { projectQueries, type ProjectDetail } from "@/entities/project";
 import { sprintErrorMessage, type Sprint } from "@/entities/sprint";
 import { taskQueries, type TaskCard } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
-import { ChipSelect, ErrorState, Skeleton } from "@/shared/ui";
+import { ChipSelect, ListSkeleton, QueryState } from "@/shared/ui";
 import { useSprintScope } from "../api/sprint-actions";
 import {
   applyScopeOverlay,
@@ -225,18 +225,20 @@ export function SprintPlan({
             어느 스프린트에도 없는 업무입니다. 오른쪽으로 끌거나 넣기를
             누르세요.
           </p>
-          {candidates.isPending ? (
-            <PlanSkeleton label="후보 업무 불러오는 중" />
-          ) : candidates.isError ? (
-            <ErrorState
-              description={sprintErrorMessage(
-                normalizeApiError(candidates.error),
-              )}
-              onRetry={() => void candidates.refetch()}
-            />
-          ) : (
-            <PlanTaskList {...listProps} tasks={view.candidates} candidate />
-          )}
+          {/* 원천을 바꾸면 이전 후보를 흐리게 두고, 비었으면 문구 없는 같은 크기 박스로 기다린다. */}
+          <QueryState
+            query={candidates}
+            isEmpty={() => view.candidates.length === 0}
+            empty={<PlanTaskList {...listProps} tasks={[]} candidate />}
+            skeleton={<PlanSkeleton label="후보 업무 불러오는 중" />}
+            errorMessage={(error) =>
+              sprintErrorMessage(normalizeApiError(error))
+            }
+          >
+            {() => (
+              <PlanTaskList {...listProps} tasks={view.candidates} candidate />
+            )}
+          </QueryState>
         </section>
       )}
       <section
@@ -248,19 +250,20 @@ export function SprintPlan({
         <div className="plan-pane-head">
           <h3 id="plan-scope" className="planning-subhead">
             이 스프린트{" "}
-            <span className="tabular-nums">{view.scoped.length}</span>
+            <span className="tabular-nums">
+              {scoped.data ? view.scoped.length : ""}
+            </span>
           </h3>
         </div>
-        {scoped.isPending ? (
-          <PlanSkeleton label="스프린트 업무 불러오는 중" />
-        ) : scoped.isError ? (
-          <ErrorState
-            description={sprintErrorMessage(normalizeApiError(scoped.error))}
-            onRetry={() => void scoped.refetch()}
-          />
-        ) : (
-          <PlanTaskList {...listProps} tasks={view.scoped} />
-        )}
+        <QueryState
+          query={scoped}
+          isEmpty={() => false}
+          empty={null}
+          skeleton={<PlanSkeleton label="스프린트 업무 불러오는 중" />}
+          errorMessage={(error) => sprintErrorMessage(normalizeApiError(error))}
+        >
+          {() => <PlanTaskList {...listProps} tasks={view.scoped} />}
+        </QueryState>
         {!!scoped.data && (scoped.data.counts.DONE ?? 0) > (shownDone ?? 0) && (
           <p className="planning-note">
             완료 업무는 최근 {shownDone}개만 보입니다(전체{" "}
@@ -279,11 +282,5 @@ export function SprintPlan({
 }
 
 function PlanSkeleton({ label }: { readonly label: string }) {
-  return (
-    <div role="status" aria-label={label} className="grid gap-2">
-      <Skeleton className="h-11" />
-      <Skeleton className="h-11" />
-      <Skeleton className="h-11" />
-    </div>
-  );
+  return <ListSkeleton label={label} rows={3} rowClassName="h-11" />;
 }

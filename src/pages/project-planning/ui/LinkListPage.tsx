@@ -12,6 +12,7 @@ import {
   Icon,
   IconButton,
   Skeleton,
+  StaleNotice,
   useToast,
 } from "@/shared/ui";
 import { projectLinkQueries, useLinkChange } from "../api/links";
@@ -81,7 +82,12 @@ function LinkBoard({ project, writes }: PlanningContext) {
     return (
       <section className="grid gap-4" aria-label="링크">
         {head}
-        <div role="status" aria-label="링크 불러오는 중" className="link-grid">
+        {/* 빈 상태 높이부터 시작하는 카드 격자(ListSkeleton과 같은 규칙). */}
+        <div
+          role="status"
+          aria-label="링크 불러오는 중"
+          className="link-grid ui-skeleton-list"
+        >
           {Array.from({ length: 3 }, (_, index) => (
             <Skeleton key={index} className="h-28" />
           ))}
@@ -109,11 +115,7 @@ function LinkBoard({ project, writes }: PlanningContext) {
         />
       ) : (
         <>
-          {stale && (
-            <p role="status" className="text-sm text-muted">
-              최신 목록을 불러오지 못해 마지막으로 받은 목록을 보여 줍니다.
-            </p>
-          )}
+          {stale && <StaleNotice query={query} />}
           {links.some((link) => link.canEdit) && links.length > 1 && (
             <p className="planning-note">
               카드를 끌어 순서를 바꿉니다. 키보드는 카드의 앞, 뒤 버튼을 씁니다.

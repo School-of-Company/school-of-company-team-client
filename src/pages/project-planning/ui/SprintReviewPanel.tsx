@@ -64,7 +64,7 @@ function ReviewContent({
   if (sprint.status === "PLANNED")
     return (
       <EmptyState
-        title="예정 스프린트는 아직 리뷰할 수 없습니다"
+        title="아직 리뷰할 수 없습니다"
         description="스프린트를 시작한 뒤 초안을 불러올 수 있습니다. 종료 후 결과를 정리해 게시하세요."
       />
     );

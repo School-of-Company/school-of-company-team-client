@@ -1,9 +1,8 @@
 "use client";
 import { Suspense } from "react";
-import { BoardWorkspace } from "@/widgets/kanban-board";
+import { BoardPageSkeleton, BoardWorkspace } from "@/widgets/kanban-board";
 import { AuthGuard } from "@/features/auth";
 import { TaskFilters } from "@/widgets/task-filters";
-import { Spinner } from "@/shared/ui";
 import type { BoardDetailComponent } from "@/widgets/kanban-board";
 export function TeamBoardPage({
   Detail,
@@ -11,9 +10,9 @@ export function TeamBoardPage({
   readonly Detail?: BoardDetailComponent;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<BoardPageSkeleton scope="TEAM" />}>
       {(user) => (
-        <Suspense fallback={<Spinner />}>
+        <Suspense fallback={<BoardPageSkeleton scope="TEAM" />}>
           <BoardWorkspace
             scope="TEAM"
             Detail={Detail}
