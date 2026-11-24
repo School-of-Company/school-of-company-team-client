@@ -1,1 +1,4 @@
-export { ServiceDetailPage } from "./ui/ServiceDetailPage";
+export {
+  ServiceDetailPage,
+  ServiceDetailSkeleton,
+} from "./ui/ServiceDetailPage";

@@ -13,7 +13,7 @@ import {
   type ServiceDetail,
 } from "@/entities/service";
 import { routes } from "@/shared/config";
-import { EmptyState, ErrorState, Skeleton } from "@/shared/ui";
+import { EmptyState, ErrorState, Skeleton, ListSkeleton } from "@/shared/ui";
 import { formatDateTime, formatDuration, shortSha } from "./format";
 import { HiddenRepositoriesNote } from "./ServiceReleases";
 
@@ -28,6 +28,11 @@ export function DeploymentsState({
   readonly compact?: boolean;
   readonly children: (items: readonly Deployment[]) => ReactNode;
 }) {
+  // 탭 본문은 빈 상태와 같은 높이에서 시작한다. 개요의 작은 칸만 짧은 줄 두 개.
+  if (query.isPending && !compact)
+    return (
+      <ListSkeleton label="배포를 불러오는 중" rows={2} rowClassName="h-12" />
+    );
   if (query.isPending)
     return (
       <div role="status" aria-label="배포를 불러오는 중" className="grid gap-2">

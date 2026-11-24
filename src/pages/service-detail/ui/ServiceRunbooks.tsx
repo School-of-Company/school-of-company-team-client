@@ -9,7 +9,7 @@ import { knowledgeErrorMessage, knowledgeQueries } from "@/entities/knowledge";
 import { CreateDocumentDialog } from "@/features/manage-knowledge";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
-import { Button, EmptyState, ErrorState, Skeleton } from "@/shared/ui";
+import { Button, EmptyState, ErrorState, ListSkeleton } from "@/shared/ui";
 
 /** 게시된 Runbook만(D7-12). 초안은 문서 화면에서 다듬은 뒤 게시하면 여기에 나온다. 사고 상세에도 같은 Runbook이 뜬다. */
 export function ServiceRunbooks({
@@ -49,14 +49,11 @@ export function ServiceRunbooks({
         {runbooks.data && runbooks.data.length > 0 && create}
       </div>
       {runbooks.isPending ? (
-        <div
-          role="status"
-          aria-label="Runbook을 불러오는 중"
-          className="grid gap-2"
-        >
-          <Skeleton className="h-10" />
-          <Skeleton className="h-10" />
-        </div>
+        <ListSkeleton
+          label="Runbook을 불러오는 중"
+          rows={2}
+          rowClassName="h-10"
+        />
       ) : !runbooks.data ? (
         <ErrorState
           description={knowledgeErrorMessage(runbooks.error)}

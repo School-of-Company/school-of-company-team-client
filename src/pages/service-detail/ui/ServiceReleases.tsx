@@ -14,7 +14,14 @@ import {
 } from "@/entities/service";
 import { statusLabels } from "@/entities/task";
 import { routes } from "@/shared/config";
-import { Badge, Dialog, EmptyState, ErrorState, Skeleton } from "@/shared/ui";
+import {
+  Badge,
+  Dialog,
+  EmptyState,
+  ErrorState,
+  Skeleton,
+  ListSkeleton,
+} from "@/shared/ui";
 import { formatDateTime } from "./format";
 
 const itemsLabel = (release: ReleaseSummary) => {
@@ -61,6 +68,11 @@ export function ReleasesState({
   readonly compact?: boolean;
   readonly children: (items: readonly ReleaseSummary[]) => ReactNode;
 }) {
+  // 탭 본문은 빈 상태와 같은 높이에서 시작한다. 개요의 작은 칸만 짧은 줄 두 개.
+  if (query.isPending && !compact)
+    return (
+      <ListSkeleton label="릴리스를 불러오는 중" rows={2} rowClassName="h-10" />
+    );
   if (query.isPending)
     return (
       <div
