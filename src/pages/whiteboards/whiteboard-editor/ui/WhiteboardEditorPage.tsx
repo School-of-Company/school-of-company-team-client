@@ -49,26 +49,53 @@ export function WhiteboardEditorPage({
   readonly whiteboardId: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<WhiteboardEditorSkeleton />}>
       {() => <Editor whiteboardId={whiteboardId} />}
     </AuthGuard>
   );
 }
 
+/** 머리글(경로, 제목, 저장 상태, 버튼)과 고정 높이 캔버스 자리. 편집기로 바뀌어도 머리글과 캔버스 높이가 그대로다. */
+export function WhiteboardEditorSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="화이트보드 불러오는 중"
+      className="whiteboard-page grid min-w-0 gap-3"
+    >
+      <header aria-hidden="true" className="page-header">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <span className="ui-skeleton-text">프로젝트 / 화이트보드</span>
+          </p>
+          <h1 className="truncate">
+            <span className="ui-skeleton-text">화이트보드 불러오는 중</span>
+          </h1>
+          <p className="page-subtitle">
+            <span className="ui-skeleton-text">저장됨</span>
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">댓글</span>
+          </span>
+          <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">변경 이력</span>
+          </span>
+        </div>
+      </header>
+      <div aria-hidden="true" className="whiteboard-layout">
+        <div className="whiteboard-canvas" />
+      </div>
+    </div>
+  );
+}
+
 function Editor({ whiteboardId }: { readonly whiteboardId: string }) {
   const board = useQuery(whiteboardQueries.detail(whiteboardId));
-  if (board.isPending)
-    return (
-      <div
-        role="status"
-        aria-label="화이트보드 불러오는 중"
-        className="grid gap-3"
-      >
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="whiteboard-canvas" />
-      </div>
-    );
-  if (board.isError)
+  if (board.isPending) return <WhiteboardEditorSkeleton />;
+  // 캐시가 있으면 재조회 실패에도 편집기를 내리지 않는다(편집 중인 캔버스를 지우지 않게).
+  if (!board.data)
     return (
       <ErrorState
         description={whiteboardErrorMessage(board.error)}
