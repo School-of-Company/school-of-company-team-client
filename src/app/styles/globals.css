@@ -2088,6 +2088,71 @@ select.ui-input {
   line-height: 1.5rem;
   text-align: center;
 }
+.ui-identity-login {
+  isolation: isolate;
+  background: var(--surface-box);
+}
+.ui-login-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: var(--login-grid-size) var(--login-grid-size);
+  mask-image: radial-gradient(ellipse at center, black, transparent 75%);
+}
+.ui-login-backdrop::before,
+.ui-login-backdrop::after {
+  content: "";
+  position: absolute;
+  width: var(--login-ambient-size);
+  height: var(--login-ambient-size);
+  border-radius: var(--radius-pill);
+  background: radial-gradient(closest-side, var(--surface-active), transparent);
+}
+.ui-login-backdrop::before {
+  top: -25%;
+  left: -15%;
+}
+.ui-login-backdrop::after {
+  bottom: -25%;
+  right: -15%;
+}
+.ui-identity-login main {
+  max-width: var(--login-width);
+  padding: var(--space-10) var(--space-8);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-2xl);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-overlay);
+}
+.ui-identity-login main > p {
+  color: var(--foreground-2);
+}
+.ui-identity-login main > div {
+  margin-top: var(--space-8);
+  gap: var(--space-5);
+}
+.ui-identity-login main .ui-button {
+  min-height: var(--control-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.ui-login-note {
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+.ui-identity-login .ui-button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: var(--space-1);
+}
+.ui-identity-login .ui-button:disabled {
+  opacity: 1;
+}
 .ui-brand-tile {
   display: inline-grid;
   flex: none;
@@ -2121,7 +2186,43 @@ select.ui-input {
     opacity: 0.45;
   }
 }
+@keyframes ui-login-drift {
+  50% {
+    transform: translate3d(var(--login-drift), var(--login-drift), 0);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
+  .ui-login-backdrop::before,
+  .ui-login-backdrop::after {
+    animation: ui-login-drift var(--login-ambient-duration) ease-in-out infinite;
+  }
+  .ui-login-backdrop::after {
+    animation-direction: reverse;
+    animation-delay: calc(var(--login-ambient-duration) / -2);
+  }
+  .ui-identity-login main > * {
+    animation: ui-fade-up var(--login-enter-duration) var(--ease-out) both;
+  }
+  .ui-identity-login main > p {
+    animation-delay: var(--dur-1);
+  }
+  .ui-identity-login main > h1 {
+    animation-delay: var(--dur-2);
+  }
+  .ui-identity-login main > div {
+    animation-delay: calc(var(--dur-1) + var(--dur-2));
+  }
+  .ui-identity-login main .ui-button {
+    transition:
+      background var(--dur-2),
+      transform var(--dur-2) var(--ease-out);
+  }
+  .ui-identity-login main .ui-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .ui-identity-login main .ui-button:active:not(:disabled) {
+    transform: translateY(1px);
+  }
   .ui-dialog[open]:not(.ui-drawer) {
     animation: ui-fade-up var(--dur-2) var(--ease-out);
   }
@@ -2135,6 +2236,18 @@ select.ui-input {
   }
   .ui-identity-status {
     animation: ui-breathe 1.6s var(--ease-in-out) infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-identity-login *,
+  .ui-identity-login *::before,
+  .ui-identity-login *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .ui-identity-login .ui-button:active {
+    transform: none;
   }
 }
 
