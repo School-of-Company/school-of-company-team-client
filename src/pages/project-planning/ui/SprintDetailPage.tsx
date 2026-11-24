@@ -183,7 +183,12 @@ function SprintScreen({
             <Markdown>{sprint.goal}</Markdown>
           </div>
         ) : (
-          <p className="sprint-goal text-muted">목표가 없습니다.</p>
+          // 목표가 있을 때(Markdown)와 같은 줄 높이를 쓴다.
+          <div className="sprint-goal">
+            <div className="ui-markdown">
+              <p className="text-muted">목표가 없습니다.</p>
+            </div>
+          </div>
         )}
         {/* 진행률 줄과 안내 줄은 상태와 상관없이 자리를 둔다(대기 자리와 같은 높이, 안내가 늦게 끼지 않음). */}
         <div className="sprint-progress-slot">
@@ -365,9 +370,13 @@ function SprintDetailSkeleton() {
         <p className="sprint-meta">
           <span className="ui-skeleton-text">11월 1일 – 11월 14일</span>
         </p>
-        <p className="sprint-goal">
-          <span className="ui-skeleton-text">스프린트 목표</span>
-        </p>
+        <div className="sprint-goal">
+          <div className="ui-markdown">
+            <p>
+              <span className="ui-skeleton-text">스프린트 목표</span>
+            </p>
+          </div>
+        </div>
         <p className="sprint-progress-slot">
           <span className="ui-skeleton-text">완료 비율</span>
         </p>
