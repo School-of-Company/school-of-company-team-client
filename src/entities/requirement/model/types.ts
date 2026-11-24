@@ -271,3 +271,15 @@ export const sectionItems = (body: string | undefined) =>
     .split("\n")
     .map((line) => line.replace(/^- /, "").trim())
     .filter(Boolean);
+
+/** 요청자가 보낸 URL 은 http(s) 일 때만 링크로 쓴다(서버도 검사하지만 렌더 시 한 번 더, javascript: 등 차단). */
+export const safeHref = (url: string): string | undefined => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:"
+      ? parsed.href
+      : undefined;
+  } catch {
+    return undefined;
+  }
+};

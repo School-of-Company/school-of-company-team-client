@@ -8,6 +8,7 @@ import {
   RequesterPriorityLabel,
   requirementApi,
   requirementErrorMessage,
+  safeHref,
   requirementQueries,
   requirementStatusLabels,
   RequirementStatusBadge,
@@ -195,7 +196,7 @@ function Sections({
                 {requirement.references.map((reference) => (
                   <li key={reference.url} className="break-all">
                     <a
-                      href={reference.url}
+                      href={safeHref(reference.url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline"

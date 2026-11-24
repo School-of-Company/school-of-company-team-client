@@ -6,6 +6,7 @@ import {
   publicIntakeApi,
   RequesterPriorityLabel,
   requirementErrorMessage,
+  safeHref,
   RequirementStatusBadge,
   statusTokenFromHash,
   statusTokenFromInput,
@@ -212,7 +213,7 @@ function StatusDetail({
                   {data.references.map((reference) => (
                     <li key={reference.url} className="break-all">
                       <a
-                        href={reference.url}
+                        href={safeHref(reference.url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="underline"

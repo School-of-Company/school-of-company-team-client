@@ -33,6 +33,7 @@ export {
   requesterPriorityLabels,
   requirementStatuses,
   requirementStatusLabels,
+  safeHref,
   sectionItems,
   teamStatusTargets,
 } from "./model/types";

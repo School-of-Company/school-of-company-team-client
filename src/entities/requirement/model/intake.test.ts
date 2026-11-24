@@ -244,3 +244,11 @@ test("공개 오류 문구: 404·410·429 는 안내 문구, 429 는 retryAfter 
     "서버 문구",
   );
 });
+
+test("참고 자료 링크는 http(s) 만 href 로 쓴다", async () => {
+  const { safeHref } = await import("./types");
+  assert.equal(safeHref("https://figma.com/a"), "https://figma.com/a");
+  assert.equal(safeHref("javascript:alert(1)"), undefined);
+  assert.equal(safeHref("data:text/html,x"), undefined);
+  assert.equal(safeHref("not a url"), undefined);
+});
