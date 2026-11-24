@@ -85,7 +85,7 @@ function PaletteBody({ onClose }: { readonly onClose: () => void }) {
             current >= 0 ? `${id}-option-${current}` : undefined
           }
           className="ui-input search-input"
-          placeholder="업무 키, 제목, 문서, 사고, 서비스, 스프린트"
+          placeholder="업무 키, 제목, 문서, 장애, 서비스, 스프린트"
           maxLength={SEARCH_MAX_LENGTH}
           autoFocus
           autoComplete="off"
