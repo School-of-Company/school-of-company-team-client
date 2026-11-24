@@ -85,9 +85,19 @@ test("fieldErrors maps validation details to known fields only", () => {
     other: "무시",
     name: 3,
   });
+  // 폼에 없는 other 와 문자열이 아닌 name 이 남으니 폼 전체 오류도 함께 보인다.
   assert.deepEqual(fieldErrors(error, ["dueDate", "name"], "x"), {
     dueDate: "마감일 형식이 잘못되었습니다.",
+    form: "x",
   });
+  assert.deepEqual(
+    fieldErrors(
+      new ApiError(400, "VALIDATION_ERROR", "bad", { dueDate: "틀림" }),
+      ["dueDate"],
+      "x",
+    ),
+    { dueDate: "틀림" },
+  );
   assert.deepEqual(fieldErrors(error, ["name"], "폼 오류"), {
     form: "폼 오류",
   });

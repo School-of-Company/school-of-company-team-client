@@ -52,7 +52,7 @@ export function normalizeApiError(error: unknown): ApiError {
 
 /**
  * 서버 `VALIDATION_ERROR` 의 details(필드 이름 → 메시지)에서 폼이 가진 필드만 골라 낸다.
- * 고를 것이 없으면 `{ form: fallback }` 을 돌려 폼 전체 오류로 보여 준다.
+ * 폼에 없는 필드의 오류가 하나라도 남거나 고를 것이 없으면 `form: fallback` 도 넣어 폼 전체 오류로 보여 준다.
  */
 export function fieldErrors(
   error: Pick<ApiError, "code" | "details">,
@@ -64,13 +64,16 @@ export function fieldErrors(
     typeof error.details === "object" &&
     error.details !== null
   ) {
+    const entries = Object.entries(error.details);
     const picked = Object.fromEntries(
-      Object.entries(error.details).filter(
+      entries.filter(
         (entry): entry is [string, string] =>
           fields.includes(entry[0]) && typeof entry[1] === "string",
       ),
     );
-    if (Object.keys(picked).length) return picked;
+    const count = Object.keys(picked).length;
+    if (count && count === entries.length) return picked;
+    if (count) return { ...picked, form: fallback };
   }
   return { form: fallback };
 }
