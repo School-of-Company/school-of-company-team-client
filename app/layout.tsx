@@ -30,9 +30,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${bodyFont.variable} ${monoFont.variable} h-full overflow-x-clip antialiased`}
     >
       <head>
-        {/* Pre-paint: stored theme or system preference, before the first frame. */}
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-        <script dangerouslySetInnerHTML={{ __html: sidebarBootScript }} />
+        {/* React hoists async script resources; blocking="render" keeps preferences ahead of paint. */}
+        <script
+          id="appearance-boot"
+          async
+          blocking="render"
+          src={`data:text/javascript,${encodeURIComponent(themeBootScript + sidebarBootScript)}`}
+        />
       </head>
       <body className="flex min-h-full flex-col overflow-x-clip">
         <Providers>{children}</Providers>
