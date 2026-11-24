@@ -49,3 +49,30 @@ export function isSidebarShortcut(
     !event.defaultPrevented
   );
 }
+
+const GROUP_KEY = "soc.sidebar.group.";
+
+/** `html[data-sidebar-closed]` 값(공백으로 나눈 묶음 이름)에서 한 묶음의 접힘만 바꾼다. */
+export function withGroupClosed(
+  current: string | undefined,
+  group: string,
+  closed: boolean,
+): string {
+  const groups = new Set((current ?? "").split(" ").filter(Boolean));
+  if (closed) groups.add(group);
+  else groups.delete(group);
+  return [...groups].join(" ");
+}
+
+/** 저장된 접힘 값으로 `html[data-sidebar-closed]` 값을 다시 만든다(다른 탭에서 바꾼 경우). */
+export function closedGroupsFromStorage(
+  storage: Pick<Storage, "length" | "key" | "getItem">,
+): string {
+  const groups: string[] = [];
+  for (let index = 0; index < storage.length; index += 1) {
+    const key = storage.key(index);
+    if (key?.startsWith(GROUP_KEY) && storage.getItem(key) === "true")
+      groups.push(key.slice(GROUP_KEY.length));
+  }
+  return groups.join(" ");
+}
