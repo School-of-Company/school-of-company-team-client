@@ -8,6 +8,7 @@ import {
   incidentErrorMessage,
   incidentSeverities,
   severityDescriptions,
+  severityLabels,
   toLocalInput,
   type IncidentDetail,
   type IncidentSeverity,
@@ -51,7 +52,7 @@ export function IncidentFormDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title={incident ? "사고 수정" : "사고 등록"}
+      title={incident ? "장애 수정" : "장애 등록"}
       className="incident-dialog"
     >
       {open && (
@@ -181,7 +182,7 @@ function IncidentForm({
                 onChange={() => set({ severity })}
               />
               <span className="incident-severity" data-severity={severity}>
-                {severity}
+                {severityLabels[severity]}
               </span>
               <span className="text-xs text-muted">
                 {severityDescriptions[severity]}
@@ -200,7 +201,7 @@ function IncidentForm({
         )}
       </fieldset>
       <div className="incident-form-row">
-        <Field id={`${id}-commander`} label="커맨더">
+        <Field id={`${id}-commander`} label="대응 책임자">
           {users.isPending ? (
             <Spinner label="팀원 불러오는 중" />
           ) : (

@@ -38,7 +38,7 @@ export function MembersPage() {
 
 const sortLabels: Readonly<Record<MemberSort, string>> = {
   name: "이름순",
-  load: "부하순",
+  load: "업무 많은 순",
 };
 
 function MembersContent({ viewer }: { readonly viewer: User }) {
@@ -68,11 +68,9 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
       <header className="page-header">
         <div>
           <h1>팀원</h1>
-          {data && (
-            <p className="page-subtitle tabular-nums">
-              활성 팀원 {data.length}명
-            </p>
-          )}
+          <p className="page-subtitle tabular-nums">
+            {data ? `활성 팀원 ${data.length}명` : "팀원 집계 중"}
+          </p>
         </div>
         <div className="ui-segmented" role="group" aria-label="정렬">
           {(["name", "load"] as const).map((option) => (
@@ -88,6 +86,10 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
           ))}
         </div>
       </header>
+      <p className="text-sm text-muted">
+        활성 팀원의 프로젝트 역할과 진행 중인 업무, 리뷰 담당 업무 수입니다.
+        개인 업무는 세지 않습니다.
+      </p>
       {stale && (
         <div
           role="status"
@@ -126,8 +128,7 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
       ) : (
         <table className="members-table">
           <caption className="sr-only">
-            활성 팀원과 프로젝트 역할, 진행 중, 리뷰 담당 업무 수. 개인 업무는
-            세지 않습니다.
+            활성 팀원의 프로젝트 역할과 진행 중인 업무, 리뷰 담당 업무 수
           </caption>
           <thead>
             <tr>

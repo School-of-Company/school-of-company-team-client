@@ -43,7 +43,7 @@ export function DeleteIncident({
       >
         삭제
       </Button>
-      <Dialog open={open} onClose={close} title="사고를 삭제할까요?">
+      <Dialog open={open} onClose={close} title="장애를 삭제할까요?">
         <div className="grid gap-4">
           <p className="text-sm text-foreground-2">
             타임라인과 사후 검토가 함께 지워집니다. 조치 항목으로 만든 업무와

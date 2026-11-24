@@ -13,8 +13,10 @@ export {
   incidentStatusLabels,
   postmortemStatusLabels,
   severityDescriptions,
+  severityLabels,
   timelineKindLabels,
 } from "./model/types";
 export type * from "./model/types";
 export { formatDateTime, fromLocalInput, toLocalInput } from "./model/time";
 export { IncidentStatusLabel, SeverityLabel } from "./ui/labels";
+export { timelineEntryText, postmortemDisplaySections } from "./model/timeline";

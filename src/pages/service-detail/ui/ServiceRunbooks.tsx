@@ -65,7 +65,7 @@ export function ServiceRunbooks({
       ) : runbooks.data.length === 0 ? (
         <EmptyState
           title="게시된 Runbook이 없습니다"
-          description="장애 때 따라 할 절차를 Runbook으로 남기면 이 서비스의 사고 화면에도 나옵니다."
+          description="장애 때 따라 할 절차를 Runbook으로 남기면 이 서비스의 장애 화면에도 나옵니다."
           action={create || undefined}
         />
       ) : (
