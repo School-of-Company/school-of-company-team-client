@@ -114,7 +114,32 @@ test("archived bucket lanes take no new tasks while active and unbucketed lanes 
   const adds = (lane: string) => lane.match(/업무 추가"/g)?.length ?? 0;
   assert.equal(lanes.length, 3);
   assert.equal(adds(lanes[0]), 5);
-  assert.match(lanes[1], /보관됨 · 새로 넣을 수 없음/);
+  assert.match(lanes[1], /보관됨, 새로 넣을 수 없음/);
   assert.equal(adds(lanes[1]), 0);
   assert.equal(adds(lanes[2]), 5);
+});
+
+test("a grouped board with a single lane shows no lane header, so the board does not move", () => {
+  const html = renderToStaticMarkup(
+    <KanbanBoard
+      board={{
+        groups: [{ key: null, label: "파트 없음", columns: columns(1) }],
+        counts: { BACKLOG: 1, PLANNED: 0, IN_PROGRESS: 0, REVIEW: 0, DONE: 0 },
+      }}
+      sort="manual"
+      groupBy="part"
+      editable={() => true}
+      pending={false}
+      onMove={() => {}}
+      onMore={() => {}}
+      visibleStatus="BACKLOG"
+      onVisibleStatus={() => {}}
+      filtered={false}
+      onClearFilters={() => {}}
+    />,
+  );
+  assert.doesNotMatch(html, /board-lane-header/);
+  assert.doesNotMatch(html, /파트 없음/);
+  // 빈 컬럼도 같은 빈 상태를 보인다.
+  assert.equal(html.match(/class="board-empty"/g)?.length, 4);
 });

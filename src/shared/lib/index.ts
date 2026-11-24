@@ -70,3 +70,14 @@ export {
   refetchOnVisit,
   repositoryName,
 } from "./query";
+export {
+  addDays,
+  addMonths,
+  clampDate,
+  isOutOfRange,
+  latestDate,
+  monthGrid,
+  todayIso,
+  weekday,
+  type DateBounds,
+} from "./date";

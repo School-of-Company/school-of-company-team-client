@@ -99,8 +99,11 @@ function HomeContent({
             href={`${routes.me}?create=1`}
             className="ui-button ui-button-primary"
           >
-            <Icon name="plus" />
-            업무 등록
+            {/* /me 의 Button 과 같은 구조(span 안 아이콘 + 글자)라 폭이 같고 보기 전환이 제자리에 있다. */}
+            <span>
+              <Icon name="plus" />
+              업무 등록
+            </span>
           </Link>
         </div>
       </header>

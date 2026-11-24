@@ -19,7 +19,7 @@ const sortOptions = [
 const relationOptions = [
   { value: "ASSIGNEE", label: "내 담당" },
   { value: "REVIEWER", label: "내가 리뷰어" },
-  { value: "ASSIGNEE,REVIEWER", label: "담당·리뷰 모두" },
+  { value: "ASSIGNEE,REVIEWER", label: "담당과 리뷰 모두" },
 ] as const;
 
 export function BoardViewControls({
