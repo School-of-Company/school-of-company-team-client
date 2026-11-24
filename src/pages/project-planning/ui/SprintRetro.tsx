@@ -53,7 +53,7 @@ export function SprintRetro({
     return (
       <EmptyState
         title="스프린트를 시작하면 회고를 씁니다"
-        description="Keep · Problem · Try 세 칸에 참여자가 한 줄씩 남깁니다."
+        description="Keep, Problem, Try 세 칸에 참여자가 한 줄씩 남깁니다."
       />
     );
   if (entries.isPending)

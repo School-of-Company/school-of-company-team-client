@@ -100,8 +100,8 @@ export function RequirementActions({
               {confirm === "token"
                 ? "요청자가 링크를 잃었을 때 씁니다. 이전 링크는 바로 열리지 않습니다."
                 : confirm === "purge"
-                  ? "이름·소속·이메일·연락처를 바로 지웁니다. 제출 내용은 남습니다. 되돌릴 수 없습니다."
-                  : "제출 내용·메시지·기록을 모두 지웁니다. 스팸이면 상태를 스팸으로 두면 30일 뒤 자동으로 지워집니다. 되돌릴 수 없습니다."}
+                  ? "이름, 소속, 이메일, 연락처를 바로 지웁니다. 제출 내용은 남습니다. 되돌릴 수 없습니다."
+                  : "제출 내용, 메시지, 기록을 모두 지웁니다. 스팸이면 상태를 스팸으로 두면 30일 뒤 자동으로 지워집니다. 되돌릴 수 없습니다."}
             </p>
             <div className="flex flex-wrap justify-end gap-2">
               <Button
@@ -189,7 +189,7 @@ function StatusForm({
         event.preventDefault();
         const text = reason.trim();
         if (needsReason && !text) {
-          setError("보류·반려에는 사유가 필요합니다. 요청자에게 보입니다.");
+          setError("보류, 반려에는 사유가 필요합니다. 요청자에게 보입니다.");
           return;
         }
         if (text.length > 1000) {
@@ -292,7 +292,7 @@ function MoveForm({
         <option value="">프로젝트 고르기</option>
         {options.map((project) => (
           <option key={project.id} value={project.id}>
-            {project.key} · {project.name}
+            {project.key}, {project.name}
           </option>
         ))}
       </Select>

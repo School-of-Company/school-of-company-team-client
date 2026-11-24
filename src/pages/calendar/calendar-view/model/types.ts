@@ -46,7 +46,7 @@ export function validateCalendarEvent(
   else if (input.startDate && input.endDate < input.startDate)
     errors.endDate = "종료일은 시작일보다 이를 수 없습니다.";
   if (!!input.startTime !== !!input.endTime)
-    errors.endTime = "시작·종료 시각을 함께 고르세요.";
+    errors.endTime = "시작, 종료 시각을 함께 고르세요.";
   else if (
     input.startTime &&
     input.startDate === input.endDate &&

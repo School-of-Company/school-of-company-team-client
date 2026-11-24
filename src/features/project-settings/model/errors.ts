@@ -36,13 +36,13 @@ const messages: Readonly<Record<string, string>> = {
   DISCORD_CHANNEL_NO_ACCESS:
     "봇이 접근할 수 없는 채널입니다. 채널 권한을 확인하세요.",
   DISCORD_CHANNEL_NOT_PRIVATE:
-    "@everyone의 채널 보기를 차단하고 역할·사용자 권한을 점검하세요.",
+    "@everyone의 채널 보기를 차단하고 역할, 사용자 권한을 점검하세요.",
   DISCORD_PRIVACY_CONFIRMATION_REQUIRED:
-    "채널을 볼 수 있는 역할·사용자를 프로젝트 참여자로 제한했는지 확인하세요.",
+    "채널을 볼 수 있는 역할, 사용자를 프로젝트 참여자로 제한했는지 확인하세요.",
   DISCORD_BOT_MISSING_PERMISSIONS:
-    "봇에 채널 보기·메시지·스레드 권한이 필요합니다. Discord 채널 설정을 확인하세요.",
+    "봇에 채널 보기, 메시지, 스레드 권한이 필요합니다. Discord 채널 설정을 확인하세요.",
   DISCORD_LINK_DISABLED:
-    "Discord 연결이 비활성화되었습니다. 채널·스레드 권한을 직접 점검한 뒤 다시 연결하세요.",
+    "Discord 연결이 비활성화되었습니다. 채널, 스레드 권한을 직접 점검한 뒤 다시 연결하세요.",
 };
 
 export function settingsErrorMessage(error: {

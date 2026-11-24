@@ -126,7 +126,7 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
       ) : (
         <table className="members-table">
           <caption className="sr-only">
-            활성 팀원과 프로젝트 역할, 진행 중·리뷰 담당 업무 수. 개인 업무는
+            활성 팀원과 프로젝트 역할, 진행 중, 리뷰 담당 업무 수. 개인 업무는
             세지 않습니다.
           </caption>
           <thead>

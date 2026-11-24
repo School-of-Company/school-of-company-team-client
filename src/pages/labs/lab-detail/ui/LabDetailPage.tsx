@@ -232,7 +232,7 @@ function ExperimentView({
         title="실험을 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          가설과 결과 기록이 모두 사라집니다. 연결된 업무·문서는 그대로
+          가설과 결과 기록이 모두 사라집니다. 연결된 업무, 문서는 그대로
           남습니다.
         </p>
         {remove.isError && (
@@ -596,7 +596,7 @@ function Links({ experiment }: { readonly experiment: Experiment }) {
   };
   return (
     <section className="grid gap-2">
-      <h2 className="task-section-title">관련 업무·문서</h2>
+      <h2 className="task-section-title">관련 업무, 문서</h2>
       {experiment.links.length === 0 ? (
         <p className="text-sm text-muted">없음</p>
       ) : (
@@ -640,8 +640,8 @@ function Links({ experiment }: { readonly experiment: Experiment }) {
           <div className="flex gap-2">
             <Input
               id={`${id}-link`}
-              aria-label="업무·문서 주소"
-              placeholder="업무·문서 주소 붙여넣기"
+              aria-label="업무, 문서 주소"
+              placeholder="업무, 문서 주소 붙여넣기"
               value={value}
               onChange={(event) => setValue(event.target.value)}
             />

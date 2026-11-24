@@ -103,7 +103,7 @@ function LinkBoard({ project, writes }: PlanningContext) {
           title="링크가 없습니다"
           description={
             writes
-              ? "기획 문서·디자인·배포 주소처럼 자주 여는 링크를 모아 두세요."
+              ? "기획 문서, 디자인, 배포 주소처럼 자주 여는 링크를 모아 두세요."
               : "프로젝트 참여자가 자주 여는 링크를 모아 둘 수 있습니다."
           }
         />
@@ -116,7 +116,7 @@ function LinkBoard({ project, writes }: PlanningContext) {
           )}
           {links.some((link) => link.canEdit) && links.length > 1 && (
             <p className="planning-note">
-              카드를 끌어 순서를 바꿉니다. 키보드는 카드의 앞·뒤 버튼을 씁니다.
+              카드를 끌어 순서를 바꿉니다. 키보드는 카드의 앞, 뒤 버튼을 씁니다.
             </p>
           )}
           <ul className="link-grid" aria-label="링크 목록">

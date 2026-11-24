@@ -93,7 +93,7 @@ function AvatarSetting({ user }: { readonly user: User }) {
         )}
       </div>
       <p className="text-xs text-muted">
-        PNG·JPEG·WebP, 2MB 이하. 올리지 않으면 GitHub 프로필 사진을 씁니다.
+        PNG, JPEG, WebP, 2MB 이하. 올리지 않으면 GitHub 프로필 사진을 씁니다.
       </p>
       {(tooLarge || failure) && (
         <p role="alert" className="text-sm text-danger">
@@ -236,7 +236,7 @@ function AccountContent({ user }: { readonly user: User }) {
       <header className="grid gap-2">
         <h1 className="text-2xl font-semibold">설정</h1>
         <p className="text-sm text-muted">
-          프로필과 로그인·알림 계정을 관리합니다.
+          프로필과 로그인, 알림 계정을 관리합니다.
         </p>
       </header>
       <section aria-labelledby="profile-title" className="grid gap-5">

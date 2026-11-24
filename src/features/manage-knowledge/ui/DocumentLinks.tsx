@@ -92,7 +92,7 @@ export function DocumentLinks({
       </div>
       {total === 0 && links.referencedBy.length === 0 && (
         <p className="text-sm text-muted">
-          연결된 서비스·사고·업무·문서가 없습니다.
+          연결된 서비스, 사고, 업무, 문서가 없습니다.
         </p>
       )}
       <LinkGroup title="서비스" count={links.services.length}>

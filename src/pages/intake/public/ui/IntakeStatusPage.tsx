@@ -243,7 +243,7 @@ function StatusDetail({
                 className={`grid gap-1 rounded-xl p-4 ${message.author === "TEAM" ? "bg-surface-box" : "bg-brand-soft"}`}
               >
                 <p className="text-xs text-muted">
-                  {message.author === "TEAM" ? "팀" : "나"} ·{" "}
+                  {message.author === "TEAM" ? "팀" : "나"}, {" "}
                   {formatDate(message.createdAt, {
                     hour: "2-digit",
                     minute: "2-digit",

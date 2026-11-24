@@ -33,7 +33,7 @@ test("import summary shows progress as numbers and only offers retry on failures
   );
   assert.equal(
     importSummary(run({ status: "SUCCEEDED", imported: 5, skipped: 2 })).text,
-    "가져옴 5 · 이미 있음 2",
+    "가져옴 5, 이미 있음 2",
   );
   const partial = importSummary(run({ status: "PARTIAL", failed: 2 }));
   assert.equal(partial.retryable, true);

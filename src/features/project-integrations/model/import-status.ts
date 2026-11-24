@@ -61,13 +61,13 @@ export function importSummary(run: RepositoryImport): ImportSummary {
         text:
           run.total === 0
             ? "가져올 열린 Issue가 없어요"
-            : `가져옴 ${run.imported} · 이미 있음 ${run.skipped}`,
+            : `가져옴 ${run.imported}, 이미 있음 ${run.skipped}`,
         tone: "muted",
         retryable: false,
       };
     case "PARTIAL":
       return {
-        text: `가져옴 ${run.imported} · 이미 있음 ${run.skipped} · 실패 ${run.failed}${run.errorCode === "GITHUB_UNAVAILABLE" ? " (GitHub 연결이 중간에 끊겼어요)" : ""}`,
+        text: `가져옴 ${run.imported}, 이미 있음 ${run.skipped}, 실패 ${run.failed}${run.errorCode === "GITHUB_UNAVAILABLE" ? " (GitHub 연결이 중간에 끊겼어요)" : ""}`,
         tone: "danger",
         retryable: true,
       };

@@ -110,11 +110,11 @@ export function linkErrorMessage(error: unknown): string {
   const problem = normalizeApiError(error);
   switch (problem.code) {
     case "LINK_URL_INVALID":
-      return "http 또는 https 주소만 넣을 수 있습니다. 아이디·비밀번호가 들어간 주소는 쓸 수 없습니다.";
+      return "http 또는 https 주소만 넣을 수 있습니다. 아이디, 비밀번호가 들어간 주소는 쓸 수 없습니다.";
     case "VALIDATION_ERROR":
       return "입력값을 확인하세요. 주소는 2000자, 제목은 100자, 라벨은 30자까지입니다.";
     case "PROJECT_FORBIDDEN":
-      return "이 프로젝트의 링크를 바꿀 권한이 없습니다. 삭제는 만든 사람과 PM·헤드 어드민만 할 수 있습니다.";
+      return "이 프로젝트의 링크를 바꿀 권한이 없습니다. 삭제는 만든 사람과 PM, 헤드 어드민만 할 수 있습니다.";
     case "PROJECT_NOT_FOUND":
       return "프로젝트를 찾을 수 없거나 접근할 수 없습니다.";
     case "LINK_NOT_FOUND":

@@ -9,11 +9,11 @@ const messages: Readonly<Record<string, string>> = {
     "다른 사람이 먼저 저장했습니다. 최신 내용과 합친 뒤 다시 저장합니다.",
   WHITEBOARD_SCENE_INVALID: "화이트보드 내용을 읽을 수 없습니다.",
   WHITEBOARD_FILES_NOT_ALLOWED:
-    "이미지·파일·웹 임베드는 넣을 수 없습니다. 지운 뒤 다시 저장됩니다.",
+    "이미지, 파일, 웹 임베드는 넣을 수 없습니다. 지운 뒤 다시 저장됩니다.",
   WHITEBOARD_LINK_NOT_ALLOWED:
     "링크는 http(s) 주소나 /로 시작하는 경로만 쓸 수 있습니다.",
   WHITEBOARD_TOO_LARGE:
-    "화이트보드가 너무 큽니다(1MB·요소 5,000개). 일부를 지우거나 새 보드로 나누세요.",
+    "화이트보드가 너무 큽니다(1MB, 요소 5,000개). 일부를 지우거나 새 보드로 나누세요.",
   WHITEBOARD_TEMPLATE_NOT_FOUND: "템플릿을 찾을 수 없습니다.",
   WHITEBOARD_REVISION_NOT_FOUND: "변경 이력을 찾을 수 없습니다.",
   WHITEBOARD_COMMENT_NOT_FOUND: "댓글이 이미 지워졌습니다.",

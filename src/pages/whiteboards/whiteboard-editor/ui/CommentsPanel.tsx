@@ -189,7 +189,7 @@ function CommentItem({
       data-resolved={comment.resolved || undefined}
     >
       <p className="text-sm text-muted">
-        {comment.author?.name ?? "알 수 없음"} ·{" "}
+        {comment.author?.name ?? "알 수 없음"}, {" "}
         {formatDate(comment.createdAt, { year: undefined })}
       </p>
       <p className="[overflow-wrap:anywhere] whitespace-pre-wrap">

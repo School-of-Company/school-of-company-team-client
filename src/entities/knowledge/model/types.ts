@@ -30,7 +30,7 @@ export const kindLabels: Readonly<Record<KnowledgeKind, string>> = {
 export const kindDescriptions: Readonly<Record<KnowledgeKind, string>> = {
   ADR: "내린 결정과 그 이유",
   RFC: "논의할 제안",
-  RUNBOOK: "장애·운영 대응 절차",
+  RUNBOOK: "장애, 운영 대응 절차",
 };
 export const knowledgeStatusLabels: Readonly<Record<KnowledgeStatus, string>> =
   {

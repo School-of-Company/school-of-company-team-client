@@ -8,7 +8,7 @@ import { Button, Field, Input } from "@/shared/ui";
 import { taskDiscordApi, type Discussion } from "../api/discord";
 
 const PRIVATE_SOURCE_NOTICE =
-  "비공개 저장소에서 가져온 업무라 Discord에서 논의할 수 없어요. 공유 채널에서는 원본 저장소 권한이 없는 사람에게도 제목·내용이 보일 수 있어요.";
+  "비공개 저장소에서 가져온 업무라 Discord에서 논의할 수 없어요. 공유 채널에서는 원본 저장소 권한이 없는 사람에게도 제목, 내용이 보일 수 있어요.";
 
 const messages: Readonly<Record<string, string>> = {
   DISCORD_NOT_CONFIGURED:
@@ -16,7 +16,7 @@ const messages: Readonly<Record<string, string>> = {
   DISCORD_CHANNEL_NOT_CONFIGURED:
     "논의 채널이 없습니다. 관리자에게 채널 연결을 요청해 주세요.",
   DISCORD_LINK_DISABLED:
-    "연결이 비활성화되었습니다. 관리자가 Discord 채널·스레드의 역할과 사용자 권한을 직접 정리한 후 채널을 다시 연결해야 합니다.",
+    "연결이 비활성화되었습니다. 관리자가 Discord 채널, 스레드의 역할과 사용자 권한을 직접 정리한 후 채널을 다시 연결해야 합니다.",
   DISCORD_THREAD_CREATING:
     "스레드를 생성하고 있습니다. 잠시 후 다시 시도해 주세요.",
   DISCORD_RESULT_UNKNOWN:
@@ -26,7 +26,7 @@ const messages: Readonly<Record<string, string>> = {
   DISCORD_THREAD_DELETED:
     "스레드가 삭제되었습니다. 관리자에게 복구를 요청해 주세요.",
   DISCORD_BOT_MISSING_PERMISSIONS:
-    "봇의 채널·스레드 접근 권한이 부족합니다. 관리자에게 권한 점검을 요청해 주세요.",
+    "봇의 채널, 스레드 접근 권한이 부족합니다. 관리자에게 권한 점검을 요청해 주세요.",
   PROJECT_ARCHIVED: "아카이브된 프로젝트에는 새 스레드를 만들 수 없습니다.",
 };
 

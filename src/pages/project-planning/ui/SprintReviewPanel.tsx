@@ -44,7 +44,7 @@ export function SprintReviewPanel({
     return (
       <EmptyState
         title="스프린트를 시작하면 리뷰를 씁니다"
-        description="완료·이월·막힘 업무로 초안을 만들어 PM이 고쳐 게시합니다."
+        description="완료, 이월, 막힘 업무로 초안을 만들어 PM이 고쳐 게시합니다."
       />
     );
   if (review.isPending)
@@ -211,7 +211,7 @@ function ReviewEditor({
         </div>
       )}
       <p id={`${id}-hint`} className="text-xs text-muted">
-        초안은 완료·merge된 PR·이월·막힘 업무로 만듭니다. 비공개 원본 업무와
+        초안은 완료, merge된 PR, 이월, 막힘 업무로 만듭니다. 비공개 원본 업무와
         비공개 저장소 PR은 게시 범위 때문에 넣지 않습니다.
       </p>
       {notice && (

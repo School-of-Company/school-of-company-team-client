@@ -181,7 +181,7 @@ const errors: Readonly<Record<string, string>> = {
   SPRINT_REVIEW_NOT_FOUND: "저장된 리뷰가 없습니다. 먼저 저장하세요.",
   RETRO_ENTRY_NOT_FOUND: "이미 삭제된 회고 항목입니다.",
   RETRO_ENTRY_FORBIDDEN: "작성자만 고칠 수 있습니다.",
-  INVALID_SCOPE: "프로젝트 업무만 스프린트·마일스톤에 넣을 수 있습니다.",
+  INVALID_SCOPE: "프로젝트 업무만 스프린트, 마일스톤에 넣을 수 있습니다.",
   TASK_NOT_FOUND: "업무를 찾을 수 없거나 볼 수 없습니다.",
   PROJECT_FORBIDDEN: "이 작업을 할 권한이 없습니다.",
   PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능합니다.",
