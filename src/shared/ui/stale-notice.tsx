@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/shared/ui";
+import { Button } from "./controls";
 
-/** 10초 폴링 재조회가 실패하면 마지막으로 받은 내용을 그대로 두고 이 안내만 띄운다(첫 로딩 실패만 오류 화면). */
+/** 재조회가 실패하면 마지막으로 받은 내용을 그대로 두고 이 안내만 띄운다(첫 로딩 실패만 오류 화면). */
 export function StaleNotice({
   query,
 }: {
@@ -17,7 +17,7 @@ export function StaleNotice({
   return (
     <div
       role="status"
-      className="service-notice flex flex-wrap items-center justify-between gap-2 text-sm"
+      className="ui-notice flex flex-wrap items-center justify-between gap-2 text-sm"
     >
       <span>최신 정보를 불러오지 못해 마지막으로 받은 내용을 보여 줍니다.</span>
       <Button

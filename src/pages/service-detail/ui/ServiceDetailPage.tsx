@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   serviceErrorMessage,
   serviceQueries,
-  StaleNotice,
   TierLabel,
   useServiceByKey,
   type ServiceDetail,
@@ -17,7 +16,7 @@ import { AuthGuard } from "@/features/auth";
 import { ArchiveService, EditServiceDialog } from "@/features/manage-service";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
-import { Badge, Button, ErrorState } from "@/shared/ui";
+import { Badge, Button, ErrorState, StaleNotice } from "@/shared/ui";
 import { ServiceOverview } from "./ServiceOverview";
 import { ServiceReleases } from "./ServiceReleases";
 import { ServiceDeployments } from "./ServiceDeployments";

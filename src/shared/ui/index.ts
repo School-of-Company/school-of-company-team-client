@@ -19,6 +19,7 @@ export {
   QueryState,
 } from "./feedback";
 export { PageHeader, PageSkeleton } from "./page-header";
+export { StaleNotice } from "./stale-notice";
 export { Dialog } from "./dialog";
 export { SegmentedLinks } from "./segmented-links";
 export { Markdown } from "./markdown";

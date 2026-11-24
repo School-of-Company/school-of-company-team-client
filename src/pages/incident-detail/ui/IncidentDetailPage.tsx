@@ -13,7 +13,6 @@ import {
   SeverityLabel,
   type IncidentDetail,
 } from "@/entities/incident";
-import { StaleNotice } from "@/entities/service";
 import { isHeadAdmin } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import {
@@ -25,7 +24,13 @@ import {
   PostmortemPanel,
 } from "@/features/manage-incident";
 import { routes } from "@/shared/config";
-import { Button, ErrorState, Skeleton, Spinner } from "@/shared/ui";
+import {
+  Button,
+  ErrorState,
+  Skeleton,
+  Spinner,
+  StaleNotice,
+} from "@/shared/ui";
 import { IncidentProperties } from "./IncidentProperties";
 import { IncidentTimeline } from "./IncidentTimeline";
 

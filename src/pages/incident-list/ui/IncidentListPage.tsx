@@ -16,7 +16,7 @@ import {
   type IncidentStatus,
   type IncidentSummary,
 } from "@/entities/incident";
-import { serviceQueries, StaleNotice } from "@/entities/service";
+import { serviceQueries } from "@/entities/service";
 import { AuthGuard } from "@/features/auth";
 import { IncidentFormDialog } from "@/features/manage-incident";
 import { routes } from "@/shared/config";
@@ -28,6 +28,7 @@ import {
   Select,
   Skeleton,
   Spinner,
+  StaleNotice,
 } from "@/shared/ui";
 
 /** 목록 기본은 진행 중(대응 중·완화됨). 상태 묶음은 URL `?status=`에 둔다. */

@@ -8,12 +8,17 @@ import {
   deploymentStatusLabels,
   serviceErrorMessage,
   serviceQueries,
-  StaleNotice,
   type Deployment,
   type ServiceDetail,
 } from "@/entities/service";
 import { routes } from "@/shared/config";
-import { EmptyState, ErrorState, Skeleton, ListSkeleton } from "@/shared/ui";
+import {
+  EmptyState,
+  ErrorState,
+  Skeleton,
+  ListSkeleton,
+  StaleNotice,
+} from "@/shared/ui";
 import { formatDateTime, formatDuration, shortSha } from "./format";
 import { HiddenRepositoriesNote } from "./ServiceReleases";
 

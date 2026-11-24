@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { StaleNotice } from "./StaleNotice";
+import { StaleNotice } from "./stale-notice";
 
 const query = (isError: boolean, data: unknown) => ({
   isError,

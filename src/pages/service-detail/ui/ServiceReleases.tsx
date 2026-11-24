@@ -7,7 +7,6 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import {
   serviceErrorMessage,
   serviceQueries,
-  StaleNotice,
   type ReleaseDetail,
   type ReleaseSummary,
   type ServiceDetail,
@@ -21,6 +20,7 @@ import {
   ErrorState,
   Skeleton,
   ListSkeleton,
+  StaleNotice,
 } from "@/shared/ui";
 import { formatDateTime } from "./format";
 
