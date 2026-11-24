@@ -1229,23 +1229,6 @@ html[data-sidebar-closed~="account"]
   color: var(--muted);
   font-size: var(--text-sm);
 }
-.my-work-empty {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-2);
-  padding: var(--space-10) var(--space-6);
-  border-radius: var(--radius-xl);
-  background: var(--surface-box);
-  text-align: center;
-}
-.my-work-empty h2 {
-  font-size: var(--text-lg);
-  font-weight: 700;
-}
-.my-work-empty p {
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
 /* A panel with nothing under its header is one quiet row. */
 .home-panel-header:only-child {
   border-bottom: 0;
