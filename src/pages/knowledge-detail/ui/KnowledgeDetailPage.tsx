@@ -59,8 +59,12 @@ export function KnowledgeDetailSkeleton() {
             <span className="ui-skeleton-text">문서 제목을 불러오는 중</span>
           </h1>
           <p className="mt-2 flex flex-wrap items-center gap-3">
-            <span className="ui-skeleton-text text-xs">ADR</span>
-            <span className="ui-skeleton-text text-xs">게시</span>
+            <span className="knowledge-kind">
+              <span className="ui-skeleton-text">ADR</span>
+            </span>
+            <span className="knowledge-status">
+              <span className="ui-skeleton-text">게시</span>
+            </span>
           </p>
         </div>
       </header>

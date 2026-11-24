@@ -46,9 +46,10 @@ function SettingsBodySkeleton() {
     <div className="grid gap-10">
       <div aria-hidden="true" className="settings-nav">
         {settingsTabs.map((label) => (
-          <span key={label} className="ui-nav-link">
+          // 탭 줄 스타일이 `.settings-nav a`에 걸려 있어 같은 요소로 그린다(href 없는 a 는 초점을 받지 않는다).
+          <a key={label} className="ui-nav-link">
             <span className="ui-skeleton-text">{label}</span>
-          </span>
+          </a>
         ))}
       </div>
       <ListSkeleton label="설정 불러오는 중" rows={5} />

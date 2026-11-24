@@ -55,7 +55,10 @@ export function RequirementDetailSkeleton() {
           </h1>
           <p className="mt-2 flex flex-wrap items-center gap-3 text-sm">
             <span className="ui-skeleton-text">검토 중</span>
-            <span className="ui-skeleton-text">접수 11월 25일 10:00</span>
+            <span className="ui-skeleton-text">기능 요청</span>
+            <span className="ui-skeleton-text">
+              접수 2026년 11월 25일 오전 10:00
+            </span>
           </p>
         </div>
         <span className="ui-button ui-button-secondary">

@@ -70,8 +70,12 @@ export function IncidentDetailSkeleton() {
             <span className="ui-skeleton-text">장애 제목을 불러오는 중</span>
           </h1>
           <p className="mt-2 flex flex-wrap items-center gap-3">
-            <span className="ui-skeleton-text text-xs">심각도 높음</span>
-            <span className="ui-skeleton-text text-xs">대응 중</span>
+            <span className="incident-severity">
+              <span className="ui-skeleton-text">높음</span>
+            </span>
+            <span className="incident-status">
+              <span className="ui-skeleton-text">대응 중</span>
+            </span>
           </p>
         </div>
         {/* 좁은 화면에서는 동작 버튼이 제목 아래 줄로 내려가므로 같은 줄을 잡는다. */}
