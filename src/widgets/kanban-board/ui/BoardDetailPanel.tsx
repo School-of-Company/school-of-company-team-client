@@ -2,7 +2,7 @@
 
 import type { ComponentType, ReactNode } from "react";
 import Link from "next/link";
-import { Dialog } from "@/shared/ui";
+import { Dialog, Icon } from "@/shared/ui";
 
 export type BoardDetailComponent = ComponentType<{
   readonly taskId: string;
@@ -34,7 +34,7 @@ export function BoardDetailPanel({
       open
       onClose={onClose}
       title="업무 상세"
-      className="board-detail-panel w-[min(48rem,calc(100%-2rem))]!"
+      className="board-detail-panel"
     >
       <Detail
         key={taskId}
@@ -43,9 +43,11 @@ export function BoardDetailPanel({
         headerAction={
           <Link
             href={`/tasks/${encodeURIComponent(taskId)}`}
-            className="ui-button ui-button-secondary ui-button-sm"
+            className="ui-button ui-button-ghost ui-icon-button"
+            aria-label="전체 페이지로 열기"
+            title="전체 페이지로 열기"
           >
-            전체 페이지로 열기
+            <Icon name="expand" />
           </Link>
         }
       />

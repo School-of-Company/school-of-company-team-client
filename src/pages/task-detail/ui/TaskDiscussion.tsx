@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { taskGithubQueries } from "@/features/link-github-issue";
 import { normalizeApiError } from "@/shared/api";
-import { Button, Field, Input } from "@/shared/ui";
+import { Button, Field, Input, useToast } from "@/shared/ui";
 import { taskDiscordApi, type Discussion } from "../api/discord";
 
 const PRIVATE_SOURCE_NOTICE =
@@ -39,6 +39,7 @@ export function TaskDiscussion({
   readonly manages: boolean;
   readonly onAccessLost: (error: unknown) => void;
 }) {
+  const toast = useToast();
   // 상세 패널과 같은 쿼리 키라 추가 요청 없이 캐시를 공유한다.
   const restricted =
     useQuery(taskGithubQueries.detail(taskId)).data?.source
@@ -74,7 +75,7 @@ export function TaskDiscussion({
       await taskDiscordApi.recover(taskId, threadId || null);
       setDiscussion(null);
       setRecovery(false);
-      setError("복구했습니다. 논의 열기를 다시 눌러 주세요.");
+      toast("복구했습니다. 논의 열기를 다시 눌러 주세요.", "success");
     } catch (cause) {
       setError(normalizeApiError(cause).message);
     } finally {
