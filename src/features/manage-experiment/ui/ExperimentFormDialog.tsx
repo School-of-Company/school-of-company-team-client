@@ -8,7 +8,16 @@ import {
   type Experiment,
 } from "@/entities/experiment";
 import { activeUsersQueryOptions } from "@/entities/user";
-import { Button, Dialog, Field, Input, Select, Textarea } from "@/shared/ui";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
+import {
+  Button,
+  DatePicker,
+  Dialog,
+  Field,
+  Input,
+  Select,
+  Textarea,
+} from "@/shared/ui";
 import { useExperimentMutation } from "../api/mutations";
 
 /**
@@ -92,6 +101,15 @@ function ExperimentForm({
           endDate: endDate || undefined,
         });
   });
+  // 서버 검증 오류는 해당 칸 밑에, 나머지는 폼 아래에 보인다.
+  const server = save.isError
+    ? fieldErrors(
+        normalizeApiError(save.error),
+        ["title", "hypothesis", "startDate", "endDate"],
+        experimentErrorMessage(save.error),
+      )
+    : {};
+  const shown = { ...server, ...errors };
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (save.isPending) return;
@@ -108,7 +126,7 @@ function ExperimentForm({
   };
   return (
     <form className="grid gap-5" onSubmit={submit} noValidate>
-      <Field id={`${id}-title`} label="제목" error={errors.title}>
+      <Field id={`${id}-title`} label="제목" error={shown.title}>
         <Input
           id={`${id}-title`}
           value={title}
@@ -123,7 +141,7 @@ function ExperimentForm({
         id={`${id}-hypothesis`}
         label="가설"
         hint="무엇을 하면 어떻게 될 거라고 생각하는지 한두 문장으로 적습니다."
-        error={errors.hypothesis}
+        error={shown.hypothesis}
       >
         <Textarea
           id={`${id}-hypothesis`}
@@ -159,41 +177,44 @@ function ExperimentForm({
           onChange={(event) => setMethod(event.target.value)}
         />
       </Field>
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Field id={`${id}-owner`} label="담당자">
-          <Select
-            id={`${id}-owner`}
-            value={ownerId}
-            onChange={(event) => setOwnerId(event.target.value)}
-          >
-            <option value="">정하지 않음</option>
-            {users.data?.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field id={`${id}-start`} label="시작일">
-          <Input
+      <Field id={`${id}-owner`} label="담당자">
+        <Select
+          id={`${id}-owner`}
+          value={ownerId}
+          onChange={(event) => setOwnerId(event.target.value)}
+        >
+          <option value="">정하지 않음</option>
+          {users.data?.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field id={`${id}-start`} label="시작일" error={shown.startDate}>
+          <DatePicker
             id={`${id}-start`}
-            type="date"
+            label="시작일"
             value={startDate}
-            onChange={(event) => setStartDate(event.target.value)}
+            onChange={setStartDate}
+            invalid={!!shown.startDate}
           />
         </Field>
-        <Field id={`${id}-end`} label="끝나는 날" error={errors.endDate}>
-          <Input
+        <Field id={`${id}-end`} label="끝나는 날" error={shown.endDate}>
+          <DatePicker
             id={`${id}-end`}
-            type="date"
+            label="끝나는 날"
             value={endDate}
-            onChange={(event) => setEndDate(event.target.value)}
+            onChange={setEndDate}
+            min={startDate || undefined}
+            invalid={!!shown.endDate}
           />
         </Field>
       </div>
-      {save.isError && (
+      {shown.form && (
         <p role="alert" className="text-sm text-danger">
-          {experimentErrorMessage(save.error)}
+          {shown.form}
         </p>
       )}
       <div className="flex flex-wrap justify-end gap-2">
