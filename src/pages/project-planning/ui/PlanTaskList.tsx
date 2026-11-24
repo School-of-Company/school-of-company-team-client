@@ -54,10 +54,11 @@ export function PlanTaskList({
                   <Button
                     variant="ghost"
                     className="ui-button-sm"
-                    disabled={busy}
+                    aria-disabled={busy}
+                    data-plan-task-action={task.id}
                     aria-label={`${task.key} 스프린트${candidate ? "에 넣기" : "에서 빼기"}`}
                     onClick={() =>
-                      candidate ? onAdd([task.id]) : onRemove(task)
+                      !busy && (candidate ? onAdd([task.id]) : onRemove(task))
                     }
                   >
                     {candidate ? "넣기" : "빼기"}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type DragEvent } from "react";
+import { useLayoutEffect, useRef, useState, type DragEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { projectQueries, type ProjectDetail } from "@/entities/project";
@@ -16,6 +16,7 @@ import {
   type ScopeOverlay,
 } from "../model/sprint-tasks";
 import { PlanTaskList } from "./PlanTaskList";
+import { restorePlanFocus } from "../model/plan-focus";
 
 const DRAG_TYPE = "application/x-soc-task";
 
@@ -67,6 +68,29 @@ export function SprintPlan({
     overlay,
   );
   const busy = scope.isPending;
+  const root = useRef<HTMLDivElement>(null);
+  const focus = useRef<{
+    readonly taskId: string;
+    readonly previous: unknown;
+  } | null>(null);
+  useLayoutEffect(() => {
+    const request = focus.current;
+    if (!request || !root.current) return;
+    const actions = Array.from(
+      root.current.querySelectorAll<HTMLButtonElement>(
+        "[data-plan-task-action]",
+      ),
+    );
+    const target =
+      actions.find(
+        (action) => action.dataset.planTaskAction === request.taskId,
+      ) ??
+      actions[0] ??
+      null;
+    const restored = restorePlanFocus(request.previous, target);
+    focus.current =
+      restored && busy ? { ...request, previous: restored } : null;
+  });
 
   function change(
     next: ScopeOverlay,
@@ -74,6 +98,10 @@ export function SprintPlan({
     done: string,
   ) {
     if (busy) return;
+    const taskId = Object.keys(next)[0];
+    if (taskId && root.current?.contains(document.activeElement)) {
+      focus.current = { taskId, previous: document.activeElement };
+    }
     setMessage(null);
     setOverlay(next);
     scope.mutate(request, {
@@ -104,7 +132,7 @@ export function SprintPlan({
       `${task.key}을(를) 스프린트에서 뺐습니다.`,
     );
   }
-  function onDrop(target: "in" | "out", event: DragEvent) {
+  function handleDrop(event: DragEvent, target: "in" | "out") {
     event.preventDefault();
     setDropping(null);
     const id = event.dataTransfer.getData(DRAG_TYPE);
@@ -123,7 +151,6 @@ export function SprintPlan({
             setDropping(target);
           },
           onDragLeave: () => setDropping(null),
-          onDrop: (event: DragEvent) => onDrop(target, event),
           "data-dropping": dropping === target || undefined,
         }
       : {};
@@ -166,12 +193,13 @@ export function SprintPlan({
     onRemove: remove,
   };
   return (
-    <div className={manages ? "sprint-plan" : "grid gap-3"}>
+    <div ref={root} className={manages ? "sprint-plan" : "grid gap-3"}>
       {manages && (
         <section
           className="plan-pane"
           aria-labelledby="plan-source"
           {...dropProps("out")}
+          onDrop={manages ? (event) => handleDrop(event, "out") : undefined}
         >
           <div className="plan-pane-head">
             <h3 id="plan-source" className="planning-subhead">
@@ -215,6 +243,7 @@ export function SprintPlan({
         className="plan-pane"
         aria-labelledby="plan-scope"
         {...dropProps("in")}
+        onDrop={manages ? (event) => handleDrop(event, "in") : undefined}
       >
         <div className="plan-pane-head">
           <h3 id="plan-scope" className="planning-subhead">
