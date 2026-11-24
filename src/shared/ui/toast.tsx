@@ -53,7 +53,9 @@ function ToastItem({
   readonly onRemove: (id: number) => void;
 }) {
   const [closing, setClosing] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const paused = hovered || focused;
   useEffect(() => {
     if (paused || closing) return;
     const timer = setTimeout(
@@ -72,12 +74,12 @@ function ToastItem({
       className="ui-toast"
       data-tone={toast.tone}
       data-closing={closing || undefined}
-      onPointerEnter={() => setPaused(true)}
-      onPointerLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget))
-          setPaused(false);
+          setFocused(false);
       }}
     >
       <span className="ui-toast-icon">

@@ -53,6 +53,7 @@ export function TaskDetailWorkspace({
     onSuccess: async () => {
       client.removeQueries({ queryKey: taskKeys.detail(taskId) });
       await client.invalidateQueries({ queryKey: taskKeys.all });
+      toast("업무를 삭제했습니다.", "success");
       router.push("/me");
     },
     onError: (cause) => {
