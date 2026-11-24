@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { apiGet, readSeed, signIn } from "./support";
+import { apiGet, apiUrl, readSeed, signIn } from "./support";
 
 // 계획 F1 시나리오: 토큰 주입 → 내 보드 → 프로젝트 보드 → 업무 생성(시작 상태) → 드래그 이동
 // → 상세 편집 → 막힘 → 완료 → 팀 공용 보드 → 권한 없는 사용자. 모두 격리 backend 실제 API 호출이다.
@@ -285,19 +285,67 @@ test("드래그 없이 키보드만으로 카드 메뉴를 열어 상태를 바�
   await page.keyboard.press("ArrowDown");
   const menu = page.getByRole("menu", { name: `${edited} 작업` });
   await expect(menu).toBeVisible();
-  await expect(menu.getByRole("menuitem").first()).toBeFocused();
+  // 첫 포커스는 "상태 바꾸기" 묶음의 첫 활성 상태다(현재 상태는 비활성이라 건너뛴다).
+  await expect(
+    menu.locator("[role='menuitemradio']:not(:disabled)").first(),
+  ).toBeFocused();
+  await expect(
+    menu.getByRole("menuitemradio", { checked: true }),
+  ).toBeDisabled();
   await page.keyboard.press("Escape");
   await expect(menu).toBeHidden();
   await expect(menuButton).toBeFocused();
   await menuButton.press("Enter");
-  await menu
-    .getByRole("menuitem", { name: "상태 변경: 진행 중" })
-    .press("Enter");
+  await menu.getByRole("menuitemradio", { name: "진행 중" }).press("Enter");
+  await expect(menu).toBeHidden();
+  await expect(menuButton).toBeFocused();
   await expect(card(column(page, "IN_PROGRESS"), edited)).toBeVisible();
   expect(
     (await apiGet<TaskDetail>(`/api/v1/tasks/${taskId}`, seed.member.tokens))
       .status,
   ).toBe("IN_PROGRESS");
+});
+
+test("1280px 첫 컬럼 카드의 메뉴가 보드 스크롤 영역에 잘리지 않는다", async ({
+  page,
+}) => {
+  // 첫 컬럼(검토 필요)에 카드 하나를 둔다. 버튼이 보드 왼쪽 가까이에 있어 메뉴가 왼쪽으로 넘친다.
+  const first = `${title} 첫 컬럼`;
+  const created = await fetch(`${apiUrl}/api/v1/tasks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${seed.member.tokens.accessToken}`,
+    },
+    body: JSON.stringify({
+      scope: "PROJECT",
+      projectId: seed.project.id,
+      title: first,
+      type: "TASK",
+      priority: "P2",
+      status: "BACKLOG",
+      assigneeIds: [],
+    }),
+  });
+  expect(created.ok).toBe(true);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await signIn(page, seed.member.tokens);
+  await page.goto(`/projects/${seed.project.id}`);
+  const menuButton = page.getByRole("button", { name: `${first} 더보기` });
+  await expect(card(column(page, "BACKLOG"), first)).toBeVisible();
+  await menuButton.click();
+  const menu = page.getByRole("menu", { name: `${first} 작업` });
+  await expect(menu).toBeVisible();
+  await expect(menu).toBeInViewport({ ratio: 1 });
+  const items = menu.locator("[role^='menuitem']");
+  for (const item of await items.all()) {
+    await expect(item).toBeInViewport({ ratio: 1 });
+    // 다른 요소에 가리거나 잘리면 trial 클릭이 실패한다.
+    if (await item.isEnabled()) await item.click({ trial: true });
+  }
+  await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
+  await expect(menuButton).toBeFocused();
 });
 
 test("빈 보드 안내는 필터 유무에 따라 다르고, legacy 계정은 Discord 를 요구받지 않는다", async ({
