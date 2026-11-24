@@ -49,6 +49,11 @@ export type KnowledgeSummary = {
   readonly title: string;
   readonly status: KnowledgeStatus;
   readonly author: IncidentPerson | null;
+  readonly project: {
+    readonly id: string;
+    readonly key: string;
+    readonly name: string;
+  } | null;
   readonly updatedAt: string;
 };
 
@@ -91,6 +96,8 @@ export type KnowledgeDetail = KnowledgeSummary & {
 };
 
 export type KnowledgeFilter = {
+  readonly projectId?: string;
+  readonly scope?: "ORG";
   readonly kind?: KnowledgeKind;
   readonly status?: KnowledgeStatus;
   readonly serviceId?: string;
@@ -99,6 +106,7 @@ export type KnowledgeFilter = {
 };
 
 export type CreateKnowledge = {
+  readonly projectId?: string;
   readonly kind: KnowledgeKind;
   readonly title: string;
   readonly body?: string;
@@ -106,9 +114,16 @@ export type CreateKnowledge = {
   readonly incidentId?: string;
 };
 export type UpdateKnowledge = {
+  readonly projectId?: string | null;
   readonly title?: string;
   readonly body?: string;
   readonly status?: KnowledgeStatus;
+};
+export type KnowledgeTemplate = {
+  readonly kind: KnowledgeKind;
+  readonly body: string;
+  readonly updatedAt: string;
+  readonly updatedBy: IncidentPerson | null;
 };
 export type AddKnowledgeLink = {
   readonly relation?: KnowledgeRelation;

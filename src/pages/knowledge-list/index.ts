@@ -1,1 +1,4 @@
-export { KnowledgeListPage } from "./ui/KnowledgeListPage";
+export {
+  KnowledgeListPage,
+  ProjectDocumentsPage,
+} from "./ui/KnowledgeListPage";

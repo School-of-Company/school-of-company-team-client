@@ -7,6 +7,8 @@ import type {
   KnowledgeFilter,
   KnowledgeSummary,
   UpdateKnowledge,
+  KnowledgeTemplate,
+  KnowledgeKind,
 } from "../model/types";
 
 const path = (id: string) => `/api/v1/knowledge/${encodeURIComponent(id)}`;
@@ -22,11 +24,24 @@ export const knowledgeKeys = {
       filter.serviceId ?? "",
       filter.taskId ?? "",
       filter.incidentId ?? "",
+      filter.projectId ?? "",
+      filter.scope ?? "",
     ] as const,
   detail: (id: string) => ["knowledge", "detail", id] as const,
+  templates: ["knowledge", "templates"] as const,
 };
 
 export const knowledgeApi = {
+  templates: async () =>
+    (await api.get<readonly KnowledgeTemplate[]>("/api/v1/knowledge/templates"))
+      .data,
+  saveTemplate: async (kind: KnowledgeKind, body: string) =>
+    (
+      await api.put<KnowledgeTemplate>(
+        `/api/v1/knowledge/templates/${kind}`,
+        { body },
+      )
+    ).data,
   list: async (filter: KnowledgeFilter) =>
     (
       await api.get<readonly KnowledgeSummary[]>("/api/v1/knowledge", {

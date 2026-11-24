@@ -121,6 +121,8 @@
   --page-inset: 32px;
   --content-narrow: 44rem;
   --content-reading: 64rem;
+  --sidebar-shortcuts-height: 30dvh;
+  --admin-user-table-min: 32rem;
   --sidebar-edge-width: 24px;
 
   /* Elevation: borders separate, shadows only lift overlays. */

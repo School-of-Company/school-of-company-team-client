@@ -11,7 +11,9 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ProjectAvatar, projectQueries } from "@/entities/project";
+import { projectQueries } from "@/entities/project";
+import { SidebarGroup } from "./SidebarGroup";
+import { ProjectShortcuts } from "./ProjectShortcuts";
 import { useMe, userDestination } from "@/entities/user";
 import { isSearchShortcut } from "../model/search";
 import { SearchPalette } from "./SearchPalette";
@@ -247,25 +249,22 @@ export function AppShell({
     });
   const navigation = (
     <>
-      <nav aria-label="주 메뉴" className="grid">
-        <h2>내 일</h2>
+      <SidebarGroup title="내 일" group="work">
         {navLinks(workLinks)}
-      </nav>
-      <nav aria-label="조직" className="grid">
-        <h2>조직</h2>
+      </SidebarGroup>
+      <SidebarGroup title="조직" group="org">
         {navLinks(orgLinks)}
-      </nav>
+      </SidebarGroup>
     </>
   );
   const accountNavigation = (
-    <nav aria-label="관리" className="grid">
+    <SidebarGroup title="안내와 설정" group="account">
       {navLinks(teamLinks)}
       {navLinks(accountLinks)}
-    </nav>
+    </SidebarGroup>
   );
   const projectNavigation = (
-    <nav aria-label="프로젝트 바로가기" className="grid">
-      <h2>프로젝트</h2>
+    <SidebarGroup title="프로젝트" group="projects">
       {projects.isPending ? (
         <div
           role="status"
@@ -285,26 +284,13 @@ export function AppShell({
       ) : activeProjects.length === 0 ? (
         <p className="px-3 text-sm text-muted">표시할 프로젝트가 없습니다.</p>
       ) : (
-        activeProjects.map((project) => {
-          const href = routes.project(project.id);
-          const active = pathname === href || pathname.startsWith(`${href}/`);
-          return (
-            <Link
-              key={project.id}
-              href={href}
-              aria-current={active ? "page" : undefined}
-              onClick={() => setMenuOpen(false)}
-              className="ui-nav-link flex min-w-0 items-center"
-            >
-              <ProjectAvatar project={project} />
-              <span className="truncate" title={project.key}>
-                {project.name}
-              </span>
-            </Link>
-          );
-        })
+        <ProjectShortcuts
+          projects={activeProjects}
+          pathname={pathname}
+          onNavigate={() => setMenuOpen(false)}
+        />
       )}
-    </nav>
+    </SidebarGroup>
   );
   return (
     <div

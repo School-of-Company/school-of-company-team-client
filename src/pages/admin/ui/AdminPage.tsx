@@ -10,6 +10,7 @@ import { AuthGuard } from "@/features/auth";
 import { AdminSettings } from "./AdminSettings";
 import { ErrorState, Spinner } from "@/shared/ui";
 import { CreateProjectForm } from "./CreateProjectForm";
+import { DocumentTemplates } from "@/features/manage-knowledge";
 
 export function AdminPage() {
   return (
@@ -33,9 +34,10 @@ export function AdminPage() {
 function AdminContent({ user }: { readonly user: User }) {
   const client = useQueryClient();
   const creating = useSearchParams()?.get("create") === "project";
+  const tab = useSearchParams()?.get("tab") ?? "users";
   const refresh = () => client.invalidateQueries({ queryKey: projectKeys.all });
   return (
-    <div className="settings-page mx-auto grid w-full max-w-3xl min-w-0 gap-6">
+    <div className="settings-page admin-page mx-auto grid w-full min-w-0 gap-6 break-keep">
       <header className="page-header">
         <div className="grid gap-2">
           <h1>{creating ? "새 프로젝트" : "관리자 설정"}</h1>
@@ -52,10 +54,46 @@ function AdminContent({ user }: { readonly user: User }) {
           {creating ? "관리자 설정으로" : "새 프로젝트"}
         </Link>
       </header>
+      {!creating && (
+        <nav className="settings-nav" aria-label="관리자 설정 구역">
+          {[
+            { id: "users", label: "사용자 관리" },
+            { id: "projects", label: "프로젝트" },
+            { id: "integrations", label: "연동" },
+            { id: "templates", label: "문서 템플릿" },
+          ].map((item) => (
+            <Link
+              key={item.id}
+              href={`/admin?tab=${item.id}`}
+              aria-current={tab === item.id ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      )}
       {creating ? (
         <CreateProjectForm onSaved={refresh} />
+      ) : tab === "templates" ? (
+        <DocumentTemplates />
+      ) : tab === "projects" ? (
+        <section className="settings-card grid gap-4">
+          <h2>프로젝트</h2>
+          <p className="text-sm text-muted">
+            프로젝트 목록에서 참여 현황과 설정을 확인합니다.
+          </p>
+          <Link
+            href="/projects"
+            className="ui-button ui-button-secondary justify-self-start"
+          >
+            모든 프로젝트 보기
+          </Link>
+        </section>
       ) : (
-        <AdminSettings user={user} />
+        <AdminSettings
+          user={user}
+          section={tab === "integrations" ? "integrations" : "users"}
+        />
       )}
     </div>
   );
