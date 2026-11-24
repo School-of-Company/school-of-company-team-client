@@ -1,1 +1,4 @@
-export { KnowledgeDetailPage } from "./ui/KnowledgeDetailPage";
+export {
+  KnowledgeDetailPage,
+  KnowledgeDetailSkeleton,
+} from "./ui/KnowledgeDetailPage";
