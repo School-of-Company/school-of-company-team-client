@@ -1568,10 +1568,170 @@ select.ui-input {
 }
 
 .board-detail-panel {
-  width: min(60rem, calc(100% - 2rem));
+  width: min(var(--content-reading), calc(100% - 2rem));
 }
 .task-detail {
   container-type: inline-size;
+  max-width: var(--content-reading);
+  margin-inline: auto;
+}
+.task-detail > .task-detail-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.task-detail-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.task-detail-back {
+  flex-basis: 100%;
+  justify-content: start;
+}
+.task-detail-heading > header {
+  flex: 1;
+  min-width: 0;
+}
+.task-detail .task-main {
+  gap: var(--space-8);
+}
+.task-detail .task-props {
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface-box);
+}
+.task-detail .task-props dl {
+  gap: var(--space-2) var(--space-6);
+}
+.task-detail .task-props .ui-input {
+  min-height: var(--control-sm);
+  height: var(--control-sm);
+  font-size: var(--text-xs);
+}
+.task-detail .task-props dd > .ui-input {
+  width: 100%;
+}
+.task-detail .task-section-title {
+  color: var(--foreground);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+.task-detail .ui-markdown {
+  max-width: var(--content-prose);
+  line-height: 1.8;
+}
+.task-detail .task-main > section {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+.task-activity,
+.task-activity > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.task-github-disclosure > summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  padding-block: var(--space-2);
+}
+.task-github-disclosure[open] > summary {
+  margin-bottom: var(--space-2);
+}
+@container (min-width: 36rem) {
+  .task-detail .task-props dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 35.999rem) {
+  .task-detail-heading > header {
+    flex-basis: 100%;
+  }
+  .task-detail .task-props .ui-input {
+    min-height: var(--control-touch);
+    height: var(--control-touch);
+  }
+}
+
+.ui-toast-stack {
+  position: fixed;
+  inset: auto var(--space-4) var(--space-4) auto;
+  width: min(var(--toast-width), calc(100% - 2 * var(--space-4)));
+  max-height: calc(100dvh - 2 * var(--space-4));
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+}
+.ui-toast-stack:popover-open {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+.ui-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay);
+  animation: toast-enter var(--dur-2) var(--ease-out) both;
+}
+.ui-toast p {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.ui-toast-icon {
+  flex: none;
+  color: var(--muted);
+}
+.ui-toast[data-tone="success"] .ui-toast-icon {
+  color: var(--success);
+}
+.ui-toast[data-tone="error"] .ui-toast-icon {
+  color: var(--danger);
+}
+.ui-toast .ui-icon-button {
+  flex: none;
+}
+.ui-toast[data-closing] {
+  animation: toast-exit var(--dur-2) ease-in both;
+}
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes toast-exit {
+  to {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-toast,
+  .ui-toast[data-closing] {
+    animation: none;
+  }
 }
 .task-detail-grid {
   display: grid;

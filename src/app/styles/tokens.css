@@ -125,6 +125,8 @@
   --plan-list-height: 24rem;
   --plan-row-height: 4.5rem;
   --plan-action-width: 3.5rem;
+  --content-prose: 68ch;
+  --toast-width: 24rem;
   --sidebar-edge-width: 24px;
 
   /* Elevation: borders separate, shadows only lift overlays. */
