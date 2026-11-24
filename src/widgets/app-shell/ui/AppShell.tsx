@@ -148,6 +148,7 @@ export function AppShell({
     { href: routes.members, label: "팀원", icon: "user" },
     { href: routes.services, label: "서비스", icon: "service" },
     { href: routes.incidents, label: "사고", icon: "alert" },
+    { href: routes.requirements, label: "요구사항", icon: "inbox" },
     { href: routes.docs, label: "문서", icon: "doc" },
   ];
   const teamLinks: readonly NavLink[] = [

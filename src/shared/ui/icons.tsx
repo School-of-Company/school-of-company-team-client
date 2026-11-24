@@ -5,6 +5,7 @@ const paths = {
   priorityHigh: "M4 20V12h3v8z M10 20V8h3v12z M16 20V4h3v16z",
   priorityMedium: "M4 20V12h3v8z M10 20V8h3v12z M16 20h3",
   priorityLow: "M4 20V12h3v8z M10 20h3 M16 20h3",
+  inbox: "M3 13h5l1.5 3h5L16 13h5 M3 13l3-8h12l3 8v7H3z",
   home: "M3 10.5 12 3l9 7.5 M5 9v12h14V9 M10 21v-6h4v6",
   board: "M3 3h18v18H3z M9 3v18 M15 3v18 M3 9h6 M9 15h6 M15 11h6",
   team: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M16 4a4 4 0 0 1 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0",

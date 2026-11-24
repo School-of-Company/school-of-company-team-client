@@ -10,6 +10,7 @@ import {
 } from "@/features/project-integrations";
 import { getSettingsPermissions } from "@/features/project-settings";
 import { NotificationSettingsForm } from "@/features/notification-settings";
+import { IntakeFormSettings } from "@/features/manage-intake-forms";
 import { AutomationSettings } from "./AutomationSettings";
 import { Button } from "@/shared/ui";
 import type { SettingsProps } from "../model/props";
@@ -25,13 +26,13 @@ export function SettingsPanels(props: SettingsProps) {
   const selected = search?.get("tab");
   const manager =
     props.user.role === "LEAD" || props.project.pmUserId === props.user.id;
-  // 자동화 탭은 헤드 어드민·PM 에게만 있다(규칙 API 도 ADMIN 만 허용). 다른 사람의 ?tab=automation 은 기본 정보로.
+  // 자동화·접수 양식 탭은 헤드 어드민·PM 에게만 있다(규칙·양식 API 도 ADMIN 만 허용). 다른 사람의 ?tab= 은 기본 정보로.
   const tab =
     selected === "members" ||
     selected === "integrations" ||
     selected === "buckets" ||
     selected === "notifications" ||
-    (selected === "automation" && manager)
+    ((selected === "automation" || selected === "intake") && manager)
       ? selected
       : "general";
   const [confirmArchive, setConfirmArchive] = useState(false);
@@ -49,7 +50,12 @@ export function SettingsPanels(props: SettingsProps) {
             ["integrations", "연동"],
             ["buckets", "계획 버킷"],
             ["notifications", "알림"],
-            ...(manager ? ([["automation", "자동화"]] as const) : []),
+            ...(manager
+              ? ([
+                  ["automation", "자동화"],
+                  ["intake", "접수 양식"],
+                ] as const)
+              : []),
           ] as const
         ).map(([value, label]) => {
           const params = new URLSearchParams(search?.toString());
@@ -165,6 +171,17 @@ export function SettingsPanels(props: SettingsProps) {
           <AutomationSettings
             project={props.project}
             activeUserIds={new Set(props.candidates.map((user) => user.id))}
+            editable={permissions.manage}
+          />
+        </section>
+      )}
+      {tab === "intake" && (
+        <section className="grid gap-5" aria-labelledby="intake-heading">
+          <h2 id="intake-heading" className="text-xl font-semibold">
+            요구사항 접수 양식
+          </h2>
+          <IntakeFormSettings
+            projectId={props.project.id}
             editable={permissions.manage}
           />
         </section>
