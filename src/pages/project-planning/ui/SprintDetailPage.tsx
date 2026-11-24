@@ -14,7 +14,13 @@ import {
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
-import { Button, Dialog, ErrorState, Markdown, Skeleton } from "@/shared/ui";
+import {
+  Button,
+  Dialog,
+  ErrorState,
+  ListSkeleton,
+  Markdown,
+} from "@/shared/ui";
 import { useSprintLifecycle, useUpdateSprint } from "../api/sprint-actions";
 import { formatRange, remainingLabel } from "../model/dates";
 import { selectedSprintTab, sprintTabLabels, sprintTabs } from "../model/tabs";
@@ -50,14 +56,33 @@ function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
   const sprint = useQuery(sprintQueries.detail(project.id, sprintId));
   if (sprint.isPending)
     return (
-      <div
-        role="status"
-        aria-label="스프린트 불러오는 중"
-        className="grid gap-3"
-      >
-        <Skeleton className="h-8 w-56" />
-        <Skeleton className="h-4 w-72 max-w-full" />
-        <Skeleton className="h-40" />
+      <div role="status" aria-label="스프린트 불러오는 중" className="contents">
+        {/* 실제 머리(이름, 기간, 목표)와 탭 줄과 같은 클래스로 자리를 잡는다. */}
+        <div aria-hidden="true" className="sprint-head">
+          <div className="sprint-head-row">
+            <h2 className="text-lg font-semibold">
+              <span className="ui-skeleton-text">스프린트 이름</span>
+            </h2>
+          </div>
+          <p className="sprint-meta">
+            <span className="ui-skeleton-text">2026. 1. 1. ~ 2026. 1. 14.</span>
+          </p>
+          <p className="text-sm">
+            <span className="ui-skeleton-text">
+              스프린트 목표를 불러오는 중
+            </span>
+          </p>
+        </div>
+        <div aria-hidden="true" className="page-toolbar">
+          <span className="ui-segmented">
+            {["진행", "계획", "리뷰", "회고"].map((label) => (
+              <span key={label} className="ui-segmented-option">
+                <span className="ui-skeleton-text">{label}</span>
+              </span>
+            ))}
+          </span>
+        </div>
+        <ListSkeleton label="스프린트 업무 불러오는 중" />
       </div>
     );
   if (sprint.isError) {
@@ -219,23 +244,27 @@ function SprintScreen({
           {message.text}
         </p>
       )}
-      <nav aria-label="스프린트 화면" className="settings-nav">
-        {sprintTabs(sprint.status).map((value) => {
-          const params = new URLSearchParams(search?.toString());
-          params.set("tab", value);
-          return (
-            <Link
-              key={value}
-              href={`${pathname}?${params}`}
-              scroll={false}
-              replace
-              aria-current={tab === value ? "page" : undefined}
-            >
-              {sprintTabLabels[value]}
-            </Link>
-          );
-        })}
-      </nav>
+      {/* 같은 화면의 보기 전환: 머리 아래 툴바 줄의 세그먼트(SegmentedLinks 모양). 주소만 바꾸고 스크롤은 그대로 둔다. */}
+      <div className="page-toolbar">
+        <nav aria-label="스프린트 화면" className="ui-segmented">
+          {sprintTabs(sprint.status).map((value) => {
+            const params = new URLSearchParams(search?.toString());
+            params.set("tab", value);
+            return (
+              <Link
+                key={value}
+                href={`${pathname}?${params}`}
+                scroll={false}
+                replace
+                aria-current={tab === value ? "page" : undefined}
+                className="ui-segmented-option"
+              >
+                {sprintTabLabels[value]}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
       {tab === "plan" && (
         <SprintPlan project={project} sprint={sprint} manages={manages} />
       )}

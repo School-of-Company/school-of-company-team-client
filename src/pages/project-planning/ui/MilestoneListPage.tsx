@@ -24,8 +24,9 @@ import {
   Field,
   Icon,
   Input,
+  ListSkeleton,
   Markdown,
-  Skeleton,
+  QueryState,
   Textarea,
 } from "@/shared/ui";
 import { useMilestones } from "../api/sprint-actions";
@@ -81,64 +82,68 @@ function Milestones({ project, manages }: PlanningContext) {
           </Button>
         )}
       </div>
-      {milestones.isPending ? (
-        <div
-          role="status"
-          aria-label="마일스톤 불러오는 중"
-          className="grid gap-2"
-        >
-          <Skeleton className="h-16" />
-          <Skeleton className="h-16" />
-        </div>
-      ) : milestones.isError ? (
-        <ErrorState
-          title="마일스톤을 불러오지 못했습니다"
-          description={milestoneErrorMessage(
-            normalizeApiError(milestones.error),
-          )}
-          onRetry={() => void milestones.refetch()}
-        />
-      ) : milestones.data.length === 0 ? (
-        <EmptyState
-          title="아직 마일스톤이 없습니다"
-          description={
-            manages
-              ? "출시나 마감처럼 여러 업무가 함께 닿을 목표를 만들고, 업무 상세에서 지정하세요."
-              : "PM 또는 헤드 어드민이 마일스톤을 만들면 여기에 보입니다."
-          }
-        />
-      ) : (
-        <ul className="milestone-rows">
-          {milestones.data.map((milestone) => (
-            <li key={milestone.id}>
-              <button
-                type="button"
-                className="milestone-row"
-                aria-haspopup="dialog"
-                onClick={() => select(milestone.id)}
-              >
-                <span className="milestone-row-name">{milestone.name}</span>
-                <span
-                  className="milestone-row-due"
-                  data-overdue={milestoneOverdue(milestone, today) || undefined}
+      <QueryState
+        query={milestones}
+        skeleton={
+          <ListSkeleton
+            label="마일스톤 불러오는 중"
+            rows={3}
+            rowClassName="h-16"
+          />
+        }
+        error={(error, retry) => (
+          <ErrorState
+            title="마일스톤을 불러오지 못했습니다"
+            description={milestoneErrorMessage(normalizeApiError(error))}
+            onRetry={retry}
+          />
+        )}
+        empty={
+          <EmptyState
+            title="아직 마일스톤이 없습니다"
+            description={
+              manages
+                ? "출시나 마감처럼 여러 업무가 함께 닿을 목표를 만들고, 업무 상세에서 지정하세요."
+                : "PM 또는 헤드 어드민이 마일스톤을 만들면 여기에 보입니다."
+            }
+          />
+        }
+      >
+        {(list) => (
+          <ul className="milestone-rows">
+            {list.map((milestone) => (
+              <li key={milestone.id}>
+                <button
+                  type="button"
+                  className="milestone-row"
+                  aria-haspopup="dialog"
+                  onClick={() => select(milestone.id)}
                 >
-                  {milestone.dueDate
-                    ? `${formatDate(milestone.dueDate)} 마감`
-                    : "마감 없음"}
-                  {milestoneOverdue(milestone, today) && (
-                    <span className="sr-only"> (지남)</span>
-                  )}
-                </span>
-                <ProgressBar
-                  done={milestone.progress.done}
-                  total={milestone.progress.total}
-                  label={`${milestone.name} 진행률`}
-                />
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                  <span className="milestone-row-name">{milestone.name}</span>
+                  <span
+                    className="milestone-row-due"
+                    data-overdue={
+                      milestoneOverdue(milestone, today) || undefined
+                    }
+                  >
+                    {milestone.dueDate
+                      ? `${formatDate(milestone.dueDate)} 마감`
+                      : "마감 없음"}
+                    {milestoneOverdue(milestone, today) && (
+                      <span className="sr-only"> (지남)</span>
+                    )}
+                  </span>
+                  <ProgressBar
+                    done={milestone.progress.done}
+                    total={milestone.progress.total}
+                    label={`${milestone.name} 진행률`}
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </QueryState>
       {milestones.data && selectedId && !selected && !milestones.isPending && (
         <p role="status" className="text-sm text-muted">
           찾는 마일스톤이 없습니다. 삭제됐을 수 있습니다.
