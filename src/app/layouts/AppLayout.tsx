@@ -14,11 +14,17 @@ export function AppLayout({ children }: { readonly children: ReactNode }) {
       userSlot={
         <div className="app-user">
           <span className="flex min-w-0 items-center gap-2">
-            {me.data && (
+            {me.data ? (
               <Avatar name={me.data.name} src={userAvatarUrl(me.data)} />
+            ) : (
+              <span aria-hidden="true" className="ui-avatar ui-skeleton-text" />
             )}
             <span className="min-w-0 truncate text-sm font-medium">
-              {me.data?.name}
+              {me.data?.name ?? (
+                <span aria-hidden="true" className="ui-skeleton-text">
+                  사용자 이름
+                </span>
+              )}
             </span>
           </span>
           <LogoutButton appearance="link" />

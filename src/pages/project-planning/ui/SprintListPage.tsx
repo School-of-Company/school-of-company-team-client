@@ -20,8 +20,9 @@ import {
   EmptyState,
   ErrorState,
   Icon,
+  ListSkeleton,
   Markdown,
-  Skeleton,
+  QueryState,
 } from "@/shared/ui";
 import { useCreateSprint } from "../api/sprint-actions";
 import { formatRange, remainingLabel } from "../model/dates";
@@ -60,51 +61,54 @@ function SprintList({ project, manages }: PlanningContext) {
           </Button>
         )}
       </div>
-      {sprints.isPending ? (
-        <div
-          role="status"
-          aria-label="스프린트 불러오는 중"
-          className="grid gap-3"
-        >
-          <Skeleton className="h-32" />
-          <Skeleton className="h-12" />
-          <Skeleton className="h-12" />
-        </div>
-      ) : sprints.isError ? (
-        <ErrorState
-          title="스프린트를 불러오지 못했습니다"
-          description={sprintErrorMessage(normalizeApiError(sprints.error))}
-          onRetry={() => void sprints.refetch()}
-        />
-      ) : list.length === 0 ? (
-        <EmptyState
-          title="아직 스프린트가 없습니다"
-          description={
-            manages
-              ? "기간과 목표를 정해 첫 스프린트를 만들고, 버킷이나 검토 필요 업무를 넣으세요."
-              : "PM 또는 헤드 어드민이 스프린트를 만들면 여기에 보입니다."
-          }
-        />
-      ) : (
-        <>
-          {active ? (
-            <CurrentSprint
-              projectId={project.id}
-              sprint={active}
-              today={today}
-            />
-          ) : (
-            <p className="planning-note">
-              진행 중인 스프린트가 없습니다.
-              {manages &&
-                planned.length > 0 &&
-                " 예정 스프린트를 열어 시작하세요."}
-            </p>
-          )}
-          <SprintRows projectId={project.id} title="예정" sprints={planned} />
-          <SprintRows projectId={project.id} title="종료" sprints={closed} />
-        </>
-      )}
+      <QueryState
+        query={sprints}
+        skeleton={
+          <ListSkeleton
+            label="스프린트 불러오는 중"
+            rows={3}
+            rowClassName="h-14"
+          />
+        }
+        error={(error, retry) => (
+          <ErrorState
+            title="스프린트를 불러오지 못했습니다"
+            description={sprintErrorMessage(normalizeApiError(error))}
+            onRetry={retry}
+          />
+        )}
+        empty={
+          <EmptyState
+            title="아직 스프린트가 없습니다"
+            description={
+              manages
+                ? "기간과 목표를 정해 첫 스프린트를 만들고, 버킷이나 검토 필요 업무를 넣으세요."
+                : "PM 또는 헤드 어드민이 스프린트를 만들면 여기에 보입니다."
+            }
+          />
+        }
+      >
+        {() => (
+          <>
+            {active ? (
+              <CurrentSprint
+                projectId={project.id}
+                sprint={active}
+                today={today}
+              />
+            ) : (
+              <p className="planning-note">
+                진행 중인 스프린트가 없습니다.
+                {manages &&
+                  planned.length > 0 &&
+                  " 예정 스프린트를 열어 시작하세요."}
+              </p>
+            )}
+            <SprintRows projectId={project.id} title="예정" sprints={planned} />
+            <SprintRows projectId={project.id} title="종료" sprints={closed} />
+          </>
+        )}
+      </QueryState>
       {creating && (
         <SprintFormDialog
           open={creating}

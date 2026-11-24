@@ -12,6 +12,7 @@ import {
   type TaskCard,
   type TaskStatus,
 } from "@/entities/task";
+import { projectQueries } from "@/entities/project";
 import type { User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import {
@@ -21,11 +22,12 @@ import {
 import { routes } from "@/shared/config";
 import { formatDate, useLastData } from "@/shared/lib";
 import {
+  EmptyState,
   ErrorState,
   Icon,
+  ListSkeleton,
+  PageHeader,
   SegmentedLinks,
-  Skeleton,
-  Spinner,
 } from "@/shared/ui";
 import { normalizeApiError } from "@/shared/api";
 import { homeQueries, type ActiveSprint, type Home } from "../api/home";
@@ -40,9 +42,9 @@ export function HomePage({
   readonly Detail?: BoardDetailComponent;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<HomeSkeleton />}>
       {(user) => (
-        <Suspense fallback={<Spinner />}>
+        <Suspense fallback={<HomeSkeleton />}>
           <HomeContent user={user} Detail={Detail} />
         </Suspense>
       )}
@@ -61,6 +63,7 @@ function HomeContent({
   // 일시 장애면 60초까지만 마지막 내용을 두고, 권한·존재 오류(4xx)면 바로 비운다.
   const { data, stale } = useLastData(home);
   const board = useQuery(taskQueries.board("", true));
+  const projects = useQuery(projectQueries.list());
   const [selected, setSelected] = useState<string | null>(null);
   const open = (id: string) => (event: MouseEvent<HTMLAnchorElement>) => {
     if (
@@ -77,36 +80,7 @@ function HomeContent({
   };
   return (
     <div className="my-work">
-      <header className="page-header">
-        <div className="min-w-0">
-          <h1>내 업무</h1>
-          <p className="page-subtitle">
-            {formatDate(data?.generatedAt ?? new Date(), {
-              year: undefined,
-              weekday: "long",
-            })}
-          </p>
-        </div>
-        <div className="page-actions">
-          <SegmentedLinks
-            label="보기"
-            items={[
-              { href: routes.home, label: "목록", active: true },
-              { href: routes.me, label: "보드", active: false },
-            ]}
-          />
-          <Link
-            href={`${routes.me}?create=1`}
-            className="ui-button ui-button-primary"
-          >
-            {/* /me 의 Button 과 같은 구조(span 안 아이콘 + 글자)라 폭이 같고 보기 전환이 제자리에 있다. */}
-            <span>
-              <Icon name="plus" />
-              업무 등록
-            </span>
-          </Link>
-        </div>
-      </header>
+      <HomeHeader date={data?.generatedAt} />
       {stale && (
         <RetryNote
           role="status"
@@ -114,8 +88,9 @@ function HomeContent({
           onRetry={() => void home.refetch()}
         />
       )}
-      {home.isPending ? (
-        <HomeSkeleton />
+      {/* 홈, 내 업무, 확인 필요 범위(프로젝트 목록)를 모두 받은 뒤 한 번에 그린다. 따로 그리면 늦게 온 구역이 아래를 민다. */}
+      {home.isPending || board.isPending || projects.isPending ? (
+        <HomeBodySkeleton />
       ) : home.isError && !data ? (
         <ErrorState
           title="최신 정보를 불러오지 못했습니다"
@@ -222,18 +197,7 @@ function MyTasks({
   ) => (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const [showDone, setShowDone] = useState(false);
-  if (pending)
-    return (
-      <div
-        role="status"
-        aria-label="내 업무를 불러오는 중"
-        className="grid gap-2"
-      >
-        <Skeleton className="h-12" />
-        <Skeleton className="h-12" />
-        <Skeleton className="h-12" />
-      </div>
-    );
+  if (pending) return <ListSkeleton label="내 업무를 불러오는 중" rows={3} />;
   if (error)
     return (
       <ErrorState
@@ -252,10 +216,10 @@ function MyTasks({
   const empty = taskStatuses.filter((status) => !filled.includes(status));
   if (filled.length === 0)
     return (
-      <section className="my-work-empty">
-        <h2>맡은 업무가 없습니다</h2>
-        <p>새 업무를 등록하거나 프로젝트 보드에서 업무를 가져오세요.</p>
-      </section>
+      <EmptyState
+        title="맡은 업무가 없습니다"
+        description="새 업무를 등록하거나 프로젝트 보드에서 업무를 가져오세요."
+      />
     );
   return (
     <section aria-label="내 업무 목록" className="my-work-groups">
@@ -407,17 +371,50 @@ const sprintLeft = (days: number) =>
         ? `종료일 ${-days}일 지남`
         : `${days}일 남음`;
 
+/** 머리글은 데이터와 상관없는 고정 모양이라 대기 중에도 그대로 그린다(보기 전환, 등록 버튼 자리 포함). */
+function HomeHeader({ date }: { readonly date?: string }) {
+  return (
+    <PageHeader
+      title="내 업무"
+      subtitle={formatDate(date ?? new Date(), {
+        year: undefined,
+        weekday: "long",
+      })}
+      actions={
+        <>
+          <SegmentedLinks
+            label="보기"
+            items={[
+              { href: routes.home, label: "목록", active: true },
+              { href: routes.me, label: "보드", active: false },
+            ]}
+          />
+          <Link
+            href={`${routes.me}?create=1`}
+            className="ui-button ui-button-primary"
+          >
+            {/* /me 의 Button 과 같은 구조(span 안 아이콘 + 글자)라 폭이 같고 보기 전환이 제자리에 있다. */}
+            <span>
+              <Icon name="plus" />
+              업무 등록
+            </span>
+          </Link>
+        </>
+      }
+    />
+  );
+}
+
+function HomeBodySkeleton() {
+  return <ListSkeleton label="내 업무를 불러오는 중" rows={4} />;
+}
+
+/** 인증 확인, Suspense 대기 자리: 실제 머리글 + 목록 자리. */
 function HomeSkeleton() {
   return (
-    <div
-      role="status"
-      aria-label="내 업무를 불러오는 중"
-      className="grid gap-2"
-    >
-      <Skeleton className="h-10 w-1/3" />
-      <Skeleton className="h-12" />
-      <Skeleton className="h-12" />
-      <Skeleton className="h-12" />
+    <div className="my-work">
+      <HomeHeader />
+      <HomeBodySkeleton />
     </div>
   );
 }

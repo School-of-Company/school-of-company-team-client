@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { isSidebarShortcut, sidebarProjects } from "./sidebar";
+import {
+  closedGroupsFromStorage,
+  isSidebarShortcut,
+  sidebarProjects,
+  withGroupClosed,
+} from "./sidebar";
 
 const event = {
   code: "Backslash",
@@ -50,4 +55,30 @@ test("sidebar shortcut ignores IME, modified, repeated or consumed keystrokes", 
     { metaKey: false },
   ])
     assert.equal(isSidebarShortcut({ ...event, ...patch }), false);
+});
+
+test("접힘 속성은 바꾼 묶음만 더하거나 빼고 다른 묶음은 그대로 둔다", () => {
+  assert.equal(
+    withGroupClosed("org account", "work", true),
+    "org account work",
+  );
+  assert.equal(withGroupClosed("org account", "org", false), "account");
+  assert.equal(withGroupClosed(undefined, "org", false), "");
+  assert.equal(withGroupClosed("org", "org", true), "org");
+});
+
+test("다른 탭에서 바꾼 접힘은 저장 값으로 속성을 다시 만든다", () => {
+  const values: Record<string, string> = {
+    "soc.sidebar.group.org": "true",
+    "soc.sidebar.group.work": "false",
+    "soc.sidebar.collapsed": "true",
+    "soc.sidebar.group.account": "true",
+  };
+  const keys = Object.keys(values);
+  const storage = {
+    length: keys.length,
+    key: (index: number) => keys[index] ?? null,
+    getItem: (key: string) => values[key] ?? null,
+  };
+  assert.equal(closedGroupsFromStorage(storage), "org account");
 });

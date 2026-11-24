@@ -27,11 +27,12 @@ import {
   Field,
   Icon,
   Input,
-  Skeleton,
+  PageSkeleton,
+  StaleNotice,
   Textarea,
   useToast,
 } from "@/shared/ui";
-import { ProjectHeading } from "@/widgets/project-nav";
+import { ProjectHeading, ProjectHeadingSkeleton } from "@/widgets/project-nav";
 import {
   itemHref,
   itemsOn,
@@ -48,7 +49,16 @@ const CELL_LIMIT = 3;
 /** projectId 가 없으면 팀 달력(`/calendar`), 있으면 프로젝트 탭. 명세: 서버 docs/spec/s11-calendar.md */
 export function CalendarPage({ projectId }: { readonly projectId?: string }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard
+      require="work"
+      fallback={
+        projectId ? (
+          <ProjectHeadingSkeleton />
+        ) : (
+          <PageSkeleton label="달력 불러오는 중" />
+        )
+      }
+    >
       {(user) =>
         projectId ? (
           <ProjectCalendar projectId={projectId} user={user} />
@@ -58,9 +68,9 @@ export function CalendarPage({ projectId }: { readonly projectId?: string }) {
             heading={
               <div className="min-w-0">
                 <h1>달력</h1>
+                {/* 부제는 390폭에서도 한 줄이다(머리 높이가 다른 화면과 같다). */}
                 <p className="page-subtitle">
-                  팀 일정과 업무 마감, 마일스톤, 스프린트, 실험을 한곳에 모아
-                  봅니다. 볼 수 있는 프로젝트 것만 나옵니다.
+                  볼 수 있는 일정과 마감을 모아 봅니다
                 </p>
               </div>
             }
@@ -80,16 +90,7 @@ function ProjectCalendar({
 }) {
   const project = useQuery(projectQueries.detail(projectId));
   if (project.isPending)
-    return (
-      <div
-        role="status"
-        aria-label="프로젝트 불러오는 중"
-        className="grid gap-3"
-      >
-        <Skeleton className="h-7 w-48" />
-        <Skeleton className="h-9 w-64 max-w-full" />
-      </div>
-    );
+    return <ProjectHeadingSkeleton label="프로젝트 불러오는 중" />;
   if (project.isError)
     return (
       <ErrorState
@@ -172,14 +173,20 @@ function Month({
           </Button>
         </div>
       </div>
-      {items.isError ? (
+      <StaleNotice query={items} />
+      {items.isError && !items.data ? (
         <ErrorState
           title="달력을 불러오지 못했습니다"
           description={calendarErrorMessage(normalizeApiError(items.error))}
           onRetry={() => void items.refetch()}
         />
       ) : (
-        <div className="calendar-grid" aria-busy={items.isPending || undefined}>
+        // 달을 바꾼 직후에는 이전 달의 일정을 흐리게 두고 새 달을 받으면 바꾼다.
+        <div
+          className="calendar-grid"
+          aria-busy={items.isFetching || undefined}
+          data-placeholder={items.isPlaceholderData || undefined}
+        >
           {WEEKDAYS.map((name) => (
             <div key={name} className="calendar-weekday" aria-hidden>
               {name}

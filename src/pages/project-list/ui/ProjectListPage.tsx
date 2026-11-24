@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   kindLabels,
@@ -20,6 +21,7 @@ import {
   Field,
   ListSkeleton,
   PageHeader,
+  PageSkeleton,
   QueryState,
   Select,
 } from "@/shared/ui";
@@ -27,13 +29,34 @@ import {
 export function ProjectListPage() {
   return (
     <AuthGuard require="work">
-      {(user) => <ProjectListContent canCreate={isHeadAdmin(user)} />}
+      {(user) => (
+        // 단계 필터가 주소(`?stage=`)에 있어 useSearchParams를 Suspense 안에서 읽는다.
+        <Suspense fallback={<PageSkeleton label="프로젝트를 불러오는 중" />}>
+          <ProjectListContent canCreate={isHeadAdmin(user)} />
+        </Suspense>
+      )}
     </AuthGuard>
   );
 }
 
 function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
-  const [stage, setStage] = useState<ProjectStage | "">("");
+  const router = useRouter();
+  const pathname = usePathname() ?? "/projects";
+  const params = useSearchParams();
+  const requested = params?.get("stage") ?? "";
+  // 모르는 값이 주소에 있으면 전체로 본다.
+  const stage: ProjectStage | "" = Object.hasOwn(stageLabels, requested)
+    ? (requested as ProjectStage)
+    : "";
+  const setStage = (next: ProjectStage | "") => {
+    const query = new URLSearchParams(params?.toString());
+    if (next) query.set("stage", next);
+    else query.delete("stage");
+    const search = query.toString();
+    router.replace(search ? `${pathname}?${search}` : pathname, {
+      scroll: false,
+    });
+  };
   const projects = useQuery({
     ...projectQueries.list(false, stage || undefined),
     placeholderData: keepPreviousData,

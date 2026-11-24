@@ -685,6 +685,29 @@ select.ui-input {
   display: grid;
   min-width: 0;
 }
+/* 수화 전 첫 그림: boot script가 적은 접힌 묶음을 바로 접는다(localStorage를 읽은 뒤 메뉴가 밀리지 않게). */
+html[data-sidebar-closed~="work"] .sidebar-group[data-group="work"] > div,
+html[data-sidebar-closed~="org"] .sidebar-group[data-group="org"] > div,
+html[data-sidebar-closed~="projects"]
+  .sidebar-group[data-group="projects"]
+  > div,
+html[data-sidebar-closed~="account"]
+  .sidebar-group[data-group="account"]
+  > div {
+  display: none;
+}
+html[data-sidebar-closed~="work"] .sidebar-group[data-group="work"] h2 svg,
+html[data-sidebar-closed~="org"] .sidebar-group[data-group="org"] h2 svg,
+html[data-sidebar-closed~="projects"]
+  .sidebar-group[data-group="projects"]
+  h2
+  svg,
+html[data-sidebar-closed~="account"]
+  .sidebar-group[data-group="account"]
+  h2
+  svg {
+  rotate: -90deg;
+}
 .sidebar-group-toggle:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: var(--space-1);
@@ -1206,23 +1229,6 @@ select.ui-input {
   color: var(--muted);
   font-size: var(--text-sm);
 }
-.my-work-empty {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-2);
-  padding: var(--space-10) var(--space-6);
-  border-radius: var(--radius-xl);
-  background: var(--surface-box);
-  text-align: center;
-}
-.my-work-empty h2 {
-  font-size: var(--text-lg);
-  font-weight: 700;
-}
-.my-work-empty p {
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
 /* A panel with nothing under its header is one quiet row. */
 .home-panel-header:only-child {
   border-bottom: 0;
@@ -1235,6 +1241,10 @@ select.ui-input {
 
 .board-workspace {
   gap: var(--space-4);
+}
+/* 프로젝트 보드의 탭 줄은 다른 프로젝트 탭(.planning-page, 간격 24)과 같은 높이에 둔다. */
+.board-workspace > .project-nav {
+  margin-top: var(--space-2);
 }
 .board-breadcrumb {
   display: flex;
@@ -3601,6 +3611,27 @@ a.search-option:hover {
   display: grid;
   gap: var(--space-2);
 }
+/* 스프린트 머리는 상태(예정, 진행 중, 종료)와 권한에 상관없이 같은 줄 높이를 잡는다. 대기 자리와 같아 탭 줄이 움직이지 않는다. */
+.sprint-head > .sprint-head-row {
+  min-height: var(--control-md);
+}
+.sprint-progress-slot {
+  display: flex;
+  min-height: 1lh;
+  align-items: center;
+  font-size: var(--text-xs);
+}
+.sprint-head-note {
+  min-height: 1lh;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+/* 안내 문장은 휴대폰 폭에서 두 줄이라 두 줄을 잡는다. */
+@media (max-width: 30rem) {
+  .sprint-head-note {
+    min-height: 2lh;
+  }
+}
 .sprint-goal {
   max-width: var(--content-narrow);
   color: var(--foreground-2);
@@ -5151,6 +5182,11 @@ a.search-option:hover {
   gap: 12px;
 }
 /* 늘 6주 × 7일. 좁은 화면에서도 가로 스크롤 없이 칸을 줄이고 글자를 자른다. */
+/* 달을 바꾼 직후 이전 달 결과는 흐리게 둔다(칸 크기는 그대로). */
+.calendar-grid[data-placeholder] .calendar-day > :not(.calendar-day-number) {
+  opacity: 0.6;
+  transition: opacity 120ms;
+}
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
