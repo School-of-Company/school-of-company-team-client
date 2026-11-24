@@ -1,5 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { requirementKeys, type RequirementDetail } from "@/entities/requirement";
+import {
+  requirementKeys,
+  type RequirementDetail,
+} from "@/entities/requirement";
 import { taskKeys } from "@/entities/task";
 
 /**

@@ -131,9 +131,10 @@ export function IntakeFormSettings({
                 ) : (
                   <Badge>꺼짐</Badge>
                 )}
-                {form.expiresAt && Date.parse(form.expiresAt) < forms.dataUpdatedAt && (
-                  <Badge className="badge-red">만료</Badge>
-                )}
+                {form.expiresAt &&
+                  Date.parse(form.expiresAt) < forms.dataUpdatedAt && (
+                    <Badge className="badge-red">만료</Badge>
+                  )}
               </div>
               <p className="text-sm text-muted">
                 하루 {form.dailyLimit}건 ·{" "}

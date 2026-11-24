@@ -32,7 +32,6 @@ import {
   Textarea,
 } from "@/shared/ui";
 
-
 /** 공개 접수 양식(로그인 없음). 템플릿 항목은 서버가 내려 주는 대로 그린다(D12-2). */
 export function IntakeFormPage({ formToken }: { readonly formToken: string }) {
   const form = useQuery({
