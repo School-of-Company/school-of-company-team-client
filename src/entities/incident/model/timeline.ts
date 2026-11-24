@@ -37,7 +37,11 @@ export function timelineEntryText(
           `심각도 ${severityNames[before]} → ${severityNames[after]}`,
       );
     case "COMMANDER":
-      return entry.body.replace(/^커맨더 /, "대응 책임자 ");
+      return entry.body.replace(
+        /^커맨더 ([\s\S]+) → ([\s\S]+)$/,
+        (_match, before: string, after: string) =>
+          `대응 책임자 ${before} → ${after}`,
+      );
     case "STATUS":
       return entry.body.replace(
         /^상태 (OPEN|MITIGATED|RESOLVED) → (OPEN|MITIGATED|RESOLVED)(:[\s\S]*)?$/,

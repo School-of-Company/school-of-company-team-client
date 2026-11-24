@@ -106,6 +106,13 @@ test("저장된 기록의 과거 값을 사용하고 알려지지 않은 형식�
     timelineEntryText({ kind: "SEVERITY", body: "심각도 SEV4 → SEV1" }),
     "심각도 SEV4 → SEV1",
   );
+  assert.equal(
+    timelineEntryText({
+      kind: "COMMANDER",
+      body: "커맨더 자동 배정됨 (형식 v2)",
+    }),
+    "커맨더 자동 배정됨 (형식 v2)",
+  );
 });
 
 test("사후 검토의 실제 자동 초안만 변환하며 NOTE와 수정된 본문은 보존한다", () => {
