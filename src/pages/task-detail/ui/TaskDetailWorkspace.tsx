@@ -2,15 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { taskApi, taskKeys, TaskError } from "@/entities/task";
 import { projectAccess } from "@/entities/project";
 import { TaskEditor } from "@/features/edit-task";
-import {
-  TaskGithubPanel,
-  taskGithubQueries,
-} from "@/features/link-github-issue";
-import { knowledgeQueries } from "@/entities/knowledge";
+import { TaskGithubPanel } from "@/features/link-github-issue";
 import { TaskDiscussion } from "./TaskDiscussion";
 import { TaskDocuments } from "./TaskDocuments";
 import { normalizeApiError } from "@/shared/api";
@@ -53,29 +49,6 @@ export function TaskDetailWorkspace({
     changeBucket,
     changeMilestone,
   } = useTaskDetail(taskId);
-  // 아래 칸들이 따로 도착하며 화면을 여러 번 밀지 않게, 첫 조회는 같은 키로 여기서 함께 기다린다(캐시 공유, 추가 요청 없음).
-  const scope = task.data?.scope;
-  const projectId = scope === "PROJECT" ? task.data?.projectId : null;
-  const github = useQuery({
-    ...taskGithubQueries.detail(taskId),
-    enabled: !!task.data,
-  });
-  const repositories = useQuery({
-    ...taskGithubQueries.repositories(projectId ?? ""),
-    enabled: !!projectId,
-  });
-  const documents = useQuery({
-    ...knowledgeQueries.list({ taskId }),
-    enabled: !!scope && scope !== "PERSONAL",
-  });
-  const settling = [
-    project,
-    buckets,
-    milestones,
-    github,
-    repositories,
-    documents,
-  ].some((query) => query.isLoading);
   const remove = useMutation({
     mutationFn: () => taskApi.delete(taskId),
     onSuccess: async () => {
@@ -103,8 +76,9 @@ export function TaskDetailWorkspace({
         }}
       />
     );
-  if (task.isPending || settling)
-    return <TaskDetailSkeleton back={!headerAction} />;
+  // 업무 첫 조회만 기다린다. 프로젝트, GitHub, 문서는 각 칸이 고정 높이 자리와 자기 로딩, 오류 상태를 가진다
+  // (곁가지 조회 하나가 실패해도 화면 전체가 스켈레톤에 묶이지 않는다).
+  if (task.isPending) return <TaskDetailSkeleton back={!headerAction} />;
   if (!task.data) return null;
   const data = task.data;
   const access =
@@ -163,15 +137,17 @@ export function TaskDetailWorkspace({
             }}
           />
           <TaskDescription task={data} />
-          <TaskGithubPanel
-            task={data}
-            editable={editable}
-            onAccessLost={setDenied}
-            onComplete={() => {
-              if (!changeStatus.isPending) changeStatus.mutate("DONE");
-            }}
-            completing={changeStatus.isPending}
-          />
+          <div className="task-github-slot">
+            <TaskGithubPanel
+              task={data}
+              editable={editable}
+              onAccessLost={setDenied}
+              onComplete={() => {
+                if (!changeStatus.isPending) changeStatus.mutate("DONE");
+              }}
+              completing={changeStatus.isPending}
+            />
+          </div>
           <section>
             <h2 className="task-section-title">활동</h2>
             <dl className="task-activity">

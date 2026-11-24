@@ -45,7 +45,8 @@ export function TaskDetailHeader({
         </p>
         <h1 className="task-title">{task.title}</h1>
       </header>
-      <span className="flex flex-wrap items-center gap-2">
+      {/* 수정, 삭제는 프로젝트 권한이 온 뒤에 생긴다. 줄을 먼저 잡아 좁은 화면에서 아래가 밀리지 않게 한다. */}
+      <span className="task-detail-actions flex flex-wrap items-center gap-2">
         {headerAction}
         {editable && (
           <Button variant="secondary" className="ui-button-sm" onClick={onEdit}>

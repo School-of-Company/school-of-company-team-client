@@ -1720,6 +1720,27 @@ select.ui-input {
 .task-detail .task-props dd > .ui-input {
   width: 100%;
 }
+/* 셀렉트가 들어갈 수 있는 줄(상태, 버킷, 마일스톤)은 권한이 오기 전 글자로 그려져도 셀렉트 높이를 잡는다. */
+.task-detail .task-props dl > div.task-prop-control {
+  min-height: var(--control-sm);
+}
+/* 수정, 삭제 버튼은 프로젝트 권한 뒤에 생기므로 줄 높이를 먼저 잡는다. 좁은 화면에서는 제목 아래 한 줄이다. */
+.task-detail-actions {
+  min-height: var(--control-sm);
+}
+/* GitHub, 관련 문서 칸은 늦게 오거나 실패해도 아래를 밀지 않게 자리를 먼저 잡는다(실측 높이). */
+.task-github-slot {
+  display: grid;
+  min-height: 13rem;
+}
+.task-docs-head {
+  min-height: var(--control-sm);
+}
+.task-docs-slot {
+  display: grid;
+  align-content: start;
+  min-height: 2.75rem;
+}
 .task-detail .task-section-title {
   color: var(--foreground);
   font-size: var(--text-lg);
@@ -1764,6 +1785,9 @@ select.ui-input {
   .task-detail .task-props .ui-input {
     min-height: var(--control-touch);
     height: var(--control-touch);
+  }
+  .task-detail .task-props dl > div.task-prop-control {
+    min-height: var(--control-touch);
   }
 }
 
