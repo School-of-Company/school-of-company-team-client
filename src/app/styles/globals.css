@@ -5193,6 +5193,11 @@ a.search-option:hover {
   gap: 12px;
 }
 /* 늘 6주 × 7일. 좁은 화면에서도 가로 스크롤 없이 칸을 줄이고 글자를 자른다. */
+/* 달을 바꾼 직후 이전 달 결과는 흐리게 둔다(칸 크기는 그대로). */
+.calendar-grid[data-placeholder] .calendar-day > :not(.calendar-day-number) {
+  opacity: 0.6;
+  transition: opacity 120ms;
+}
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
