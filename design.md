@@ -42,11 +42,13 @@
 
 - 버튼: `primary`(채움, 화면당 하나), `secondary`(회색 채움), `ghost`(글자), `danger`(연한 빨강 채움). 테두리 버튼은 쓰지 않습니다. 작은 버튼은 `ui-button-sm`.
 - 입력: `Input`, `Textarea`, `Select`, `Checkbox`. 드롭다운은 `Select` 또는 `ChipSelect`(회색 채움 칩).
-- 전환: `ui-segmented`(라디오·`aria-pressed`), 페이지 전환은 `SegmentedLinks`(예: 내 업무 목록/보드).
+- 전환: `ui-segmented`(라디오·`aria-pressed`), 페이지 전환은 `SegmentedLinks`(예: 내 업무 목록/보드, 서비스 목록/의존관계). 바 높이는 `--segment-height`입니다.
 - 배지: `Badge`(회색 채움), 색 배지는 `badge-red`·`badge-blue`·`badge-green`.
 - 목록: `.list` + `.list-row`(키 · 제목 · 오른쪽 메타, 줄 전체가 링크). 표 대신 이 행을 먼저 씁니다.
 - 상태: `<span className="status-icon" data-status>`, 우선순위: `<span className="priority-label" data-priority>`(이름은 `priorityLabels`).
+- 머리글: `PageHeader`(제목, 부제, 오른쪽 버튼). 머리글 아래 보기 전환과 필터는 `.page-toolbar` 한 줄에 둡니다.
 - 빈 상태: `EmptyState`(회색 박스). 머리글에 같은 생성 버튼이 있으면 빈 상태에는 버튼을 두지 않습니다.
+- 목록 조회: `QueryState`(첫 로딩, 실패, 빈 결과, 결과)와 `ListSkeleton`.
 - 겹쳐 뜨는 것: `Dialog`, 필터 패널, 칩 메뉴. 본문을 밀어내는 펼침은 쓰지 않습니다.
 
 ## 화면 구조
@@ -60,6 +62,23 @@
 - 보드: 컬럼 폭을 고정하고 좁으면 가로로 스크롤합니다. 컬럼은 `--surface-box`, 카드는 `--surface-raised`입니다.
 - 업무 상세: 키와 제목 다음에 간결한 속성 목록을 놓고 설명, GitHub, 활동을 구분합니다. 보드 상세 패널은 본문을 한 열로 유지합니다. 전체 페이지에서 속성을 옆에 둘 때도 280px 이내로 제한합니다.
 - 실험 상세는 읽기 너비 안에서 머리글, 담당자와 기간 및 프로젝트, 가설부터 배운 점까지의 본문, 관련 링크 순서로 읽습니다. 장애 상세는 남은 너비를 쓰며 타임라인 옆 속성 열을 `--detail-sidebar-width`(280px) 이하로 둡니다. 요구사항 상세는 읽기 너비 안에서 제출 내용과 업무 및 메시지를 본문에, 요청자 정보를 별도 카드에 둡니다.
+
+## 레이아웃 안정성과 공통 상태
+
+버튼을 누르거나 새로고침해도 자리가 흔들리지 않게 합니다.
+
+- 머리글은 `PageHeader`로 씁니다. 부제 줄은 값이 아직 없어도 한 줄(`min-height: 1lh`)을 잡습니다. 개수 부제는 집계 중에도 같은 줄에 "집계 중"을 씁니다(빈 줄로 두지 않습니다). 부제가 아예 없는 화면만 `subtitle={false}`로 줄을 빼고, 그 화면의 대기 자리도 `PageSkeleton subtitle={false}`로 맞춥니다.
+- 회색 빈 상태 박스는 어디서나 같은 크기입니다(높이 고정 `--empty-height` 14rem, 패딩 24, `--radius-xl`, 제목 17/700, 설명 14). 탭, 패널 안, 390폭에서도 크기를 바꾸지 않습니다. 화면별로 `.ui-empty` 크기를 덮어쓰지 않습니다.
+- 빈 상태 문구 길이: 제목은 한 줄(390폭에서 약 18자), 설명은 390폭에서 4줄 이내(약 80자), 버튼은 하나까지입니다. 넘치면 말줄임으로 잘리므로 긴 안내는 박스 밖 본문에 둡니다.
+- 첫 로딩 자리는 결과와 같은 모양으로 둡니다. 목록은 `ListSkeleton`(빈 상태 높이부터 시작, 행 높이는 실제 행과 같게), 상세는 실제 머리글 클래스에 `ui-skeleton-text`를 넣은 스켈레톤을 둡니다. 스피너 한 줄로 화면을 대신하지 않습니다.
+- 인증 확인(`AuthGuard`), `Suspense`, 라우트 `loading.tsx`의 대체 화면은 `PageSkeleton` 또는 그 화면의 스켈레톤입니다. 셋이 서로 다른 모양이면 새로고침 때 세 번 흔들립니다.
+- 필터나 탭으로 키가 바뀌는 목록 조회는 `placeholderData: keepPreviousKey(key)`로 이전 결과를 흐리게(`data-placeholder`) 남깁니다. 상세처럼 id가 키인 조회에는 쓰지 않습니다(다른 대상의 내용이 보입니다).
+- placeholder 데이터로 개수, 빈 상태 문구를 그리지 않습니다. 개수는 `settledData(query)`로 읽고, 빈 결과는 `QueryState`가 문구 없는 같은 크기 박스로 둡니다.
+- 캐시가 있으면 스켈레톤을 다시 띄우지 않습니다(`isPending`일 때만). 재조회 중에는 `aria-busy`만 켜고, 폴링 재조회에 화면 표시를 바꾸지 않습니다.
+- 캐시가 있는데 재조회가 실패하면 캐시를 그대로 두고 `StaleNotice`(다시 시도)를 위에 띄웁니다. `QueryState`가 직접 그리므로 화면에서 따로 넣지 않습니다. 오류 화면은 첫 로딩 실패에만 씁니다.
+- `QueryState`의 감싸는 요소는 `display: contents`라 배치에 끼어들지 않습니다. 결과 마크업은 부모의 grid/flex 간격을 그대로 따릅니다.
+- 브라우저에만 있는 값(sessionStorage, localStorage, 화면 폭)으로 크기가 정해지는 부분은 같은 크기의 자리를 먼저 그립니다. 글꼴은 `next/font`로 읽고, 이미지는 너비와 높이를 적습니다.
+- 확인은 `PerformanceObserver`의 `layout-shift`로 하드 새로고침 CLS를 재고, 머리글 위치가 첫 그림부터 바뀌지 않는지 봅니다.
 
 ## 지킬 것
 

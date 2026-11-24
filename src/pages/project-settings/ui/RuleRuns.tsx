@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { StaleNotice } from "@/entities/service";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
@@ -15,6 +14,7 @@ import {
   Select,
   Skeleton,
   type IconName,
+  StaleNotice,
 } from "@/shared/ui";
 import { ruleQueries } from "../api/rules";
 import {

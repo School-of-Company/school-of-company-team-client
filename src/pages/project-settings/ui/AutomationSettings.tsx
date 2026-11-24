@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { projectQueries, type ProjectDetail } from "@/entities/project";
-import { StaleNotice } from "@/entities/service";
 import { normalizeApiError } from "@/shared/api";
 import { relativeSince } from "@/shared/lib";
 import {
@@ -14,6 +13,7 @@ import {
   ErrorState,
   Icon,
   Skeleton,
+  StaleNotice,
 } from "@/shared/ui";
 import { ruleQueries, useRuleChange } from "../api/rules";
 import {

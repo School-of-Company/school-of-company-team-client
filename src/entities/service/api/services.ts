@@ -1,6 +1,7 @@
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
+import { keepPreviousKey } from "@/shared/lib";
 import type {
   CreateService,
   Deployment,
@@ -112,11 +113,8 @@ export const serviceApi = {
   },
 };
 
-// 화면 조회는 10초 폴링, 재조회 중에는 이전 데이터를 그대로 둔다(깜빡임 없음).
-const polled = {
-  refetchInterval: BOARD_POLL_INTERVAL,
-  placeholderData: keepPreviousData,
-} as const;
+// 화면 조회는 10초 폴링. 폴링 재조회는 같은 키라 데이터가 그대로 남는다(깜빡임 없음).
+const polled = { refetchInterval: BOARD_POLL_INTERVAL } as const;
 
 export const serviceQueries = {
   list: (archived: boolean) =>
@@ -124,6 +122,8 @@ export const serviceQueries = {
       queryKey: serviceKeys.list(archived),
       queryFn: () => serviceApi.list(archived),
       ...polled,
+      // 운영 중/아카이브를 바꾸는 동안만 이전 목록을 흐리게 둔다. 상세(id가 키)는 다른 서비스를 빌려 그리지 않는다.
+      placeholderData: keepPreviousKey(serviceKeys.list(archived)),
     }),
   detail: (id: string) =>
     queryOptions({

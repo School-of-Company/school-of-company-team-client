@@ -14,4 +14,3 @@ export {
 export type * from "./model/types";
 export { TierLabel, OwnerList } from "./ui/labels";
 export { useServiceByKey } from "./api/use-service-by-key";
-export { StaleNotice } from "./ui/StaleNotice";

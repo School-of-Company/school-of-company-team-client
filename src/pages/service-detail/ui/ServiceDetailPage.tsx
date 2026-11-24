@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   serviceErrorMessage,
   serviceQueries,
-  StaleNotice,
   TierLabel,
   useServiceByKey,
   type ServiceDetail,
@@ -17,7 +16,7 @@ import { AuthGuard } from "@/features/auth";
 import { ArchiveService, EditServiceDialog } from "@/features/manage-service";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
-import { Badge, Button, ErrorState, Skeleton, Spinner } from "@/shared/ui";
+import { Badge, Button, ErrorState, StaleNotice } from "@/shared/ui";
 import { ServiceOverview } from "./ServiceOverview";
 import { ServiceReleases } from "./ServiceReleases";
 import { ServiceDeployments } from "./ServiceDeployments";
@@ -37,9 +36,9 @@ export function ServiceDetailPage({
   readonly serviceKey: string;
 }) {
   return (
-    <AuthGuard require="work">
+    <AuthGuard require="work" fallback={<ServiceDetailSkeleton />}>
       {(user) => (
-        <Suspense fallback={<Spinner label="서비스 불러오는 중" />}>
+        <Suspense fallback={<ServiceDetailSkeleton />}>
           <ServiceDetailContent
             key={serviceKey}
             serviceKey={serviceKey}
@@ -51,12 +50,35 @@ export function ServiceDetailPage({
   );
 }
 
-function DetailSkeleton() {
+/** 상세 머리글(경로, 제목, 등급 줄)과 탭 줄을 실제와 같은 줄 높이로 잡는다. 하드 새로고침에도 탭이 밀리지 않는다. */
+export function ServiceDetailSkeleton() {
   return (
-    <div role="status" aria-label="서비스를 불러오는 중" className="grid gap-4">
-      <Skeleton className="w-24" />
-      <Skeleton className="h-8 w-1/2" />
-      <Skeleton className="h-64" />
+    <div
+      role="status"
+      aria-label="서비스를 불러오는 중"
+      className="service-detail grid gap-5"
+    >
+      <header aria-hidden="true" className="page-header">
+        <div className="min-w-0">
+          <p className="board-breadcrumb">
+            <span className="ui-skeleton-text">서비스 / 키</span>
+          </p>
+          <h1 className="task-title font-semibold">
+            <span className="ui-skeleton-text">서비스 이름</span>
+          </h1>
+          <p className="mt-2 flex items-center">
+            <span className="service-tier">
+              <span className="ui-skeleton-text">2등급</span>
+            </span>
+          </p>
+        </div>
+      </header>
+      <div aria-hidden="true" className="project-nav flex border-b">
+        <span className="ui-nav-link flex items-center border-b-2 border-transparent">
+          <span className="ui-skeleton-text">개요</span>
+        </span>
+      </div>
+      <div aria-hidden="true" className="ui-empty" />
     </div>
   );
 }
@@ -97,7 +119,7 @@ function ServiceDetailContent({
         onRetry={() => void detail.refetch()}
       />
     );
-  if (lookup.pending || !detail.data) return <DetailSkeleton />;
+  if (lookup.pending || !detail.data) return <ServiceDetailSkeleton />;
   return (
     <>
       <StaleNotice query={detail} />

@@ -13,7 +13,16 @@ import {
 import { TaskError } from "@/entities/task";
 import { AuthGuard } from "@/features/auth";
 import { isHeadAdmin } from "@/entities/user";
-import { Badge, EmptyState, Field, Select, Skeleton } from "@/shared/ui";
+import { settledData } from "@/shared/lib";
+import {
+  Badge,
+  EmptyState,
+  Field,
+  ListSkeleton,
+  PageHeader,
+  QueryState,
+  Select,
+} from "@/shared/ui";
 
 export function ProjectListPage() {
   return (
@@ -29,19 +38,30 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
     ...projectQueries.list(false, stage || undefined),
     placeholderData: keepPreviousData,
   });
+  const count = settledData(projects)?.length;
+  const scope = stage ? `${stageLabels[stage]} 단계 ` : "";
   return (
-    <div className="grid gap-6">
-      <header className="page-header">
-        <h1>프로젝트</h1>
-        {canCreate && (
-          <Link
-            href="/admin?create=project"
-            className="ui-button ui-button-primary"
-          >
-            새 프로젝트
-          </Link>
-        )}
-      </header>
+    <div className="grid gap-5">
+      <PageHeader
+        title="프로젝트"
+        subtitle={
+          count !== undefined
+            ? `${scope}${count}개`
+            : projects.isError && !projects.data
+              ? "프로젝트 집계를 불러오지 못했습니다"
+              : `${scope}프로젝트 집계 중`
+        }
+        actions={
+          canCreate && (
+            <Link
+              href="/admin?create=project"
+              className="ui-button ui-button-primary"
+            >
+              새 프로젝트
+            </Link>
+          )
+        }
+      />
       <div className="flex items-end gap-3">
         <div className="max-w-48 grow">
           <Field id="project-stage-filter" label="단계">
@@ -61,69 +81,66 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
             </Select>
           </Field>
         </div>
-        <span role="status" className="text-sm text-muted">
-          {projects.isFetching && !projects.isPending ? "불러오는 중…" : ""}
-        </span>
       </div>
-      {projects.isPending ? (
-        <div
-          role="status"
-          aria-label="프로젝트를 불러오는 중"
-          className="grid gap-3"
-        >
-          {Array.from({ length: 3 }, (_, index) => (
-            <Skeleton key={index} className="h-13" />
-          ))}
-        </div>
-      ) : projects.isError ? (
-        <TaskError
-          error={projects.error}
-          onRetry={() => void projects.refetch()}
-        />
-      ) : !projects.isPlaceholderData && projects.data.length === 0 && stage ? (
-        <EmptyState
-          title={`${stageLabels[stage]} 단계 프로젝트가 없습니다`}
-          description="다른 단계를 선택해 보세요."
-        />
-      ) : !projects.isPlaceholderData && projects.data.length === 0 ? (
-        <EmptyState
-          title="참여할 수 있는 프로젝트가 없습니다"
-          description="프로젝트 관리자에게 참여를 요청해 주세요."
-        />
-      ) : (
-        <ul className="list" aria-busy={projects.isFetching}>
-          {projects.data.map((project) => (
-            <li key={project.id} className="list-row">
-              <Link
-                href={`/projects/${encodeURIComponent(project.id)}`}
-                className="list-row-main project-list-main"
-              >
-                <ProjectAvatar project={project} />
-                <div className="grid min-w-0 gap-0.5">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <h2 className="list-row-title">{project.name}</h2>
-                    <Badge className="font-mono">{project.key}</Badge>
+      <QueryState
+        query={projects}
+        skeleton={
+          <ListSkeleton
+            label="프로젝트를 불러오는 중"
+            rows={3}
+            rowClassName="h-13"
+          />
+        }
+        error={(error, retry) => <TaskError error={error} onRetry={retry} />}
+        empty={
+          stage ? (
+            <EmptyState
+              title={`${stageLabels[stage]} 단계 프로젝트가 없습니다`}
+              description="다른 단계를 선택해 보세요."
+            />
+          ) : (
+            <EmptyState
+              title="참여할 수 있는 프로젝트가 없습니다"
+              description="프로젝트 관리자에게 참여를 요청해 주세요."
+            />
+          )
+        }
+      >
+        {(data) => (
+          <ul className="list">
+            {data.map((project) => (
+              <li key={project.id} className="list-row">
+                <Link
+                  href={`/projects/${encodeURIComponent(project.id)}`}
+                  className="list-row-main project-list-main"
+                >
+                  <ProjectAvatar project={project} />
+                  <div className="grid min-w-0 gap-0.5">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <h2 className="list-row-title">{project.name}</h2>
+                      <Badge className="font-mono">{project.key}</Badge>
+                    </div>
+                    {project.description && (
+                      <span className="truncate text-sm text-muted">
+                        {project.description}
+                      </span>
+                    )}
                   </div>
-                  {project.description && (
-                    <span className="truncate text-sm text-muted">
-                      {project.description}
-                    </span>
-                  )}
-                </div>
-              </Link>
-              <span className="list-row-meta">
-                <Badge>{stageLabels[project.stage]}</Badge>
-                <Badge>{kindLabels[project.kind]}</Badge>
-                <Badge>
-                  {project.visibility === "TEAM"
-                    ? "팀 전체 공개"
-                    : "참여자 공개"}
-                </Badge>
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+                </Link>
+                <span className="list-row-meta">
+                  <Badge>{stageLabels[project.stage]}</Badge>
+                  <Badge>{kindLabels[project.kind]}</Badge>
+                  <Badge>
+                    {project.visibility === "TEAM"
+                      ? "팀 전체 공개"
+                      : "참여자 공개"}
+                  </Badge>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </QueryState>
     </div>
   );
 }

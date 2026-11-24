@@ -9,7 +9,7 @@ import {
   useMe,
   type User,
 } from "@/entities/user";
-import { ErrorState, Spinner } from "@/shared/ui";
+import { ErrorState, PageSkeleton } from "@/shared/ui";
 import { authErrorCode, authErrorMessage } from "../model/error-message";
 import { guardDestination } from "../model/guard-destination";
 import { guardView } from "../model/guard-view";
@@ -17,8 +17,11 @@ import { guardView } from "../model/guard-view";
 export function AuthGuard({
   children,
   require = "work",
+  fallback = <PageSkeleton label="계정 상태 확인 중" />,
 }: {
   readonly require?: "work" | "account";
+  /** 확인 중에 그릴 자리. 머리글 모양이 다른 화면(상세)은 자기 스켈레톤을 넘긴다. */
+  readonly fallback?: ReactNode;
   readonly children: ReactNode | ((user: User) => ReactNode);
 }) {
   const router = useRouter();
@@ -52,7 +55,7 @@ export function AuthGuard({
         }}
       />
     );
-  if (view === "loading" || !me.data)
-    return <Spinner label="계정 상태 확인 중" />;
+  // 하드 새로고침 때 세션은 hydration 뒤에야 읽힌다. 화면 머리글과 같은 모양의 자리를 먼저 그려 본문이 튀지 않게 한다.
+  if (view === "loading" || !me.data) return fallback;
   return typeof children === "function" ? children(me.data) : children;
 }
