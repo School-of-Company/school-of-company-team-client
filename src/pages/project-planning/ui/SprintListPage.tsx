@@ -15,7 +15,14 @@ import {
 } from "@/entities/sprint";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
-import { Button, EmptyState, ErrorState, Icon, Skeleton } from "@/shared/ui";
+import {
+  Button,
+  EmptyState,
+  ErrorState,
+  Icon,
+  Markdown,
+  Skeleton,
+} from "@/shared/ui";
 import { useCreateSprint } from "../api/sprint-actions";
 import { formatRange, remainingLabel } from "../model/dates";
 import { ProgressBar } from "./ProgressBar";
@@ -98,17 +105,19 @@ function SprintList({ project, manages }: PlanningContext) {
           <SprintRows projectId={project.id} title="종료" sprints={closed} />
         </>
       )}
-      <SprintFormDialog
-        open={creating}
-        defaults={nextSprintDates(list, today)}
-        onClose={() => setCreating(false)}
-        onSubmit={async (input) => {
-          const sprint = await create.mutateAsync(input);
-          router.push(
-            `${routes.projectSprint(project.id, sprint.id)}?tab=plan`,
-          );
-        }}
-      />
+      {creating && (
+        <SprintFormDialog
+          open={creating}
+          defaults={nextSprintDates(list, today)}
+          onClose={() => setCreating(false)}
+          onSubmit={async (input) => {
+            const sprint = await create.mutateAsync(input);
+            router.push(
+              `${routes.projectSprint(project.id, sprint.id)}?tab=plan`,
+            );
+          }}
+        />
+      )}
     </section>
   );
 }
@@ -139,7 +148,9 @@ function CurrentSprint({
         <span>{remainingLabel(sprint.endDate, today)}</span>
       </p>
       {sprint.goal && (
-        <p className="text-sm text-foreground-2">{sprint.goal}</p>
+        <div className="sprint-goal">
+          <Markdown>{sprint.goal}</Markdown>
+        </div>
       )}
       <ProgressBar
         done={progress.done}
