@@ -12,8 +12,8 @@ import {
   ErrorState,
   Field,
   Input,
+  ListSkeleton,
   Select,
-  Skeleton,
   Textarea,
 } from "@/shared/ui";
 import {
@@ -285,8 +285,13 @@ export function ApiTokens() {
       >
         토큰 만들기
       </Button>
+      {/* 재조회가 실패하면 캐시(폐기된 토큰이 남아 있을 수 있음) 대신 오류를 보인다. QueryState를 쓰지 않는다. */}
       {tokens.isPending ? (
-        <Skeleton className="h-16" />
+        <ListSkeleton
+          label="API 토큰 불러오는 중"
+          rows={2}
+          rowClassName="h-16"
+        />
       ) : tokens.isError ? (
         <ErrorState
           description={normalizeApiError(tokens.error).message}

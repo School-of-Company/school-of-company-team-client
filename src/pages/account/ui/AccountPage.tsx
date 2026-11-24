@@ -24,6 +24,7 @@ import {
   Dialog,
   Field,
   Input,
+  PageHeader,
   Select,
   ThemeSelect,
 } from "@/shared/ui";
@@ -235,12 +236,10 @@ function AccountContent({ user }: { readonly user: User }) {
   });
   return (
     <div className="settings-page mx-auto grid w-full min-w-0 gap-6 break-keep">
-      <header className="grid gap-2">
-        <h1 className="text-2xl font-semibold">설정</h1>
-        <p className="text-sm text-muted">
-          프로필과 로그인 계정, 알림 계정, AI 도구용 API 토큰을 관리합니다.
-        </p>
-      </header>
+      <PageHeader
+        title="설정"
+        subtitle="프로필과 로그인 계정, 알림 계정, AI 도구용 API 토큰을 관리합니다."
+      />
       <section
         aria-labelledby="profile-title"
         className="settings-card grid gap-5"

@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useState, type ReactNode } from "react";
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthGuard } from "@/features/auth";
@@ -11,8 +10,11 @@ import {
   Button,
   Dialog,
   ErrorState,
+  ListSkeleton,
   Markdown,
-  Skeleton,
+  PageHeader,
+  PageSkeleton,
+  SegmentedLinks,
   Spinner,
   Textarea,
 } from "@/shared/ui";
@@ -30,7 +32,7 @@ export function TeamGuidePage() {
   return (
     <AuthGuard require="work">
       {() => (
-        <Suspense fallback={<Spinner label="팀 문화 불러오는 중" />}>
+        <Suspense fallback={<PageSkeleton label="팀 문화 불러오는 중" />}>
           <TeamGuideTabs />
         </Suspense>
       )}
@@ -48,19 +50,14 @@ function TeamGuideTabs() {
       key={current.section}
       current={current}
       nav={
-        <nav aria-label="팀 문화 영역" className="settings-nav">
-          {guideTabs.map((item) => (
-            <Link
-              key={item.tab}
-              href={`${pathname}?tab=${item.tab}`}
-              scroll={false}
-              aria-current={item.tab === current.tab ? "page" : undefined}
-              className="ui-nav-link"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <SegmentedLinks
+          label="팀 문화 영역"
+          items={guideTabs.map((item) => ({
+            href: `${pathname}?tab=${item.tab}`,
+            label: item.label,
+            active: item.tab === current.tab,
+          }))}
+        />
       }
     />
   );
@@ -77,56 +74,59 @@ function TeamGuideContent({
   const guide = useQuery(teamGuideQueries.current(section));
   const [editing, setEditing] = useState(false);
   const [history, setHistory] = useState(false);
-  if (guide.isPending)
-    return (
-      <div
-        role="status"
-        aria-label={`${current.label} 불러오는 중`}
-        className="grid gap-3"
-      >
-        {nav}
-        <Skeleton className="h-8 w-40" />
-        <Skeleton className="h-96" />
-      </div>
-    );
-  if (!guide.data)
-    return (
-      <div className="grid gap-3">
-        {nav}
-        <ErrorState
-          description={normalizeApiError(guide.error).message}
-          onRetry={() => void guide.refetch()}
-        />
-      </div>
-    );
   const data = guide.data;
   return (
     <div className="guide-page">
-      <header className="page-header">
-        <div className="min-w-0">
-          <h1>팀 문화</h1>
-          <p className="page-subtitle">
-            {data.updatedBy
-              ? `${formatDate(data.updatedAt)} ${data.updatedBy.name} 수정`
-              : "처음 작성된 내용입니다"}
-            {", "}
-            <button
-              type="button"
-              className="guide-history-link"
-              onClick={() => setHistory(true)}
-            >
-              수정 이력
-            </button>
-          </p>
-        </div>
-        {data.canEdit && !editing && (
-          <Button variant="secondary" onClick={() => setEditing(true)}>
-            고치기
-          </Button>
-        )}
-      </header>
-      {nav}
-      {editing ? (
+      {/* 머리글과 탭 줄은 불러오는 동안에도 같은 자리에 둔다(탭을 바꿔도 머리글이 사라지지 않게). */}
+      <PageHeader
+        title="팀 문화"
+        subtitle={
+          data ? (
+            <>
+              {data.updatedBy
+                ? `${formatDate(data.updatedAt)} ${data.updatedBy.name} 수정`
+                : "처음 작성된 내용입니다"}
+              {", "}
+              <button
+                type="button"
+                className="guide-history-link"
+                onClick={() => setHistory(true)}
+              >
+                수정 이력
+              </button>
+            </>
+          ) : guide.isError ? (
+            `${current.label} 내용을 불러오지 못했습니다`
+          ) : (
+            `${current.label} 불러오는 중`
+          )
+        }
+        actions={
+          data?.canEdit &&
+          !editing && (
+            <Button variant="secondary" onClick={() => setEditing(true)}>
+              고치기
+            </Button>
+          )
+        }
+      />
+      <div className="page-toolbar">{nav}</div>
+      {!data ? (
+        guide.isPending ? (
+          <div className="guide-body">
+            <ListSkeleton
+              label={`${current.label} 불러오는 중`}
+              rows={6}
+              rowClassName="h-6"
+            />
+          </div>
+        ) : (
+          <ErrorState
+            description={normalizeApiError(guide.error).message}
+            onRetry={() => void guide.refetch()}
+          />
+        )
+      ) : editing ? (
         <GuideEditor
           section={section}
           label={current.label}
