@@ -26,7 +26,7 @@ export function formatDateTime(
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-/** ISO → `<input type="datetime-local">` 값(브라우저 지역 시각, 분 단위). */
+/** ISO → `DateTimePicker` 값 "YYYY-MM-DDTHH:mm"(브라우저 지역 시각, 분 단위). */
 export function toLocalInput(value: string | Date): string {
   const date = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(date.getTime())) return "";

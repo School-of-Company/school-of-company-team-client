@@ -383,6 +383,11 @@ select.ui-input {
   position: relative;
   min-width: 0;
 }
+.ui-date-time {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--time-input-width);
+  gap: var(--space-2);
+}
 .ui-date-trigger {
   display: flex;
   align-items: center;
@@ -4307,7 +4312,8 @@ a.search-option:hover {
   gap: var(--space-2);
 }
 .incident-note-time {
-  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 /* 속성 열의 칸(Discord·Runbook·관련 문서·관계). 속성 목록 아래 구분선으로 나눈다. */
 .incident-prop-section,

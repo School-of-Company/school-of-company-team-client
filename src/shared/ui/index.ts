@@ -28,4 +28,4 @@ export { ThemeSelect } from "./theme-select";
 export { ChipSelect } from "./chip-select";
 export type { ChipOption } from "./chip-select";
 export { restoreFocus } from "./focus-return";
-export { DatePicker } from "./date-picker";
+export { DatePicker, DateTimePicker } from "./date-picker";

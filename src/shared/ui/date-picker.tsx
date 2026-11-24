@@ -43,6 +43,7 @@ export function DatePicker({
   placeholder = "날짜 선택",
   disabled = false,
   invalid = false,
+  describedBy,
 }: {
   readonly id: string;
   readonly name?: string;
@@ -55,6 +56,8 @@ export function DatePicker({
   readonly placeholder?: string;
   readonly disabled?: boolean;
   readonly invalid?: boolean;
+  /** 안내 문구 등 함께 읽을 요소 id. 오류(`${id}-error`)는 invalid 일 때 알아서 붙는다. */
+  readonly describedBy?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [focus, setFocus] = useState(value || todayIso());
@@ -168,7 +171,7 @@ export function DatePicker({
         aria-haspopup="dialog"
         aria-expanded={open}
         data-invalid={invalid || undefined}
-        aria-describedby={invalid ? `${id}-error` : undefined}
+        aria-describedby={describe(id, invalid, describedBy)}
         disabled={disabled}
         onClick={() => (open ? setOpen(false) : show())}
         onKeyDown={(event) => {
@@ -300,6 +303,79 @@ export function DatePicker({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const describe = (id: string, invalid: boolean, extra?: string) =>
+  [invalid && `${id}-error`, extra].filter(Boolean).join(" ") || undefined;
+
+/** 지금 브라우저 시각 "HH:mm". */
+const nowTime = () => new Date().toTimeString().slice(0, 5);
+
+/**
+ * 날짜는 DatePicker, 시각은 시각 칸으로 고르는 입력. 값은 `datetime-local` 과 같은 "YYYY-MM-DDTHH:mm"(브라우저 시간대)이고
+ * 날짜가 없으면 "" 이다. 날짜만 고르면 `defaultTime`(기본은 지금 시각)을 붙인다.
+ * `min`, `max` 도 같은 형식이며 날짜는 달력에서, 시각은 같은 날일 때 시각 칸에서 막는다.
+ */
+export function DateTimePicker({
+  id,
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  defaultTime,
+  invalid = false,
+  describedBy,
+}: {
+  readonly id: string;
+  readonly label: string;
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  readonly min?: string;
+  readonly max?: string;
+  readonly defaultTime?: string;
+  readonly invalid?: boolean;
+  /** 안내 문구 등 함께 읽을 요소 id. */
+  readonly describedBy?: string;
+}) {
+  const date = value.slice(0, 10);
+  const [draftTime, setDraftTime] = useState(value.slice(11, 16));
+  const time = value.slice(11, 16) || draftTime;
+  const fallback = () => defaultTime ?? nowTime();
+  const minDate = min?.slice(0, 10);
+  const maxDate = max?.slice(0, 10);
+  return (
+    <div className="ui-date-time">
+      <DatePicker
+        id={id}
+        label={`${label} 날짜`}
+        value={date}
+        min={minDate}
+        max={maxDate}
+        invalid={invalid}
+        describedBy={describedBy}
+        onChange={(next) =>
+          onChange(next ? `${next}T${time || fallback()}` : "")
+        }
+      />
+      <input
+        id={`${id}-time`}
+        type="time"
+        className="ui-input"
+        aria-label={`${label} 시각`}
+        aria-invalid={invalid || undefined}
+        aria-describedby={describe(id, invalid, describedBy)}
+        value={time}
+        min={min && date === minDate ? min.slice(11, 16) : undefined}
+        max={max && date === maxDate ? max.slice(11, 16) : undefined}
+        onChange={(event) => {
+          const next = event.target.value;
+          setDraftTime(next);
+          if (date) onChange(`${date}T${next || fallback()}`);
+        }}
+      />
     </div>
   );
 }
