@@ -1,14 +1,11 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
-import {
-  sprintErrorMessage,
-  type Sprint,
-  type SprintInput,
-} from "@/entities/sprint";
+import { type Sprint, type SprintInput } from "@/entities/sprint";
 import { normalizeApiError } from "@/shared/api";
-import { Button, Dialog, Field, Input, Textarea } from "@/shared/ui";
-import { validateSprint } from "../model/validation";
+import { Button, DatePicker, Dialog, Field, Input } from "@/shared/ui";
+import { sprintFormErrors, validateSprint } from "../model/validation";
+import { SprintGoalEditor } from "./SprintGoalEditor";
 
 /** Sprint 만들기·수정. 같은 양식이고 수정은 기존 값으로 채운다. */
 export function SprintFormDialog({
@@ -27,6 +24,11 @@ export function SprintFormDialog({
   const id = useId();
   const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<Readonly<Record<string, string>>>({});
+  const [goal, setGoal] = useState(initial?.goal ?? "");
+  const [startDate, setStartDate] = useState(
+    initial?.startDate ?? defaults.startDate,
+  );
+  const [endDate, setEndDate] = useState(initial?.endDate ?? defaults.endDate);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending) return;
@@ -45,7 +47,7 @@ export function SprintFormDialog({
       await onSubmit(input);
       onClose();
     } catch (cause) {
-      setErrors({ form: sprintErrorMessage(normalizeApiError(cause)) });
+      setErrors(sprintFormErrors(normalizeApiError(cause)));
     } finally {
       setPending(false);
     }
@@ -76,39 +78,36 @@ export function SprintFormDialog({
               {...describe("name")}
             />
           </Field>
-          <Field id={`${id}-goal`} label="목표" error={errors.goal}>
-            <Textarea
-              id={`${id}-goal`}
-              name="goal"
-              defaultValue={initial?.goal ?? ""}
-              maxLength={500}
-              className="min-h-20"
-              {...describe("goal")}
-            />
-          </Field>
+          <SprintGoalEditor
+            id={`${id}-goal`}
+            value={goal}
+            onChange={setGoal}
+            error={errors.goal}
+          />
           <div className="grid items-start gap-4 sm:grid-cols-2">
             <Field
               id={`${id}-startDate`}
               label="시작일"
               error={errors.startDate}
             >
-              <Input
+              <DatePicker
                 id={`${id}-startDate`}
                 name="startDate"
-                type="date"
-                defaultValue={initial?.startDate ?? defaults.startDate}
-                required
-                {...describe("startDate")}
+                label="시작일"
+                value={startDate}
+                onChange={setStartDate}
+                invalid={!!errors.startDate}
               />
             </Field>
             <Field id={`${id}-endDate`} label="종료일" error={errors.endDate}>
-              <Input
+              <DatePicker
                 id={`${id}-endDate`}
                 name="endDate"
-                type="date"
-                defaultValue={initial?.endDate ?? defaults.endDate}
-                required
-                {...describe("endDate")}
+                label="종료일"
+                value={endDate}
+                onChange={setEndDate}
+                min={startDate || undefined}
+                invalid={!!errors.endDate}
               />
             </Field>
           </div>

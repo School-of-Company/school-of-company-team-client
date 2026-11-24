@@ -212,7 +212,7 @@ function RuleEditorForm({
       </div>
       {incident && (
         <p id={id("incident-note")} className="text-xs text-muted">
-          사고의 영향 서비스가 이 프로젝트에 연결된 저장소를 쓰면 걸립니다.
+          장애의 영향 서비스가 이 프로젝트에 연결된 저장소를 쓰면 걸립니다.
         </p>
       )}
       {!incident && (
