@@ -2951,6 +2951,22 @@ select.ui-input {
   padding: 0;
   list-style: none;
 }
+/* 개요의 최근 릴리스, 배포 칸: 최근 3건 높이를 먼저 잡아 늦게 오거나 적게 와도 아래 칸이 밀리지 않는다. */
+.service-recent {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 13.5rem;
+}
+.service-recent[data-kind="deployments"] {
+  min-height: 11.75rem;
+}
+@media (width < 40rem) {
+  /* 좁으면 배포 한 건이 두 줄 더 접힌다(실측 3건 259px). */
+  .service-recent[data-kind="deployments"] {
+    min-height: 16.25rem;
+  }
+}
 .deploy-entry {
   --deploy: var(--gray-8);
   position: relative;
