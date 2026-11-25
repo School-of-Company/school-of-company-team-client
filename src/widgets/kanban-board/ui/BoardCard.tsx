@@ -6,6 +6,7 @@ import {
   ReviewChip,
   SignalChip,
   priorityLabels,
+  sizeLabels,
   suggestsDone,
   type TaskCard,
   type TaskStatus,
@@ -88,12 +89,23 @@ export function BoardCard({
         <span className="min-w-0 truncate" aria-label="담당자">
           {task.assignees.map((person) => person.name).join(", ") || "미지정"}
         </span>
-        <span
-          className="priority-label"
-          data-priority={task.priority}
-          title={`우선순위 ${task.priority}`}
-        >
-          {priorityLabels[task.priority]}
+        <span className="board-card-badges">
+          {task.size && (
+            <span
+              className="board-card-size"
+              title={`크기 ${task.size} ${sizeLabels[task.size]}`}
+            >
+              <span className="sr-only">크기 </span>
+              {task.size}
+            </span>
+          )}
+          <span
+            className="priority-label"
+            data-priority={task.priority}
+            title={`우선순위 ${task.priority}`}
+          >
+            {priorityLabels[task.priority]}
+          </span>
         </span>
       </div>
       {task.status === "REVIEW" && !!task.reviewers?.length && (

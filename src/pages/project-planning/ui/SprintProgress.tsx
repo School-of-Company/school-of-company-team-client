@@ -16,8 +16,10 @@ import { formatDate } from "@/shared/lib";
 import { EmptyState, ErrorState, ListSkeleton } from "@/shared/ui";
 import { boardTasks } from "../model/sprint-tasks";
 import { TaskRow } from "./TaskRow";
+import { SprintBurndown } from "./SprintBurndown";
+import { SprintGoalChecklist } from "./SprintGoalChecklist";
 
-/** 진행: 상태별 수와 업무 목록. 종료된 Sprint 는 종료 시 범위의 수와 이월 기록을 보여 준다. */
+/** 진행: 목표 체크리스트, 번다운, 상태별 수와 업무 목록. 종료된 Sprint 는 종료 시 범위의 수와 이월 기록을 보여 준다. */
 export function SprintProgress({
   project,
   sprint,
@@ -27,6 +29,10 @@ export function SprintProgress({
 }) {
   return (
     <div className="grid gap-5">
+      <SprintGoalChecklist sprint={sprint} />
+      {sprint.status !== "PLANNED" && (
+        <SprintBurndown project={project} sprint={sprint} />
+      )}
       <dl className="sprint-counts" aria-label="상태별 업무 수">
         {taskStatuses.map((status) => (
           <div key={status}>

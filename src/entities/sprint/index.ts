@@ -8,6 +8,8 @@ export {
   decodeDestination,
   closeSprintRequest,
   nextSprintDates,
+  nextSprintDefaults,
+  NEXT_SPRINT_DESTINATION,
   seoulToday,
   sprintErrorMessage,
 } from "./model/types";
@@ -20,6 +22,12 @@ export type {
   CarryOverTarget,
   CloseSprint,
   SprintReview,
+  SprintGoalItem,
+  NextSprintRequest,
+  Burndown,
+  BurndownBasis,
+  SprintStats,
+  DiscordPostStatus,
   RetroEntry,
   RetroKind,
 } from "./model/types";

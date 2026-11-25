@@ -24,7 +24,7 @@ import {
 import { useSaveReview } from "../api/sprint-actions";
 
 /**
- * Sprint Review. 관리자는 결정적 초안을 불러와 고치고 저장·게시한다.
+ * 스프린트 결과 보고(서버 이름 review). 관리자는 결정적 초안을 불러와 고치고 저장·게시한다.
  * 다른 사람은 게시된 본문만 본다(미게시면 404 → 없음으로 보인다).
  */
 export function SprintReviewPanel({
@@ -37,11 +37,10 @@ export function SprintReviewPanel({
   readonly manages: boolean;
 }) {
   return (
-    <section className="grid gap-4" aria-label="스프린트 리뷰">
+    <section className="grid gap-4" aria-label="스프린트 결과 보고">
       <p className="planning-note">
-        스프린트가 끝나면 완료한 업무, merge된 PR, 이월한 업무와 막힌 업무를
-        모아 리뷰 초안을 만들 수 있어요. PM 또는 헤드 어드민이 초안을 불러와
-        다듬고 게시하면 프로젝트를 볼 수 있는 모두가 읽을 수 있어요.
+        스프린트에서 끝낸 것, 머지된 PR, 이월, 막힌 업무를 모은 결과 보고예요.
+        PM이 다듬어 게시하면 프로젝트 참여자 모두가 보고 Discord에도 공유돼요.
       </p>
       <ReviewContent project={project} sprint={sprint} manages={manages} />
     </section>
@@ -64,13 +63,17 @@ function ReviewContent({
   if (sprint.status === "PLANNED")
     return (
       <EmptyState
-        title="아직 리뷰할 수 없습니다"
+        title="아직 결과 보고를 쓸 수 없습니다"
         description="스프린트를 시작한 뒤 초안을 불러올 수 있습니다. 종료 후 결과를 정리해 게시하세요."
       />
     );
   if (review.isPending)
     return (
-      <div role="status" aria-label="리뷰 불러오는 중" className="grid gap-2">
+      <div
+        role="status"
+        aria-label="결과 보고 불러오는 중"
+        className="grid gap-2"
+      >
         <Skeleton className="h-6 w-40" />
         <Skeleton className="h-48" />
       </div>
@@ -78,7 +81,7 @@ function ReviewContent({
   if (review.isError)
     return (
       <ErrorState
-        title="리뷰를 불러오지 못했습니다"
+        title="결과 보고를 불러오지 못했습니다"
         description={sprintErrorMessage(normalizeApiError(review.error))}
         onRetry={() => void review.refetch()}
       />
@@ -96,19 +99,37 @@ function ReviewContent({
   if (!review.data)
     return (
       <EmptyState
-        title="아직 게시된 리뷰가 없습니다"
-        description="PM이 리뷰를 게시하면 여기에서 볼 수 있습니다."
+        title="게시된 결과 보고가 없습니다"
+        description="PM이 결과 보고를 게시하면 여기에서 볼 수 있습니다."
       />
     );
   return (
-    <article className="review-body grid gap-3" aria-label="스프린트 리뷰">
+    <article className="review-body grid gap-3" aria-label="스프린트 결과 보고">
       <ReviewStamp review={review.data} />
       <Markdown>{review.data.body}</Markdown>
     </article>
   );
 }
 
+const discordLabels: Readonly<
+  Record<NonNullable<SprintReview["discordPost"]>["status"], string>
+> = {
+  PENDING: "Discord 공유 대기",
+  SENDING: "Discord 공유 중",
+  SENT: "Discord에 공유함",
+  SKIPPED: "Discord 공유 안 함",
+  FAILED: "Discord 공유 실패",
+};
+const discordReasons: Readonly<Record<string, string>> = {
+  DISCORD_NOT_CONFIGURED: "Discord가 설정되지 않았습니다",
+  DISCORD_CHANNEL_MISSING: "연결된 채널이 없습니다",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트입니다",
+  DISCORD_SEND_FAILED: "보내지 못했습니다",
+  DISCORD_RESULT_UNKNOWN: "결과를 알 수 없습니다",
+};
+
 function ReviewStamp({ review }: { readonly review: SprintReview }) {
+  const post = review.discordPost;
   return (
     <p className="sprint-meta">
       {review.publishedAt ? (
@@ -124,6 +145,14 @@ function ReviewStamp({ review }: { readonly review: SprintReview }) {
         {formatDate(review.updatedAt, { hour: "numeric", minute: "2-digit" })}{" "}
         저장
       </span>
+      {post && (
+        <span>
+          {discordLabels[post.status]}
+          {post.resultCode && discordReasons[post.resultCode]
+            ? `(${discordReasons[post.resultCode]})`
+            : ""}
+        </span>
+      )}
     </p>
   );
 }
@@ -140,7 +169,7 @@ function ReviewEditor({
   const id = useId();
   const { save, publish } = useSaveReview(project.id, sprint.id);
   const [body, setBody] = useState(saved?.body ?? "");
-  // 이미 게시한 리뷰는 읽는 모습부터 보여 준다.
+  // 이미 게시한 결과 보고는 읽는 모습부터 보여 준다.
   const [mode, setMode] = useState<"write" | "preview">(
     saved?.publishedAt ? "preview" : "write",
   );
@@ -179,7 +208,7 @@ function ReviewEditor({
   return (
     <div className="grid gap-4">
       <div className="review-toolbar">
-        <div className="ui-segmented" role="group" aria-label="리뷰 보기">
+        <div className="ui-segmented" role="group" aria-label="결과 보고 보기">
           {(["write", "preview"] as const).map((value) => (
             <button
               key={value}
@@ -207,10 +236,10 @@ function ReviewEditor({
       {current ? (
         <ReviewStamp review={current} />
       ) : (
-        <p className="sprint-meta">저장한 리뷰가 없습니다.</p>
+        <p className="sprint-meta">저장한 결과 보고가 없습니다.</p>
       )}
       <label htmlFor={`${id}-body`} className="sr-only">
-        리뷰 본문
+        결과 보고 본문
       </label>
       <Textarea
         id={`${id}-body`}
@@ -232,7 +261,8 @@ function ReviewEditor({
         </div>
       )}
       <p id={`${id}-hint`} className="text-xs text-muted">
-        초안은 완료, merge된 PR, 이월, 막힘 업무로 만듭니다. 비공개 원본 업무와
+        초안은 완료, 머지된 PR, 이월, 막힘 업무, 목표 체크리스트, 크기 합계로
+        만듭니다. 종료하면 초안이 저장 본문으로 들어갑니다. 비공개 원본 업무와
         비공개 저장소 PR은 게시 범위 때문에 넣지 않습니다.
       </p>
       {notice && (
@@ -256,7 +286,7 @@ function ReviewEditor({
           onClick={() =>
             save.mutate(body, {
               onSuccess: () =>
-                setNotice({ tone: "ok", text: "리뷰를 저장했습니다." }),
+                setNotice({ tone: "ok", text: "결과 보고를 저장했습니다." }),
               onError: fail,
             })
           }
@@ -267,15 +297,13 @@ function ReviewEditor({
           <Button
             loading={publish.isPending}
             disabled={busy || dirty || !current}
-            aria-describedby={
-              dirty || !current ? `${id}-publish-hint` : undefined
-            }
+            aria-describedby={`${id}-publish-hint`}
             onClick={() =>
               publish.mutate(undefined, {
                 onSuccess: () =>
                   setNotice({
                     tone: "ok",
-                    text: "리뷰를 게시했습니다. 프로젝트 조회자 모두가 봅니다.",
+                    text: "결과 보고를 게시했어요. Discord 공유를 요청했어요.",
                   }),
                 onError: fail,
               })
@@ -285,9 +313,11 @@ function ReviewEditor({
           </Button>
         )}
       </div>
-      {!current?.publishedAt && (dirty || !current) && (
+      {!current?.publishedAt && (
         <p id={`${id}-publish-hint`} className="text-right text-xs text-muted">
-          저장한 본문만 게시할 수 있습니다.
+          {dirty || !current ? "저장한 본문만 게시할 수 있습니다. " : ""}
+          게시하면 프로젝트 참여자 모두가 보고 Discord 채널에도 한 번
+          공유됩니다.
         </p>
       )}
       <Dialog

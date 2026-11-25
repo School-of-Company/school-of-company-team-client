@@ -17,6 +17,15 @@ export const priorityLabels: Readonly<Record<TaskPriority, string>> = {
   P2: "보통",
   P3: "낮음",
 };
+// 크기(계약 s14 D14-a): 가중치 S=1, M=2, L=4, XL=8. null = 크기 미정.
+export const taskSizes = ["S", "M", "L", "XL"] as const;
+export type TaskSize = (typeof taskSizes)[number];
+export const sizeLabels: Readonly<Record<TaskSize, string>> = {
+  S: "반나절",
+  M: "하루",
+  L: "2~3일",
+  XL: "1주",
+};
 export const statusLabels: Readonly<Record<TaskStatus, string>> = {
   BACKLOG: "검토 필요",
   PLANNED: "진행 예정",
@@ -56,6 +65,8 @@ export type TaskCard = {
   readonly deadline: string | null;
   readonly blocked: boolean;
   readonly blockedReason: string | null;
+  /** s14: 서버가 아직 보내지 않으면 없을 수 있다. */
+  readonly size?: TaskSize | null;
   readonly position: number;
   readonly completedAt: string | null;
   /** Linked GitHub issue/PR; sent by the board API from feat/board-card-issue. */
@@ -115,6 +126,7 @@ export type CreateTask = {
   readonly planningBucketId?: string;
   readonly reviewerIds?: readonly string[];
   readonly milestoneId?: string;
+  readonly size?: TaskSize;
 };
 export type DeadlineUpdate =
   | { readonly deadline?: string; readonly clearDeadline?: false }
@@ -136,6 +148,8 @@ export type UpdateTask = DeadlineUpdate & {
   readonly milestoneId?: string;
   readonly blocked?: boolean;
   readonly blockedReason?: string;
+  /** 생략은 유지, null 은 해제. */
+  readonly size?: TaskSize | null;
 };
 export type MoveTask = {
   readonly status: TaskStatus;

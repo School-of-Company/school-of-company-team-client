@@ -47,6 +47,7 @@ test("sprint goals accept 500 characters and reject 501", () => {
     goal: "가".repeat(500),
     startDate: "2026-11-24",
     endDate: "2026-11-24",
+    goalItems: [],
   };
   assert.deepEqual(validateSprint(input), {});
   assert.deepEqual(

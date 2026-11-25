@@ -17,12 +17,19 @@ export {
   laneTotal,
 } from "./model/board";
 export type { BoardFilterKey, BoardSort } from "./model/board";
-export { taskStatuses, statusLabels, priorityLabels } from "./model/types";
+export {
+  taskStatuses,
+  statusLabels,
+  priorityLabels,
+  taskSizes,
+  sizeLabels,
+} from "./model/types";
 export type {
   TaskStatus,
   TaskType,
   TaskScope,
   TaskPriority,
+  TaskSize,
   TaskCard,
   TaskDetail,
   TaskPerson,

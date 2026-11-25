@@ -46,7 +46,20 @@ export function useSprintLifecycle(projectId: string, sprintId: string) {
   const close = useMutation({
     mutationFn: (body: CloseSprint) =>
       sprintApi.close(projectId, sprintId, body),
+    // 종료하면 서버가 초안을 저장 본문으로 둔다(D14-e). 결과 보고 탭이 바로 그 본문으로 열린다.
+    onSuccess: (result) => {
+      if (result.review)
+        client.setQueryData(
+          sprintKeys.review(projectId, sprintId),
+          result.review,
+        );
+    },
     onSettled: refresh,
+  });
+  const capacity = useMutation({
+    mutationFn: (value: number | null) =>
+      sprintApi.updateCapacity(projectId, sprintId, value),
+    onSuccess: refresh,
   });
   const remove = useMutation({
     mutationFn: () => sprintApi.remove(projectId, sprintId),
@@ -57,7 +70,7 @@ export function useSprintLifecycle(projectId: string, sprintId: string) {
     },
     onSettled: refresh,
   });
-  return { start, close, remove };
+  return { start, close, remove, capacity };
 }
 
 /** 계획 화면의 넣기·빼기. 화면 반영(낙관적)은 호출하는 쪽이 들고 실패하면 되돌린다. */

@@ -16,6 +16,7 @@ import {
   type ScopeOverlay,
 } from "../model/sprint-tasks";
 import { PlanTaskList } from "./PlanTaskList";
+import { SprintCapacity } from "./SprintCapacity";
 import { restorePlanFocus } from "../model/plan-focus";
 
 const DRAG_TYPE = "application/x-soc-task";
@@ -255,6 +256,11 @@ export function SprintPlan({
             </span>
           </h3>
         </div>
+        <SprintCapacity
+          projectId={project.id}
+          sprint={sprint}
+          manages={manages}
+        />
         <QueryState
           query={scoped}
           isEmpty={() => false}
