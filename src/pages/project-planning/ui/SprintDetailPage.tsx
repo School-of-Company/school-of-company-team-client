@@ -384,7 +384,7 @@ function SprintDetailSkeleton() {
       </div>
       <div aria-hidden="true" className="page-toolbar">
         <span className="ui-segmented">
-          {["계획", "진행", "리뷰", "회고"].map((label) => (
+          {["계획", "진행", "결과 보고", "회고"].map((label) => (
             <span key={label} className="ui-segmented-option">
               <span className="ui-skeleton-text">{label}</span>
             </span>

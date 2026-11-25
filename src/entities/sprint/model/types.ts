@@ -178,7 +178,7 @@ const errors: Readonly<Record<string, string>> = {
     "그 사이 스프린트 업무가 바뀌었습니다. 최신 목록을 보고 다시 시도하세요.",
   INVALID_CARRY_OVER_TARGET:
     "이월 대상이 올바르지 않습니다. 예정 스프린트 또는 사용 중인 버킷을 고르세요.",
-  SPRINT_REVIEW_NOT_FOUND: "저장된 리뷰가 없습니다. 먼저 저장하세요.",
+  SPRINT_REVIEW_NOT_FOUND: "저장된 결과 보고가 없습니다. 먼저 저장하세요.",
   RETRO_ENTRY_NOT_FOUND: "이미 삭제된 회고 항목입니다.",
   RETRO_ENTRY_FORBIDDEN: "작성자만 고칠 수 있습니다.",
   INVALID_SCOPE: "프로젝트 업무만 스프린트, 마일스톤에 넣을 수 있습니다.",

@@ -5,7 +5,7 @@ export type SprintTab = "plan" | "progress" | "review" | "retro";
 export const sprintTabLabels: Readonly<Record<SprintTab, string>> = {
   plan: "계획",
   progress: "진행",
-  review: "리뷰",
+  review: "결과 보고",
   retro: "회고",
 };
 
@@ -16,7 +16,7 @@ export function sprintTabs(status: SprintStatus): readonly SprintTab[] {
     : ["plan", "progress", "review", "retro"];
 }
 
-/** URL `?tab=`이 없거나 쓸 수 없으면 상태에 맞는 첫 화면: 예정=계획, 진행 중=진행, 종료=리뷰. */
+/** URL `?tab=`이 없거나 쓸 수 없으면 상태에 맞는 첫 화면: 예정=계획, 진행 중=진행, 종료=결과 보고. */
 export function selectedSprintTab(
   status: SprintStatus,
   requested: string | null | undefined,
