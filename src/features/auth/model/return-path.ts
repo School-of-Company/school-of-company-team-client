@@ -19,6 +19,14 @@ export function safeReturnPath(path: unknown): string | null {
     return null;
   }
   if (url.origin !== "https://origin.invalid") return null;
+  // 입력이 아니라 정규화한 결과를 본다: `/.//host`, `/x/..//host` 는 정리되면 `//host` 가 된다.
+  // 인코딩한 `/`, `\` 도 거른다(앱 경로에는 쓰지 않고, 어디선가 디코드되면 다른 출처가 된다).
+  if (
+    url.pathname.startsWith("//") ||
+    url.pathname.includes("\\") ||
+    /%(2f|5c)/i.test(url.pathname)
+  )
+    return null;
   if (/^\/(login|auth|pending|connect-discord)(\/|$)/.test(url.pathname))
     return null;
   if (url.pathname === "/" && !url.search && !url.hash) return null;
@@ -31,15 +39,15 @@ export function safeReturnPath(path: unknown): string | null {
  */
 export function rememberReturnPath(
   location: Pick<Location, "pathname" | "search" | "hash"> = window.location,
-  storage: Pick<Storage, "setItem" | "removeItem"> = sessionStorage,
+  storage: Pick<Storage, "setItem"> = sessionStorage,
   now = Date.now(),
 ) {
   const path = safeReturnPath(
     location.pathname + location.search + location.hash,
   );
-  // 홈처럼 돌아갈 필요가 없는 주소면 예전에 적어 둔 주소도 버린다.
+  // 돌아갈 필요가 없는 주소(홈, 로그인 흐름)에서는 적어 둔 주소를 건드리지 않는다.
+  // 지우는 것은 꺼내 쓸 때(takeReturnPath)뿐이다. 오래된 값은 TTL 로 버린다.
   if (path) storage.setItem(KEY, JSON.stringify({ path, at: now }));
-  else storage.removeItem(KEY);
 }
 
 /** 적어 둔 주소를 한 번만 꺼낸다. 꺼내면 지운다. */

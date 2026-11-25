@@ -41,6 +41,14 @@ test("only same-origin relative paths are accepted", () => {
   for (const bad of [
     "//evil.example/x",
     "/\\evil.example",
+    "/.//evil.example/x",
+    "/x/..//evil.example",
+    "/%2e//evil.example",
+    "/./\t/evil.example",
+    "/%2F%2Fevil.example",
+    "/%2f/evil.example",
+    "/%5Cevil.example",
+    "/x/%5c/evil.example",
     "https://evil.example/",
     "javascript:alert(1)",
     "tasks/T1",
@@ -85,7 +93,7 @@ test("users who cannot work yet go to their status screen and keep the path for 
   assert.equal(postLoginDestination(user, storage, 2), "/tasks/T1");
 });
 
-test("expired, tampered or replaced entries are dropped", () => {
+test("expired or tampered entries are dropped, and only taking an entry clears it", () => {
   const storage = memoryStorage();
   rememberReturnPath(
     { pathname: "/tasks/T1", search: "", hash: "" },
@@ -108,6 +116,9 @@ test("expired, tampered or replaced entries are dropped", () => {
     storage,
     0,
   );
-  rememberReturnPath({ pathname: "/", search: "", hash: "" }, storage, 1);
-  assert.equal(takeReturnPath(storage, 2), null);
+  // 로그인 흐름이나 홈에서 다시 불려도(늦게 온 401 등) 적어 둔 주소는 남고, 꺼낼 때만 지워진다.
+  for (const pathname of ["/login", "/auth/discord/callback", "/"])
+    rememberReturnPath({ pathname, search: "", hash: "" }, storage, 1);
+  assert.equal(takeReturnPath(storage, 2), "/tasks/T1");
+  assert.equal(takeReturnPath(storage, 3), null);
 });
