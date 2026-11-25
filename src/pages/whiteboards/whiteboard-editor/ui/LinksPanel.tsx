@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useDeferredValue, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { kindLabels } from "@/entities/knowledge";
 import { statusLabels } from "@/entities/task";
@@ -25,6 +25,19 @@ import {
 } from "@/shared/ui";
 
 type TargetType = "TASK" | "DOCUMENT";
+
+/** 통합 검색 서버가 받는 검색어 길이(s8). */
+const SEARCH_MAX_LENGTH = 100;
+
+/** 입력이 멈추고 이만큼 지나면 검색한다. */
+function useDebounced(value: string, delay = 250) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebounced(value), delay);
+    return () => window.clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
 
 /**
  * 화이트보드와 업무, 문서 연결(D16-8~D16-10). 캔버스 요소의 link 와는 따로다.
@@ -54,7 +67,13 @@ export function LinksPanel({
       ),
     onSuccess: (next) =>
       client.setQueryData(whiteboardKeys.links(whiteboardId), next),
-    onError,
+    // 409(이미 연결, 상한)와 404(대상이 사라짐)는 화면 목록이 서버와 어긋났다는 뜻이다. 다시 받는다.
+    onError: (error) => {
+      onError(error);
+      void client.invalidateQueries({
+        queryKey: whiteboardKeys.links(whiteboardId),
+      });
+    },
   });
   const remove = useMutation({
     mutationFn: (linkId: string) =>
@@ -240,7 +259,7 @@ function TargetPicker({
   readonly onPick: (id: string) => void;
 }) {
   const [query, setQuery] = useState("");
-  const deferred = useDeferredValue(query.trim());
+  const deferred = useDebounced(query.trim());
   const candidates = useQuery(whiteboardQueries.linkCandidates(type, deferred));
   const noun = type === "TASK" ? "업무" : "문서";
   const id = `link-search-${type}`;
@@ -254,6 +273,7 @@ function TargetPicker({
         id={id}
         type="search"
         value={query}
+        maxLength={SEARCH_MAX_LENGTH}
         disabled={disabled}
         placeholder={`${noun} 제목${type === "TASK" ? "이나 키" : ""}로 찾기`}
         onChange={(event) => setQuery(event.target.value)}
