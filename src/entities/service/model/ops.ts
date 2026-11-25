@@ -10,7 +10,8 @@ export type SentryStatus =
 
 export const healthStatusLabels: Readonly<Record<HealthStatus, string>> = {
   UP: "정상",
-  DEGRADED: "느림",
+  // 지연이 길거나 최근 3회 중 실패가 섞인 경우(D17-1).
+  DEGRADED: "불안정",
   DOWN: "다운",
   UNKNOWN: "확인 안 됨",
 };

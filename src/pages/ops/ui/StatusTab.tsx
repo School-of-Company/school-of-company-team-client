@@ -69,7 +69,7 @@ function OpsTotals({
 }) {
   const items = [
     ["정상", totals?.up],
-    ["느림", totals?.degraded],
+    ["불안정", totals?.degraded],
     ["다운", totals?.down],
     ["확인 안 됨", totals?.unknown],
     ["열린 장애", totals?.openIncidents],
