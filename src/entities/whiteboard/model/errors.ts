@@ -14,6 +14,8 @@ const messages: Readonly<Record<string, string>> = {
     "링크는 http(s) 주소나 /로 시작하는 경로만 쓸 수 있습니다.",
   WHITEBOARD_TOO_LARGE:
     "화이트보드가 너무 큽니다(1MB, 요소 5,000개). 일부를 지우거나 새 보드로 나누세요.",
+  WHITEBOARD_READ_ONLY: "이 화이트보드는 볼 수만 있습니다.",
+  WS_MESSAGE_INVALID: "실시간 변경을 보내지 못했습니다.",
   WHITEBOARD_TEMPLATE_NOT_FOUND:
     "템플릿이 지워졌습니다. 목록을 새로 불러와 다시 고르세요.",
   WHITEBOARD_TEMPLATE_SOURCE_PRIVATE:

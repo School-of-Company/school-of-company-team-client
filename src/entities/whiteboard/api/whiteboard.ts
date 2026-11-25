@@ -7,6 +7,7 @@ import type {
   WhiteboardLinks,
   WhiteboardDetail,
   WhiteboardPresence,
+  WhiteboardRealtimeTicket,
   WhiteboardRevision,
   WhiteboardRevisionDetail,
   WhiteboardScene,
@@ -105,6 +106,9 @@ export const whiteboardApi = {
     id: string,
     body: { x: number; y: number; selectedElementIds: readonly string[] },
   ) => (await api.put<WhiteboardPresence>(`${path(id)}/presence`, body)).data,
+  realtimeTicket: async (id: string) =>
+    (await api.post<WhiteboardRealtimeTicket>(`${path(id)}/realtime-ticket`))
+      .data,
   revisions: async (id: string) =>
     (await api.get<readonly WhiteboardRevision[]>(`${path(id)}/revisions`))
       .data,
@@ -185,3 +189,18 @@ export const whiteboardQueries = {
       retry: false,
     }),
 };
+
+/**
+ * 티켓의 path 를 소켓 주소로 바꾼다(s19 1절): API 기준 URL 의 http→ws, https→wss 에 path 를 붙인다.
+ * 기준 URL 이 비었거나 상대 경로면 지금 페이지의 출처를 쓴다.
+ */
+export function realtimeSocketUrl(
+  ticketPath: string,
+  apiBase: string | undefined = api.defaults.baseURL,
+  origin: string = globalThis.location?.origin ?? "",
+): string {
+  const base = /^https?:\/\//i.test(apiBase ?? "")
+    ? apiBase!
+    : `${origin}${apiBase ?? ""}`;
+  return `${base.replace(/\/+$/, "")}${ticketPath}`.replace(/^http/i, "ws");
+}
