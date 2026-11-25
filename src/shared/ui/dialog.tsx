@@ -1,9 +1,24 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { IconButton } from "./controls";
 import { Icon } from "./icons";
 import { restoreFocus } from "./focus-return";
+
+/**
+ * `open` prop 과 네이티브 dialog 를 맞추는 판정. Chromium 은 사용자 활성화 없이 연달아 온 두 번째 Esc 의
+ * cancel 을 막을 수 없게 두어, 호출부가 닫기를 거부해도(`open` 이 true 그대로) 네이티브 dialog 는 닫힌다.
+ * 그때도 다시 열어야 한다. 이미 보였던 것을 다시 여는 경우(`shown`)는 연 곳(opener)을 새로 잡지 않는다.
+ */
+export function dialogSync(state: {
+  readonly open: boolean;
+  readonly nativeOpen: boolean;
+  readonly shown: boolean;
+}): "show" | "reshow" | "hide" | null {
+  if (state.open && !state.nativeOpen) return state.shown ? "reshow" : "show";
+  if (!state.open && state.shown) return "hide";
+  return null;
+}
 
 export function Dialog({
   open,
@@ -24,10 +39,17 @@ export function Dialog({
   const opener = useRef<HTMLElement | null>(null);
   // 실제로 열려 있었는지. 닫힌 채 언마운트되는 대화상자가 남의 포커스를 빼앗지 않게 한다.
   const shown = useRef(false);
+  // 네이티브 dialog 가 스스로 닫힌 횟수. 호출부가 닫기를 거부해 `open` 이 그대로여도 아래 effect 를 다시 돌린다.
+  const [nativeCloses, setNativeCloses] = useState(0);
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) {
+    const sync = dialogSync({
+      open,
+      nativeOpen: dialog.open,
+      shown: shown.current,
+    });
+    if (sync === "show") {
       const active = document.activeElement;
       opener.current =
         active instanceof HTMLElement &&
@@ -35,16 +57,18 @@ export function Dialog({
         !dialog.contains(active)
           ? active
           : null;
+    }
+    if (sync === "show" || sync === "reshow") {
       dialog.showModal();
       shown.current = true;
     }
-    if (!open && dialog.open) {
-      dialog.close();
+    if (sync === "hide") {
+      if (dialog.open) dialog.close();
       shown.current = false;
       restoreFocus(opener.current);
       opener.current = null;
     }
-  }, [open]);
+  }, [open, nativeCloses]);
   // 숨김·언마운트. Next.js(Cache Components)는 떠난 화면을 언마운트하지 않고 숨겨 두는데(Activity hidden),
   // 그 화면의 대화상자가 열린 채 남으면 보이지 않는 모달이 문서 전체를 막는다(V-route-focus H1).
   // 그래서 effect 가 정리될 때 onClose 를 부르지 않고 조용히 닫는다(호출부 상태·URL 은 그대로).
@@ -105,6 +129,7 @@ export function Dialog({
           silent.current = false;
           return;
         }
+        setNativeCloses((count) => count + 1);
         onClose();
       }}
       className={`ui-dialog ${className}`}
