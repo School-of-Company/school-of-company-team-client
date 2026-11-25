@@ -211,11 +211,11 @@ export function BucketSettings({ project, user }: SettingsProps) {
       <StaleNotice query={buckets} />
       {list.length === 0 ? (
         <EmptyState
-          title="버킷이 없습니다"
+          title="아직 버킷이 없어요"
           description={
             manage
-              ? "아래 새 버킷 이름에 이름을 적고 버킷 추가를 누르세요. 보드에서 버킷별로 묶어 볼 수 있어요."
-              : "헤드 어드민 또는 PM이 버킷을 만들 수 있습니다."
+              ? "아래에 이름을 적고 버킷 추가를 누르면 첫 버킷이 생겨요."
+              : "헤드 어드민 또는 PM이 만들면 여기에 보여요."
           }
         />
       ) : (

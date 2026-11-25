@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type { Sprint } from "@/entities/sprint";
 import { percent } from "../model/goal-items";
 
@@ -9,12 +10,13 @@ const states = {
 
 /** 목표 체크리스트와 달성률. 항목이 없으면 그리지 않는다. */
 export function SprintGoalChecklist({ sprint }: { readonly sprint: Sprint }) {
+  const headingId = useId();
   if (sprint.goalItems.length === 0) return null;
   const rate = percent(sprint.goalAchievedRate);
   return (
-    <section className="grid gap-2" aria-labelledby="goal-checklist">
-      <h3 id="goal-checklist" className="planning-subhead">
-        목표 체크리스트
+    <section className="grid gap-2" aria-labelledby={headingId}>
+      <h3 id={headingId} className="planning-subhead">
+        목표 체크리스트{" "}
         <span className="tabular-nums">
           {sprint.status === "CLOSED"
             ? `달성률 ${rate ?? 0}%`

@@ -197,7 +197,10 @@ export const sprintQueries = {
     }),
   burndown: (projectId: string, sprintId: string) =>
     queryOptions({
-      ...polled(sprintKeys.burndown(projectId, sprintId)),
+      // id가 키라 다른 Sprint 번다운을 빌려 그리지 않는다(placeholder 없음).
+      queryKey: sprintKeys.burndown(projectId, sprintId),
+      refetchInterval: BOARD_POLL_INTERVAL,
+      retry: false,
       queryFn: () => sprintApi.burndown(projectId, sprintId),
     }),
   stats: (projectId: string, limit = 6) =>

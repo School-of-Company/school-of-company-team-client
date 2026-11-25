@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { sprintErrorMessage, sprintQueries } from "@/entities/sprint";
 import { normalizeApiError } from "@/shared/api";
@@ -26,6 +26,7 @@ export function SprintTrend({
   readonly projectId: string;
   readonly closedCount: number;
 }) {
+  const headingId = useId();
   const stats = useQuery(sprintQueries.stats(projectId, LIMIT));
   const rows = Math.min(closedCount, LIMIT);
   const style = { "--trend-rows": rows } as CSSProperties;
@@ -35,10 +36,9 @@ export function SprintTrend({
     ...(data?.sprints.map((item) => item.velocity) ?? []),
   );
   return (
-    <section className="grid gap-2" aria-labelledby="sprint-trend">
-      <h3 id="sprint-trend" className="planning-subhead">
-        최근 스프린트 비교
-        <span className="tabular-nums">최근 {rows}개</span>
+    <section className="grid gap-2" aria-labelledby={headingId}>
+      <h3 id={headingId} className="planning-subhead">
+        최근 스프린트 비교 <span className="tabular-nums">최근 {rows}개</span>
       </h3>
       <StaleNotice query={stats} />
       <div className="sprint-trend" style={style}>

@@ -38,6 +38,7 @@ test("burndown places points on the sprint range in the basis unit", () => {
       [0.5, 0.75],
     ],
   );
+  assert.equal(points.endX, 1);
   assert.deepEqual(points.ideal.at(-1), {
     date: "2026-12-02",
     value: 0,
@@ -56,4 +57,27 @@ test("burndown table merges ideal and snapshot dates", () => {
     { date: "2026-12-01", remaining: 6, ideal: 4 },
     { date: "2026-12-02", remaining: null, ideal: 0 },
   ]);
+});
+
+test("burndown extends past the planned end for an overdue sprint", () => {
+  const overdue = burndownPoints(
+    {
+      ...data,
+      days: [
+        ...data.days,
+        {
+          date: "2026-12-04",
+          remainingWeight: 2,
+          remainingCount: 1,
+          totalWeight: 8,
+          totalCount: 4,
+        },
+      ],
+    },
+    range,
+  );
+  assert.equal(overdue.lastDate, "2026-12-04");
+  assert.equal(overdue.endX, 0.5);
+  assert.equal(overdue.remaining.at(-1)?.x, 1);
+  assert.equal(overdue.ideal.at(-1)?.x, 0.5);
 });

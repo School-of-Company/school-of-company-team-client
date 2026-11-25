@@ -12,7 +12,7 @@ import {
   type Sprint,
 } from "@/entities/sprint";
 import { statusLabels, taskQueries } from "@/entities/task";
-import { normalizeApiError } from "@/shared/api";
+import { fieldErrors, normalizeApiError } from "@/shared/api";
 import {
   Button,
   Checkbox,
@@ -112,7 +112,26 @@ export function CloseSprintDialog({
       valid(value) ? value : "",
     ]),
   );
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Readonly<Record<string, string>>>({});
+  const fieldIds: Readonly<Record<string, string>> = {
+    "nextSprint.name": `${id}-next-name`,
+    "nextSprint.startDate": `${id}-next-start`,
+    "nextSprint.endDate": `${id}-next-end`,
+    goalResults: `${id}-goals`,
+  };
+  // 칸 오류는 그 칸 밑에 두고 첫 칸으로 초점을 옮긴다. 칸이 없는 오류만 폼 아래에 보인다.
+  function showErrors(next: Readonly<Record<string, string>>) {
+    setErrors(next);
+    const first = Object.keys(fieldIds).find((key) => next[key]);
+    if (first)
+      requestAnimationFrame(() =>
+        document.getElementById(fieldIds[first])?.focus(),
+      );
+  }
+  const invalid = (key: string) =>
+    errors[key]
+      ? { "aria-invalid": true, "aria-describedby": `${fieldIds[key]}-error` }
+      : {};
   const tasks = boardTasks(open.data);
   return (
     <Dialog
@@ -128,16 +147,17 @@ export function CloseSprintDialog({
           if (pending) return;
           const carry = closeSprintRequest(fallback, rows);
           if (!carry) return;
-          if (
-            createNext &&
-            (!nextName.trim() || nextName.trim().length > 100)
-          ) {
-            setError("다음 스프린트 이름은 1~100자로 입력하세요.");
-            return;
-          }
-          if (createNext && (!nextStart || !nextEnd || nextEnd < nextStart)) {
-            setError("다음 스프린트 종료일은 시작일과 같거나 뒤여야 합니다.");
-            return;
+          if (createNext) {
+            const local: Record<string, string> = {};
+            if (!nextName.trim() || nextName.trim().length > 100)
+              local["nextSprint.name"] = "이름은 1~100자로 입력하세요.";
+            if (!nextStart)
+              local["nextSprint.startDate"] = "시작일을 고르세요.";
+            if (!nextEnd) local["nextSprint.endDate"] = "종료일을 고르세요.";
+            else if (nextStart && nextEnd < nextStart)
+              local["nextSprint.endDate"] =
+                "종료일은 시작일과 같거나 뒤여야 합니다.";
+            if (Object.keys(local).length) return showErrors(local);
           }
           const body: CloseSprint = {
             ...carry,
@@ -157,10 +177,18 @@ export function CloseSprintDialog({
                 }
               : {}),
           };
-          setError(null);
+          setErrors({});
           onSubmit(body, (cause) => {
             const problem = normalizeApiError(cause);
-            setError(sprintErrorMessage(problem));
+            showErrors(
+              problem.code === "DUPLICATE_SPRINT_NAME" && createNext
+                ? { "nextSprint.name": sprintErrorMessage(problem) }
+                : fieldErrors(
+                    problem,
+                    Object.keys(fieldIds),
+                    sprintErrorMessage(problem),
+                  ),
+            );
             // 그 사이 범위가 바뀌었으면 최신 미완료 목록으로 다시 고른다.
             if (problem.code === "STALE_SPRINT_SCOPE") {
               setRows({});
@@ -170,7 +198,12 @@ export function CloseSprintDialog({
         }}
       >
         {sprint.goalItems.length > 0 && (
-          <fieldset className="grid min-w-0 gap-2">
+          <fieldset
+            id={fieldIds.goalResults}
+            tabIndex={-1}
+            className="grid min-w-0 gap-2"
+            {...invalid("goalResults")}
+          >
             <legend className="planning-subhead mb-2">목표 체크리스트</legend>
             <ul className="close-rows">
               {sprint.goalItems.map((item) => (
@@ -207,6 +240,15 @@ export function CloseSprintDialog({
             <p className="text-xs text-muted">
               고르지 않은 항목은 미기록으로 남습니다.
             </p>
+            {errors.goalResults && (
+              <p
+                id={`${fieldIds.goalResults}-error`}
+                role="alert"
+                className="text-sm text-danger"
+              >
+                {errors.goalResults}
+              </p>
+            )}
           </fieldset>
         )}
         <fieldset className="grid min-w-0 gap-3">
@@ -221,9 +263,14 @@ export function CloseSprintDialog({
           </label>
           {createNext && (
             <div className="grid gap-4">
-              <Field id={`${id}-next-name`} label="이름">
+              <Field
+                id={fieldIds["nextSprint.name"]}
+                label="이름"
+                error={errors["nextSprint.name"]}
+              >
                 <Input
-                  id={`${id}-next-name`}
+                  id={fieldIds["nextSprint.name"]}
+                  {...invalid("nextSprint.name")}
                   value={nextName}
                   maxLength={100}
                   disabled={pending}
@@ -231,21 +278,33 @@ export function CloseSprintDialog({
                 />
               </Field>
               <div className="grid items-start gap-4 sm:grid-cols-2">
-                <Field id={`${id}-next-start`} label="시작일">
+                <Field
+                  id={fieldIds["nextSprint.startDate"]}
+                  label="시작일"
+                  error={errors["nextSprint.startDate"]}
+                >
                   <DatePicker
-                    id={`${id}-next-start`}
+                    id={fieldIds["nextSprint.startDate"]}
                     label="다음 스프린트 시작일"
                     value={nextStart}
                     onChange={setNextStart}
+                    disabled={pending}
+                    invalid={!!errors["nextSprint.startDate"]}
                   />
                 </Field>
-                <Field id={`${id}-next-end`} label="종료일">
+                <Field
+                  id={fieldIds["nextSprint.endDate"]}
+                  label="종료일"
+                  error={errors["nextSprint.endDate"]}
+                >
                   <DatePicker
-                    id={`${id}-next-end`}
+                    id={fieldIds["nextSprint.endDate"]}
                     label="다음 스프린트 종료일"
                     value={nextEnd}
                     min={nextStart || undefined}
                     onChange={setNextEnd}
+                    disabled={pending}
+                    invalid={!!errors["nextSprint.endDate"]}
                   />
                 </Field>
               </div>
@@ -339,9 +398,9 @@ export function CloseSprintDialog({
             </ul>
           )}
         </section>
-        {error && (
+        {errors.form && (
           <p role="alert" className="text-sm text-danger">
-            {error}
+            {errors.form}
           </p>
         )}
         <div className="flex flex-wrap justify-end gap-2">

@@ -7,14 +7,17 @@ const dayIndex = (start: string, date: string) =>
   );
 
 /**
- * 번다운을 0~1 좌표의 점으로 바꾼다. x는 시작일~종료일, y는 0~최댓값(위가 1).
- * 남은 양은 계약 basis(D14-i) 단위로 읽는다.
+ * 번다운을 0~1 좌표의 점으로 바꾼다. x는 시작일부터 종료 예정일, 또는 그보다 늦은 마지막 스냅샷까지
+ * (기한을 넘겨 진행 중인 Sprint), y는 0~최댓값(위가 1). 남은 양은 계약 basis(D14-i) 단위로 읽는다.
  */
 export function burndownPoints(
   data: Burndown,
   range: { readonly startDate: string; readonly endDate: string },
 ) {
-  const span = Math.max(dayIndex(range.startDate, range.endDate), 1);
+  const lastDate = [range.endDate, ...data.days.map((day) => day.date)]
+    .sort()
+    .at(-1)!;
+  const span = Math.max(dayIndex(range.startDate, lastDate), 1);
   const remaining = data.days.map((day) => ({
     date: day.date,
     value: data.basis === "WEIGHT" ? day.remainingWeight : day.remainingCount,
@@ -25,11 +28,14 @@ export function burndownPoints(
     ...data.ideal.map((point) => point.remaining),
   );
   const place = (date: string, value: number) => ({
-    x: Math.min(Math.max(dayIndex(range.startDate, date) / span, 0), 1),
+    x: dayIndex(range.startDate, date) / span,
     y: value / max,
   });
   return {
     max,
+    lastDate,
+    /** 종료 예정일의 x. 기한을 넘겼으면 1보다 작다. */
+    endX: dayIndex(range.startDate, range.endDate) / span,
     remaining: remaining.map((point) => ({
       ...point,
       ...place(point.date, point.value),

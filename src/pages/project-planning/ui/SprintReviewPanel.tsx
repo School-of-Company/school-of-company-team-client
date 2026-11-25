@@ -303,7 +303,7 @@ function ReviewEditor({
                 onSuccess: () =>
                   setNotice({
                     tone: "ok",
-                    text: "결과 보고를 게시했습니다. 프로젝트 참여자 모두가 보고 Discord에도 공유했습니다.",
+                    text: "결과 보고를 게시했어요. Discord 공유를 요청했어요.",
                   }),
                 onError: fail,
               })

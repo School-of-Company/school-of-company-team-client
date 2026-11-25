@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { ProjectDetail } from "@/entities/project";
 import {
@@ -42,16 +42,18 @@ export function SprintBurndown({
   return (
     <section className="grid gap-2" aria-labelledby={`${id}-title`}>
       <div className="plan-pane-head">
-        <h3 id={`${id}-title`} className="planning-subhead">
-          번다운
+        <div className="flex min-w-0 items-baseline gap-2">
+          <h3 id={`${id}-title`} className="planning-subhead">
+            번다운
+          </h3>
           <span className="burndown-basis">
             {data
               ? data.basis === "WEIGHT"
                 ? "기준: 크기 합계"
                 : "기준: 업무 수(모두 크기 미정)"
-              : " "}
+              : "\u00a0"}
           </span>
-        </h3>
+        </div>
         <div className="ui-segmented" role="group" aria-label="번다운 보기">
           {(["chart", "table"] as const).map((value) => (
             <button
@@ -160,16 +162,37 @@ function BurndownChart({
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
           role="img"
-          aria-label={`번다운: 남은 양 ${last?.value ?? 0}${unit}, 시작 ${points.max}${unit}. 값은 표 보기에서 읽을 수 있습니다.`}
+          aria-label={`번다운: 남은 양 ${last?.value ?? 0}${unit}, 시작 ${points.max}${unit}${points.endX < 1 ? ", 종료 예정일이 지났습니다" : ""}. 값은 표 보기에서 읽을 수 있습니다.`}
         >
           <line x1="0" y1="100" x2="100" y2="100" className="burndown-axis" />
+          {points.endX < 1 && (
+            <line
+              x1={points.endX * 100}
+              y1="0"
+              x2={points.endX * 100}
+              y2="100"
+              className="burndown-end"
+            />
+          )}
           <path d={path(points.ideal)} className="burndown-ideal" />
           <path d={path(points.remaining)} className="burndown-remaining" />
         </svg>
       </div>
       <div className="burndown-x" aria-hidden="true">
         <span>{shortDate(sprint.startDate)}</span>
-        <span>{shortDate(sprint.endDate)}</span>
+        {points.endX < 1 ? (
+          <>
+            <span
+              className="burndown-x-end"
+              style={{ "--end-x": points.endX } as CSSProperties}
+            >
+              종료 예정 {shortDate(sprint.endDate)}
+            </span>
+            <span>{shortDate(points.lastDate)}</span>
+          </>
+        ) : (
+          <span>종료 예정 {shortDate(sprint.endDate)}</span>
+        )}
       </div>
     </figure>
   );
