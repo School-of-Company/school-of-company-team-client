@@ -138,10 +138,19 @@ function ServiceWorkspace({
   const pathname = usePathname() ?? routes.service(service.key);
   const search = useSearchParams();
   const legacy = search?.get("tab");
-  if (legacy === "releases" || legacy === "deployments")
-    redirect(
-      `${routes.serviceDeploys(service.key)}${legacy === "releases" ? "&view=releases" : ""}`,
-    );
+  if (legacy === "releases" || legacy === "deployments") {
+    // 옛 링크의 열린 릴리스 노트(release)와 환경 필터(env)는 배포 탭에서도 같은 이름이다.
+    const params = new URLSearchParams({
+      tab: "deploys",
+      service: service.key,
+    });
+    if (legacy === "releases") params.set("view", "releases");
+    for (const key of ["release", "env"]) {
+      const value = search?.get(key);
+      if (value) params.set(key, value);
+    }
+    redirect(`${routes.ops}?${params.toString()}`);
+  }
   const tab: ServiceTab =
     tabs.find((item) => item.value === search?.get("tab"))?.value ?? "overview";
   const [editing, setEditing] = useState(false);
