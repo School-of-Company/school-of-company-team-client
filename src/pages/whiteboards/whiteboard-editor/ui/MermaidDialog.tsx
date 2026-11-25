@@ -1,12 +1,13 @@
 "use client";
 
+// 먼저 읽어야 한다: Excalidraw 가 읽히기 전에 글꼴 주소(window.EXCALIDRAW_ASSET_PATH)를 정한다.
+import { readTheme } from "@/shared/lib";
 import { useEffect, useRef, useState } from "react";
 import {
   convertToExcalidrawElements,
   exportToSvg,
 } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
-import { readTheme } from "@/shared/lib";
 import { Button, Dialog, Textarea } from "@/shared/ui";
 
 const EXAMPLE = `flowchart LR
@@ -18,7 +19,8 @@ const PREVIEW_DELAY = 300;
 
 type Converted =
   | { readonly elements: readonly OrderedExcalidrawElement[] }
-  | { readonly error: string };
+  /** detail 은 파서가 준 원문(영어)이다. 한국어 첫 줄 아래 펼쳐 볼 수 있게 둔다. */
+  | { readonly error: string; readonly detail?: string };
 
 /**
  * Excalidraw 공식 변환기(@excalidraw/mermaid-to-excalidraw)로 Mermaid 를 도형으로 바꾼다.
@@ -45,10 +47,9 @@ async function convert(definition: string): Promise<Converted> {
     };
   } catch (error) {
     return {
-      error:
-        error instanceof Error && error.message
-          ? error.message
-          : "Mermaid 코드를 읽을 수 없습니다.",
+      error: "Mermaid 문법을 확인해 주세요.",
+      detail:
+        error instanceof Error && error.message ? error.message : undefined,
     };
   }
 }
@@ -103,7 +104,7 @@ export default function MermaidDialog({
     };
   }, [text]);
   const elements = result && "elements" in result ? result.elements : null;
-  const error = result && "error" in result ? result.error : null;
+  const error = result && "error" in result ? result : null;
   return (
     <Dialog
       open
@@ -144,13 +145,28 @@ export default function MermaidDialog({
             />
           </div>
         </div>
-        <p
+        {/* 입력할 때마다 바뀌므로 alert 로 끊지 않고 쉬는 틈에 읽힌다. */}
+        <div
           id="whiteboard-mermaid-error"
-          role="alert"
-          className="whiteboard-mermaid-error text-danger"
+          aria-live="polite"
+          className="whiteboard-mermaid-error"
         >
-          {error}
-        </p>
+          {error && (
+            <>
+              <p className="text-danger">{error.error}</p>
+              {error.detail && (
+                <details>
+                  <summary className="cursor-pointer text-muted">
+                    자세히
+                  </summary>
+                  <pre className="whitespace-pre-wrap text-muted">
+                    {error.detail}
+                  </pre>
+                </details>
+              )}
+            </>
+          )}
+        </div>
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setText(EXAMPLE)}>
             예시로 되돌리기

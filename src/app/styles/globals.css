@@ -5594,7 +5594,7 @@ a.search-option:hover {
 }
 /* 파서 오류는 고정 높이 칸에 둔다. 글을 고칠 때마다 대화상자 높이가 바뀌지 않는다. */
 .whiteboard-mermaid-error {
-  height: 3lh;
+  height: 4lh;
   overflow-y: auto;
   font-size: var(--text-caption);
   white-space: pre-wrap;
