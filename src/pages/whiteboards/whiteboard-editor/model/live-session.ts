@@ -49,12 +49,20 @@ export function createLiveSession<E extends Versioned>(port: LivePort<E>) {
   };
 
   const session = {
-    /** joined: 방의 scene 과 합치고, 끊긴 동안의 내 변경을 보낸다. */
+    /**
+     * joined: 방의 scene 과 합치고, 끊긴 동안의 내 변경을 보낸다.
+     * 소켓이 거부한 변경(1009 등)이 남아 있으면 false: REST 저장으로 보내야 한다.
+     */
     joined(remote: readonly E[], appState?: AppStateLike) {
       port.merge(remote);
       tracker.reset(remote);
       applyAppState(appState);
       session.flush();
+      return session.settled();
+    },
+    /** saved: 그때까지 보낸 것은 받아들여졌다. */
+    confirm() {
+      tracker.confirm();
     },
     /** 다른 사람(또는 REST 저장)의 변경. 이기는 요소가 없으면 화면을 건드리지 않는다. */
     incoming(remote: readonly E[], appState?: AppStateLike) {

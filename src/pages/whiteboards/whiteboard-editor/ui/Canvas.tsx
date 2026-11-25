@@ -378,12 +378,14 @@ export default function Canvas({
           if (sendTimer.current) clearTimeout(sendTimer.current);
           sendTimer.current = null;
           // 읽기 전용이면 합치기만 하고 보내지 않는다(port.send 가 막는다).
-          liveSync.current?.joined(
+          const settled = liveSync.current?.joined(
             restore(message.scene),
             message.scene.appState,
           );
           engine.current.drawCursors();
-          engine.current.settle();
+          // 위에서 지운 REST 저장 타이머가 1009 로 거부된 변경을 맡고 있었다. 다시 건다(방이 병합한다, D19-10).
+          if (!engine.current.settle() && settled === false)
+            engine.current.schedule(0);
           return engine.current.report("live");
         }
         case "participant-joined":
@@ -423,6 +425,7 @@ export default function Canvas({
         case "saved":
           version.current = message.version;
           realtime.current?.healthy();
+          liveSync.current?.confirm();
           engine.current.settle();
           return;
         case "scene":

@@ -88,3 +88,23 @@ test("a rejected batch stays out of delta across rejoin until it changes", () =>
   sync.mark([el("a", 2), el("b", 1)]);
   assert.equal(sync.pending(scene), false, "the room has them now");
 });
+
+test("an error rejects every batch sent since the last saved, not just the newest", () => {
+  const sync = createSyncTracker();
+  sync.reset([]);
+  sync.sent([el("bad", 1)]); // 서버가 거부할 묶음
+  sync.sent([el("ok", 1)]); // 오류가 오기 전에 나간 다음 묶음(RTT > 100ms)
+  assert.equal(sync.reject(), 2);
+  assert.equal(sync.pending([el("bad", 1), el("ok", 1)]), true);
+});
+
+test("saved confirms earlier batches so a later error does not blame them", () => {
+  const sync = createSyncTracker();
+  sync.reset([]);
+  sync.sent([el("ok", 1)]);
+  sync.confirm();
+  sync.sent([el("bad", 1)]);
+  assert.equal(sync.reject(), 1);
+  assert.equal(sync.pending([el("ok", 1)]), false);
+  assert.equal(sync.pending([el("bad", 1)]), true);
+});

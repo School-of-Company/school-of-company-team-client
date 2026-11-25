@@ -204,3 +204,42 @@ test("scene replaces instead of merging", () => {
   assert.deepEqual(t.scene, [el("a", 10)]);
   assert.equal(t.session.settled(), true);
 });
+
+test("joined reports when rejected changes still need a REST save", () => {
+  const t = setup([el("a", 1)]);
+  assert.equal(
+    t.session.joined([el("a", 1)], { viewBackgroundColor: "#fff" }),
+    true,
+  );
+  t.scene = [el("a", 1), el("huge", 1)];
+  t.session.flush();
+  t.session.reject(); // 1009
+  // 다시 붙었다. 방은 huge 를 모르니 REST 저장을 다시 걸어야 한다.
+  assert.equal(
+    t.session.joined([el("a", 1)], { viewBackgroundColor: "#fff" }),
+    false,
+  );
+  // REST 저장이 방에 병합된 뒤라면 더 할 일이 없다.
+  assert.equal(
+    t.session.joined([el("a", 1), el("huge", 1)], {
+      viewBackgroundColor: "#fff",
+    }),
+    true,
+  );
+});
+
+test("a late error after two quick batches keeps both unsaved; saved confirms", () => {
+  const t = setup([]);
+  t.session.joined([], { viewBackgroundColor: "#fff" });
+  t.scene = [el("bad", 1)];
+  t.session.flush();
+  t.scene = [el("bad", 1), el("next", 1)];
+  t.session.flush();
+  t.session.reject();
+  assert.equal(t.session.settled(), false);
+  t.scene = [el("ok", 1)];
+  t.session.flush();
+  t.session.confirm();
+  t.session.reject(); // 확인된 뒤의 오류는 아무것도 탓하지 않는다
+  assert.equal(t.session.settled(), true);
+});
