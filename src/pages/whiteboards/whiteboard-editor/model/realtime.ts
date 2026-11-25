@@ -70,7 +70,8 @@ const statusOf = (error: unknown) =>
 /**
  * 화이트보드 방 하나의 연결 상태(s19 5절).
  * - 처음 붙기가 실패하면(티켓 실패, joined 전 닫힘, 5초 안에 joined 없음) off 로 두고 폴링에 맡긴다.
- * - 붙은 뒤 끊기면 reconnecting 으로 두고 새 티켓으로 1·2·4…30초 백오프 재접속한다. 4429 는 5초 뒤.
+ * - 붙은 뒤 끊기면 reconnecting 으로 두고 새 티켓으로 1·2·4…30초 백오프 재접속한다. 4429 와 티켓 429 는 5초 이상 쉰다.
+ * - 티켓은 접속 시도마다 하나만 받고 바로 쓴다(쓰지 않은 티켓이 쌓이면 서버가 429 를 준다).
  * - 4403·4409·1000 은 다시 붙지 않는다. 4408 은 wake() 가 불리면(사용자가 다시 움직이면) 붙는다.
  */
 export function createRealtimeConnection(deps: RealtimeDeps) {
@@ -124,8 +125,17 @@ export function createRealtimeConnection(deps: RealtimeDeps) {
       url = await deps.connectUrl();
     } catch (error) {
       if (stopped) return;
+      const code = statusOf(error);
       // 보드가 사라졌거나 못 읽는다. 폴링이 상태를 다시 본다.
-      if ([401, 403, 404].includes(statusOf(error))) return off("unavailable");
+      if ([401, 403, 404].includes(code)) return off("unavailable");
+      // 쓰지 않은 티켓이 사용자당 10개다(60초 안에 풀린다). 처음 접속이어도 쉬었다가 다시 받는다.
+      if (code === 429)
+        return retry(
+          Math.min(
+            Math.max(1_000 * 2 ** attempt, RATE_LIMIT_DELAY),
+            MAX_BACKOFF,
+          ),
+        );
       return failBeforeJoin();
     }
     if (stopped) return;

@@ -289,3 +289,21 @@ test("broken frames are ignored", async () => {
   t.sockets[0].onmessage?.({ data: "{not json" });
   assert.deepEqual(t.messages, []);
 });
+
+test("ticket 429 backs off at least 5 seconds, even on the first connect", async () => {
+  let calls = 0;
+  const t = setup(async () => {
+    calls += 1;
+    if (calls <= 2) throw Object.assign(new Error("too many"), { status: 429 });
+    return "ws://x/ws";
+  });
+  t.connection.start();
+  await flush();
+  assert.equal(t.connection.status, "reconnecting");
+  assert.equal(t.sockets.length, 0, "no socket without a ticket");
+  assert.equal(await t.fire(), RATE_LIMIT_DELAY);
+  assert.equal(await t.fire(), RATE_LIMIT_DELAY);
+  assert.equal(calls, 3, "one ticket per attempt");
+  t.sockets[0].receive(joined);
+  assert.equal(t.connection.status, "live");
+});

@@ -211,7 +211,8 @@ export default function Canvas({
       saving.current = true;
       callbacks.current.onSaveState("saving");
       try {
-        // ponytail: 지운 요소(isDeleted)도 함께 보낸다. 빼면 다른 화면이 병합하며 되살린다. 1MB 상한에 닿으면 오래된 지움부터 정리한다.
+        // 지운 요소(isDeleted)도 함께 보낸다(s19 5절). 빼면 다른 화면이 병합하며 되살리고, 방이 열려 있으면 서버가
+        // baseVersion 이후 안 바뀐 요소만 지운 것으로 본다(D19-10). 24시간 지난 지운 요소는 서버가 정리한다(D19-14).
         const saved = await whiteboardApi.saveScene(board.id, version.current, {
           elements,
           appState: sharedAppState(api.getAppState()),
