@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { githubErrorMessage } from "../model/github-error";
 import { ImportStatus } from "./ImportStatus";
+import { RepositoryLinkForm } from "./RepositoryLinkForm";
 import {
   Badge,
   Button,
   EmptyState,
   ErrorState,
   Field,
-  Input,
   Select,
   Spinner,
 } from "@/shared/ui";
@@ -34,8 +34,8 @@ export function RepositorySettings({
   const installable = useInstallableRepositories(projectId, !disabled);
   const change = useRepositoryChange(projectId);
   const [editing, setEditing] = useState(false);
-  const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState("");
+  // 일괄 연결이 도는 동안 폼이 닫혀 요청이 화면 밖에서 이어지지 않게 여기서 들고 있다.
+  const [linking, setLinking] = useState(false);
   if (repositories.isPending || (!disabled && installable.isPending))
     return <Spinner label="저장소 불러오는 중" />;
   if (repositories.isError)
@@ -45,17 +45,6 @@ export function RepositorySettings({
         onRetry={() => void repositories.refetch()}
       />
     );
-  const available =
-    installable.data?.filter(
-      (repo) =>
-        !repo.archived &&
-        !repositories.data.some(
-          (linked) => linked.repositoryId === repo.repositoryId,
-        ),
-    ) ?? [];
-  const matches = available.filter((repo) =>
-    repositoryName(repo).toLowerCase().includes(search.toLowerCase()),
-  );
   return (
     <div className="grid gap-4">
       <p className="text-sm text-muted">
@@ -150,91 +139,29 @@ export function RepositorySettings({
           </Select>
         </Field>
       )}
-      {!disabled && editing && !installable.isError && (
-        <form
-          className="grid gap-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (change.isPending) return;
-            const repoId = String(
-              new FormData(event.currentTarget).get("repository") ?? "",
-            );
-            const repo = available.find(
-              (item) => String(item.repositoryId) === repoId,
-            );
-            if (repo)
-              change.mutate(
-                {
-                  action: "link",
-                  installationId: repo.installationId,
-                  repositoryId: repo.repositoryId,
-                },
-                { onSuccess: () => setSelectedId("") },
-              );
-          }}
-        >
-          <Field id="repository-search" label="허용된 저장소 검색">
-            <Input
-              id="repository-search"
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-          </Field>
-          <Field id="installable-repository" label="연결할 저장소">
-            <Select
-              id="installable-repository"
-              name="repository"
-              required
-              disabled={change.isPending || available.length === 0}
-              value={selectedId}
-              onChange={(event) => setSelectedId(event.target.value)}
-            >
-              <option value="" disabled>
-                저장소 선택
-              </option>
-              {matches.map((repo) => (
-                <option key={repo.repositoryId} value={repo.repositoryId}>
-                  {repositoryName(repo)}
-                  {repo.private ? " (비공개)" : " (공개)"}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          {available.find((repo) => String(repo.repositoryId) === selectedId)
-            ?.private && (
-            <p className="text-sm text-muted">
-              연결하면 열린 Issue를 업무로 가져옵니다. 비공개 저장소의 업무는
-              원본 저장소 권한이 있는 참여자에게만 보여요.
-            </p>
-          )}
-          {available.length === 0 && (
-            <p className="text-sm text-muted">
-              새로 연결할 수 있는 저장소가 없습니다. 설치에 허용된 저장소와 보관
-              여부를 확인하세요.
-            </p>
-          )}
-          {available.length > 0 && matches.length === 0 && (
-            <p className="text-sm text-muted">
-              검색 결과가 없습니다. 검색어를 바꿔보세요.
-            </p>
-          )}
-          <Button
-            type="submit"
-            variant="secondary"
-            disabled={available.length === 0}
-            loading={change.isPending}
-          >
-            저장소 연결
-          </Button>
-        </form>
+      {!disabled && editing && installable.data && (
+        <RepositoryLinkForm
+          projectId={projectId}
+          installable={installable.data}
+          linked={repositories.data}
+          running={linking}
+          onRunningChange={setLinking}
+        />
       )}
       {editing && (
         <Button
           variant="ghost"
           className="justify-self-start"
           disabled={change.isPending}
-          onClick={() => setEditing(false)}
+          aria-disabled={linking || undefined}
+          title={
+            linking
+              ? "저장소 연결이 끝나거나 취소한 뒤 닫을 수 있어요"
+              : undefined
+          }
+          onClick={() => {
+            if (!linking) setEditing(false);
+          }}
         >
           편집 마침
         </Button>

@@ -25,3 +25,26 @@ export function githubErrorMessage(error: unknown): string {
       return normalized.message;
   }
 }
+
+/** 일괄 연결 결과 한 줄에 들어갈 짧은 실패 사유. */
+export function githubLinkFailureReason(error: unknown): string {
+  const normalized = normalizeApiError(error);
+  switch (normalized.code) {
+    case "GITHUB_NOT_CONFIGURED":
+      return "GitHub App 설정 필요";
+    case "GITHUB_ACCOUNT_NOT_LINKED":
+      return "GitHub 계정 연결 필요";
+    case "GITHUB_NO_REPOSITORY_ACCESS":
+      return "원본 저장소 접근 권한 없음";
+    case "GITHUB_REPOSITORY_NOT_INSTALLED":
+      return "GitHub App에 허용되지 않은 저장소";
+    case "GITHUB_INSTALLATION_UNAVAILABLE":
+      return "GitHub App 설치를 사용할 수 없음";
+    case "GITHUB_REPOSITORY_ALREADY_LINKED":
+      return "이미 연결된 저장소";
+    case "GITHUB_UNAVAILABLE":
+      return "GitHub 연결 실패, 잠시 후 다시 시도";
+    default:
+      return normalized.message;
+  }
+}

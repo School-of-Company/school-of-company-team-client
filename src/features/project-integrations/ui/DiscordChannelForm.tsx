@@ -126,8 +126,8 @@ export function DiscordChannelForm({
                   className="mt-1 shrink-0"
                 />
                 <span>
-                  이 채널을 볼 수 있는 역할, 사용자를 프로젝트 참여자로 제한했고,
-                  기존 스레드 권한도 직접 점검했습니다.
+                  이 채널을 볼 수 있는 역할, 사용자를 프로젝트 참여자로
+                  제한했고, 기존 스레드 권한도 직접 점검했습니다.
                 </span>
               </label>
             )}
