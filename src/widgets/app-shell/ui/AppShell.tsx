@@ -238,6 +238,7 @@ export function AppShell({
     },
     { href: routes.requirements, label: "요구사항", icon: "inbox" },
     { href: routes.docs, label: "문서", icon: "doc" },
+    { href: routes.stats, label: "통계", icon: "chart" },
   ];
   const teamLinks: readonly NavLink[] = [
     { href: routes.culture, label: "팀 문화", icon: "heart" },
