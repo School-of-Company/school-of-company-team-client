@@ -2,6 +2,7 @@ export {
   whiteboardApi,
   whiteboardKeys,
   whiteboardQueries,
+  realtimeSocketUrl,
 } from "./api/whiteboard";
 export type { WhiteboardLinkCandidate } from "./api/whiteboard";
 export { templateErrorMessage, whiteboardErrorMessage } from "./model/errors";

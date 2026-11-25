@@ -1,4 +1,4 @@
-// 서버 계약: docs/spec/s10-whiteboard.md, s16-whiteboard-v2.md(서버 저장소). 권한 판정은 서버가 하고 canEdit·canDelete 로 알려 준다.
+// 서버 계약: docs/spec/s10-whiteboard.md, s16-whiteboard-v2.md, s19-whiteboard-realtime.md(서버 저장소). 권한 판정은 서버가 하고 canEdit·canDelete 로 알려 준다.
 import type { KnowledgeSummary } from "@/entities/knowledge/@x/whiteboard";
 import type { TaskScope, TaskStatus } from "@/entities/task/@x/whiteboard";
 
@@ -164,3 +164,75 @@ export const WHITEBOARD_COMMENT_MAX = 2000;
 export type WhiteboardRevisionDetail = WhiteboardRevision & {
   readonly scene: WhiteboardScene;
 };
+
+/** s19: WebSocket 접속용 60초, 1회용 티켓. path 는 API 서버 기준 상대 경로다. */
+export type WhiteboardRealtimeTicket = {
+  readonly ticket: string;
+  readonly expiresAt: string;
+  readonly path: string;
+};
+
+export type WhiteboardRealtimeParticipant = {
+  readonly connectionId: string;
+  readonly user: WhiteboardPerson;
+  readonly canEdit: boolean;
+};
+
+/** s19 3.2 서버가 보내는 메시지. connectionId 가 null 이면 REST 저장이나 폴링 사용자에게서 왔다. */
+export type WhiteboardServerMessage =
+  | {
+      readonly type: "joined";
+      readonly connectionId: string;
+      readonly canEdit: boolean;
+      readonly version: number;
+      readonly scene: WhiteboardScene;
+      readonly participants: readonly WhiteboardRealtimeParticipant[];
+    }
+  | {
+      readonly type: "participant-joined";
+      readonly participant: WhiteboardRealtimeParticipant;
+    }
+  | { readonly type: "participant-left"; readonly connectionId: string }
+  | {
+      readonly type: "elements";
+      readonly connectionId: string | null;
+      readonly elements: readonly unknown[];
+      readonly appState?: Readonly<Record<string, unknown>>;
+    }
+  | {
+      readonly type: "pointer";
+      readonly connectionId: string | null;
+      readonly userId: string;
+      readonly x: number;
+      readonly y: number;
+      readonly selectedElementIds?: readonly string[];
+    }
+  | { readonly type: "saved"; readonly version: number }
+  | {
+      readonly type: "scene";
+      readonly version: number;
+      readonly scene: WhiteboardScene;
+    }
+  | { readonly type: "access"; readonly canEdit: boolean }
+  | {
+      readonly type: "error";
+      readonly code: string;
+      readonly message: string;
+      readonly details?: unknown;
+    }
+  | { readonly type: "pong" };
+
+/** s19 3.1 클라이언트가 보내는 메시지. */
+export type WhiteboardClientMessage =
+  | {
+      readonly type: "elements";
+      readonly elements: readonly unknown[];
+      readonly appState?: Readonly<Record<string, unknown>>;
+    }
+  | {
+      readonly type: "pointer";
+      readonly x: number;
+      readonly y: number;
+      readonly selectedElementIds: readonly string[];
+    }
+  | { readonly type: "ping" };
