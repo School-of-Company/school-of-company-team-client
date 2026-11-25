@@ -9,6 +9,7 @@ import {
   serviceErrorMessage,
   type ServiceOps,
 } from "@/entities/service";
+import { normalizeApiError } from "@/shared/api";
 import { Button } from "@/shared/ui";
 import {
   HEALTH_RUN_COOLDOWN_SECONDS,
@@ -46,6 +47,9 @@ export function RunHealthCheck({ serviceId }: { readonly serviceId: string }) {
     onError: (error) => {
       const seconds = retryAfterSeconds(error);
       if (seconds) setWait(seconds);
+      // 그사이 헬스체크가 꺼졌다(409). 화면의 설정과 상태를 서버 값으로 다시 맞춘다.
+      if (normalizeApiError(error).code === "OPS_HEALTH_CHECK_NOT_CONFIGURED")
+        void client.invalidateQueries({ queryKey: opsKeys.all });
     },
   });
   const check = run.data?.check;

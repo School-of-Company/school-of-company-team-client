@@ -43,6 +43,7 @@ const messages: Readonly<Record<string, string>> = {
   OPS_LINK_URL_INVALID: "링크는 http 또는 https 로 시작하는 주소여야 합니다.",
   OPS_RUNBOOK_INVALID: "Runbook 종류의 문서만 고를 수 있습니다.",
   OPS_HTTP_REQUIRES_LEAD: "http 허용은 헤드 어드민만 바꿀 수 있습니다.",
+  OPS_HEALTH_CHECK_NOT_CONFIGURED: "헬스체크 주소를 먼저 설정해 주세요.",
   KNOWLEDGE_NOT_FOUND: "고른 Runbook을 찾을 수 없거나 읽을 권한이 없습니다.",
 };
 
