@@ -14,7 +14,12 @@ export type RuleEvent =
   | "CI_FAILED"
   | "REVIEW_REQUESTED"
   | "DEADLINE_APPROACHING"
-  | "INCIDENT_CREATED";
+  | "INCIDENT_CREATED"
+  | "REQUIREMENT_SUBMITTED"
+  | "REQUIREMENT_REPLIED"
+  | "SPRINT_STARTED"
+  | "SPRINT_ENDING_SOON"
+  | "SPRINT_OVERDUE";
 export type RuleAction =
   "NOTIFY_DISCORD" | "MARK_ATTENTION" | "ASSIGN_REVIEWER" | "MOVE_BUCKET";
 export type RuleConditionField = "PRIORITY" | "TYPE" | "PART" | "BUCKET";
@@ -89,6 +94,10 @@ export type SaveRuleRequest = {
   readonly mentions: RuleMentions | null;
 };
 
+/**
+ * 이벤트 표시 이름. 서버 RuleEvent 가 늘면 여기와 TASKLESS_EVENTS 만 고친다.
+ * 키 순서가 편집기의 선택 순서다(업무 이벤트, 그다음 업무가 없는 이벤트).
+ */
 export const eventLabels: Readonly<Record<RuleEvent, string>> = {
   TASK_STATUS_CHANGED: "상태가 바뀔 때",
   TASK_BLOCKED: "막힘으로 표시될 때",
@@ -96,16 +105,35 @@ export const eventLabels: Readonly<Record<RuleEvent, string>> = {
   REVIEW_REQUESTED: "연결된 PR에 리뷰가 요청될 때",
   DEADLINE_APPROACHING: "마감 하루 전",
   INCIDENT_CREATED: "장애가 생길 때",
+  REQUIREMENT_SUBMITTED: "요구사항이 접수될 때",
+  REQUIREMENT_REPLIED: "요청자가 요구사항에 답글을 달 때",
+  SPRINT_STARTED: "스프린트가 시작될 때",
+  SPRINT_ENDING_SOON: "스프린트 종료 2일 전부터",
+  SPRINT_OVERDUE: "스프린트 종료일이 지났을 때",
 };
-/** 업무 이벤트 다음에 사고 이벤트. 사고 이벤트는 업무 필드가 없어 조건을 두지 않는다. */
-export const selectableEvents: readonly RuleEvent[] = [
-  "TASK_STATUS_CHANGED",
-  "TASK_BLOCKED",
-  "CI_FAILED",
-  "REVIEW_REQUESTED",
-  "DEADLINE_APPROACHING",
+export const selectableEvents = Object.keys(
+  eventLabels,
+) as readonly RuleEvent[];
+/** 서버가 아직 클라이언트에 없는 이벤트를 보내도 빈 칸이나 undefined 가 보이지 않게 한다. */
+export function eventLabel(event: string): string {
+  return eventLabels[event as RuleEvent] ?? "알 수 없는 이벤트";
+}
+/**
+ * 업무가 없는 이벤트(서버 AutomationRuleValidator.TASKLESS_EVENTS 와 같은 집합).
+ * 조건을 둘 수 없고, 동작은 Discord 알림만, 멘션은 PM 만 된다.
+ * 모르는 이벤트는 넣지 않는다: 규칙을 켜고 끌 때 서버가 받아 준 정의를 그대로 돌려보낸다.
+ */
+const TASKLESS_EVENTS: ReadonlySet<string> = new Set<RuleEvent>([
   "INCIDENT_CREATED",
-];
+  "REQUIREMENT_SUBMITTED",
+  "REQUIREMENT_REPLIED",
+  "SPRINT_STARTED",
+  "SPRINT_ENDING_SOON",
+  "SPRINT_OVERDUE",
+]);
+export function isTasklessEvent(event: string): boolean {
+  return TASKLESS_EVENTS.has(event);
+}
 export const actionLabels: Readonly<Record<RuleAction, string>> = {
   NOTIFY_DISCORD: "Discord로 알림",
   MARK_ATTENTION: "확인 필요로 표시",
@@ -158,11 +186,21 @@ const resultMessages: Readonly<Record<string, string>> = {
  * 실행 결과 code 의 한국어 이유. 서버가 새 code 를 더해도 원문 code 만 덩그러니 보이지 않게,
  * 비공개 원본 공유 제한 계열은 그 뜻으로, 나머지는 상태에 맞는 문장 + code 로 보여 준다.
  */
-/** 사고 실행에는 대상 업무·업무 스레드가 없어 같은 code 라도 뜻이 다르다. */
-const incidentResultMessages: Readonly<Record<string, string>> = {
-  TASK_NOT_ELIGIBLE: "장애가 삭제되었습니다.",
-  DISCORD_CHANNEL_MISSING: "Discord 프로젝트 채널이 연결되지 않았습니다.",
+/** 업무가 없는 이벤트의 실행에는 대상 업무·업무 스레드가 없어 같은 code 라도 뜻이 다르다. */
+const tasklessTargetGone: Readonly<Partial<Record<RuleEvent, string>>> = {
+  INCIDENT_CREATED: "장애가 삭제되었습니다.",
+  REQUIREMENT_SUBMITTED: "요구사항이 삭제되었거나 스팸으로 분류되었습니다.",
+  REQUIREMENT_REPLIED: "요구사항이 삭제되었거나 스팸으로 분류되었습니다.",
+  SPRINT_STARTED: "스프린트가 삭제되었거나 이미 끝났습니다.",
+  SPRINT_ENDING_SOON: "스프린트가 삭제되었거나 이미 끝났습니다.",
+  SPRINT_OVERDUE: "스프린트가 삭제되었거나 이미 끝났습니다.",
 };
+function tasklessResultMessage(code: string, event: RuleEvent) {
+  if (code === "TASK_NOT_ELIGIBLE") return tasklessTargetGone[event];
+  if (code === "DISCORD_CHANNEL_MISSING")
+    return "Discord 프로젝트 채널이 연결되지 않았습니다.";
+  return undefined;
+}
 export function resultMessage(
   code: string | null,
   status?: RuleRunStatus,
@@ -170,8 +208,9 @@ export function resultMessage(
 ): string | null {
   if (!code) return null;
   const known =
-    (event === "INCIDENT_CREATED" ? incidentResultMessages[code] : undefined) ??
-    resultMessages[code];
+    (event && isTasklessEvent(event)
+      ? tasklessResultMessage(code, event)
+      : undefined) ?? resultMessages[code];
   if (known) return known;
   if (/PRIVATE|RESTRICT|SHARING/.test(code))
     return "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.";
@@ -186,7 +225,7 @@ const errorMessages: Readonly<Record<string, string>> = {
   DUPLICATE_RULE_NAME: "같은 이름의 규칙이 있습니다. 다른 이름을 입력하세요.",
   RULE_EVENT_STATUS_NOT_APPLICABLE: "상태는 '상태가 바뀔 때'에서만 고릅니다.",
   RULE_CONDITION_INVALID: "조건 값이 올바르지 않습니다.",
-  RULE_CONDITION_NOT_APPLICABLE: "장애 이벤트에는 조건을 둘 수 없습니다.",
+  RULE_CONDITION_NOT_APPLICABLE: "이 이벤트에는 조건을 둘 수 없습니다.",
   RULE_ACTION_NOT_APPLICABLE: "이 동작에 맞지 않는 대상이나 멘션이 있습니다.",
   RULE_ACTION_TARGET_REQUIRED:
     "옮길 버킷이나 지정할 리뷰어가 없습니다. 편집에서 대상을 고르세요.",
@@ -260,9 +299,9 @@ export function ruleToForm(rule: AutomationRule): RuleForm {
   };
 }
 
-/** 사고 이벤트는 조건 없이 Discord 알림(PM 멘션)만 된다(서버 저장 검증 3). */
+/** 업무가 없는 이벤트는 조건 없이 Discord 알림(PM 멘션)만 된다(서버 저장 검증 3). */
 export function allowedActions(event: RuleEvent): readonly RuleAction[] {
-  return event === "INCIDENT_CREATED" ? ["NOTIFY_DISCORD"] : actions;
+  return isTasklessEvent(event) ? ["NOTIFY_DISCORD"] : actions;
 }
 
 /** 이벤트를 바꾸면 그 이벤트가 허용하지 않는 동작은 Discord 알림으로 되돌린다(조건·대상은 남겨 두고 보낼 때 뺀다). */
@@ -278,7 +317,7 @@ export function changeEvent(form: RuleForm, event: RuleEvent): RuleForm {
 
 /** 서버로 보낼 본문. 이벤트·동작에 맞지 않는 값은 빼서 RULE_*_NOT_APPLICABLE 을 미리 피한다. */
 export function formToRequest(form: RuleForm): SaveRuleRequest {
-  const incident = form.event === "INCIDENT_CREATED";
+  const taskless = isTasklessEvent(form.event);
   return {
     name: form.name.trim(),
     enabled: form.enabled,
@@ -287,7 +326,7 @@ export function formToRequest(form: RuleForm): SaveRuleRequest {
       form.event === "TASK_STATUS_CHANGED" && form.eventStatus
         ? form.eventStatus
         : null,
-    conditions: incident
+    conditions: taskless
       ? []
       : conditionFields.flatMap((field) =>
           [...new Set(form.conditions[field])].map((value) => ({
@@ -301,7 +340,7 @@ export function formToRequest(form: RuleForm): SaveRuleRequest {
       form.action === "ASSIGN_REVIEWER" ? form.reviewerId || null : null,
     mentions:
       form.action === "NOTIFY_DISCORD"
-        ? incident
+        ? taskless
           ? { assignees: false, reviewers: false, pm: form.mentions.pm }
           : form.mentions
         : null,
@@ -349,7 +388,15 @@ export function triggerText(rule: {
 }): string {
   if (rule.event === "TASK_STATUS_CHANGED" && rule.eventStatus)
     return `상태가 ${statusLabels[rule.eventStatus]}(으)로 바뀔 때`;
-  return eventLabels[rule.event];
+  return eventLabel(rule.event);
+}
+
+/** 실행 기록에 업무·장애 링크가 없을 때 대상 칸에 쓸 말. 요구사항·스프린트 실행에는 대상 ID 가 오지 않는다. */
+export function runTargetFallback(event: RuleEvent): string {
+  if (event === "INCIDENT_CREATED") return "삭제된 장애";
+  if (event.startsWith("REQUIREMENT_")) return "요구사항";
+  if (event.startsWith("SPRINT_")) return "스프린트";
+  return event in eventLabels ? "삭제된 업무" : "대상 없음";
 }
 
 export function conditionValueLabel(

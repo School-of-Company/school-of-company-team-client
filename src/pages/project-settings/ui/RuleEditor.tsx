@@ -24,10 +24,11 @@ import {
   conditionFields,
   conditionValueLabel,
   emptyRuleForm,
-  eventLabels,
+  eventLabel,
   eventStatusOptions,
   fieldLabels,
   formToRequest,
+  isTasklessEvent,
   ruleErrorMessage,
   ruleToForm,
   selectableEvents,
@@ -100,6 +101,11 @@ function RuleEditorForm({
   const set = (patch: Partial<RuleForm>) =>
     setForm((current) => ({ ...current, ...patch }));
   const incident = form.event === "INCIDENT_CREATED";
+  const taskless = isTasklessEvent(form.event);
+  // 클라이언트가 모르는 이벤트 규칙을 열어도 선택 칸이 다른 이벤트로 보이지 않게 그 값을 그대로 둔다.
+  const events = selectableEvents.includes(form.event)
+    ? selectableEvents
+    : [...selectableEvents, form.event];
   const options: Readonly<Record<RuleConditionField, readonly Option[]>> = {
     PRIORITY: (Object.keys(priorityLabels) as TaskPriority[]).map((value) => ({
       value,
@@ -182,9 +188,9 @@ function RuleEditorForm({
               )
             }
           >
-            {selectableEvents.map((value) => (
+            {events.map((value) => (
               <option key={value} value={value}>
-                {eventLabels[value]}
+                {eventLabel(value)}
               </option>
             ))}
           </Select>
@@ -215,7 +221,7 @@ function RuleEditorForm({
           장애의 영향 서비스가 이 프로젝트에 연결된 저장소를 쓰면 걸립니다.
         </p>
       )}
-      {!incident && (
+      {!taskless && (
         <fieldset className="grid gap-3">
           <legend className="text-sm font-medium">조건</legend>
           <p className="-mt-1 text-xs text-muted">
@@ -340,7 +346,7 @@ function RuleEditorForm({
                 ["pm", "PM"],
               ] as const
             )
-              .filter(([key]) => !incident || key === "pm")
+              .filter(([key]) => !taskless || key === "pm")
               .map(([key, label]) => (
                 <span key={key} className="flex items-center gap-2">
                   <Checkbox
@@ -360,7 +366,7 @@ function RuleEditorForm({
               ))}
           </div>
           <p className="text-xs text-muted">
-            {incident
+            {taskless
               ? "프로젝트 채널로 보냅니다. Discord를 연결한 사람만 멘션합니다."
               : "업무 스레드, 없으면 프로젝트 채널로 보냅니다. Discord를 연결한 사람만 멘션합니다."}
           </p>
