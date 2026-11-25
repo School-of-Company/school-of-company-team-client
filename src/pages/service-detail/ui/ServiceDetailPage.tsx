@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Suspense, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { redirect, usePathname, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   serviceErrorMessage,
@@ -18,16 +18,16 @@ import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
 import { Badge, Button, ErrorState, StaleNotice } from "@/shared/ui";
 import { ServiceOverview } from "./ServiceOverview";
-import { ServiceReleases } from "./ServiceReleases";
-import { ServiceDeployments } from "./ServiceDeployments";
+import { ServiceMonitoring } from "./ServiceMonitoring";
 import { ServiceRunbooks } from "./ServiceRunbooks";
 
+// 릴리스와 배포 전체 이력은 운영 화면의 배포 탭으로 옮겼다(개요에는 최근 3건).
 const tabs = [
   { value: "overview", label: "개요" },
-  { value: "releases", label: "릴리스" },
-  { value: "deployments", label: "배포" },
+  { value: "monitoring", label: "모니터링" },
   { value: "runbooks", label: "Runbook" },
 ] as const;
+
 export type ServiceTab = (typeof tabs)[number]["value"];
 
 export function ServiceDetailPage({
@@ -61,7 +61,7 @@ export function ServiceDetailSkeleton() {
       <header aria-hidden="true" className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
-            <span className="ui-skeleton-text">서비스 / 키</span>
+            <span className="ui-skeleton-text">운영 / 키</span>
           </p>
           <h1 className="task-title font-semibold">
             <span className="ui-skeleton-text">서비스 이름</span>
@@ -137,6 +137,20 @@ function ServiceWorkspace({
 }) {
   const pathname = usePathname() ?? routes.service(service.key);
   const search = useSearchParams();
+  const legacy = search?.get("tab");
+  if (legacy === "releases" || legacy === "deployments") {
+    // 옛 링크의 열린 릴리스 노트(release)와 환경 필터(env)는 배포 탭에서도 같은 이름이다.
+    const params = new URLSearchParams({
+      tab: "deploys",
+      service: service.key,
+    });
+    if (legacy === "releases") params.set("view", "releases");
+    for (const key of ["release", "env"]) {
+      const value = search?.get(key);
+      if (value) params.set(key, value);
+    }
+    redirect(`${routes.ops}?${params.toString()}`);
+  }
   const tab: ServiceTab =
     tabs.find((item) => item.value === search?.get("tab"))?.value ?? "overview";
   const [editing, setEditing] = useState(false);
@@ -145,7 +159,7 @@ function ServiceWorkspace({
       <header className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
-            <Link href={routes.services}>서비스</Link>
+            <Link href={routes.services}>운영</Link>
             <span aria-hidden="true">/</span>
             <span>{service.key}</span>
           </p>
@@ -188,8 +202,9 @@ function ServiceWorkspace({
         ))}
       </nav>
       {tab === "overview" && <ServiceOverview service={service} />}
-      {tab === "releases" && <ServiceReleases service={service} />}
-      {tab === "deployments" && <ServiceDeployments service={service} />}
+      {tab === "monitoring" && (
+        <ServiceMonitoring service={service} headAdmin={headAdmin} />
+      )}
       {tab === "runbooks" && <ServiceRunbooks service={service} />}
       {editing && (
         <EditServiceDialog

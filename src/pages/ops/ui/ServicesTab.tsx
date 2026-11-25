@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -13,8 +13,6 @@ import {
   type DependencyGraph as Graph,
   type ServiceSummary,
 } from "@/entities/service";
-import { isHeadAdmin } from "@/entities/user";
-import { AuthGuard } from "@/features/auth";
 import { CreateServiceDialog } from "@/features/manage-service";
 import { DependencyGraph } from "@/widgets/dependency-graph";
 import { routes } from "@/shared/config";
@@ -25,26 +23,15 @@ import {
   Icon,
   ListSkeleton,
   PageHeader,
-  PageSkeleton,
   QueryState,
   SegmentedLinks,
 } from "@/shared/ui";
+import { OpsTabs } from "./OpsTabs";
 
-export function ServiceListPage() {
-  return (
-    <AuthGuard require="work">
-      {(user) => (
-        <Suspense fallback={<PageSkeleton label="서비스 불러오는 중" />}>
-          <ServiceListContent canCreate={isHeadAdmin(user)} />
-        </Suspense>
-      )}
-    </AuthGuard>
-  );
-}
-
-function ServiceListContent({ canCreate }: { readonly canCreate: boolean }) {
+/** 서비스 카탈로그(목록, 의존관계). 운영 화면의 서비스 탭이다. */
+export function ServicesTab({ canCreate }: { readonly canCreate: boolean }) {
   const router = useRouter();
-  const pathname = usePathname() ?? routes.services;
+  const pathname = usePathname() ?? routes.ops;
   const search = useSearchParams();
   const view = search?.get("view") === "graph" ? "graph" : "list";
   const archived = view === "list" && search?.get("archived") === "1";
@@ -66,12 +53,12 @@ function ServiceListContent({ canCreate }: { readonly canCreate: boolean }) {
   return (
     <div className="grid gap-5">
       <PageHeader
-        title="서비스"
+        title="운영"
         subtitle={
           view === "graph"
             ? "서비스 간 의존관계"
             : count !== undefined
-              ? `${status} ${count}개`
+              ? `${status} 서비스 ${count}개`
               : services.isError && !services.data
                 ? "서비스 집계를 불러오지 못했습니다"
                 : `${status} 서비스 집계 중`
@@ -84,6 +71,7 @@ function ServiceListContent({ canCreate }: { readonly canCreate: boolean }) {
           )
         }
       />
+      <OpsTabs active="services" />
       <div className="page-toolbar">
         <SegmentedLinks
           label="서비스 보기"

@@ -21,6 +21,7 @@ import {
 } from "@/shared/ui";
 import { formatDateTime, formatDuration, shortSha } from "./format";
 import { HiddenRepositoriesNote } from "./ServiceReleases";
+import { withParams } from "./href";
 
 export function DeploymentsState({
   service,
@@ -162,9 +163,7 @@ export function ServiceDeployments({
     ]),
   ].sort();
   const href = (env: string) =>
-    env
-      ? `${pathname}?tab=deployments&env=${encodeURIComponent(env)}`
-      : `${pathname}?tab=deployments`;
+    withParams(pathname, search, { env: env || null });
   return (
     <section aria-label="배포 이력" className="grid gap-4">
       {environments.length > 1 && (

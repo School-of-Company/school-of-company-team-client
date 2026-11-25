@@ -13,6 +13,8 @@ const kinds: readonly {
   readonly kind: NotificationKind;
   readonly label: string;
   readonly hint: string;
+  /** 팀 공용 설정에만 보인다. */
+  readonly teamOnly?: true;
 }[] = [
   {
     kind: "ciFailed",
@@ -28,6 +30,12 @@ const kinds: readonly {
     kind: "deadlineDue",
     label: "마감 하루 전",
     hint: "마감 전날 오전 9시에 완료되지 않은 업무의 담당자를 멘션합니다.",
+  },
+  {
+    kind: "serviceDown",
+    label: "서비스 다운",
+    hint: "헬스체크나 업타임 모니터가 다운을 알리면 팀 채널에 알려요.",
+    teamOnly: true,
   },
 ];
 
@@ -46,7 +54,7 @@ const channelText = {
   DISABLED: "Discord 채널 연결이 비활성이라 알림이 가지 않습니다.",
 } as const;
 
-/** 알림 3종 토글. projectId=null 이면 팀 공용 업무 설정이다. */
+/** 고정 알림 토글. projectId=null 이면 팀 공용 설정이고 서비스 다운이 더 보인다. */
 export function NotificationSettingsForm({
   projectId,
   editable,
@@ -59,6 +67,7 @@ export function NotificationSettingsForm({
 }) {
   const settings = useNotificationSettings(projectId);
   const update = useUpdateNotificationSetting(projectId);
+  const shown = kinds.filter(({ teamOnly }) => !teamOnly || projectId === null);
   if (settings.isPending)
     return (
       <div
@@ -66,9 +75,9 @@ export function NotificationSettingsForm({
         aria-label="알림 설정을 불러오는 중"
         className="grid gap-3"
       >
-        <Skeleton className="h-10" />
-        <Skeleton className="h-10" />
-        <Skeleton className="h-10" />
+        {shown.map(({ kind }) => (
+          <Skeleton key={kind} className="h-10" />
+        ))}
       </div>
     );
   if (settings.isError)
@@ -94,7 +103,7 @@ export function NotificationSettingsForm({
       )}
       <fieldset className="notify-list">
         <legend className="sr-only">알림 종류</legend>
-        {kinds.map(({ kind, label, hint }) => {
+        {shown.map(({ kind, label, hint }) => {
           const id = `notify-${projectId ?? "team"}-${kind}`;
           return (
             <div key={kind} className="notify-row">
@@ -111,7 +120,7 @@ export function NotificationSettingsForm({
                 type="checkbox"
                 role="switch"
                 className="notify-switch"
-                checked={data[kind]}
+                checked={data[kind] ?? false}
                 aria-describedby={`${id}-hint`}
                 disabled={!editable || update.isPending}
                 onChange={(event) =>

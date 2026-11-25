@@ -23,6 +23,7 @@ import {
   StaleNotice,
 } from "@/shared/ui";
 import { formatDateTime } from "./format";
+import { withParams } from "./href";
 
 const itemsLabel = (release: ReleaseSummary) => {
   switch (release.itemsStatus) {
@@ -128,11 +129,20 @@ export function ReleasesState({
   );
 }
 
-export function ReleaseRow({ release }: { readonly release: ReleaseSummary }) {
+/** 기본은 지금 주소에 `release` 만 더해 같은 화면의 릴리스 노트를 연다. 노트가 없는 화면은 `href`로 다른 곳을 가리킨다. */
+export function ReleaseRow({
+  release,
+  href,
+}: {
+  readonly release: ReleaseSummary;
+  readonly href?: string;
+}) {
+  const search = useSearchParams();
+  const pathname = usePathname() ?? "";
   return (
     <li className="service-list-row">
       <Link
-        href={`?tab=releases&release=${encodeURIComponent(release.id)}`}
+        href={href ?? withParams(pathname, search, { release: release.id })}
         className="min-w-0 grow"
       >
         <span className="flex flex-wrap items-center gap-2">
@@ -187,7 +197,9 @@ export function ServiceReleases({
         <ReleaseNote
           releaseId={selected}
           onClose={() =>
-            router.replace(`${pathname}?tab=releases`, { scroll: false })
+            router.replace(withParams(pathname, search, { release: null }), {
+              scroll: false,
+            })
           }
         />
       )}

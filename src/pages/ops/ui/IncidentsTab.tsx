@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -11,13 +11,13 @@ import {
   incidentErrorMessage,
   incidentQueries,
   IncidentStatusLabel,
+  MonitorSourceBadge,
   postmortemStatusLabels,
   SeverityLabel,
   type IncidentStatus,
   type IncidentSummary,
 } from "@/entities/incident";
 import { serviceQueries } from "@/entities/service";
-import { AuthGuard } from "@/features/auth";
 import { IncidentFormDialog } from "@/features/manage-incident";
 import { routes } from "@/shared/config";
 import { settledData } from "@/shared/lib";
@@ -28,10 +28,10 @@ import {
   Icon,
   ListSkeleton,
   PageHeader,
-  PageSkeleton,
   QueryState,
   SegmentedLinks,
 } from "@/shared/ui";
+import { OpsTabs } from "./OpsTabs";
 
 /** 목록 기본은 진행 중(대응 중·완화됨). 상태 묶음은 URL `?status=`에 둔다. */
 const views = [
@@ -44,21 +44,10 @@ const views = [
   statuses: readonly IncidentStatus[];
 }[];
 
-export function IncidentListPage() {
-  return (
-    <AuthGuard require="work">
-      {() => (
-        <Suspense fallback={<PageSkeleton label="장애 불러오는 중" />}>
-          <IncidentListContent />
-        </Suspense>
-      )}
-    </AuthGuard>
-  );
-}
-
-function IncidentListContent() {
+/** 장애 목록. 운영 화면의 장애 탭이다. */
+export function IncidentsTab() {
   const router = useRouter();
-  const pathname = usePathname() ?? routes.incidents;
+  const pathname = usePathname() ?? routes.ops;
   const search = useSearchParams();
   const view =
     views.find((item) => item.value === search?.get("status")) ?? views[0];
@@ -80,10 +69,10 @@ function IncidentListContent() {
   return (
     <div className="grid gap-5">
       <PageHeader
-        title="장애"
+        title="운영"
         subtitle={
           count !== undefined
-            ? `${view.label} ${count}건`
+            ? `${view.label} 장애 ${count}건`
             : incidents.isError && !incidents.data
               ? "장애 집계를 불러오지 못했습니다"
               : `${view.label} 장애 집계 중`
@@ -94,6 +83,7 @@ function IncidentListContent() {
           </Button>
         }
       />
+      <OpsTabs active="incidents" />
       <div className="page-toolbar">
         <SegmentedLinks
           label="장애 상태"
@@ -176,8 +166,9 @@ function IncidentTable({
               className="incident-table-row"
             >
               <span className="min-w-0">
-                <span className="block truncate font-medium">
-                  {incident.title}
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="truncate font-medium">{incident.title}</span>
+                  <MonitorSourceBadge source={incident.source} />
                 </span>
                 <span className="block truncate text-xs text-muted">
                   {incident.services.length

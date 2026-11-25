@@ -8,6 +8,8 @@ export type IncidentStatus = "OPEN" | "MITIGATED" | "RESOLVED";
 export type TimelineKind =
   "CREATED" | "STATUS" | "SEVERITY" | "COMMANDER" | "NOTE";
 export type PostmortemStatus = "DRAFT" | "PUBLISHED";
+/** s17 3.8: 사람이 만든 사고는 MANUAL, 헬스체크·업타임 웹훅 DOWN 으로 만든 것은 MONITOR_*. */
+export type IncidentSource = "MANUAL" | "MONITOR_HEALTH" | "MONITOR_WEBHOOK";
 
 export const incidentSeverities: readonly IncidentSeverity[] = [
   "SEV1",
@@ -69,6 +71,7 @@ export type IncidentSummary = {
   readonly id: string;
   readonly title: string;
   readonly severity: IncidentSeverity;
+  readonly source: IncidentSource;
   readonly status: IncidentStatus;
   readonly commander: IncidentPerson | null;
   readonly services: readonly IncidentService[];

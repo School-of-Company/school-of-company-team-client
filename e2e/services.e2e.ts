@@ -34,9 +34,14 @@ test("헤드 어드민이 서비스를 만들고 의존관계를 추가한다", 
   await page.goto("/me");
   await page
     .getByRole("navigation", { name: "조직" })
+    .getByRole("link", { name: "운영" })
+    .click();
+  await expect(page).toHaveURL(/\/ops$/);
+  await page
+    .getByRole("navigation", { name: "운영 메뉴" })
     .getByRole("link", { name: "서비스" })
     .click();
-  await expect(page).toHaveURL(/\/services$/);
+  await expect(page).toHaveURL(/\/ops\?tab=services$/);
   await page.getByRole("button", { name: "새 서비스" }).first().click();
   const dialog = page.getByRole("dialog", { name: "새 서비스" });
   await dialog.getByLabel("키").fill(key);

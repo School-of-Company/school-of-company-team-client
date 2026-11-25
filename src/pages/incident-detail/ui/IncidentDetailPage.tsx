@@ -9,6 +9,7 @@ import {
   incidentQueries,
   IncidentStatusLabel,
   isNotFound,
+  MonitorSourceBadge,
   postmortemStatusLabels,
   SeverityLabel,
   type IncidentDetail,
@@ -64,7 +65,7 @@ export function IncidentDetailSkeleton() {
       <header aria-hidden="true" className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
-            <span className="ui-skeleton-text">장애 / 진행 중</span>
+            <span className="ui-skeleton-text">운영 / 진행 중</span>
           </p>
           <h1 className="task-title font-semibold">
             <span className="ui-skeleton-text">장애 제목을 불러오는 중</span>
@@ -176,7 +177,7 @@ function IncidentWorkspace({
       <header className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb">
-            <Link href={routes.incidents}>장애</Link>
+            <Link href={routes.incidents}>운영</Link>
             <span aria-hidden="true">/</span>
             <span>{incident.status === "RESOLVED" ? "해결됨" : "진행 중"}</span>
           </p>
@@ -184,6 +185,7 @@ function IncidentWorkspace({
           <p className="mt-2 flex flex-wrap items-center gap-3">
             <SeverityLabel severity={incident.severity} />
             <IncidentStatusLabel status={incident.status} />
+            <MonitorSourceBadge source={incident.source} />
             {incident.postmortemStatus && (
               <span className="text-xs text-muted">
                 사후 검토 {postmortemStatusLabels[incident.postmortemStatus]}
