@@ -189,9 +189,9 @@ function MilestoneBody({
               percent={milestonePercent(progress)}
               label={`${milestone.name} 진행률`}
             />
-            {progress.totalWeight !== null && (
+            {progress.totalWeight > 0 && (
               <span className="text-xs text-muted tabular-nums">
-                크기 기준 {progress.doneWeight ?? 0}/{progress.totalWeight}
+                크기 기준 {progress.doneWeight}/{progress.totalWeight}
               </span>
             )}
           </dd>

@@ -25,7 +25,7 @@ const milestone = {
   statusSource: "AUTO",
   statusOverride: null,
   risk: { level: "NONE", reason: null },
-  progress: { total: 4, done: 1, totalWeight: null, doneWeight: null },
+  progress: { total: 4, done: 1, totalWeight: 0, doneWeight: 0 },
   sprints: [],
   releaseLink: null,
   release: null,
@@ -98,7 +98,7 @@ test("validation mirrors the server rules", () => {
   );
 });
 
-test("percent uses weight when the server sends it, otherwise counts", () => {
+test("percent uses weight when anything is sized, otherwise counts", () => {
   assert.equal(milestonePercent(milestone.progress), 25);
   assert.equal(
     milestonePercent({ total: 4, done: 1, totalWeight: 10, doneWeight: 8 }),
@@ -108,9 +108,14 @@ test("percent uses weight when the server sends it, otherwise counts", () => {
     milestonePercent({
       total: 0,
       done: 0,
-      totalWeight: null,
-      doneWeight: null,
+      totalWeight: 0,
+      doneWeight: 0,
     }),
     0,
+  );
+  // 크기 없는 업무는 무게 0: 무게로 보면 S(1) 하나 끝난 2/3 업무가 100%다.
+  assert.equal(
+    milestonePercent({ total: 3, done: 2, totalWeight: 1, doneWeight: 1 }),
+    100,
   );
 });

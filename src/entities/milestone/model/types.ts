@@ -76,8 +76,9 @@ export type Milestone = {
   readonly progress: {
     readonly total: number;
     readonly done: number;
-    readonly totalWeight: number | null;
-    readonly doneWeight: number | null;
+    /** 크기 무게 합(S=1, M=2, L=4, XL=8). 크기 없는 업무는 0이지만 개수에는 들어간다. */
+    readonly totalWeight: number;
+    readonly doneWeight: number;
   };
   readonly sprints: readonly MilestoneSprint[];
   readonly releaseLink: {
@@ -200,9 +201,9 @@ export function updateMilestoneBody(
   };
 }
 
-/** 0~100 정수. 무게가 있으면 무게로, 없으면 개수로. 업무가 없으면 0. */
+/** 0~100 정수. 서버 위험 계산과 같이 무게 합이 0보다 크면 무게로, 아니면(크기를 하나도 안 매김) 개수로. 업무가 없으면 0. */
 export function milestonePercent(progress: Milestone["progress"]) {
-  if (progress.totalWeight && progress.doneWeight !== null)
+  if (progress.totalWeight > 0)
     return Math.floor((progress.doneWeight / progress.totalWeight) * 100);
   return progress.total
     ? Math.floor((progress.done / progress.total) * 100)
