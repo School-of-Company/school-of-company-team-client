@@ -18,6 +18,7 @@ import { isHeadAdmin, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { TemplateFormDialog } from "@/features/manage-whiteboard-template";
 import { routes } from "@/shared/config";
+import { localExcalidrawAssets } from "@/shared/lib";
 import {
   Button,
   Dialog,
@@ -40,12 +41,16 @@ import { RevisionsDialog } from "./RevisionsDialog";
 import { TemplateInsertDialog } from "./TemplateInsertDialog";
 
 // Excalidraw 는 window 를 바로 읽어 서버에서 그릴 수 없다.
-const Canvas = dynamic(() => import("./Canvas"), {
+// 청크를 부르기 전에 글꼴 주소를 같은 출처로 정한다(esm.sh 를 부르지 않는다).
+const Canvas = dynamic(() => (localExcalidrawAssets(), import("./Canvas")), {
   ssr: false,
   loading: () => <Skeleton className="h-full" />,
 });
 // Mermaid 변환기는 편집기보다도 무겁다. 대화상자를 처음 열 때 받는다.
-const MermaidDialog = dynamic(() => import("./MermaidDialog"), { ssr: false });
+const MermaidDialog = dynamic(
+  () => (localExcalidrawAssets(), import("./MermaidDialog")),
+  { ssr: false },
+);
 
 const noSubscribe = () => () => {};
 

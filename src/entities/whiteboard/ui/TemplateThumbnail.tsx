@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { readTheme } from "@/shared/lib";
+import { localExcalidrawAssets, readTheme } from "@/shared/lib";
 import type { WhiteboardScene } from "../model/types";
 
 /**
@@ -19,6 +19,7 @@ export function TemplateThumbnail({
     if (!box || scene.elements.length === 0) return;
     let cancelled = false;
     const draw = async () => {
+      localExcalidrawAssets();
       const { exportToSvg, restoreElements } =
         await import("@excalidraw/excalidraw");
       const elements = restoreElements(

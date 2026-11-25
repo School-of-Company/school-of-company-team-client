@@ -1,13 +1,12 @@
 "use client";
 
-// 먼저 읽어야 한다: Excalidraw 가 읽히기 전에 글꼴 주소(window.EXCALIDRAW_ASSET_PATH)를 정한다.
-import { readTheme } from "@/shared/lib";
 import { useEffect, useRef, useState } from "react";
 import {
   convertToExcalidrawElements,
   exportToSvg,
 } from "@excalidraw/excalidraw";
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+import { readTheme } from "@/shared/lib";
 import { Button, Dialog, Textarea } from "@/shared/ui";
 
 const EXAMPLE = `flowchart LR
