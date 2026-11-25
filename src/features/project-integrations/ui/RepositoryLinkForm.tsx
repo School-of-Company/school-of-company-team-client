@@ -1,6 +1,12 @@
 "use client";
 
-import { type KeyboardEvent, useState } from "react";
+import {
+  type KeyboardEvent,
+  type MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Badge, Button, Checkbox, Field, Input, Select } from "@/shared/ui";
 import { repositoryName } from "@/shared/lib";
 import {
@@ -10,6 +16,13 @@ import {
 } from "../api/integrations";
 import { linkInBatches, type LinkOutcome } from "../model/batch-link";
 import { githubLinkFailureReason } from "../model/github-error";
+import {
+  chosenIds,
+  defaultRepositoryId,
+  isSelectable,
+  settledResults,
+  statusLabel,
+} from "../model/link-selection";
 
 const NO_DEFAULT = "";
 
@@ -17,10 +30,15 @@ export function RepositoryLinkForm({
   projectId,
   installable,
   linked,
+  running,
+  onRunningChange,
 }: {
   readonly projectId: string;
   readonly installable: readonly InstallableRepository[];
   readonly linked: readonly ProjectRepository[];
+  /** 부모가 들고 있어 묶음이 도는 동안 편집 마침으로 폼을 닫지 못하게 한다. */
+  readonly running: boolean;
+  readonly onRunningChange: (running: boolean) => void;
 }) {
   const { link, refresh } = useLinkRepository(projectId);
   const [search, setSearch] = useState("");
@@ -28,31 +46,53 @@ export function RepositoryLinkForm({
   const [results, setResults] = useState<ReadonlyMap<number, LinkOutcome>>(
     new Map(),
   );
-  const [running, setRunning] = useState(false);
-  const [total, setTotal] = useState(0);
+  const [summary, setSummary] = useState("");
   const [defaultId, setDefaultId] = useState(NO_DEFAULT);
+  const [focusRequest, setFocusRequest] = useState(0);
+  const abortRef = useRef<AbortController | null>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const summaryRef = useRef<HTMLParagraphElement>(null);
+
+  // 폼이 사라지면(다른 탭으로 이동 등) 남은 요청을 멈춘다.
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  // 묶음이 끝나면 첫 실패 저장소, 없으면 결과 요약으로 초점을 옮긴다.
+  // 그사이 사용자가 폼 밖으로 초점을 옮겼다면 건드리지 않는다.
+  useEffect(() => {
+    if (focusRequest === 0) return;
+    const active = document.activeElement;
+    const form = summaryRef.current?.closest("form");
+    if (active && active !== document.body && !form?.contains(active)) return;
+    const failed = listRef.current?.querySelector<HTMLInputElement>(
+      '[data-outcome="failed"] input',
+    );
+    (failed ?? summaryRef.current)?.focus();
+  }, [focusRequest]);
 
   const linkedIds = new Set(linked.map((repo) => repo.repositoryId));
-  const hasDefault = linked.some((repo) => repo.isDefault);
+  const currentDefault = linked.find((repo) => repo.isDefault);
   const repositories = installable.filter((repo) => !repo.archived);
   const selectable = (repo: InstallableRepository) =>
-    !linkedIds.has(repo.repositoryId) && repo.accessible !== false;
+    isSelectable(repo.repositoryId, linkedIds, results);
   const visible = repositories.filter((repo) =>
     repositoryName(repo).toLowerCase().includes(search.toLowerCase()),
   );
   const visibleSelectable = visible.filter(selectable);
-  // 연결되었거나 사라진 저장소는 선택에서 뺀다.
-  const chosen = repositories.filter(
-    (repo) => selectable(repo) && selected.has(repo.repositoryId),
+  const chosen = chosenIds(
+    repositories.map((repo) => repo.repositoryId),
+    selected,
+    linkedIds,
+    results,
+  );
+  const chosenRepositories = repositories.filter((repo) =>
+    chosen.includes(repo.repositoryId),
   );
   const allVisibleChosen =
     visibleSelectable.length > 0 &&
     visibleSelectable.every((repo) => selected.has(repo.repositoryId));
-  const outcomes = [...results.values()];
-  const linkedCount = outcomes.filter((o) => o.status === "linked").length;
-  const failedCount = outcomes.filter((o) => o.status === "failed").length;
 
-  const toggle = (ids: readonly number[], on: boolean) =>
+  const toggle = (ids: readonly number[], on: boolean) => {
+    if (running) return;
     setSelected((current) => {
       const next = new Set(current);
       for (const id of ids) {
@@ -61,37 +101,61 @@ export function RepositoryLinkForm({
       }
       return next;
     });
+  };
 
   const submit = async () => {
     if (running || chosen.length === 0) return;
-    const byId = new Map(chosen.map((repo) => [repo.repositoryId, repo]));
-    setRunning(true);
-    setTotal(byId.size);
+    const byId = new Map(
+      chosenRepositories.map((repo) => [repo.repositoryId, repo]),
+    );
+    const ids = [...byId.keys()];
+    const defaultFor = defaultRepositoryId(
+      ids,
+      defaultId === NO_DEFAULT ? null : Number(defaultId),
+      currentDefault !== undefined,
+    );
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const outcomes = new Map<number, LinkOutcome>();
+    let done = 0;
+    onRunningChange(true);
     setResults(new Map());
+    setSummary(`${ids.length}개 중 0개 처리함`);
     try {
-      const failed = await linkInBatches(
-        [...byId.keys()],
-        (id) => link(byId.get(id)!, String(id) === defaultId),
-        (id, outcome) =>
-          setResults((current) => new Map(current).set(id, outcome)),
+      const notLinked = await linkInBatches(
+        ids,
+        (id, signal) => link(byId.get(id)!, id === defaultFor, signal),
+        (id, outcome) => {
+          outcomes.set(id, outcome);
+          if (outcome.status !== "linking") done++;
+          setResults(new Map(outcomes));
+          setSummary(`${ids.length}개 중 ${done}개 처리함`);
+        },
         githubLinkFailureReason,
+        { signal: controller.signal },
       );
-      // 실패한 저장소만 선택에 남겨 바로 다시 시도할 수 있게 한다.
-      setSelected(new Set(failed));
+      const failedCount = [...outcomes.values()].filter(
+        (o) => o.status === "failed",
+      ).length;
+      const parts = [`${ids.length - notLinked.length}개 연결됨`];
+      if (failedCount > 0) parts.push(`${failedCount}개 실패`);
+      if (notLinked.length > failedCount)
+        parts.push(`${notLinked.length - failedCount}개 취소됨`);
+      setSummary(parts.join(", "));
+      // 실패, 취소, 시작 전 저장소만 선택에 남겨 바로 다시 시도할 수 있게 한다.
+      setSelected(new Set(notLinked));
       await refresh();
     } finally {
-      setRunning(false);
+      // 목록을 다시 받은 뒤라 연결됨은 목록이 보여 준다. 실패와 취소만 남긴다.
+      setResults(settledResults(outcomes, new Set()));
+      abortRef.current = null;
+      onRunningChange(false);
+      setFocusRequest((n) => n + 1);
     }
   };
 
-  const statusText = (repo: InstallableRepository) => {
-    const outcome = results.get(repo.repositoryId);
-    if (outcome?.status === "linking") return "연결 중";
-    if (outcome?.status === "failed") return `실패: ${outcome.reason}`;
-    if (outcome?.status === "linked" || linkedIds.has(repo.repositoryId))
-      return "연결됨";
-    if (repo.accessible === false) return "원본 저장소 접근 권한 없음";
-    return "";
+  const blockWhileRunning = (event: MouseEvent) => {
+    if (running) event.preventDefault();
   };
 
   return (
@@ -113,9 +177,12 @@ export function RepositoryLinkForm({
       </Field>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label className="flex items-center gap-2 text-sm">
+          {/* 도는 동안에는 disabled 대신 aria-disabled로 두어 초점이 body로 빠지지 않게 한다. */}
           <Checkbox
             checked={allVisibleChosen}
-            disabled={running || visibleSelectable.length === 0}
+            disabled={!running && visibleSelectable.length === 0}
+            aria-disabled={running || undefined}
+            onClick={blockWhileRunning}
             onChange={(event) =>
               toggle(
                 visibleSelectable.map((repo) => repo.repositoryId),
@@ -129,24 +196,32 @@ export function RepositoryLinkForm({
         <p className="text-sm text-muted">{chosen.length}개 선택됨</p>
       </div>
       <ul
+        ref={listRef}
         aria-label="연결할 저장소"
         className="max-h-96 divide-y divide-border overflow-y-auto"
       >
         {visible.map((repo) => {
-          const status = statusText(repo);
-          const failed = results.get(repo.repositoryId)?.status === "failed";
+          const id = repo.repositoryId;
+          const status = statusLabel(id, linkedIds, results);
+          const outcome = results.get(id)?.status;
+          const failed = outcome === "failed" && !linkedIds.has(id);
           return (
-            <li key={repo.repositoryId} className="py-2">
+            <li
+              key={id}
+              className="py-2"
+              data-outcome={failed ? "failed" : undefined}
+            >
               <label className="flex items-center gap-3">
                 <Checkbox
                   checked={
-                    linkedIds.has(repo.repositoryId) ||
-                    selected.has(repo.repositoryId)
+                    linkedIds.has(id) ||
+                    outcome === "linked" ||
+                    selected.has(id)
                   }
-                  disabled={running || !selectable(repo)}
-                  onChange={(event) =>
-                    toggle([repo.repositoryId], event.target.checked)
-                  }
+                  disabled={!running && !selectable(repo)}
+                  aria-disabled={running || undefined}
+                  onClick={blockWhileRunning}
+                  onChange={(event) => toggle([id], event.target.checked)}
                   onKeyDown={submitOnEnter}
                 />
                 <span className="min-w-0 flex-1 truncate font-medium">
@@ -165,61 +240,70 @@ export function RepositoryLinkForm({
           );
         })}
       </ul>
-      {repositories.filter(selectable).length === 0 ? (
-        <p className="text-sm text-muted">
-          새로 연결할 수 있는 저장소가 없습니다. 설치에 허용된 저장소와 보관
-          여부를 확인하세요.
-        </p>
-      ) : (
-        visible.length === 0 && (
-          <p className="text-sm text-muted">
-            검색 결과가 없습니다. 검색어를 바꿔보세요.
-          </p>
-        )
-      )}
-      {repositories.some((repo) => repo.private && selectable(repo)) && (
-        <p className="text-sm text-muted">
-          연결하면 열린 Issue를 업무로 가져옵니다. 비공개 저장소의 업무는 원본
-          저장소 권한이 있는 참여자에게만 보여요.
-        </p>
-      )}
-      {!hasDefault && (
-        <Field
-          id="link-default-repository"
-          label="연결하면서 기본 발행 저장소로 지정"
-        >
-          <Select
-            id="link-default-repository"
-            disabled={running}
-            value={defaultId}
-            onChange={(event) => setDefaultId(event.target.value)}
-          >
-            <option value={NO_DEFAULT}>지정 안 함</option>
-            {chosen.map((repo) => (
-              <option key={repo.repositoryId} value={repo.repositoryId}>
-                {repositoryName(repo)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      )}
-      <p role="status" className="h-5 text-sm">
-        {results.size > 0 &&
-          (running
-            ? `${total}개 중 ${linkedCount + failedCount}개 처리함`
-            : failedCount > 0
-              ? `${linkedCount}개 연결됨, ${failedCount}개 실패`
-              : `${linkedCount}개 모두 연결함`)}
+      {/* 안내 줄은 늘 두 줄 자리를 잡아, 완료 뒤 문구가 바뀌어도 아래가 밀리지 않게 한다. */}
+      <p className="min-h-10 text-sm text-muted">
+        {repositories.filter(selectable).length === 0
+          ? "새로 연결할 저장소가 없습니다. 설치 허용과 보관 여부를 확인하세요."
+          : visible.length === 0
+            ? "검색 결과가 없습니다. 검색어를 바꿔보세요."
+            : repositories.some((repo) => repo.private)
+              ? "연결하면 열린 Issue를 업무로 가져옵니다. 비공개 저장소의 업무는 원본 저장소 권한이 있는 참여자에게만 보여요."
+              : "연결하면 열린 Issue를 업무로 가져옵니다."}
       </p>
-      <Button
-        type="submit"
-        variant="secondary"
-        className="justify-self-start"
-        disabled={chosen.length === 0}
-        loading={running}
+      {/* 기본 저장소가 생겨도 자리를 유지하도록 늘 그리고, 이미 있으면 현재 값을 보여 주며 잠근다. */}
+      <Field
+        id="link-default-repository"
+        label="연결하면서 기본 발행 저장소로 지정"
       >
-        선택한 {chosen.length}개 연결
-      </Button>
+        <Select
+          id="link-default-repository"
+          disabled={!running && currentDefault !== undefined}
+          aria-disabled={running || undefined}
+          value={currentDefault ? "current" : defaultId}
+          onChange={(event) => {
+            if (!running) setDefaultId(event.target.value);
+          }}
+        >
+          {currentDefault ? (
+            <option value="current">
+              이미 지정됨: {repositoryName(currentDefault)}
+            </option>
+          ) : (
+            <>
+              <option value={NO_DEFAULT}>지정 안 함</option>
+              {chosenRepositories.map((repo) => (
+                <option key={repo.repositoryId} value={repo.repositoryId}>
+                  {repositoryName(repo)}
+                </option>
+              ))}
+            </>
+          )}
+        </Select>
+      </Field>
+      <p
+        ref={summaryRef}
+        role="status"
+        tabIndex={-1}
+        className="h-5 text-sm outline-none"
+      >
+        {summary}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="submit"
+          variant="secondary"
+          disabled={!running && chosen.length === 0}
+          aria-disabled={running || undefined}
+          aria-busy={running || undefined}
+        >
+          선택한 {chosen.length}개 연결
+        </Button>
+        {running && (
+          <Button variant="ghost" onClick={() => abortRef.current?.abort()}>
+            취소
+          </Button>
+        )}
+      </div>
     </form>
   );
 }

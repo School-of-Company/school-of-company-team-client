@@ -34,6 +34,8 @@ export function RepositorySettings({
   const installable = useInstallableRepositories(projectId, !disabled);
   const change = useRepositoryChange(projectId);
   const [editing, setEditing] = useState(false);
+  // 일괄 연결이 도는 동안 폼이 닫혀 요청이 화면 밖에서 이어지지 않게 여기서 들고 있다.
+  const [linking, setLinking] = useState(false);
   if (repositories.isPending || (!disabled && installable.isPending))
     return <Spinner label="저장소 불러오는 중" />;
   if (repositories.isError)
@@ -142,6 +144,8 @@ export function RepositorySettings({
           projectId={projectId}
           installable={installable.data}
           linked={repositories.data}
+          running={linking}
+          onRunningChange={setLinking}
         />
       )}
       {editing && (
@@ -149,7 +153,15 @@ export function RepositorySettings({
           variant="ghost"
           className="justify-self-start"
           disabled={change.isPending}
-          onClick={() => setEditing(false)}
+          aria-disabled={linking || undefined}
+          title={
+            linking
+              ? "저장소 연결이 끝나거나 취소한 뒤 닫을 수 있어요"
+              : undefined
+          }
+          onClick={() => {
+            if (!linking) setEditing(false);
+          }}
         >
           편집 마침
         </Button>

@@ -179,6 +179,13 @@
   margin: 0;
   accent-color: var(--brand);
 }
+/* 작업 중 초점을 잃지 않게 disabled 대신 aria-disabled를 쓰는 컨트롤도 같은 모양으로 둔다. */
+.ui-button[aria-disabled="true"],
+.ui-checkbox[aria-disabled="true"],
+select.ui-input[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 
 /* Native select: styled closed control everywhere, styled list where the
    browser supports customizable select (Chromium 135+). */

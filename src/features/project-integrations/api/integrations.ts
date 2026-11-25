@@ -12,7 +12,6 @@ export type InstallableRepository = {
   readonly fullName: string;
   readonly private: boolean;
   readonly archived: boolean;
-  readonly accessible?: boolean;
 };
 
 export type ProjectRepository = {
@@ -103,12 +102,20 @@ export function useRepositoryChange(projectId: string) {
 export function useLinkRepository(projectId: string) {
   const client = useQueryClient();
   return {
-    link: async (repo: InstallableRepository, isDefault: boolean) => {
-      await api.post(`/api/v1/projects/${projectId}/github/repositories`, {
-        installationId: repo.installationId,
-        repositoryId: repo.repositoryId,
-        isDefault,
-      });
+    link: async (
+      repo: InstallableRepository,
+      isDefault: boolean,
+      signal?: AbortSignal,
+    ) => {
+      await api.post(
+        `/api/v1/projects/${projectId}/github/repositories`,
+        {
+          installationId: repo.installationId,
+          repositoryId: repo.repositoryId,
+          isDefault,
+        },
+        { signal },
+      );
     },
     refresh: () =>
       client.invalidateQueries({
