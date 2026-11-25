@@ -12,7 +12,6 @@ export type InstallableRepository = {
   readonly fullName: string;
   readonly private: boolean;
   readonly archived: boolean;
-  readonly accessible?: boolean;
 };
 
 export type ProjectRepository = {
@@ -35,11 +34,6 @@ export type ChannelLink = {
 };
 
 type RepositoryChange =
-  | {
-      readonly action: "link";
-      readonly installationId: number;
-      readonly repositoryId: number;
-    }
   | { readonly action: "default"; readonly projectRepositoryId: string | null }
   | { readonly action: "unlink"; readonly projectRepositoryId: string };
 
@@ -81,13 +75,6 @@ export function useRepositoryChange(projectId: string) {
     mutationFn: async (change: RepositoryChange) => {
       const base = `/api/v1/projects/${projectId}/github`;
       switch (change.action) {
-        case "link":
-          await api.post(`${base}/repositories`, {
-            installationId: change.installationId,
-            repositoryId: change.repositoryId,
-            isDefault: false,
-          });
-          return;
         case "default":
           await api.put(`${base}/default-repository`, {
             projectRepositoryId: change.projectRepositoryId,
@@ -109,6 +96,32 @@ export function useRepositoryChange(projectId: string) {
         queryKey: ["settings-repositories", projectId],
       }),
   });
+}
+
+/** 저장소 하나씩 연결한다. 목록 갱신은 묶음이 끝난 뒤 `refresh`로 한 번만 한다. */
+export function useLinkRepository(projectId: string) {
+  const client = useQueryClient();
+  return {
+    link: async (
+      repo: InstallableRepository,
+      isDefault: boolean,
+      signal?: AbortSignal,
+    ) => {
+      await api.post(
+        `/api/v1/projects/${projectId}/github/repositories`,
+        {
+          installationId: repo.installationId,
+          repositoryId: repo.repositoryId,
+          isDefault,
+        },
+        { signal },
+      );
+    },
+    refresh: () =>
+      client.invalidateQueries({
+        queryKey: ["settings-repositories", projectId],
+      }),
+  };
 }
 
 const importKey = (

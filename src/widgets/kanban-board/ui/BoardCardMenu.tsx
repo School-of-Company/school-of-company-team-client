@@ -8,8 +8,7 @@ import {
   type TaskCard,
   type TaskStatus,
 } from "@/entities/task";
-import { Icon, IconButton } from "@/shared/ui";
-import { menuPosition } from "../model/menu-position";
+import { Icon, IconButton, useAnchoredPosition } from "@/shared/ui";
 
 export function BoardCardMenu({
   task,
@@ -36,28 +35,10 @@ export function BoardCardMenu({
   // DOM 위치는 그대로라 포커스, 바깥 클릭, Tab 닫기는 지금처럼 root 기준으로 동작한다.
   useLayoutEffect(() => {
     const element = menu.current;
-    const button = trigger.current;
-    if (!open || !element || !button) return;
-    if (typeof element.showPopover === "function") element.showPopover();
-    function place() {
-      if (!element || !button) return;
-      const anchor = button.getBoundingClientRect();
-      const size = element.getBoundingClientRect();
-      const { top, left } = menuPosition(anchor, size, {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-      element.style.top = `${top}px`;
-      element.style.left = `${left}px`;
-    }
-    place();
-    window.addEventListener("resize", place);
-    window.addEventListener("scroll", place, true);
-    return () => {
-      window.removeEventListener("resize", place);
-      window.removeEventListener("scroll", place, true);
-    };
+    if (open && typeof element?.showPopover === "function")
+      element.showPopover();
   }, [open]);
+  useAnchoredPosition(trigger, menu, { open });
   useEffect(() => {
     if (!open) return;
     const items = menu.current?.querySelectorAll<HTMLElement>(
