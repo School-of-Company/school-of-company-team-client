@@ -6,7 +6,7 @@ import {
   WHITEBOARD_TEMPLATE_DESCRIPTION_MAX,
   WHITEBOARD_TEMPLATE_NAME_MAX,
   whiteboardApi,
-  whiteboardErrorMessage,
+  templateErrorMessage,
   whiteboardKeys,
   whiteboardTemplateCategories,
   whiteboardTemplateCategoryLabels,
@@ -93,7 +93,7 @@ function TemplateForm({
       const { form, ...fields } = fieldErrors(
         normalizeApiError(failure),
         ["name", "description"],
-        whiteboardErrorMessage(failure),
+        templateErrorMessage(failure),
       );
       setErrors(fields);
       if (form) toast(form, "error");

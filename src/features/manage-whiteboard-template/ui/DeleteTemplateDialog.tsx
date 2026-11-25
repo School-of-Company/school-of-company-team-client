@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   whiteboardApi,
-  whiteboardErrorMessage,
+  templateErrorMessage,
   whiteboardKeys,
   type WhiteboardTemplate,
 } from "@/entities/whiteboard";
@@ -29,7 +29,7 @@ export function DeleteTemplateDialog({
       onDeleted?.(id);
       onClose();
     },
-    onError: (failure) => toast(whiteboardErrorMessage(failure), "error"),
+    onError: (failure) => toast(templateErrorMessage(failure), "error"),
   });
   return (
     <Dialog open={!!template} onClose={onClose} title="팀 템플릿 지우기">

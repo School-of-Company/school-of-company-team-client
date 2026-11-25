@@ -20,16 +20,13 @@ const messages: Readonly<Record<string, string>> = {
     "참여자 공개 프로젝트의 화이트보드는 팀 템플릿으로 저장할 수 없습니다.",
   WHITEBOARD_TEMPLATE_LIMIT:
     "팀 템플릿은 50개까지입니다. 쓰지 않는 템플릿을 지운 뒤 다시 저장하세요.",
-  // ponytail: 서버 리뷰에서 팀 템플릿 scene 을 300KB 로 막기로 했다. 코드 이름은 s16 반영 뒤 맞춘다.
-  WHITEBOARD_TEMPLATE_TOO_LARGE:
-    "팀 템플릿은 300KB까지입니다. 보드를 나누거나 요소를 줄인 뒤 다시 저장하세요.",
   WHITEBOARD_LINK_NOT_FOUND: "연결이 이미 지워졌습니다.",
   WHITEBOARD_LINK_DUPLICATE: "이미 연결된 대상입니다.",
   WHITEBOARD_LINK_LIMIT:
     "화이트보드 하나에 업무와 문서를 합쳐 50개까지 연결할 수 있습니다.",
   TASK_NOT_FOUND: "업무가 없거나 볼 권한이 없습니다.",
   KNOWLEDGE_NOT_FOUND: "문서가 없거나 볼 권한이 없습니다.",
-  ACCESS_DENIED: "헤드 어드민만 팀 템플릿을 관리할 수 있습니다.",
+  ACCESS_DENIED: "이 작업을 할 권한이 없습니다.",
   WHITEBOARD_REVISION_NOT_FOUND: "변경 이력을 찾을 수 없습니다.",
   WHITEBOARD_COMMENT_NOT_FOUND: "댓글이 이미 지워졌습니다.",
   PROJECT_FORBIDDEN: "이 프로젝트는 볼 수만 있습니다.",
@@ -41,4 +38,35 @@ const messages: Readonly<Record<string, string>> = {
 export function whiteboardErrorMessage(error: unknown): string {
   const problem = normalizeApiError(error);
   return messages[problem.code] ?? problem.message;
+}
+
+/**
+ * 팀 템플릿 크기 상한 오류 코드. 서버 s16 이 팀 템플릿 scene 을 300KB 로 막는다.
+ * ponytail: 서버 #70 최종 head 의 코드 이름으로 이 한 줄만 맞춘다.
+ */
+export const TEMPLATE_TOO_LARGE_CODE = "WHITEBOARD_TEMPLATE_TOO_LARGE";
+
+const limitOf = (details: unknown): string | null => {
+  const limit =
+    typeof details === "object" && details !== null && "limit" in details
+      ? (details as { limit: unknown }).limit
+      : null;
+  return typeof limit === "string" || typeof limit === "number"
+    ? String(limit)
+    : null;
+};
+
+/** 팀 템플릿 만들기, 고치기, 지우기의 오류. 크기 상한과 권한만 템플릿 문구로 바꾸고 나머지는 화이트보드 문구다. */
+export function templateErrorMessage(error: unknown): string {
+  const problem = normalizeApiError(error);
+  if (
+    problem.code === TEMPLATE_TOO_LARGE_CODE ||
+    problem.code === "WHITEBOARD_TOO_LARGE"
+  ) {
+    const limit = limitOf(problem.details);
+    return `팀 템플릿으로 저장하기에 너무 큽니다${limit ? `(상한 ${limit})` : ""}. 요소를 줄이거나 보드를 나눈 뒤 다시 저장하세요.`;
+  }
+  if (problem.code === "ACCESS_DENIED")
+    return "헤드 어드민만 팀 템플릿을 관리할 수 있습니다.";
+  return whiteboardErrorMessage(error);
 }

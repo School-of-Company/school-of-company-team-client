@@ -4,7 +4,7 @@ export {
   whiteboardQueries,
 } from "./api/whiteboard";
 export type { WhiteboardLinkCandidate } from "./api/whiteboard";
-export { whiteboardErrorMessage } from "./model/errors";
+export { templateErrorMessage, whiteboardErrorMessage } from "./model/errors";
 export {
   WHITEBOARD_COMMENT_MAX,
   WHITEBOARD_LINK_LIMIT,
