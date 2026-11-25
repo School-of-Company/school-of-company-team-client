@@ -4266,6 +4266,389 @@ a.search-option:hover {
   border-radius: var(--radius-md);
   background: var(--surface-hover);
 }
+
+/* Milestone v2(s15): 상태 배지, 위험 배지, 로드맵, 상세의 연결 목록. */
+.milestone-status {
+  --tone: var(--muted);
+  --tone-soft: var(--surface-fill);
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--tone-soft);
+  color: var(--tone);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.milestone-status[data-status="IN_PROGRESS"] {
+  --tone: var(--hue-blue);
+  --tone-soft: var(--hue-blue-soft);
+}
+.milestone-status[data-status="DONE"] {
+  --tone: var(--hue-green);
+  --tone-soft: var(--hue-green-soft);
+}
+.milestone-status[data-status="DELAYED"] {
+  --tone: var(--danger);
+  --tone-soft: var(--hue-red-soft);
+}
+.milestone-risk-wrap {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+}
+.milestone-risk {
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--hue-orange-soft);
+  color: var(--foreground);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: help;
+}
+.milestone-risk::before {
+  width: 6px;
+  height: 6px;
+  margin-right: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--hue-orange);
+  content: "";
+}
+.milestone-risk[data-level="AT_RISK"] {
+  background: var(--hue-red-soft);
+  color: var(--danger);
+}
+.milestone-risk[data-level="AT_RISK"]::before {
+  background: var(--danger);
+}
+/* 이유 말풍선: 마우스를 올리거나 키보드로 포커스하면 위에 뜬다. 자리를 차지하지 않는다. */
+.milestone-risk-tip {
+  position: absolute;
+  bottom: calc(100% + var(--space-1));
+  left: 0;
+  width: max-content;
+  max-width: 16rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-overlay);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+/* 탭(터치)은 :focus-visible 이 아니라 :focus 만 켜므로 둘 다 본다. */
+.milestone-risk:hover + .milestone-risk-tip,
+.milestone-risk:focus + .milestone-risk-tip,
+.milestone-risk:focus-visible + .milestone-risk-tip {
+  opacity: 1;
+}
+/* 390폭: 말풍선 대신 배지 아래 글자로 늘 보인다. */
+@media (max-width: 39.99rem) {
+  .milestone-risk-wrap {
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+  .milestone-risk-tip {
+    position: static;
+    width: auto;
+    max-width: none;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--muted);
+    opacity: 1;
+  }
+  /* 상세는 바로 아래 "위험 이유" 줄이 같은 글을 보여 준다. */
+  .milestone-facts .milestone-risk-tip {
+    display: none;
+  }
+}
+
+/* 목록: 줄 전체가 이름 버튼(늘린 클릭 영역), 위험 배지만 그 위에 따로 잡힌다. */
+.milestone-row {
+  position: relative;
+}
+.milestone-row-name {
+  text-align: left;
+}
+.milestone-row-name::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+.milestone-row-meta {
+  display: inline-flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+@media (min-width: 40rem) {
+  .milestone-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+}
+
+.milestone-form-dates {
+  display: grid;
+  gap: var(--space-4);
+}
+@media (min-width: 30rem) {
+  .milestone-form-dates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.milestone-panel-skeleton {
+  display: grid;
+  min-height: var(--empty-height);
+  align-content: start;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+.milestone-panel-skeleton > span,
+.milestone-task-skeleton > span {
+  justify-self: start;
+}
+.milestone-task-skeleton {
+  display: grid;
+  min-height: calc(var(--control-md) + var(--space-4));
+  align-items: center;
+  font-size: var(--text-sm);
+}
+.milestone-links {
+  display: grid;
+  border-top: 1px solid var(--border);
+}
+.milestone-links > li {
+  display: flex;
+  min-height: var(--control-md);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.milestone-link-main {
+  min-width: 0;
+  flex: 1 1 12rem;
+  overflow-wrap: anywhere;
+}
+.milestone-link-main:hover {
+  text-decoration: underline;
+}
+.milestone-link-meta {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+.milestone-link-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.milestone-link-add > .ui-input {
+  width: auto;
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+.milestone-release {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--surface-box);
+  font-size: var(--text-sm);
+}
+
+/* 로드맵: 이름 칸 + 기간 칸. 넓을 때만 가로 막대를 그리고, 좁으면(390) 이름 칸만 세로로 쌓는다. */
+.roadmap-viewport {
+  min-width: 0;
+  overflow-x: auto;
+}
+.roadmap {
+  --roadmap-label: 15rem;
+  display: grid;
+  min-width: 46rem;
+  border-top: 1px solid var(--border);
+}
+.roadmap-scale,
+.roadmap-row {
+  display: grid;
+  grid-template-columns: var(--roadmap-label) minmax(0, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+.roadmap-scale {
+  min-height: var(--control-sm);
+  color: var(--muted);
+  font-size: var(--text-caption);
+}
+.roadmap-rows {
+  display: grid;
+}
+.roadmap-row {
+  min-height: 4.5rem;
+}
+/* 날짜가 있는 마일스톤이 하나도 없으면 기간 칸 없이 이름 칸만 둔다. */
+.roadmap:not([data-dated]) {
+  min-width: 0;
+}
+.roadmap:not([data-dated]) .roadmap-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+.roadmap:not([data-dated]) .roadmap-track {
+  display: none;
+}
+.roadmap-track {
+  position: relative;
+  min-height: 100%;
+  overflow: hidden;
+}
+/* 오늘 선은 칸마다 같은 자리에 그려 위아래로 이어진다. */
+.roadmap-track::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--roadmap-today);
+  width: 2px;
+  background: var(--brand);
+  content: "";
+  opacity: 0.6;
+}
+.roadmap-month {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding-left: var(--space-1);
+  border-left: 1px solid var(--border);
+  white-space: nowrap;
+}
+.roadmap-today-label {
+  position: absolute;
+  top: 0;
+  left: var(--roadmap-today);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: var(--on-brand);
+  font-weight: 600;
+  transform: translateX(-50%);
+}
+.roadmap-label {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-2);
+}
+.roadmap-name {
+  justify-self: start;
+  max-width: 100%;
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.roadmap-name:hover {
+  text-decoration: underline;
+}
+.roadmap-meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.roadmap-sprint-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+}
+.roadmap-bar,
+.roadmap-sprint {
+  position: absolute;
+  min-width: 6px;
+  border-radius: var(--radius-pill);
+}
+.roadmap-bar {
+  --tone: var(--muted);
+  top: var(--space-4);
+  height: 12px;
+  background: var(--tone);
+  cursor: pointer;
+}
+.roadmap-bar[data-status="IN_PROGRESS"] {
+  --tone: var(--hue-blue);
+}
+.roadmap-bar[data-status="DONE"] {
+  --tone: var(--hue-green);
+}
+.roadmap-bar[data-status="DELAYED"] {
+  --tone: var(--danger);
+}
+.roadmap-sprint {
+  top: calc(var(--space-4) + 12px + var(--space-2));
+  overflow: hidden;
+  padding-inline: var(--space-2);
+  background: var(--surface-fill);
+  color: var(--foreground-2);
+  font-size: var(--text-caption);
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.roadmap-sprint[data-status="ACTIVE"] {
+  background: var(--brand-soft);
+  color: var(--foreground);
+}
+@media (min-width: 40rem) {
+  /* 넓을 때는 스프린트가 막대로 보이므로 글자 목록은 화면 낭독기에만 남긴다. */
+  .roadmap-sprint-list {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 39.99rem) {
+  .roadmap {
+    min-width: 0;
+  }
+  .roadmap-scale,
+  .roadmap-track {
+    display: none;
+  }
+  .roadmap-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .milestone-risk-tip {
+    transition: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .planning-progress-fill {
     transition: none;
