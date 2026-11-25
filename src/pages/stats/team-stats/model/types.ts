@@ -37,7 +37,7 @@ export type TeamStats = {
       readonly id: string;
       readonly projectId: string;
       readonly name: string;
-      readonly closedAt: string;
+      readonly closedAt: string | null;
       readonly plannedCount: number;
       readonly doneCount: number;
       readonly completionRate: number | null;

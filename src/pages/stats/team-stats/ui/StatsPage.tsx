@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { projectQueries, stageLabels } from "@/entities/project";
 import { AuthGuard } from "@/features/auth";
 import { routes } from "@/shared/config";
+import { formatDate } from "@/shared/lib";
 import {
   Badge,
   ChipSelect,
@@ -156,9 +157,15 @@ function StatsBody({
           )}
           <FlowSection stats={data} />
           <SprintSection stats={data} />
-          {scope === "team" && <OpsSection stats={data} />}
-          {scope === "team" && data.projects && (
-            <ProjectSection projects={data.projects} />
+          {scope === "team" ? (
+            <>
+              <OpsSection stats={data} />
+              <ProjectSection projects={data.projects} />
+            </>
+          ) : (
+            <p className="planning-note">
+              장애, 배포, 프로젝트 진행은 팀 전체 통계에서만 봅니다.
+            </p>
           )}
           <p className="planning-note">
             숫자는 최대 1분 늦게 반영됩니다. 비공개 원본 업무와 비공개 저장소
@@ -284,7 +291,7 @@ function SprintSection({ stats }: { readonly stats: TeamStats }) {
                       {item.name}
                     </Link>
                   </th>
-                  <td>{weekLabel(item.closedAt.slice(0, 10))}</td>
+                  <td>{formatDate(item.closedAt, { year: undefined })}</td>
                   <td>
                     {formatRate(item.completionRate)}
                     <span className="text-muted">
@@ -385,11 +392,15 @@ function OpsSection({ stats }: { readonly stats: TeamStats }) {
 function ProjectSection({
   projects,
 }: {
-  readonly projects: NonNullable<TeamStats["projects"]>;
+  readonly projects: TeamStats["projects"];
 }) {
   return (
     <Section title="프로젝트 진행">
-      {projects.length === 0 ? (
+      {!projects ? (
+        <p className="planning-note">
+          이 조건에서는 프로젝트 진행을 받지 못했습니다.
+        </p>
+      ) : projects.length === 0 ? (
         <EmptyState title="진행 중인 프로젝트가 없습니다" />
       ) : (
         <ul className="list">
