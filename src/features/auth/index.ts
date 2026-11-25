@@ -2,6 +2,7 @@ export { beginOAuth, completeOAuth, OAuthCallbackError } from "./api/oauth";
 export type { OAuthProvider } from "./api/oauth";
 export { authErrorCode, authErrorMessage } from "./model/error-message";
 export { logout } from "./model/logout";
+export { postLoginDestination } from "./model/return-path";
 export { AuthGuard } from "./ui/AuthGuard";
 export { IdentityPanel } from "./ui/IdentityPanel";
 export { OAuthButton } from "./ui/OAuthButton";

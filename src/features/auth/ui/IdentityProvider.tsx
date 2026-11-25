@@ -11,6 +11,7 @@ import {
   rotateSession,
   type SessionTokens,
 } from "@/entities/user";
+import { rememberReturnPath } from "../model/return-path";
 import { clearCacheOnSessionChange } from "../model/session-cache";
 import { api, setAccessRefresher, subscribeApiErrors } from "@/shared/api";
 
@@ -56,6 +57,7 @@ export function IdentityProvider({
     const unsubscribe = subscribeApiErrors((error) => {
       if (error.status === 401) {
         clearSession();
+        rememberReturnPath();
         router.replace("/login");
       } else if (error.code === "SUSPENDED" || error.code === "REJECTED") {
         clearSession(error.code);

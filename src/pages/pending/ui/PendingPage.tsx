@@ -7,7 +7,6 @@ import {
   useAccountRestriction,
   useMe,
   useSessionReady,
-  userDestination,
 } from "@/entities/user";
 import {
   authErrorCode,
@@ -15,6 +14,7 @@ import {
   IdentityPanel,
   LogoutButton,
   OAuthButton,
+  postLoginDestination,
 } from "@/features/auth";
 import { formatDate } from "@/shared/lib";
 import { Button } from "@/shared/ui";
@@ -32,7 +32,7 @@ function PendingContent() {
   const terminal = status === "REJECTED" || status === "SUSPENDED";
   useEffect(() => {
     if (me.data && me.data.status === "ACTIVE")
-      router.replace(userDestination(me.data));
+      router.replace(postLoginDestination(me.data));
     else if (ready && !token && !terminal) router.replace("/login");
   }, [me.data, ready, token, terminal, router]);
   const title =

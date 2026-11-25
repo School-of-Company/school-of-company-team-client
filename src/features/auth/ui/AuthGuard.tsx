@@ -13,6 +13,7 @@ import { ErrorState, PageSkeleton } from "@/shared/ui";
 import { authErrorCode, authErrorMessage } from "../model/error-message";
 import { guardDestination } from "../model/guard-destination";
 import { guardView } from "../model/guard-view";
+import { rememberReturnPath } from "../model/return-path";
 
 export function AuthGuard({
   children,
@@ -33,8 +34,10 @@ export function AuthGuard({
   const code = authErrorCode(me.error);
   useEffect(() => {
     if (restriction) router.replace(`/pending?status=${restriction}`);
-    else if (ready && !token) router.replace("/login");
-    else if (destination) router.replace(destination);
+    else if (ready && !token) {
+      rememberReturnPath();
+      router.replace("/login");
+    } else if (destination) router.replace(destination);
     else if (code === "SUSPENDED" || code === "REJECTED")
       router.replace(`/pending?status=${code}`);
   }, [ready, token, destination, code, router, restriction]);

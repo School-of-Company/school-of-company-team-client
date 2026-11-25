@@ -14,6 +14,7 @@ import {
   IdentityPanel,
   LogoutButton,
   OAuthButton,
+  postLoginDestination,
 } from "@/features/auth";
 import { ErrorState } from "@/shared/ui";
 
@@ -27,7 +28,7 @@ export function ConnectDiscordPage() {
     if (restriction) router.replace(`/pending?status=${restriction}`);
     else if (ready && !token) router.replace("/login");
     else if (me.data && userDestination(me.data) !== "/connect-discord")
-      router.replace(userDestination(me.data));
+      router.replace(postLoginDestination(me.data));
   }, [ready, token, me.data, router, restriction]);
   return (
     <IdentityPanel title="Discord 계정을 연결해 주세요">

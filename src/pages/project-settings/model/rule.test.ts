@@ -6,9 +6,13 @@ import {
   brokenReferences,
   changeEvent,
   emptyRuleForm,
+  eventLabel,
   formToRequest,
+  isTasklessEvent,
   resultMessage,
+  ruleErrorMessage,
   ruleToForm,
+  runTargetFallback,
   selectableEvents,
   toggleRequest,
   triggerText,
@@ -99,7 +103,7 @@ test("there is no status-changing or external write action, and the incident eve
     "ASSIGN_REVIEWER",
     "MOVE_BUCKET",
   ]);
-  assert.equal(selectableEvents.at(-1), "INCIDENT_CREATED");
+  assert.ok(selectableEvents.includes("INCIDENT_CREATED"));
 });
 
 test("targets are required for move and reviewer actions", () => {
@@ -214,4 +218,81 @@ test("incident runs explain reasons without task wording", () => {
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "TASK_BLOCKED"),
     "업무가 삭제되었거나 프로젝트 업무가 아닙니다.",
   );
+});
+
+const tasklessEvents = [
+  "INCIDENT_CREATED",
+  "REQUIREMENT_SUBMITTED",
+  "REQUIREMENT_REPLIED",
+  "SPRINT_STARTED",
+  "SPRINT_ENDING_SOON",
+  "SPRINT_OVERDUE",
+] as const;
+
+test("requirement and sprint events are taskless like the server's TASKLESS_EVENTS", () => {
+  for (const event of tasklessEvents) {
+    assert.ok(isTasklessEvent(event), event);
+    assert.ok(selectableEvents.includes(event), event);
+    assert.deepEqual(allowedActions(event), ["NOTIFY_DISCORD"]);
+    const body = formToRequest(
+      changeEvent({ ...ruleToForm(rule), action: "MOVE_BUCKET" }, event),
+    );
+    assert.deepEqual(body.conditions, [], event);
+    assert.equal(body.action, "NOTIFY_DISCORD");
+    assert.deepEqual(body.mentions, {
+      assignees: false,
+      reviewers: false,
+      pm: true,
+    });
+  }
+  assert.equal(isTasklessEvent("TASK_BLOCKED"), false);
+  assert.equal(
+    triggerText({ event: "REQUIREMENT_SUBMITTED", eventStatus: null }),
+    "요구사항이 접수될 때",
+  );
+  assert.equal(
+    triggerText({ event: "SPRINT_OVERDUE", eventStatus: null }),
+    "스프린트 종료일이 지났을 때",
+  );
+  assert.equal(
+    ruleErrorMessage({ code: "RULE_CONDITION_NOT_APPLICABLE", message: "" }),
+    "이 이벤트에는 조건을 둘 수 없습니다.",
+  );
+});
+
+test("requirement and sprint runs explain reasons and targets without task wording", () => {
+  assert.equal(
+    resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "REQUIREMENT_SUBMITTED"),
+    "요구사항이 삭제되었거나 스팸으로 분류되었습니다.",
+  );
+  assert.equal(
+    resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "SPRINT_ENDING_SOON"),
+    "스프린트가 삭제되었거나 이미 끝났습니다.",
+  );
+  assert.equal(
+    resultMessage("DISCORD_CHANNEL_MISSING", "SKIPPED", "SPRINT_STARTED"),
+    "Discord 프로젝트 채널이 연결되지 않았습니다.",
+  );
+  assert.equal(runTargetFallback("REQUIREMENT_REPLIED"), "요구사항");
+  assert.equal(runTargetFallback("SPRINT_STARTED"), "스프린트");
+  assert.equal(runTargetFallback("INCIDENT_CREATED"), "삭제된 장애");
+  assert.equal(runTargetFallback("TASK_BLOCKED"), "삭제된 업무");
+});
+
+test("an event the client does not know yet renders safely and round-trips on toggle", () => {
+  const future = "AUTOMATION_V2_EVENT" as AutomationRule["event"];
+  assert.equal(eventLabel(future), "알 수 없는 이벤트");
+  assert.equal(
+    triggerText({ event: future, eventStatus: null }),
+    "알 수 없는 이벤트",
+  );
+  assert.equal(runTargetFallback(future), "대상 없음");
+  assert.equal(
+    resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", future),
+    "업무가 삭제되었거나 프로젝트 업무가 아닙니다.",
+  );
+  const body = toggleRequest({ ...rule, event: future }, false);
+  assert.equal(body.event, future);
+  assert.deepEqual(body.mentions, rule.mentions);
+  assert.equal(body.conditions.length, 3);
 });

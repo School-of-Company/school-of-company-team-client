@@ -18,8 +18,9 @@ import {
 } from "@/shared/ui";
 import { ruleQueries } from "../api/rules";
 import {
-  eventLabels,
+  eventLabel,
   resultMessage,
+  runTargetFallback,
   ruleErrorMessage,
   runStatuses,
   runStatusLabels,
@@ -144,7 +145,7 @@ export function RuleRuns({
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{run.ruleName}</p>
                   <p className="truncate text-xs text-muted">
-                    {eventLabels[run.event]}
+                    {eventLabel(run.event)}
                   </p>
                 </div>
                 <div className="min-w-0 text-sm">
@@ -166,10 +167,10 @@ export function RuleRuns({
                     >
                       <span className="truncate">장애 보기</span>
                     </Link>
-                  ) : run.event === "INCIDENT_CREATED" ? (
-                    <span className="text-muted">삭제된 장애</span>
                   ) : (
-                    <span className="text-muted">삭제된 업무</span>
+                    <span className="text-muted">
+                      {runTargetFallback(run.event)}
+                    </span>
                   )}
                 </div>
                 <div className="min-w-0">
