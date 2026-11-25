@@ -8,3 +8,4 @@ export { ServiceDependencies } from "./ui/ServiceDependencies";
 export { ArchiveService } from "./ui/ArchiveService";
 export { OpsSettingsDialog } from "./ui/OpsSettingsDialog";
 export { WebhookPanel } from "./ui/WebhookPanel";
+export { RunHealthCheck } from "./ui/RunHealthCheck";

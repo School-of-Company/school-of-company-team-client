@@ -3310,8 +3310,15 @@ html[data-sidebar-closed~="account"]
 .ops-chart-bar {
   fill: var(--hue-green);
 }
-.ops-chart-bar[data-ok="false"] {
+/* 실패가 섞인 구간은 꽉 찬 막대(높이로도 구분), 실패만 있으면 빨강, 섞이면 주황. 기록 없는 구간은 바닥 선. */
+.ops-chart-bar[data-state="MIXED"] {
+  fill: var(--hue-amber);
+}
+.ops-chart-bar[data-state="FAIL"] {
   fill: var(--danger);
+}
+.ops-chart-bar[data-state="EMPTY"] {
+  fill: var(--border);
 }
 .ops-setup summary,
 .ops-chart summary {

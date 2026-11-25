@@ -14,13 +14,16 @@ export const healthStatusLabels: Readonly<Record<HealthStatus, string>> = {
   DOWN: "다운",
   UNKNOWN: "확인 안 됨",
 };
-export const healthErrorLabels: Readonly<Record<HealthErrorCode, string>> = {
+const healthErrorLabels: Readonly<Record<HealthErrorCode, string>> = {
   BLOCKED: "차단된 주소",
   TIMEOUT: "시간 초과",
   UNREACHABLE: "연결 실패",
   BAD_RESPONSE: "응답 해석 실패",
   UNEXPECTED_STATUS: "기대하지 않은 상태 코드",
 };
+/** 서버 DTO 는 문자열이라 모르는 코드는 그대로 보인다. */
+export const healthErrorLabel = (code: string) =>
+  healthErrorLabels[code as HealthErrorCode] ?? code;
 
 export type HealthCheckConfig = {
   readonly url: string;
@@ -35,7 +38,7 @@ export type HealthState = {
   readonly status: HealthStatus;
   readonly latencyMs: number | null;
   readonly lastCheckedAt: string | null;
-  readonly lastErrorCode: HealthErrorCode | null;
+  readonly lastErrorCode: string | null;
 };
 
 export type HealthCheckRecord = {
@@ -43,7 +46,7 @@ export type HealthCheckRecord = {
   readonly ok: boolean;
   readonly statusCode: number | null;
   readonly latencyMs: number | null;
-  readonly errorCode: HealthErrorCode | null;
+  readonly errorCode: string | null;
 };
 
 export type SentryState = {
@@ -75,7 +78,7 @@ export type ServiceOps = {
     readonly runbook: {
       readonly id: string;
       readonly title: string;
-      readonly status: string;
+      readonly status: "DRAFT" | "PUBLISHED" | "DEPRECATED";
     } | null;
   };
   readonly sentry: SentryState & {
@@ -161,36 +164,48 @@ export function sentrySummary(sentry: SentryState): string {
   }
 }
 
-export type HealthHistory = {
-  readonly checks: readonly HealthCheckRecord[];
-  readonly ok: number;
-  readonly failed: number;
-  readonly averageLatencyMs: number | null;
-  readonly maxLatencyMs: number;
+export type HealthCheckRun = {
+  readonly check: HealthCheckRecord;
+  /** 이 검사까지 반영한 상태. */
+  readonly health: HealthState;
 };
 
-/** 최근 검사 중 24시간 안의 것만, 오래된 것부터(그림은 왼쪽에서 오른쪽으로 읽는다). */
-export function healthHistory(
-  checks: readonly HealthCheckRecord[],
-  now: number,
-): HealthHistory {
-  const since = now - 24 * 60 * 60 * 1000;
-  const shown = checks
-    .filter((check) => Date.parse(check.checkedAt) >= since)
-    .sort((a, b) => Date.parse(a.checkedAt) - Date.parse(b.checkedAt));
-  const latencies = shown
-    .filter((check) => check.ok && check.latencyMs !== null)
-    .map((check) => check.latencyMs ?? 0);
-  const ok = shown.filter((check) => check.ok).length;
-  return {
-    checks: shown,
-    ok,
-    failed: shown.length - ok,
-    averageLatencyMs: latencies.length
-      ? Math.round(
-          latencies.reduce((sum, value) => sum + value, 0) / latencies.length,
-        )
-      : null,
-    maxLatencyMs: Math.max(0, ...latencies),
-  };
+export type HealthBucket = {
+  readonly start: string;
+  readonly okCount: number;
+  readonly failCount: number;
+  /** 그 구간 성공 검사 지연의 중앙값. 성공이 없으면 null. */
+  readonly p50LatencyMs: number | null;
+};
+
+/** 15분 구간 96개, 시각 오름차순, 빈 구간 포함(s17 3.7). */
+export type HealthHistory = {
+  readonly range: "24h";
+  readonly from: string;
+  readonly to: string;
+  readonly bucketMinutes: number;
+  readonly buckets: readonly HealthBucket[];
+};
+
+export type HealthBucketState = "EMPTY" | "OK" | "MIXED" | "FAIL";
+
+export const bucketState = (bucket: HealthBucket): HealthBucketState =>
+  bucket.failCount === 0
+    ? bucket.okCount === 0
+      ? "EMPTY"
+      : "OK"
+    : bucket.okCount === 0
+      ? "FAIL"
+      : "MIXED";
+
+export function historySummary(history: HealthHistory) {
+  let ok = 0;
+  let failed = 0;
+  let maxLatencyMs = 0;
+  for (const bucket of history.buckets) {
+    ok += bucket.okCount;
+    failed += bucket.failCount;
+    maxLatencyMs = Math.max(maxLatencyMs, bucket.p50LatencyMs ?? 0);
+  }
+  return { ok, failed, maxLatencyMs };
 }

@@ -16,9 +16,10 @@ export { TierLabel, OwnerList } from "./ui/labels";
 export { useServiceByKey } from "./api/use-service-by-key";
 export { opsApi, opsKeys, opsQueries, OPS_POLL_INTERVAL } from "./api/ops";
 export {
-  healthErrorLabels,
-  healthHistory,
+  bucketState,
+  healthErrorLabel,
   healthStatusLabels,
+  historySummary,
   sentrySummary,
 } from "./model/ops";
 export type * from "./model/ops";

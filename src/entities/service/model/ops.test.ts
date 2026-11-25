@@ -1,44 +1,50 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { healthHistory, sentrySummary, type HealthCheckRecord } from "./ops";
+import {
+  bucketState,
+  healthErrorLabel,
+  historySummary,
+  sentrySummary,
+  type HealthBucket,
+  type HealthHistory,
+} from "./ops";
 
-const now = Date.parse("2026-11-25T10:00:00+09:00");
-const check = (
-  checkedAt: string,
-  ok: boolean,
-  latencyMs: number | null,
-): HealthCheckRecord => ({
-  checkedAt,
-  ok,
-  latencyMs,
-  statusCode: ok ? 200 : null,
-  errorCode: ok ? null : "TIMEOUT",
+const bucket = (
+  okCount: number,
+  failCount: number,
+  p50LatencyMs: number | null,
+): HealthBucket => ({
+  start: "2026-11-25T10:00:00+09:00",
+  okCount,
+  failCount,
+  p50LatencyMs,
 });
 
-test("history keeps the last 24 hours, oldest first, and averages successful latency", () => {
-  const history = healthHistory(
-    [
-      check("2026-11-25T09:55:00+09:00", true, 300),
-      check("2026-11-25T09:50:00+09:00", false, null),
-      check("2026-11-25T09:45:00+09:00", true, 100),
-      check("2026-11-24T09:00:00+09:00", true, 9000),
-    ],
-    now,
-  );
-  assert.deepEqual(
-    history.checks.map((item) => item.latencyMs),
-    [100, null, 300],
-  );
-  assert.equal(history.ok, 2);
-  assert.equal(history.failed, 1);
-  assert.equal(history.averageLatencyMs, 200);
-  assert.equal(history.maxLatencyMs, 300);
+test("bucket state separates empty, ok, mixed and failed buckets", () => {
+  assert.equal(bucketState(bucket(0, 0, null)), "EMPTY");
+  assert.equal(bucketState(bucket(3, 0, 140)), "OK");
+  assert.equal(bucketState(bucket(2, 1, 140)), "MIXED");
+  assert.equal(bucketState(bucket(0, 3, null)), "FAIL");
 });
 
-test("empty history has no average", () => {
-  const history = healthHistory([], now);
-  assert.equal(history.averageLatencyMs, null);
-  assert.equal(history.maxLatencyMs, 0);
+test("history summary counts checks and finds the tallest p50", () => {
+  const history: HealthHistory = {
+    range: "24h",
+    from: "2026-11-24T10:15:00+09:00",
+    to: "2026-11-25T10:15:00+09:00",
+    bucketMinutes: 15,
+    buckets: [bucket(3, 0, 140), bucket(0, 0, null), bucket(1, 2, 900)],
+  };
+  assert.deepEqual(historySummary(history), {
+    ok: 4,
+    failed: 2,
+    maxLatencyMs: 900,
+  });
+});
+
+test("unknown error codes are shown as they are", () => {
+  assert.equal(healthErrorLabel("TIMEOUT"), "시간 초과");
+  assert.equal(healthErrorLabel("NEW_CODE"), "NEW_CODE");
 });
 
 test("sentry says why there are no numbers", () => {

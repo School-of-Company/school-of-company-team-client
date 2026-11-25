@@ -6,15 +6,20 @@ import { useQuery } from "@tanstack/react-query";
 import { formatDateTime, SeverityLabel } from "@/entities/incident";
 import {
   HealthBadge,
-  healthErrorLabels,
-  healthHistory,
+  bucketState,
+  healthErrorLabel,
+  historySummary,
   opsQueries,
   sentrySummary,
   serviceErrorMessage,
   type ServiceDetail,
   type ServiceOps,
 } from "@/entities/service";
-import { OpsSettingsDialog, WebhookPanel } from "@/features/manage-service";
+import {
+  OpsSettingsDialog,
+  RunHealthCheck,
+  WebhookPanel,
+} from "@/features/manage-service";
 import { routes } from "@/shared/config";
 import { Button, ErrorState, ListSkeleton, StaleNotice } from "@/shared/ui";
 
@@ -65,13 +70,16 @@ function MonitoringBody({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 id="ops-health">헬스체크</h2>
           {ops.canEdit && (
-            <Button
-              variant="secondary"
-              className="ui-button-sm"
-              onClick={() => setEditing(true)}
-            >
-              설정 수정
-            </Button>
+            <span className="flex flex-wrap items-center gap-2">
+              {ops.healthCheck && <RunHealthCheck serviceId={serviceId} />}
+              <Button
+                variant="secondary"
+                className="ui-button-sm"
+                onClick={() => setEditing(true)}
+              >
+                설정 수정
+              </Button>
+            </span>
           )}
         </div>
         <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
@@ -86,7 +94,7 @@ function MonitoringBody({
           </span>
           {health.lastErrorCode && (
             <span className="text-muted">
-              {healthErrorLabels[health.lastErrorCode]}
+              {healthErrorLabel(health.lastErrorCode)}
             </span>
           )}
         </p>
@@ -107,7 +115,7 @@ function MonitoringBody({
             </Link>
           </p>
         )}
-        <HealthChart ops={ops} />
+        <HealthChart serviceId={serviceId} />
       </section>
       <section aria-labelledby="ops-links" className="grid gap-3">
         <h2 id="ops-links">링크</h2>
@@ -207,86 +215,99 @@ function LinkRow({
 }
 
 /**
- * 최근 검사(서버가 주는 최근 20회 중 24시간 안의 것). 성공은 지연에 비례한 막대, 실패는 꽉 찬 막대로
- * 모양이 다르다. 그림은 요약 문장으로 읽히고, 같은 내용을 표로도 볼 수 있다.
+ * 최근 24시간, 15분 구간 96개(빈 구간 포함). 성공만 있는 구간은 중앙값 지연만큼, 실패가 섞이면 꽉 찬 막대에
+ * 다른 색과 무늬로, 기록이 없으면 바닥 선만 그려 모양으로도 구분한다. 요약 문장과 표로도 읽힌다.
  */
-function HealthChart({ ops }: { readonly ops: ServiceOps }) {
-  const [now] = useState(() => Date.now());
-  const history = healthHistory(ops.recentChecks, now);
-  if (history.checks.length === 0) return null;
-  const summary = `최근 24시간 검사 ${history.checks.length}회 중 성공 ${history.ok}회, 실패 ${history.failed}회${
-    history.averageLatencyMs !== null
-      ? `, 평균 지연 ${history.averageLatencyMs}ms`
-      : ""
-  }`;
-  const width = 8;
+function HealthChart({ serviceId }: { readonly serviceId: string }) {
+  const history = useQuery(opsQueries.history(serviceId));
   const height = 48;
+  const width = 6;
+  if (!history.data)
+    return history.isPending ? (
+      <div aria-hidden="true" className="ops-chart-plot" />
+    ) : (
+      <p className="text-sm text-muted">24시간 기록을 불러오지 못했습니다.</p>
+    );
+  const { buckets } = history.data;
+  const totals = historySummary(history.data);
+  const summary =
+    totals.ok + totals.failed === 0
+      ? "최근 24시간 검사 기록이 없습니다"
+      : `최근 24시간 검사 ${totals.ok + totals.failed}회 중 성공 ${totals.ok}회, 실패 ${totals.failed}회`;
+  const recorded = buckets.filter((bucket) => bucketState(bucket) !== "EMPTY");
   return (
     <figure className="ops-chart grid gap-2">
+      <StaleNotice query={history} />
       <svg
         role="img"
         aria-label={summary}
-        viewBox={`0 0 ${history.checks.length * width} ${height}`}
+        viewBox={`0 0 ${buckets.length * width} ${height}`}
         preserveAspectRatio="none"
         className="ops-chart-plot"
       >
-        {history.checks.map((check, index) => {
-          const bar = check.ok
-            ? Math.max(
-                4,
-                Math.round(
-                  ((check.latencyMs ?? 0) / (history.maxLatencyMs || 1)) *
-                    height,
-                ),
-              )
-            : height;
+        {buckets.map((bucket, index) => {
+          const state = bucketState(bucket);
+          const bar =
+            state === "EMPTY"
+              ? 2
+              : state === "OK"
+                ? Math.max(
+                    6,
+                    Math.round(
+                      ((bucket.p50LatencyMs ?? 0) /
+                        (totals.maxLatencyMs || 1)) *
+                        height,
+                    ),
+                  )
+                : height;
           return (
             <rect
-              key={check.checkedAt}
-              x={index * width + 1}
+              key={bucket.start}
+              x={index * width + 0.5}
               y={height - bar}
-              width={width - 2}
+              width={width - 1}
               height={bar}
               className="ops-chart-bar"
-              data-ok={check.ok}
+              data-state={state}
             />
           );
         })}
       </svg>
       <figcaption className="text-xs text-muted">
-        {summary}. 성공은 지연만큼, 실패는 꽉 찬 막대로 그립니다.
+        {summary}. 15분 구간마다 성공은 지연 중앙값만큼, 실패가 있으면 꽉 찬
+        막대로 그립니다.
       </figcaption>
-      <details className="text-sm">
-        <summary className="font-medium">표로 보기</summary>
-        <table className="service-edge-table">
-          <thead>
-            <tr>
-              <th scope="col">시각</th>
-              <th scope="col">결과</th>
-              <th scope="col">상태 코드</th>
-              <th scope="col">지연</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...history.checks].reverse().map((check) => (
-              <tr key={check.checkedAt}>
-                <td className="tabular-nums">
-                  {formatDateTime(check.checkedAt)}
-                </td>
-                <td>
-                  {check.ok
-                    ? "성공"
-                    : `실패${check.errorCode ? `, ${healthErrorLabels[check.errorCode]}` : ""}`}
-                </td>
-                <td className="tabular-nums">{check.statusCode ?? "—"}</td>
-                <td className="tabular-nums">
-                  {check.latencyMs !== null ? `${check.latencyMs}ms` : "—"}
-                </td>
+      {recorded.length > 0 && (
+        <details className="text-sm">
+          <summary className="font-medium">표로 보기</summary>
+          <table className="service-edge-table">
+            <thead>
+              <tr>
+                <th scope="col">구간 시작</th>
+                <th scope="col">성공</th>
+                <th scope="col">실패</th>
+                <th scope="col">지연 중앙값</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </details>
+            </thead>
+            <tbody>
+              {[...recorded].reverse().map((bucket) => (
+                <tr key={bucket.start}>
+                  <td className="tabular-nums">
+                    {formatDateTime(bucket.start)}
+                  </td>
+                  <td className="tabular-nums">{bucket.okCount}</td>
+                  <td className="tabular-nums">{bucket.failCount}</td>
+                  <td className="tabular-nums">
+                    {bucket.p50LatencyMs !== null
+                      ? `${bucket.p50LatencyMs}ms`
+                      : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
+      )}
     </figure>
   );
 }

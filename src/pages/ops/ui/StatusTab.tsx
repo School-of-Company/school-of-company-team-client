@@ -6,7 +6,7 @@ import { formatDateTime, SeverityLabel } from "@/entities/incident";
 import {
   deploymentStatusLabels,
   HealthBadge,
-  healthErrorLabels,
+  healthErrorLabel,
   opsQueries,
   sentrySummary,
   serviceErrorMessage,
@@ -121,7 +121,7 @@ function OpsTable({
               <HealthBadge status={service.health.status} />
               <span className="block truncate text-xs text-muted">
                 {service.health.lastErrorCode
-                  ? healthErrorLabels[service.health.lastErrorCode]
+                  ? healthErrorLabel(service.health.lastErrorCode)
                   : service.health.lastCheckedAt
                     ? `${formatDateTime(service.health.lastCheckedAt)} 확인`
                     : "검사 기록 없음"}

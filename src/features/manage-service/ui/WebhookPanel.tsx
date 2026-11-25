@@ -70,6 +70,12 @@ export function WebhookPanel({
         <summary className="font-medium">연결 방법</summary>
         <div className="grid gap-2 pt-2 text-foreground-2">
           <p>
+            운영 서버 API 주소는{" "}
+            <code>https://school-of-company.https.gsmsv.site</code>
+            입니다(화면은 https://team.schoolofcompany.com). 위 웹훅 주소는 이
+            화면이 쓰는 API 주소로 만듭니다.
+          </p>
+          <p>
             비밀값은 헤더 <code>X-Hub-Webhook-Secret</code>에 넣는 것을
             권장합니다. 헤더를 넣을 수 없으면 주소 끝에{" "}
             <code>?token=비밀값</code>을 붙입니다(프록시 로그에 남을 수

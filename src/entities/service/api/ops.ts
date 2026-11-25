@@ -1,6 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 import type {
+  HealthCheckRun,
+  HealthHistory,
   OpsOverview,
   ServiceOps,
   UpdateServiceOps,
@@ -16,6 +18,7 @@ export const opsKeys = {
   all: ["ops"] as const,
   overview: ["ops", "overview"] as const,
   service: (id: string) => ["ops", "service", id] as const,
+  history: (id: string) => ["ops", "history", id] as const,
 };
 
 export const opsApi = {
@@ -24,6 +27,20 @@ export const opsApi = {
   service: async (id: string) => (await api.get<ServiceOps>(path(id))).data,
   update: async (id: string, body: UpdateServiceOps) =>
     (await api.put<ServiceOps>(path(id), body)).data,
+  /** 지금 검사(소유자, LEAD). 같은 서비스에 10초 안에 다시 부르면 429(details.retryAfter 초). */
+  runHealthCheck: async (id: string) =>
+    (
+      await api.post<HealthCheckRun>(
+        `/api/v1/services/${encodeURIComponent(id)}/health-check/run`,
+      )
+    ).data,
+  history: async (id: string) =>
+    (
+      await api.get<HealthHistory>(
+        `/api/v1/services/${encodeURIComponent(id)}/health-checks`,
+        { params: { range: "24h" } },
+      )
+    ).data,
   /** 비밀값은 이 응답에서 한 번만 온다. 캐시나 저장소에 넣지 않는다. */
   rotateWebhookSecret: async (id: string) =>
     (await api.post<WebhookSecret>(`${path(id)}/webhook-secret`)).data,
@@ -40,6 +57,12 @@ export const opsQueries = {
     queryOptions({
       queryKey: opsKeys.service(id),
       queryFn: () => opsApi.service(id),
+      refetchInterval: OPS_POLL_INTERVAL,
+    }),
+  history: (id: string) =>
+    queryOptions({
+      queryKey: opsKeys.history(id),
+      queryFn: () => opsApi.history(id),
       refetchInterval: OPS_POLL_INTERVAL,
     }),
 };
