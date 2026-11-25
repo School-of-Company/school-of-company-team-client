@@ -7,18 +7,25 @@ import {
   whiteboardErrorMessage,
 } from "./errors";
 
-test("template size errors (new code and the generic 413) both get the template message with the limit", () => {
-  for (const code of [TEMPLATE_TOO_LARGE_CODE, "WHITEBOARD_TOO_LARGE"]) {
-    const message = templateErrorMessage(
-      new ApiError(413, code, "too large", { limit: "300KB" }),
-    );
-    assert.match(message, /팀 템플릿/);
-    assert.match(message, /300KB/);
-  }
-  assert.doesNotMatch(
-    templateErrorMessage(new ApiError(413, "WHITEBOARD_TOO_LARGE", "x")),
-    /상한/,
+test("TEMPLATE_TOO_LARGE shows the server limit from details.limitBytes", () => {
+  const message = templateErrorMessage(
+    new ApiError(400, TEMPLATE_TOO_LARGE_CODE, "too large", {
+      limitBytes: 300000,
+    }),
   );
+  assert.match(message, /팀 템플릿은 300KB까지/);
+  assert.match(
+    templateErrorMessage(new ApiError(400, TEMPLATE_TOO_LARGE_CODE, "x")),
+    /300KB/,
+  );
+});
+
+test("board-wide 413 WHITEBOARD_TOO_LARGE stays handled on template save", () => {
+  const message = templateErrorMessage(
+    new ApiError(413, "WHITEBOARD_TOO_LARGE", "too large", { limit: "1MB" }),
+  );
+  assert.match(message, /팀 템플릿/);
+  assert.match(message, /1MB/);
 });
 
 test("ACCESS_DENIED is template-specific only on template actions", () => {

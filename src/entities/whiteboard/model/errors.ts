@@ -40,31 +40,27 @@ export function whiteboardErrorMessage(error: unknown): string {
   return messages[problem.code] ?? problem.message;
 }
 
-/**
- * 팀 템플릿 크기 상한 오류 코드. 서버 s16 이 팀 템플릿 scene 을 300KB 로 막는다.
- * ponytail: 서버 #70 최종 head 의 코드 이름으로 이 한 줄만 맞춘다.
- */
+/** 서버 s16 D16-6: 팀 템플릿 scene 은 정규화 뒤 300KB 이하(400, details.limitBytes). 만들 때만 검사한다. */
 export const TEMPLATE_TOO_LARGE_CODE = "WHITEBOARD_TEMPLATE_TOO_LARGE";
 
-const limitOf = (details: unknown): string | null => {
-  const limit =
-    typeof details === "object" && details !== null && "limit" in details
-      ? (details as { limit: unknown }).limit
-      : null;
-  return typeof limit === "string" || typeof limit === "number"
-    ? String(limit)
-    : null;
-};
+const detail = (details: unknown, key: string): unknown =>
+  typeof details === "object" && details !== null && key in details
+    ? (details as Record<string, unknown>)[key]
+    : undefined;
 
 /** 팀 템플릿 만들기, 고치기, 지우기의 오류. 크기 상한과 권한만 템플릿 문구로 바꾸고 나머지는 화이트보드 문구다. */
 export function templateErrorMessage(error: unknown): string {
   const problem = normalizeApiError(error);
-  if (
-    problem.code === TEMPLATE_TOO_LARGE_CODE ||
-    problem.code === "WHITEBOARD_TOO_LARGE"
-  ) {
-    const limit = limitOf(problem.details);
-    return `팀 템플릿으로 저장하기에 너무 큽니다${limit ? `(상한 ${limit})` : ""}. 요소를 줄이거나 보드를 나눈 뒤 다시 저장하세요.`;
+  if (problem.code === TEMPLATE_TOO_LARGE_CODE) {
+    const bytes = detail(problem.details, "limitBytes");
+    const limit =
+      typeof bytes === "number" ? `${Math.round(bytes / 1000)}KB` : "300KB";
+    return `팀 템플릿은 ${limit}까지 저장할 수 있습니다. 요소를 줄이거나 보드를 나눈 뒤 다시 저장하세요.`;
+  }
+  // 원본 화이트보드 자체의 1MB, 요소 5,000개 상한(413).
+  if (problem.code === "WHITEBOARD_TOO_LARGE") {
+    const limit = detail(problem.details, "limit");
+    return `화이트보드가 너무 커서 팀 템플릿으로 저장할 수 없습니다${typeof limit === "string" || typeof limit === "number" ? `(상한 ${limit})` : ""}. 요소를 줄인 뒤 다시 저장하세요.`;
   }
   if (problem.code === "ACCESS_DENIED")
     return "헤드 어드민만 팀 템플릿을 관리할 수 있습니다.";
