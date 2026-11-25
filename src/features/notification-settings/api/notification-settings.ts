@@ -1,10 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 
-export type NotificationKind = "ciFailed" | "reviewOverdue" | "deadlineDue";
+export type NotificationKind =
+  "ciFailed" | "reviewOverdue" | "deadlineDue" | "serviceDown";
 export type NotificationSettings = Readonly<
-  Record<NotificationKind, boolean>
+  Record<Exclude<NotificationKind, "serviceDown">, boolean>
 > & {
+  /** 팀 공용(TEAM)에만 있다. 프로젝트 설정은 null 이고 보내면 400 이다. */
+  readonly serviceDown: boolean | null;
   readonly scope: "TEAM" | "PROJECT";
   readonly projectId: string | null;
   /** 같은 범위의 Discord 채널 상태. ACTIVE가 아니면 켜져 있어도 보내지 않는다. */
