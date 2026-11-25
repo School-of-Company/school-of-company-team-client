@@ -121,6 +121,7 @@ export function MilestoneFormDialog({
           onChange={(value) => set("goal", value)}
           error={errors.goal}
           max={MILESTONE_GOAL_MAX}
+          hint="마크다운을 쓸 수 있어요."
         />
         <SpecDocumentField
           id={`${id}-spec`}
@@ -166,7 +167,7 @@ export function MilestoneFormDialog({
           id={`${id}-description`}
           label="설명"
           error={errors.description}
-          hint="마크다운을 지원합니다."
+          hint="마크다운을 쓸 수 있어요."
         >
           <Textarea
             id={`${id}-description`}
@@ -223,8 +224,8 @@ function SpecDocumentField({
       error={error}
       hint={
         project.isError || org.isError
-          ? "문서 목록을 불러오지 못했습니다. 잠시 뒤 다시 여세요."
-          : "이 프로젝트 문서나 조직 문서 하나를 고릅니다."
+          ? "문서 목록을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요."
+          : "이 프로젝트 문서나 조직 문서 하나를 골라요."
       }
     >
       <Select
@@ -282,8 +283,8 @@ function StatusOverrideField({
       label="상태"
       hint={
         value
-          ? `수동으로 지정하면 자동 계산(지금은 ${auto}) 대신 이 상태를 씁니다. 자동을 고르면 되돌아갑니다.`
-          : `업무 진행, 마감일, 연결 릴리스로 계산합니다. 지금은 ${auto}입니다.`
+          ? `수동으로 지정하면 자동 계산(지금은 ${auto}) 대신 이 상태를 써요. 자동을 고르면 되돌아가요.`
+          : `업무 진행, 마감일, 연결 릴리스로 계산해요. 지금은 ${auto}예요.`
       }
     >
       <Select

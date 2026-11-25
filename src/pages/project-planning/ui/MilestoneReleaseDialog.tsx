@@ -36,6 +36,7 @@ export function MilestoneReleaseDialog({
   );
   const [tag, setTag] = useState(previous.releaseTag);
   const [error, setError] = useState<string | null>(null);
+  const [repositoryError, setRepositoryError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const services = useQuery({ ...serviceQueries.list(false), ...once });
   const linked = (services.data ?? []).filter(
@@ -84,13 +85,18 @@ export function MilestoneReleaseDialog({
     };
     const problem = validateMilestone(input).releaseTag;
     setError(problem ?? null);
+    setRepositoryError(null);
     if (problem) return;
     setPending(true);
     try {
       await onSubmit(input);
       onClose();
     } catch (cause) {
-      setError(milestoneErrorMessage(normalizeApiError(cause)));
+      const failure = normalizeApiError(cause);
+      // 저장소 문제는 저장소 칸에, 나머지(태그 검증 등)는 태그 칸 또는 양식 아래에.
+      if (failure.code === "MILESTONE_RELEASE_REPOSITORY_NOT_LINKED")
+        setRepositoryError(milestoneErrorMessage(failure));
+      else setError(milestoneErrorMessage(failure));
     } finally {
       setPending(false);
     }
@@ -107,24 +113,30 @@ export function MilestoneReleaseDialog({
     >
       <form onSubmit={submit} className="grid gap-5" noValidate>
         <p className="text-sm text-muted">
-          이 저장소에 태그의 릴리스가 게시되면 마일스톤이 자동으로 완료됩니다.
+          이 저장소에 태그의 릴리스가 게시되면 마일스톤이 자동으로 완료돼요.
         </p>
         <Field
           id={`${id}-repository`}
           label="저장소"
+          error={repositoryError ?? undefined}
           hint={
             services.isError
-              ? "서비스 목록을 불러오지 못했습니다. 잠시 뒤 다시 여세요."
+              ? "서비스 목록을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요."
               : empty
-                ? "서비스에 연결된 저장소가 없습니다. 릴리스는 서비스에 연결된 저장소에서만 모으기 때문에, 먼저 서비스 화면에서 저장소를 연결하세요."
-                : "서비스에 연결된 저장소만 고를 수 있습니다."
+                ? "서비스에 연결된 저장소가 없어요. 릴리스는 서비스에 연결된 저장소에서만 모으기 때문에, 먼저 서비스 화면에서 저장소를 연결해 주세요."
+                : "서비스에 연결된 저장소만 고를 수 있어요."
           }
         >
           <Select
             id={`${id}-repository`}
             value={repositoryId}
             onChange={(event) => setRepositoryId(event.target.value)}
-            aria-describedby={`${id}-repository-hint`}
+            aria-invalid={repositoryError ? true : undefined}
+            aria-describedby={
+              repositoryError
+                ? `${id}-repository-error ${id}-repository-hint`
+                : `${id}-repository-hint`
+            }
             aria-busy={loading || undefined}
           >
             <option value="">연결 안 함</option>
@@ -162,7 +174,7 @@ export function MilestoneReleaseDialog({
             id={`${id}-tag`}
             label="태그"
             error={error ?? undefined}
-            hint="예: v1.0.0. 아직 게시되지 않은 태그도 적을 수 있습니다."
+            hint="예: v1.0.0. 아직 게시되지 않은 태그도 적을 수 있어요."
           >
             <Input
               id={`${id}-tag`}

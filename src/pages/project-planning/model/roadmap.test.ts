@@ -89,3 +89,20 @@ test("date label reads the range, due-only, start-only and none", () => {
     /11월 1일 시작/,
   );
 });
+
+test("start-only bar runs to today, or is one day before it starts", () => {
+  const started = roadmapLayout(
+    [item({ timelineStart: "2026-11-01" })],
+    "2026-11-11",
+  );
+  // 11월 30일 기간 중 1일~11일.
+  assert.deepEqual(started.rows[0].bar, { left: 0, width: (11 / 30) * 100 });
+  const upcoming = roadmapLayout(
+    [item({ timelineStart: "2026-11-20" })],
+    "2026-11-11",
+  );
+  assert.deepEqual(upcoming.rows[0].bar, {
+    left: (19 / 30) * 100,
+    width: (1 / 30) * 100,
+  });
+});

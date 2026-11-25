@@ -78,7 +78,8 @@ export function roadmapLayout(
     today: at(today),
     rows: dated.map((milestone) => {
       const start = (milestone.timelineStart ?? milestone.dueDate)!;
-      const finish = milestone.dueDate ?? start;
+      // 마감일이 없으면 오늘까지(아직 시작 전이면 시작일 하루).
+      const finish = milestone.dueDate ?? (today > start ? today : start);
       return {
         milestone,
         bar: span(start, finish < start ? start : finish),

@@ -3,6 +3,7 @@ import { useId, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   milestoneErrorMessage,
+  milestonePercent,
   milestoneInput,
   milestoneQueries,
   milestoneStatusLabels,
@@ -129,8 +130,8 @@ export function MilestonePanel({
         <ErrorState
           title={
             isGoneError(detail.error)
-              ? "찾는 마일스톤이 없습니다"
-              : "마일스톤을 불러오지 못했습니다"
+              ? "찾는 마일스톤이 없어요"
+              : "마일스톤을 불러오지 못했어요"
           }
           description={milestoneErrorMessage(normalizeApiError(detail.error))}
           onRetry={() => void detail.refetch()}
@@ -185,6 +186,7 @@ function MilestoneBody({
             <ProgressBar
               done={progress.done}
               total={progress.total}
+              percent={milestonePercent(progress)}
               label={`${milestone.name} 진행률`}
             />
             {progress.totalWeight !== null && (
@@ -211,8 +213,8 @@ function MilestoneBody({
         </div>
       </dl>
       <p className="planning-note">
-        진행률은 연결한 스프린트의 업무와 직접 연결한 업무를 합쳐, 내가 볼 수
-        있는 업무만 셉니다.
+        진행률에는 연결한 스프린트의 업무와 직접 연결한 업무가 함께 들어가요. 두
+        곳에 모두 걸린 업무도 한 번만 들어가고, 내가 볼 수 있는 업무만 반영돼요.
       </p>
       {milestone.goal && (
         <section className="grid gap-2" aria-label="목표">
@@ -312,8 +314,8 @@ function LinkedSprints({
         </ul>
       ) : (
         <p className="text-sm text-muted">
-          연결한 스프린트가 없습니다. 스프린트를 연결하면 그 업무가 진행률에
-          들어갑니다.
+          연결한 스프린트가 없어요. 스프린트를 연결하면 그 업무가 진행률에
+          들어가요.
         </p>
       )}
       {manages && (
@@ -343,7 +345,7 @@ function LinkedSprints({
             연결
           </Button>
           <p className="planning-note w-full">
-            다른 마일스톤에 연결된 스프린트를 고르면 이 마일스톤으로 옮깁니다.
+            다른 마일스톤에 연결된 스프린트를 고르면 이 마일스톤으로 옮겨요.
           </p>
         </div>
       )}
@@ -384,7 +386,7 @@ function LinkedTasks({
           <span className="ui-skeleton-text">업무 불러오는 중</span>
         </div>
       ) : board.isError && !board.data ? (
-        <p className="text-sm text-muted">업무를 불러오지 못했습니다.</p>
+        <p className="text-sm text-muted">업무를 불러오지 못했어요.</p>
       ) : tasks.length ? (
         <ul className="plan-list" aria-label="직접 연결 업무">
           {tasks.map((task) => (
@@ -393,8 +395,8 @@ function LinkedTasks({
         </ul>
       ) : (
         <p className="text-sm text-muted">
-          직접 연결한 업무가 없습니다. 업무 상세에서 이 마일스톤을 지정할 수
-          있습니다.
+          직접 연결한 업무가 없어요. 업무 상세에서 이 마일스톤을 지정할 수
+          있어요.
         </p>
       )}
     </section>
@@ -430,16 +432,16 @@ function LinkedRelease({
       </div>
       {!link ? (
         <p className="text-sm text-muted">
-          연결한 릴리스가 없습니다. 저장소와 태그를 연결하면 릴리스가 게시될 때
-          자동으로 완료됩니다.
+          연결한 릴리스가 없어요. 저장소와 태그를 연결하면 릴리스가 게시될 때
+          자동으로 완료돼요.
         </p>
       ) : !release ? (
         <p className="text-sm">
           <span className="font-mono">{link.repositoryFullName}</span>{" "}
           {link.tag}
           <span className="block text-muted">
-            이 태그의 릴리스가 아직 게시되지 않았습니다. 게시되면 자동으로
-            완료됩니다.
+            이 태그의 릴리스가 아직 게시되지 않았어요. 게시되면 자동으로
+            완료돼요.
           </span>
         </p>
       ) : (
@@ -454,13 +456,16 @@ function LinkedRelease({
               {release.name ?? release.tag}
             </a>
             <span className="text-xs text-muted">
-              {link.repositoryFullName} {release.tag}{" "}
+              {link.repositoryFullName}{" "}
+              {release.name &&
+                release.name !== release.tag &&
+                `${release.tag} `}
               {formatDate(release.publishedAt)} 게시
             </span>
           </p>
           {autoDone && (
             <p className="text-sm text-muted">
-              릴리스가 게시되어 자동으로 완료됐습니다.
+              릴리스가 게시되어 자동으로 완료됐어요.
             </p>
           )}
           <ReleaseItems release={release} />
@@ -476,18 +481,18 @@ function ReleaseItems({
   readonly release: NonNullable<Milestone["release"]>;
 }) {
   if (release.itemsStatus === "PENDING")
-    return <p className="text-sm text-muted">PR 목록을 계산하는 중입니다.</p>;
+    return <p className="text-sm text-muted">PR 목록을 계산하는 중이에요.</p>;
   if (release.itemsStatus === "FAILED")
-    return <p className="text-sm text-muted">PR 목록을 만들지 못했습니다.</p>;
+    return <p className="text-sm text-muted">PR 목록을 만들지 못했어요.</p>;
   if (release.itemsStatus === "NO_BASE")
     return (
       <p className="text-sm text-muted">
-        이전 릴리스가 없어 포함된 PR을 계산하지 않았습니다.
+        이전 릴리스가 없어 포함된 PR을 계산하지 않았어요.
       </p>
     );
   const items = release.items ?? [];
   if (!items.length)
-    return <p className="text-sm text-muted">포함된 PR이 없습니다.</p>;
+    return <p className="text-sm text-muted">포함된 PR이 없어요.</p>;
   return (
     <>
       <ul className="milestone-links" aria-label="포함된 PR">
@@ -513,7 +518,7 @@ function ReleaseItems({
         ))}
       </ul>
       {release.itemsStatus === "TRUNCATED" && (
-        <p className="planning-note">PR이 많아 일부만 보여 줍니다.</p>
+        <p className="planning-note">PR이 많아 일부만 보여 줘요.</p>
       )}
     </>
   );
@@ -548,7 +553,7 @@ function MilestoneFooter({
       {deleting ? (
         <div className="milestone-confirm" role="group" aria-label="삭제 확인">
           <p className="text-sm">
-            삭제하면 스프린트와 업무는 그대로 두고 연결만 풉니다.
+            삭제하면 스프린트와 업무는 그대로 두고 연결만 풀어요.
           </p>
           <div className="flex flex-wrap justify-end gap-2">
             <Button

@@ -4072,9 +4072,34 @@ a.search-option:hover {
   pointer-events: none;
   transition: opacity var(--dur-1) var(--ease-out);
 }
+/* 탭(터치)은 :focus-visible 이 아니라 :focus 만 켜므로 둘 다 본다. */
 .milestone-risk:hover + .milestone-risk-tip,
+.milestone-risk:focus + .milestone-risk-tip,
 .milestone-risk:focus-visible + .milestone-risk-tip {
   opacity: 1;
+}
+/* 390폭: 말풍선 대신 배지 아래 글자로 늘 보인다. */
+@media (max-width: 39.99rem) {
+  .milestone-risk-wrap {
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+  .milestone-risk-tip {
+    position: static;
+    width: auto;
+    max-width: none;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--muted);
+    opacity: 1;
+  }
+  /* 상세는 바로 아래 "위험 이유" 줄이 같은 글을 보여 준다. */
+  .milestone-facts .milestone-risk-tip {
+    display: none;
+  }
 }
 
 /* 목록: 줄 전체가 이름 버튼(늘린 클릭 영역), 위험 배지만 그 위에 따로 잡힌다. */

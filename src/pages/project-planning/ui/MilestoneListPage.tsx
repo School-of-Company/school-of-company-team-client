@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   milestoneErrorMessage,
+  milestonePercent,
   milestoneQueries,
   type Milestone,
 } from "@/entities/milestone";
@@ -104,18 +105,18 @@ function Milestones({ project, manages }: PlanningContext) {
         }
         error={(error, retry) => (
           <ErrorState
-            title="마일스톤을 불러오지 못했습니다"
+            title="마일스톤을 불러오지 못했어요"
             description={milestoneErrorMessage(normalizeApiError(error))}
             onRetry={retry}
           />
         )}
         empty={
           <EmptyState
-            title="아직 마일스톤이 없습니다"
+            title="아직 마일스톤이 없어요"
             description={
               manages
-                ? "출시할 결과물을 만들고 스프린트나 업무를 연결하세요."
-                : "PM 또는 헤드 어드민이 마일스톤을 만들면 여기에 보입니다."
+                ? "출시할 결과물을 만들고 스프린트나 업무를 연결해 보세요."
+                : "PM 또는 헤드 어드민이 마일스톤을 만들면 여기에 보여요."
             }
           />
         }
@@ -190,6 +191,7 @@ function MilestoneList({
           <ProgressBar
             done={milestone.progress.done}
             total={milestone.progress.total}
+            percent={milestonePercent(milestone.progress)}
             label={`${milestone.name} 진행률`}
           />
         </li>
