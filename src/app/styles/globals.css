@@ -654,6 +654,13 @@ select.ui-input {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
+/* 크기 선택: 우선순위 칩 모양에서 색 점만 뺀다. */
+.ui-size-option {
+  --priority: var(--foreground-2);
+}
+.ui-size-option::before {
+  display: none;
+}
 
 /* ───────────────────────── Shell ───────────────────────── */
 
@@ -1559,6 +1566,23 @@ html[data-sidebar-closed~="account"]
   gap: var(--space-1) var(--space-2);
   color: var(--muted);
   font-size: var(--text-xs);
+}
+.board-card-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* 크기 배지: 우선순위 글자 줄 높이 안에 들어가는 작은 회색 칩(카드 높이를 바꾸지 않는다). */
+.board-card-size {
+  display: inline-flex;
+  min-width: 1.5rem;
+  justify-content: center;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-fill);
+  color: var(--foreground-2);
+  font-weight: 600;
+  line-height: 1.4;
 }
 .board-card-issue {
   display: inline-flex;

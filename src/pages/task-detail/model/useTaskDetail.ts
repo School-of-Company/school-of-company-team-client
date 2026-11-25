@@ -8,7 +8,9 @@ import {
   taskApi,
   taskKeys,
   taskQueries,
+  type TaskSize,
 } from "@/entities/task";
+import { sprintKeys } from "@/entities/sprint";
 import { projectQueries } from "@/entities/project";
 import { milestoneQueries } from "@/entities/milestone";
 import { activeUsersQueryOptions } from "@/entities/user";
@@ -51,6 +53,24 @@ export function useTaskDetail(taskId: string) {
     onSuccess: async () => {
       toast("계획 버킷을 변경했습니다.", "success");
       await client.invalidateQueries({ queryKey: taskKeys.all });
+    },
+    onError: (cause) => {
+      const problem = normalizeApiError(cause);
+      toast(problem.message, "error");
+      if (problem.status === 403 || problem.status === 404) setDenied(cause);
+    },
+  });
+  const changeSize = useMutation({
+    mutationFn: (size: TaskSize | null) => taskApi.update(taskId, { size }),
+    onSuccess: async () => {
+      toast("크기를 변경했습니다.", "success");
+      await Promise.all([
+        client.invalidateQueries({ queryKey: taskKeys.all }),
+        // Sprint 크기 합계가 바뀐다.
+        client.invalidateQueries({
+          queryKey: sprintKeys.list(task.data?.projectId ?? ""),
+        }),
+      ]);
     },
     onError: (cause) => {
       const problem = normalizeApiError(cause);
@@ -128,6 +148,7 @@ export function useTaskDetail(taskId: string) {
     setDenied,
     changeStatus,
     changeBucket,
+    changeSize,
     changeMilestone,
   };
 }
