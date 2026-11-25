@@ -1,22 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   opsApi,
   opsKeys,
   serviceErrorMessage,
   type ServiceOps,
+  type WebhookSecret,
 } from "@/entities/service";
 import { formatDate } from "@/shared/lib";
 import { Button, CopyField, Dialog } from "@/shared/ui";
 import { ConfirmDialog } from "./ConfirmDialog";
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "";
+// 끝의 / 를 떼어 path(/api/...)와 붙여도 // 가 생기지 않게 한다.
+const apiBase = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
 
 /**
  * 업타임 웹훅(BetterStack, UptimeRobot). 비밀값은 발급 응답에서 한 번만 보이고, 창을 닫으면 메모리에서도 버린다.
- * 쿼리 캐시와 브라우저 저장소에는 넣지 않는다.
+ * useMutation 을 쓰지 않는다(MutationCache 에 응답이 몇 분 남는다). API 를 직접 부르고 이 컴포넌트 상태에만 두며,
+ * 화면을 떠나면(언마운트) 늦게 온 응답도 버린다. 쿼리 캐시와 브라우저 저장소에는 넣지 않는다.
  */
 export function WebhookPanel({
   serviceId,
@@ -27,15 +30,35 @@ export function WebhookPanel({
 }) {
   const client = useQueryClient();
   const [confirming, setConfirming] = useState(false);
-  const rotate = useMutation({
-    mutationFn: () => opsApi.rotateWebhookSecret(serviceId),
-    onSuccess: () => {
-      setConfirming(false);
-      void client.invalidateQueries({ queryKey: opsKeys.service(serviceId) });
-    },
-  });
+  const [issued, setIssued] = useState<WebhookSecret | null>(null);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const rotate = () => {
+    setPending(true);
+    setError(null);
+    opsApi.rotateWebhookSecret(serviceId).then(
+      (secret) => {
+        void client.invalidateQueries({ queryKey: opsKeys.service(serviceId) });
+        if (!mounted.current) return;
+        setIssued(secret);
+        setConfirming(false);
+        setPending(false);
+      },
+      (failure: unknown) => {
+        if (!mounted.current) return;
+        setError(failure);
+        setPending(false);
+      },
+    );
+  };
   const url = `${apiBase}${ops.webhook.path}`;
-  const issued = rotate.data;
   return (
     <section aria-labelledby="ops-webhook" className="grid gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -44,11 +67,11 @@ export function WebhookPanel({
           <Button
             variant="secondary"
             className="ui-button-sm"
-            loading={rotate.isPending && !confirming}
+            loading={pending && !confirming}
             onClick={() => {
-              rotate.reset();
+              setError(null);
               if (ops.webhook.configured) setConfirming(true);
-              else rotate.mutate();
+              else rotate();
             }}
           >
             {ops.webhook.configured ? "비밀값 재발급" : "비밀값 발급"}
@@ -61,9 +84,9 @@ export function WebhookPanel({
           : "비밀값을 발급하면 모니터링 도구가 이 주소로 다운과 복구를 알릴 수 있습니다."}
       </p>
       <CopyField id="ops-webhook-url" label="웹훅 주소" value={url} />
-      {rotate.isError && !confirming && (
+      {error !== null && !confirming && (
         <p role="alert" className="text-sm text-danger">
-          {serviceErrorMessage(rotate.error)}
+          {serviceErrorMessage(error)}
         </p>
       )}
       <details className="ops-setup text-sm">
@@ -101,14 +124,14 @@ export function WebhookPanel({
         title="비밀값을 재발급할까요?"
         description="새 비밀값을 만들면 이전 값은 바로 쓸 수 없습니다. 모니터링 도구의 설정도 새 값으로 바꿔야 합니다."
         confirmLabel="재발급"
-        pending={rotate.isPending}
-        error={rotate.isError ? serviceErrorMessage(rotate.error) : undefined}
-        onConfirm={() => rotate.mutate()}
+        pending={pending}
+        error={error !== null ? serviceErrorMessage(error) : undefined}
+        onConfirm={rotate}
         onClose={() => setConfirming(false)}
       />
       <Dialog
         open={!!issued}
-        onClose={() => rotate.reset()}
+        onClose={() => setIssued(null)}
         title="웹훅 비밀값"
       >
         {issued && (
@@ -128,7 +151,7 @@ export function WebhookPanel({
               value={`${apiBase}${issued.path}`}
             />
             <div className="flex justify-end">
-              <Button onClick={() => rotate.reset()}>닫기</Button>
+              <Button onClick={() => setIssued(null)}>닫기</Button>
             </div>
           </div>
         )}
