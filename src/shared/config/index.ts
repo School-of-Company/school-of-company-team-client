@@ -30,9 +30,13 @@ export const routes = {
   requirement: (id: string) => `/requirements/${encodeURIComponent(id)}`,
   calendar: "/calendar",
   task: (taskId: string) => `/tasks/${encodeURIComponent(taskId)}`,
-  services: "/services",
+  /** 운영: 상태(기본), 장애, 서비스, 배포 탭. 옛 /services, /incidents 는 next.config 에서 이 탭으로 보낸다. */
+  ops: "/ops",
+  services: "/ops?tab=services",
   service: (key: string) => `/services/${encodeURIComponent(key)}`,
-  incidents: "/incidents",
+  serviceDeploys: (key: string) =>
+    `/ops?tab=deploys&service=${encodeURIComponent(key)}`,
+  incidents: "/ops?tab=incidents",
   incident: (id: string) => `/incidents/${encodeURIComponent(id)}`,
   docs: "/docs",
   labs: "/labs",

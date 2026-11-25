@@ -19,8 +19,13 @@ import { DependencyGraph } from "@/widgets/dependency-graph";
 import { neighbourGraph } from "../model/neighbour-graph";
 import { Button } from "@/shared/ui";
 import { formatDate } from "@/shared/lib";
-import { DeploymentEntry, DeploymentsState } from "./ServiceDeployments";
-import { ReleaseRow, ReleasesState } from "./ServiceReleases";
+import {
+  DeploymentEntry,
+  DeploymentsState,
+  ReleaseRow,
+  ReleasesState,
+} from "@/widgets/service-delivery";
+import { routes } from "@/shared/config";
 
 export function ServiceOverview({
   service,
@@ -131,7 +136,10 @@ function RecentReleases({ service }: { readonly service: ServiceDetail }) {
     <section aria-labelledby="recent-releases" className="grid gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="recent-releases">최근 릴리스</h2>
-        <AllLink href="?tab=releases" label="최근 릴리스 전체 보기" />
+        <AllLink
+          href={`${routes.serviceDeploys(service.key)}&view=releases`}
+          label="최근 릴리스 전체 보기"
+        />
       </div>
       {/* 최근 3건 높이를 먼저 잡아 두어 늦게 와도(또는 적게 와도) 아래 칸이 밀리지 않는다. */}
       <div className="service-recent" data-kind="releases">
@@ -139,7 +147,11 @@ function RecentReleases({ service }: { readonly service: ServiceDetail }) {
           {(items) => (
             <ul className="service-list">
               {items.slice(0, 3).map((release) => (
-                <ReleaseRow key={release.id} release={release} />
+                <ReleaseRow
+                  key={release.id}
+                  release={release}
+                  href={`${routes.serviceDeploys(service.key)}&view=releases&release=${encodeURIComponent(release.id)}`}
+                />
               ))}
             </ul>
           )}
@@ -155,7 +167,10 @@ function RecentDeployments({ service }: { readonly service: ServiceDetail }) {
     <section aria-labelledby="recent-deployments" className="grid gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="recent-deployments">최근 배포</h2>
-        <AllLink href="?tab=deployments" label="최근 배포 전체 보기" />
+        <AllLink
+          href={routes.serviceDeploys(service.key)}
+          label="최근 배포 전체 보기"
+        />
       </div>
       <div className="service-recent" data-kind="deployments">
         <DeploymentsState service={service} query={deployments} compact>

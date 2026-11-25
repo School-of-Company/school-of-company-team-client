@@ -215,12 +215,12 @@ export function AppShell({
     readonly href: string;
     readonly label: string;
     readonly icon: IconName;
-    /** Another path that belongs to the same entry (내 업무 목록 / 보드). */
-    readonly also?: string;
+    /** Other paths that belong to the same entry (내 업무 목록 / 보드, 운영 아래 상세). */
+    readonly also?: readonly string[];
   };
   // 순서와 그룹은 AGENTS.md의 정보 구조 규칙을 따른다. 관리자·설정은 맨 아래.
   const workLinks: readonly NavLink[] = [
-    { href: routes.home, label: "내 업무", icon: "home", also: routes.me },
+    { href: routes.home, label: "내 업무", icon: "home", also: [routes.me] },
     { href: routes.team, label: "팀 공용", icon: "team" },
     { href: routes.projects, label: "프로젝트", icon: "project" },
     { href: routes.calendar, label: "달력", icon: "calendar" },
@@ -229,8 +229,13 @@ export function AppShell({
   ];
   const orgLinks: readonly NavLink[] = [
     { href: routes.members, label: "팀원", icon: "user" },
-    { href: routes.services, label: "서비스", icon: "service" },
-    { href: routes.incidents, label: "장애", icon: "alert" },
+    // 서비스와 장애 상세는 주소가 그대로라 운영 항목으로 묶는다.
+    {
+      href: routes.ops,
+      label: "운영",
+      icon: "service",
+      also: ["/services", "/incidents"],
+    },
     { href: routes.requirements, label: "요구사항", icon: "inbox" },
     { href: routes.docs, label: "문서", icon: "doc" },
   ];
@@ -249,7 +254,9 @@ export function AppShell({
       const active =
         pathname === href ||
         (href !== "/" && pathname.startsWith(`${href}/`)) ||
-        (!!also && (pathname === also || pathname.startsWith(`${also}/`)));
+        (also ?? []).some(
+          (path) => pathname === path || pathname.startsWith(`${path}/`),
+        );
       return (
         <Link
           key={href}

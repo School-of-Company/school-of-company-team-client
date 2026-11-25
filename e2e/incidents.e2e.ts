@@ -43,9 +43,13 @@ test("팀원이 사고를 등록하고 메모·상태 변경을 타임라인에 
   await page.goto("/me");
   await page
     .getByRole("navigation", { name: "조직" })
-    .getByRole("link", { name: "사고" })
+    .getByRole("link", { name: "운영" })
     .click();
-  await expect(page).toHaveURL(/\/incidents$/);
+  await page
+    .getByRole("navigation", { name: "운영 메뉴" })
+    .getByRole("link", { name: "장애" })
+    .click();
+  await expect(page).toHaveURL(/\/ops\?tab=incidents$/);
   await page.getByRole("button", { name: "사고 등록" }).first().click();
   const dialog = page.getByRole("dialog", { name: "사고 등록" });
   await dialog.getByLabel("제목").fill(title);

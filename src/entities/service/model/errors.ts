@@ -38,6 +38,12 @@ const messages: Readonly<Record<string, string>> = {
   GITHUB_NOT_CONFIGURED:
     "GitHub App이 설정되지 않았습니다. 운영자에게 문의하세요.",
   GITHUB_UNAVAILABLE: "GitHub에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
+  OPS_HEALTH_URL_INVALID:
+    "헬스체크 주소를 확인하세요. https 주소만 되고, 사용자 정보와 기본 외 포트는 쓸 수 없습니다.",
+  OPS_LINK_URL_INVALID: "링크는 http 또는 https 로 시작하는 주소여야 합니다.",
+  OPS_RUNBOOK_INVALID: "Runbook 종류의 문서만 고를 수 있습니다.",
+  OPS_HTTP_REQUIRES_LEAD: "http 허용은 헤드 어드민만 바꿀 수 있습니다.",
+  KNOWLEDGE_NOT_FOUND: "고른 Runbook을 찾을 수 없거나 읽을 권한이 없습니다.",
 };
 
 export function serviceErrorMessage(error: unknown): string {
