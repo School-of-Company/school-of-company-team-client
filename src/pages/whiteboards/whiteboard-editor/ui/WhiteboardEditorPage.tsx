@@ -73,6 +73,8 @@ const realtimeLabels: Readonly<Record<RealtimeStatus, string>> = {
 
 /** 실시간이 꺼진 이유. 꺼져도 저장과 커서는 폴링으로 계속된다. */
 const offMessages: Readonly<Partial<Record<RealtimeOffReason, string>>> = {
+  denied:
+    "이 화이트보드를 볼 권한이 없어 실시간으로 연결하지 못했습니다. 상태를 다시 확인합니다.",
   revoked:
     "이 화이트보드에 대한 권한이 바뀌어 실시간 연결을 끊었습니다. 상태를 다시 확인합니다.",
   full: "동시에 편집하는 사람이 많아 실시간 연결 없이 계속합니다. 변경은 그대로 저장됩니다.",

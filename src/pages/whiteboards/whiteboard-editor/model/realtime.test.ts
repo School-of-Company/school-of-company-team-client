@@ -4,6 +4,7 @@ import {
   JOIN_TIMEOUT,
   MAX_BACKOFF,
   RATE_LIMIT_DELAY,
+  STABLE_AFTER,
   createRealtimeConnection,
   type RealtimeStatus,
   type SocketLike,
@@ -93,7 +94,11 @@ test("joins, goes live and sends only while live", async () => {
   t.sockets[0].receive(joined);
   assert.equal(t.connection.status, "live");
   assert.deepEqual(t.messages, [joined]);
-  assert.equal(t.pending.length, 0, "join timeout cleared");
+  assert.deepEqual(
+    t.pending.map((timer) => timer.ms),
+    [STABLE_AFTER],
+    "join timeout cleared, only the stability timer is left",
+  );
   assert.equal(t.connection.send({ type: "ping" }), true);
   assert.deepEqual(t.sockets[0].sent, ['{"type":"ping"}']);
 });
@@ -145,8 +150,49 @@ test("drop after joined reconnects with a fresh ticket and backoff", async () =>
   assert.equal(await t.fire(), 4_000);
   t.sockets[3].receive(joined);
   assert.equal(t.connection.status, "live");
+  // 붙자마자 끊기면 백오프를 이어 간다(1009 → 재접속 → 다시 1009 가 1초마다 돌지 않게).
   t.sockets[3].drop(1001);
-  assert.equal(await t.fire(), 1_000, "backoff resets after joined");
+  assert.equal(await t.fire(), 8_000);
+});
+
+test("backoff resets once the socket stays up or a save lands", async () => {
+  const t = setup();
+  t.connection.start();
+  await flush();
+  t.sockets[0].receive(joined);
+  t.sockets[0].drop(1006);
+  await t.fire(); // 1s
+  t.sockets[1].receive(joined);
+  assert.equal(await t.fire(), STABLE_AFTER, "stability timer");
+  t.sockets[1].drop(1006);
+  assert.equal(await t.fire(), 1_000, "reset after staying up");
+  t.sockets[2].receive(joined);
+  t.sockets[2].drop(1006);
+  assert.equal(await t.fire(), 2_000, "no reset when it drops early");
+  t.sockets[3].receive(joined);
+  t.connection.healthy(); // saved 를 받았다
+  t.sockets[3].drop(1006);
+  assert.equal(await t.fire(), 1_000, "reset after saved");
+});
+
+test("1009 reconnects and says the frame was too large", async () => {
+  const t = setup();
+  t.connection.start();
+  await flush();
+  t.sockets[0].receive(joined);
+  t.sockets[0].drop(1009);
+  assert.equal(t.statuses.at(-1), "reconnecting:too-large");
+  assert.equal(await t.fire(), 1_000);
+  assert.equal(t.sockets.length, 2);
+});
+
+test("4403 before joined means no access, not a permission change", async () => {
+  const t = setup();
+  t.connection.start();
+  await flush();
+  t.sockets[0].drop(4403);
+  assert.equal(t.statuses.at(-1), "off:denied");
+  assert.equal(t.pending.length, 0);
 });
 
 test("backoff is capped at 30 seconds", async () => {

@@ -49,7 +49,11 @@ import {
   type RealtimeStatus,
   type SocketLike,
 } from "../model/realtime";
-import { createSyncTracker, remoteWins } from "../model/sync";
+import {
+  createLiveSession,
+  rejectsElements,
+  type LiveSession,
+} from "../model/live-session";
 
 export type SaveState = "saved" | "dirty" | "saving" | "error";
 
@@ -175,13 +179,16 @@ export default function Canvas({
   // 실시간 상태. live 인 동안 폴링과 REST 자동 저장을 멈춘다.
   const realtime = useRef<RealtimeConnection | null>(null);
   const live = useRef(false);
-  const sync = useRef(createSyncTracker());
   const me = useRef<string | null>(null);
   const participants = useRef(new Map<string, WhiteboardRealtimeParticipant>());
   const cursors = useRef(new Map<string, RemoteCursor>());
-  const sentAppState = useRef("");
+  /** 1009 안내는 한 번만. */
+  const toldTooLarge = useRef(false);
   const sendTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pointerSentAt = useRef(0);
+
+  // 소켓 동기화(model/live-session). 연결과 함께 아래 effect 에서 만든다.
+  const liveSync = useRef<LiveSession<OrderedExcalidrawElement> | null>(null);
 
   const engine = useRef({
     schedule(delay = SAVE_DELAY) {
@@ -191,7 +198,11 @@ export default function Canvas({
     async save() {
       const api = apiRef.current;
       if (!api || !editableRef.current) return;
-      if (live.current) return engine.current.flush();
+      if (live.current) {
+        engine.current.flush();
+        // 소켓이 거부한 변경(1009 등)이 남았으면 REST 로 보낸다. 방이 열려 있으면 서버가 방에 병합한다(D19-10).
+        if (liveSync.current?.settled() ?? true) return;
+      }
       if (saving.current || pulling.current) return engine.current.schedule();
       const elements = api.getSceneElementsIncludingDeleted();
       const hash = hashElementsVersion(elements);
@@ -276,12 +287,7 @@ export default function Canvas({
       }
       if (!editableRef.current) return;
       if (live.current) {
-        if (
-          sync.current.delta(elements).length > 0 ||
-          JSON.stringify(
-            sharedAppState(appState as unknown as Record<string, unknown>),
-          ) !== sentAppState.current
-        ) {
+        if (liveSync.current?.changed()) {
           callbacks.current.onSaveState("dirty");
           if (!sendTimer.current)
             sendTimer.current = setTimeout(() => {
@@ -305,20 +311,7 @@ export default function Canvas({
       if (!api || !live.current || !editableRef.current) return;
       if (sendTimer.current) clearTimeout(sendTimer.current);
       sendTimer.current = null;
-      const delta = sync.current.delta(api.getSceneElementsIncludingDeleted());
-      const appState = sharedAppState(api.getAppState());
-      const appStateKey = JSON.stringify(appState);
-      const appStateChanged = appStateKey !== sentAppState.current;
-      if (delta.length === 0 && !appStateChanged) return;
-      const sent = realtime.current?.send({
-        type: "elements",
-        elements: delta,
-        ...(appStateChanged ? { appState } : {}),
-      });
-      if (!sent) return;
-      // 보낸 것은 서버가 안다고 본다. 거부(error)돼도 같은 내용을 되풀이해 보내지 않는다(REST 의 rejectedHash 와 같다).
-      sync.current.mark(delta);
-      sentAppState.current = appStateKey;
+      liveSync.current?.flush();
     },
     /** 소켓의 다른 사람 커서를 그린다. 이름은 참여자 목록에서 찾는다(폴링 사용자는 이름을 모른다). */
     drawCursors() {
@@ -358,23 +351,12 @@ export default function Canvas({
     /** 지금 화면이 서버가 아는 것과 같으면 저장됨으로 둔다. */
     settle() {
       const api = apiRef.current;
-      if (!api) return;
-      const elements = api.getSceneElementsIncludingDeleted();
-      if (sync.current.delta(elements).length > 0) return;
-      savedHash.current = hashElementsVersion(elements);
-      callbacks.current.onSaveState("saved");
-    },
-    applyAppState(appState: Readonly<Record<string, unknown>> | undefined) {
-      const api = apiRef.current;
-      if (!api || !appState) return;
-      const shared = sharedAppState(appState);
-      sentAppState.current = JSON.stringify(
-        sharedAppState({ ...api.getAppState(), ...shared }),
+      if (!api || !liveSync.current?.settled()) return false;
+      savedHash.current = hashElementsVersion(
+        api.getSceneElementsIncludingDeleted(),
       );
-      api.updateScene({
-        appState: shared as unknown as AppState,
-        captureUpdate: CaptureUpdateAction.NEVER,
-      });
+      callbacks.current.onSaveState("saved");
+      return true;
     },
     receive(message: WhiteboardServerMessage) {
       const api = apiRef.current;
@@ -392,19 +374,14 @@ export default function Canvas({
           version.current = message.version;
           callbacks.current.onAccess(message.canEdit);
           editableRef.current = message.canEdit;
-          const remote = restore(message.scene);
-          api.updateScene({
-            elements: reconcileElements(
-              api.getSceneElementsIncludingDeleted(),
-              remote as RemoteExcalidrawElement[],
-              api.getAppState(),
-            ),
-            captureUpdate: CaptureUpdateAction.NEVER,
-          });
-          sync.current.reset(remote);
-          engine.current.applyAppState(message.scene.appState);
+          if (sendTimer.current) clearTimeout(sendTimer.current);
+          sendTimer.current = null;
+          // 읽기 전용이면 합치기만 하고 보내지 않는다(port.send 가 막는다).
+          liveSync.current?.joined(
+            restore(message.scene),
+            message.scene.appState,
+          );
           engine.current.drawCursors();
-          engine.current.flush();
           engine.current.settle();
           return engine.current.report("live");
         }
@@ -424,24 +401,10 @@ export default function Canvas({
         case "elements": {
           if (message.connectionId && message.connectionId === me.current)
             return;
-          const remote = restore({ elements: message.elements });
-          const local = api.getSceneElementsIncludingDeleted();
-          const byId = new Map(local.map((element) => [element.id, element]));
-          sync.current.mark(remote);
-          if (
-            remote.some((element) => remoteWins(byId.get(element.id), element))
-          )
-            // reconcileElements 는 내가 그리고·늘이고·글을 쓰는 중인 요소를 지키고 선택도 건드리지 않는다.
-            api.updateScene({
-              elements: reconcileElements(
-                local,
-                remote as RemoteExcalidrawElement[],
-                api.getAppState(),
-              ),
-              captureUpdate: CaptureUpdateAction.NEVER,
-            });
-          engine.current.applyAppState(message.appState);
-          return;
+          return liveSync.current?.incoming(
+            restore({ elements: message.elements }),
+            message.appState,
+          );
         }
         case "pointer": {
           if (message.connectionId && message.connectionId === me.current)
@@ -458,23 +421,23 @@ export default function Canvas({
         }
         case "saved":
           version.current = message.version;
-          return engine.current.settle();
-        case "scene": {
-          // 복원(D19-11): 병합하지 않고 통째로 바꾼다.
-          const elements = restore(message.scene);
-          api.updateScene({
-            elements,
-            captureUpdate: CaptureUpdateAction.NEVER,
-          });
-          sync.current.reset(elements);
+          realtime.current?.healthy();
+          engine.current.settle();
+          return;
+        case "scene":
+          liveSync.current?.replace(
+            restore(message.scene),
+            message.scene.appState,
+          );
           version.current = message.version;
-          engine.current.applyAppState(message.scene.appState);
-          return engine.current.settle();
-        }
+          engine.current.settle();
+          return;
         case "access":
           editableRef.current = message.canEdit;
           return callbacks.current.onAccess(message.canEdit);
         case "error":
+          // 그 묶음은 하나도 반영되지 않았다. 다시 보내지 않고, 화면에 남아 있는 동안 저장됨으로 두지 않는다.
+          if (rejectsElements(message.code)) liveSync.current?.reject();
           return callbacks.current.onSaveState(
             "error",
             whiteboardErrorMessage(
@@ -496,7 +459,22 @@ export default function Canvas({
         me.current = null;
       }
       engine.current.report(status, reason);
+      // 볼 권한이 없거나(denied) 잃었다(revoked). 보드 상태를 다시 본다(404 면 onGone).
+      if (reason === "denied" || reason === "revoked")
+        void engine.current.pull();
       if (!wasLive || live.current) return;
+      // 보낸 묶음이 너무 커서 닫혔다(1009). 소켓으로 되풀이하지 않고 REST 저장으로 보낸다.
+      if (
+        reason === "too-large" &&
+        (liveSync.current?.reject() ?? 0) > 0 &&
+        !toldTooLarge.current
+      ) {
+        toldTooLarge.current = true;
+        callbacks.current.onSaveState(
+          "error",
+          "변경이 커서 실시간으로 보내지 못했습니다. 일반 저장으로 보냅니다.",
+        );
+      }
       // 폴링으로 떨어졌다. 보내지 못한 변경은 REST 로 저장한다(baseVersion 은 마지막 saved/joined version).
       engine.current.drawCursors();
       const api = apiRef.current;
@@ -509,8 +487,6 @@ export default function Canvas({
         callbacks.current.onSaveState("dirty");
         engine.current.schedule(0);
       }
-      // 권한을 잃었다(4403). 보드 상태를 다시 본다(404 면 onGone).
-      if (reason === "revoked") void engine.current.pull();
     },
   });
 
@@ -575,6 +551,41 @@ export default function Canvas({
       onStatus: (status, reason) => engine.current.onStatus(status, reason),
     });
     realtime.current = connection;
+    liveSync.current = createLiveSession<OrderedExcalidrawElement>({
+      elements: () => apiRef.current?.getSceneElementsIncludingDeleted() ?? [],
+      appState: () =>
+        sharedAppState(
+          (apiRef.current?.getAppState() ?? {}) as unknown as Record<
+            string,
+            unknown
+          >,
+        ),
+      merge: (remote) => {
+        const api = apiRef.current;
+        if (!api) return;
+        // reconcileElements 는 내가 그리고 늘이고 글을 쓰는 중인 요소를 지키고 선택도 건드리지 않는다.
+        api.updateScene({
+          elements: reconcileElements(
+            api.getSceneElementsIncludingDeleted(),
+            remote as RemoteExcalidrawElement[],
+            api.getAppState(),
+          ),
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+      },
+      replace: (elements) =>
+        apiRef.current?.updateScene({
+          elements,
+          captureUpdate: CaptureUpdateAction.NEVER,
+        }),
+      applyAppState: (shared) =>
+        apiRef.current?.updateScene({
+          appState: shared as unknown as AppState,
+          captureUpdate: CaptureUpdateAction.NEVER,
+        }),
+      send: (message) =>
+        editableRef.current && !!realtime.current?.send(message),
+    });
     if (apiRef.current) connection.start();
     // 폴링 사용자 커서는 떠나도 알려 주지 않는다. 오래된 것을 내린다.
     const prune = setInterval(() => {
@@ -590,7 +601,11 @@ export default function Canvas({
     const current = engine.current;
     return () => {
       clearInterval(prune);
-      current.flush();
+      // 소켓으로 보낸 것은 서버가 마지막 퇴장 때 저장한다. 다 보냈으면 아래 REST 저장을 건너뛴다(겹쳐 저장, 409 방지).
+      if (live.current) {
+        current.flush();
+        current.settle();
+      }
       connection.stop();
       realtime.current = null;
       live.current = false;

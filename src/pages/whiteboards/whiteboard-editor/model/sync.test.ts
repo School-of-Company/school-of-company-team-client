@@ -73,3 +73,18 @@ test("changes made while offline are found after rejoining", () => {
     ["a", "b"],
   );
 });
+
+test("a rejected batch stays out of delta across rejoin until it changes", () => {
+  const sync = createSyncTracker();
+  sync.reset([el("a", 1)]);
+  sync.sent([el("a", 2), el("b", 1)]);
+  assert.equal(sync.reject(), 2);
+  assert.equal(sync.reject(), 0, "only the last batch");
+  sync.reset([el("a", 1)]);
+  const scene = [el("a", 2), el("b", 1)];
+  assert.deepEqual(sync.delta(scene), []);
+  assert.equal(sync.pending(scene), true);
+  assert.deepEqual(sync.delta([el("a", 3)]), [el("a", 3)]);
+  sync.mark([el("a", 2), el("b", 1)]);
+  assert.equal(sync.pending(scene), false, "the room has them now");
+});

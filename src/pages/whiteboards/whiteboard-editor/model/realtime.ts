@@ -9,9 +9,18 @@ import type {
  */
 export type RealtimeStatus = "connecting" | "live" | "reconnecting" | "off";
 
-/** off 의 이유. revoked 는 권한을 잃었다(4403), idle 은 오래 쉬어 닫혔다(4408, 다시 움직이면 붙는다). */
+/**
+ * 상태가 바뀐 이유. denied 는 처음부터 볼 권한이 없다(joined 전 4403), revoked 는 붙은 뒤 권한을 잃었다(4403).
+ * idle 은 오래 쉬어 닫혔다(4408, 다시 움직이면 붙는다). too-large 는 보낸 프레임이 커서 닫혔다(1009, reconnecting 과 함께 온다).
+ */
 export type RealtimeOffReason =
-  "unavailable" | "revoked" | "full" | "idle" | "closed";
+  | "unavailable"
+  | "denied"
+  | "revoked"
+  | "full"
+  | "idle"
+  | "closed"
+  | "too-large";
 
 /** 브라우저 WebSocket 에서 쓰는 부분만(테스트는 흉내 낸 것을 넣는다). */
 export type SocketLike = {
@@ -42,12 +51,13 @@ export type RealtimeDeps = {
 export const JOIN_TIMEOUT = 5_000;
 export const MAX_BACKOFF = 30_000;
 export const RATE_LIMIT_DELAY = 5_000;
+/** 이만큼 붙어 있거나 saved 를 받아야 백오프를 처음부터 센다. 붙자마자 끊기는 고리(1009 등)가 1초마다 돌지 않게. */
+export const STABLE_AFTER = 10_000;
 const OPEN = 1;
 
 /** 다시 붙지 않는 닫힘 코드(s19 3.3). */
 const terminal: Readonly<Record<number, RealtimeOffReason>> = {
   1000: "closed",
-  4403: "revoked",
   4409: "full",
   4408: "idle",
 };
@@ -74,6 +84,7 @@ export function createRealtimeConnection(deps: RealtimeDeps) {
   let stopped = true;
   let attempt = 0;
   let timer: unknown = null;
+  let stableTimer: unknown = null;
   let idle = false;
 
   const setStatus = (next: RealtimeStatus, reason?: RealtimeOffReason) => {
@@ -84,13 +95,17 @@ export function createRealtimeConnection(deps: RealtimeDeps) {
     if (timer !== null) timers.clear(timer);
     timer = null;
   };
+  const clearStable = () => {
+    if (stableTimer !== null) timers.clear(stableTimer);
+    stableTimer = null;
+  };
   const off = (reason: RealtimeOffReason) => {
     clearTimer();
     idle = reason === "idle";
     setStatus("off", reason);
   };
-  const retry = (delay?: number) => {
-    setStatus("reconnecting");
+  const retry = (delay?: number, reason?: RealtimeOffReason) => {
+    setStatus("reconnecting", reason);
     const wait = delay ?? Math.min(1_000 * 2 ** attempt, MAX_BACKOFF);
     attempt += 1;
     timer = timers.set(() => {
@@ -135,8 +150,11 @@ export function createRealtimeConnection(deps: RealtimeDeps) {
       if (message.type === "joined" && !joined) {
         joined = true;
         everJoined = true;
-        attempt = 0;
         clearTimer();
+        stableTimer = timers.set(() => {
+          stableTimer = null;
+          attempt = 0;
+        }, STABLE_AFTER);
         setStatus("live");
       }
       deps.onMessage(message);
@@ -145,10 +163,13 @@ export function createRealtimeConnection(deps: RealtimeDeps) {
       if (socket !== current) return;
       socket = null;
       clearTimer();
+      clearStable();
       if (stopped) return;
+      if (code === 4403) return off(joined ? "revoked" : "denied");
       const reason = terminal[code];
       if (reason && (joined || code !== 1000)) return off(reason);
       if (!joined) return failBeforeJoin();
+      if (code === 1009) return retry(undefined, "too-large");
       return retry(code === 4429 ? RATE_LIMIT_DELAY : undefined);
     };
   }
@@ -165,12 +186,19 @@ export function createRealtimeConnection(deps: RealtimeDeps) {
     stop() {
       stopped = true;
       clearTimer();
+      clearStable();
       const current = socket;
       socket = null;
       if (current) {
         current.onclose = null;
         current.close(1000);
       }
+    },
+    /** 서버가 저장했다(saved). 연결이 건강하니 백오프를 처음부터 센다. */
+    healthy() {
+      if (status !== "live") return;
+      clearStable();
+      attempt = 0;
     },
     /** 4408 로 쉬던 연결을 다시 붙인다. 사용자가 움직일 때 부른다. */
     wake() {
