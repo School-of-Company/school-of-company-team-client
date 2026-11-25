@@ -12,6 +12,7 @@ import {
   Badge,
   ChipSelect,
   EmptyState,
+  ErrorState,
   ListSkeleton,
   PageHeader,
   PageSkeleton,
@@ -24,6 +25,7 @@ import {
   formatHours,
   formatNumber,
   formatRate,
+  isProjectNotFound,
   parseRange,
   ranges,
   statsErrorMessage,
@@ -104,6 +106,12 @@ function StatsContent() {
           value={projectId}
           options={[
             { value: "", label: "프로젝트 전체" },
+            // 목록에 없는(숨겨진) 프로젝트가 URL 에 있으면 "전체"로 잘못 보이지 않게 따로 둔다.
+            ...(projectId &&
+            projects.data &&
+            !projects.data.some((project) => project.id === projectId)
+              ? [{ value: projectId, label: "찾을 수 없는 프로젝트" }]
+              : []),
             ...(projects.data ?? []).map((project) => ({
               value: project.id,
               label: project.archived
@@ -120,6 +128,7 @@ function StatsContent() {
         scope={scope}
         range={range}
         projectId={projectId}
+        allProjectsHref={href({ project: null })}
       />
     </div>
   );
@@ -129,10 +138,12 @@ function StatsBody({
   scope,
   range,
   projectId,
+  allProjectsHref,
 }: {
   readonly scope: Scope;
   readonly range: StatsRange;
   readonly projectId: string;
+  readonly allProjectsHref: string;
 }) {
   const stats = useQuery(statsQueries.stats(scope, range, projectId));
   return (
@@ -144,6 +155,24 @@ function StatsBody({
         <ListSkeleton label="통계를 불러오는 중" rows={5} rowClassName="h-28" />
       }
       errorMessage={statsErrorMessage}
+      error={(error, retry) =>
+        isProjectNotFound(error) ? (
+          <EmptyState
+            title="프로젝트를 찾을 수 없습니다"
+            description="없거나 볼 수 없는 프로젝트입니다. 전체 프로젝트로 돌아가 보세요."
+            action={
+              <Link
+                href={allProjectsHref}
+                className="ui-button ui-button-secondary"
+              >
+                프로젝트 전체 보기
+              </Link>
+            }
+          />
+        ) : (
+          <ErrorState description={statsErrorMessage(error)} onRetry={retry} />
+        )
+      }
     >
       {(data) => (
         <div className="stats-page">
@@ -168,8 +197,8 @@ function StatsBody({
             </p>
           )}
           <p className="planning-note">
-            숫자는 최대 1분 늦게 반영됩니다. 비공개 원본 업무와 비공개 저장소
-            배포는 세지 않습니다.
+            숫자는 최대 1분 늦게 반영됩니다. 비공개 원본 업무
+            {scope === "team" && "와 비공개 저장소 배포"}는 세지 않습니다.
           </p>
         </div>
       )}
@@ -433,7 +462,7 @@ function ProjectSection({
                     role="meter"
                     aria-label={`${project.name} 마일스톤 업무 진행`}
                     aria-valuemin={0}
-                    aria-valuemax={milestones.taskTotal}
+                    aria-valuemax={Math.max(1, milestones.taskTotal)}
                     aria-valuenow={milestones.taskDone}
                     aria-valuetext={`${milestones.taskTotal}개 중 ${milestones.taskDone}개 완료, ${percent}%`}
                     className="planning-progress-track"

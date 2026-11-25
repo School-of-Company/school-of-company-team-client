@@ -41,14 +41,9 @@ export function weeklySummary(weeks: readonly WeekCount[], unit: string) {
   return `${weeks.length}주 동안 ${total}${unit}, 주 평균 ${average}${unit}, 가장 많은 주는 ${weekLabel(peak.weekStart)} 주 ${peak.count}${unit}`;
 }
 
-const messages: Readonly<Record<string, string>> = {
-  PROJECT_NOT_FOUND:
-    "프로젝트를 찾을 수 없습니다. 프로젝트 필터를 전체로 바꿔 보세요.",
-  INVALID_PARAMETER: "기간 값이 올바르지 않습니다. 기간을 다시 고르세요.",
-  ONBOARDING_REQUIRED: "가입 승인과 Discord 연결을 완료한 뒤 이용해 주세요.",
-};
+export const statsErrorMessage = (error: unknown) =>
+  normalizeApiError(error).message;
 
-export function statsErrorMessage(error: unknown): string {
-  const problem = normalizeApiError(error);
-  return messages[problem.code] ?? problem.message;
-}
+/** 없거나 읽을 수 없는 프로젝트(D18-d). 다시 시도해도 같으므로 필터를 풀게 한다. */
+export const isProjectNotFound = (error: unknown) =>
+  normalizeApiError(error).code === "PROJECT_NOT_FOUND";
