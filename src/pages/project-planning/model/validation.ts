@@ -1,6 +1,7 @@
 import { sprintErrorMessage, type SprintInput } from "@/entities/sprint";
 import type { ApiError } from "@/shared/api";
 import type { MilestoneInput } from "@/entities/milestone";
+import { goalItemsError } from "./goal-items";
 
 /** 서버와 같은 기준(계약 DTO)으로 먼저 막는다. 키는 입력 이름. */
 export function validateSprint(input: SprintInput) {
@@ -8,6 +9,8 @@ export function validateSprint(input: SprintInput) {
   if (!input.name || input.name.length > 100)
     errors.name = "이름은 1~100자로 입력하세요.";
   if (input.goal.length > 500) errors.goal = "목표는 500자 이하로 입력하세요.";
+  const items = goalItemsError(input.goalItems);
+  if (items) errors.goalItems = items;
   if (!input.startDate) errors.startDate = "시작일을 고르세요.";
   if (!input.endDate) errors.endDate = "종료일을 고르세요.";
   else if (input.startDate && input.endDate < input.startDate)
@@ -26,7 +29,7 @@ export function sprintFormErrors(
     const fields = Object.fromEntries(
       Object.entries(error.details).filter(
         ([key, value]) =>
-          ["name", "goal", "startDate", "endDate"].includes(key) &&
+          ["name", "goal", "startDate", "endDate", "goalItems"].includes(key) &&
           typeof value === "string",
       ),
     );

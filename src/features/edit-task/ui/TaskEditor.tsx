@@ -3,11 +3,14 @@
 import { useId, useState, type FormEvent } from "react";
 import {
   priorityLabels,
+  sizeLabels,
   statusLabels,
+  taskSizes,
   taskStatuses,
   type CreateTask,
   type TaskDetail,
   type TaskScope,
+  type TaskSize,
   type TaskType,
   type TaskStatus,
   type UpdateTask,
@@ -159,6 +162,9 @@ export function TaskEditor({
     setDateError(dates);
     if (dates.startDate || dates.deadline) return;
     const description = String(form.get("description") ?? "");
+    const sizeValue = String(form.get("size") ?? "");
+    const size = taskSizes.find((value) => value === sizeValue) ?? null;
+    const initialSize: TaskSize | null = initial?.size ?? null;
     const partId = String(form.get("partId") ?? "");
     const bucketId = String(form.get("planningBucketId") ?? initialBucket);
     const initialMilestone = initial?.milestone?.id ?? "";
@@ -185,6 +191,7 @@ export function TaskEditor({
           ...(bucketId !== initialBucket ? { planningBucketId: bucketId } : {}),
           ...(milestoneId !== initialMilestone ? { milestoneId } : {}),
           ...(reviewersChanged ? { reviewerIds: nextReviewers } : {}),
+          ...(size !== initialSize ? { size } : {}),
           ...(startDate !== initialStartDate
             ? { startDate: startDate || null }
             : {}),
@@ -206,6 +213,7 @@ export function TaskEditor({
           ...(bucketId ? { planningBucketId: bucketId } : {}),
           ...(milestoneId ? { milestoneId } : {}),
           ...(nextReviewers.length ? { reviewerIds: nextReviewers } : {}),
+          ...(size ? { size } : {}),
           ...(startDate ? { startDate } : {}),
           ...(deadline ? { deadline } : {}),
         });
@@ -289,6 +297,25 @@ export function TaskEditor({
                 defaultChecked={(initial?.priority ?? "P2") === option.value}
               />
               {option.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset className="min-w-0">
+        <legend className="mb-2 text-sm font-medium">크기</legend>
+        <div className="ui-priority-picker">
+          {(["", ...taskSizes] as const).map((value) => (
+            <label
+              key={value || "none"}
+              className="ui-priority-option ui-size-option"
+            >
+              <input
+                type="radio"
+                name="size"
+                value={value}
+                defaultChecked={(initial?.size ?? "") === value}
+              />
+              {value ? `${value} ${sizeLabels[value]}` : "미정"}
             </label>
           ))}
         </div>

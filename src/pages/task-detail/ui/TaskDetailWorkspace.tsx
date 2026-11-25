@@ -47,6 +47,7 @@ export function TaskDetailWorkspace({
     setDenied,
     changeStatus,
     changeBucket,
+    changeSize,
     changeMilestone,
   } = useTaskDetail(taskId);
   const remove = useMutation({
@@ -128,6 +129,10 @@ export function TaskDetailWorkspace({
             bucketPending={changeBucket.isPending}
             onBucket={(bucketId) => {
               if (!changeBucket.isPending) changeBucket.mutate(bucketId);
+            }}
+            sizePending={changeSize.isPending}
+            onSize={(size) => {
+              if (!changeSize.isPending) changeSize.mutate(size);
             }}
             milestones={milestones.data}
             milestonePending={changeMilestone.isPending}

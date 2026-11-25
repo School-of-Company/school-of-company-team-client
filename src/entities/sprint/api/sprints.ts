@@ -3,6 +3,7 @@ import { BOARD_POLL_INTERVAL } from "@/shared/config";
 import { keepPreviousKey } from "@/shared/lib";
 import { queryOptions, type QueryKey } from "@tanstack/react-query";
 import type {
+  Burndown,
   CarryOver,
   CloseSprint,
   RetroEntry,
@@ -10,6 +11,7 @@ import type {
   Sprint,
   SprintInput,
   SprintReview,
+  SprintStats,
 } from "../model/types";
 
 // 키는 프로젝트 키 아래에 둔다: 프로젝트 invalidate(멤버·PM 변경)가 Sprint 권한 표시도 갱신한다.
@@ -23,6 +25,11 @@ export const sprintKeys = {
     ["projects", projectId, "sprints", sprintId, "review"] as const,
   retro: (projectId: string, sprintId: string) =>
     ["projects", projectId, "sprints", sprintId, "retro"] as const,
+  burndown: (projectId: string, sprintId: string) =>
+    ["projects", projectId, "sprints", sprintId, "burndown"] as const,
+  // 목록 키 아래에 둬서 Sprint 변경(종료 등)이 비교도 다시 읽게 한다.
+  stats: (projectId: string, limit: number) =>
+    ["projects", projectId, "sprints", "@stats", limit] as const,
 };
 
 function base(projectId: string, sprintId?: string) {
@@ -42,9 +49,21 @@ export const sprintApi = {
         goal: body.goal.trim() || null,
       })
     ).data,
-  /** 목표 빈 문자열 = 지움(계약). */
+  /** 목표 빈 문자열 = 지움(계약). 목표 항목은 목록 전체 교체(D14-j). */
   update: async (projectId: string, sprintId: string, body: SprintInput) =>
     (await api.patch<Sprint>(base(projectId, sprintId), body)).data,
+  /** 용량만 바꾼다. null = 지움(`clearCapacity`, D14-b). */
+  updateCapacity: async (
+    projectId: string,
+    sprintId: string,
+    capacity: number | null,
+  ) =>
+    (
+      await api.patch<Sprint>(
+        base(projectId, sprintId),
+        capacity === null ? { clearCapacity: true } : { capacity },
+      )
+    ).data,
   remove: async (projectId: string, sprintId: string) => {
     await api.delete(base(projectId, sprintId));
   },
@@ -55,6 +74,8 @@ export const sprintApi = {
       await api.post<{
         readonly sprint: Sprint;
         readonly carryOvers: readonly CarryOver[];
+        readonly nextSprint: Sprint | null;
+        readonly review: SprintReview | null;
       }>(`${base(projectId, sprintId)}/close`, body)
     ).data,
   addTasks: async (
@@ -107,6 +128,14 @@ export const sprintApi = {
       await api.post<SprintReview>(
         `${base(projectId, sprintId)}/review/publish`,
       )
+    ).data,
+  burndown: async (projectId: string, sprintId: string) =>
+    (await api.get<Burndown>(`${base(projectId, sprintId)}/burndown`)).data,
+  stats: async (projectId: string, limit: number) =>
+    (
+      await api.get<SprintStats>(`${base(projectId)}/stats`, {
+        params: { limit },
+      })
     ).data,
   retro: async (projectId: string, sprintId: string) =>
     (await api.get<readonly RetroEntry[]>(`${base(projectId, sprintId)}/retro`))
@@ -165,6 +194,20 @@ export const sprintQueries = {
     queryOptions({
       ...polled(sprintKeys.review(projectId, sprintId)),
       queryFn: () => sprintApi.review(projectId, sprintId),
+    }),
+  burndown: (projectId: string, sprintId: string) =>
+    queryOptions({
+      // id가 키라 다른 Sprint 번다운을 빌려 그리지 않는다(placeholder 없음).
+      queryKey: sprintKeys.burndown(projectId, sprintId),
+      refetchInterval: BOARD_POLL_INTERVAL,
+      retry: false,
+      queryFn: () => sprintApi.burndown(projectId, sprintId),
+    }),
+  stats: (projectId: string, limit = 6) =>
+    queryOptions({
+      queryKey: sprintKeys.stats(projectId, limit),
+      queryFn: () => sprintApi.stats(projectId, limit),
+      retry: false,
     }),
   retro: (projectId: string, sprintId: string) =>
     queryOptions({

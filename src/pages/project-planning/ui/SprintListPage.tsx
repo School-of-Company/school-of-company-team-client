@@ -30,6 +30,7 @@ import { ProgressBar } from "./ProgressBar";
 import { ProjectFrame, type PlanningContext } from "./ProjectFrame";
 import { SprintFormDialog } from "./SprintFormDialog";
 import { SprintStatusBadge } from "./SprintStatus";
+import { SprintTrend } from "./SprintTrend";
 
 export function SprintListPage({ projectId }: { readonly projectId: string }) {
   return (
@@ -105,6 +106,9 @@ function SprintList({ project, manages }: PlanningContext) {
               </p>
             )}
             <SprintRows projectId={project.id} title="예정" sprints={planned} />
+            {closed.length > 0 && (
+              <SprintTrend projectId={project.id} closedCount={closed.length} />
+            )}
             <SprintRows projectId={project.id} title="종료" sprints={closed} />
           </>
         )}

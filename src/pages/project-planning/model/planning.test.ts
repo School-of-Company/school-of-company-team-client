@@ -83,6 +83,7 @@ test("sprint and retro validation match the server limits", () => {
         goal: "",
         startDate: "2026-11-20",
         endDate: "2026-11-19",
+        goalItems: [],
       }),
     ),
     ["name", "endDate"],
@@ -93,6 +94,7 @@ test("sprint and retro validation match the server limits", () => {
       goal: "",
       startDate: "2026-11-20",
       endDate: "2026-11-20",
+      goalItems: [],
     }),
     {},
   );

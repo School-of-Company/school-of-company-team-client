@@ -61,7 +61,9 @@ export function BoardViewControls({
       ? "순서 이동은 수동 순서에서만 가능해요."
       : group === "owner" || group === "reviewer" || group === "part"
         ? "레인 사이 이동은 버킷별 그룹에서만 가능해요."
-        : null;
+        : group === "bucket"
+          ? "버킷은 상태와 따로 움직이는 업무 묶음이에요. 레인 사이로 끌어 옮겨요."
+          : null;
   return (
     <div className="board-view-controls flex min-w-0 flex-wrap items-center gap-2">
       {scope === "PERSONAL" && (

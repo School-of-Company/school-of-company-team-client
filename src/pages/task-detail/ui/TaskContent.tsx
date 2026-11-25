@@ -1,8 +1,11 @@
 import {
   priorityLabels,
+  sizeLabels,
   statusLabels,
+  taskSizes,
   taskStatuses,
   type TaskDetail,
+  type TaskSize,
   type TaskStatus,
 } from "@/entities/task";
 import Link from "next/link";
@@ -21,6 +24,8 @@ export function TaskProperties({
   buckets,
   bucketPending,
   onBucket,
+  sizePending = false,
+  onSize,
   milestones,
   milestonePending = false,
   onMilestone,
@@ -33,6 +38,8 @@ export function TaskProperties({
   readonly buckets?: readonly PlanningBucket[];
   readonly bucketPending: boolean;
   readonly onBucket: (bucketId: string) => void;
+  readonly sizePending?: boolean;
+  readonly onSize?: (size: TaskSize | null) => void;
   /** 프로젝트 업무일 때만. 없으면 Milestone 행을 읽기 전용으로 보인다. */
   readonly milestones?: readonly Milestone[];
   readonly milestonePending?: boolean;
@@ -89,6 +96,35 @@ export function TaskProperties({
             <span className="priority-label" data-priority={task.priority}>
               {priorityLabels[task.priority]}
             </span>
+          </dd>
+        </div>
+        <div className="task-prop-control">
+          <dt>크기</dt>
+          <dd>
+            {editable && onSize ? (
+              <Select
+                aria-label="크기 변경"
+                value={task.size ?? ""}
+                disabled={sizePending}
+                onChange={(event) =>
+                  onSize(
+                    taskSizes.find((value) => value === event.target.value) ??
+                      null,
+                  )
+                }
+              >
+                <option value="">미정</option>
+                {taskSizes.map((size) => (
+                  <option key={size} value={size}>
+                    {size} {sizeLabels[size]}
+                  </option>
+                ))}
+              </Select>
+            ) : task.size ? (
+              `${task.size} ${sizeLabels[task.size]}`
+            ) : (
+              <span className="text-muted">미정</span>
+            )}
           </dd>
         </div>
         <div>
