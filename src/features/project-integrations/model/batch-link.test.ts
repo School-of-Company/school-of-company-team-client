@@ -43,7 +43,7 @@ test("limit 1이면 하나씩 차례로 연결한다", async () => {
     },
     () => {},
     String,
-    1,
+    { limit: 1 },
   );
   await Promise.resolve();
   assert.deepEqual(started, [0]);
@@ -105,4 +105,29 @@ test("빈 목록은 아무것도 요청하지 않는다", async () => {
   );
   assert.deepEqual(failed, []);
   assert.equal(called, false);
+});
+
+test("중단하면 새 요청을 시작하지 않고 진행 중인 요청은 취소로 표시한다", async () => {
+  const controller = new AbortController();
+  const started: number[] = [];
+  const updates = new Map<number, LinkOutcome>();
+  const run = linkInBatches(
+    [1, 2, 3, 4, 5],
+    (id, signal) => {
+      started.push(id);
+      return new Promise((_, reject) =>
+        signal?.addEventListener("abort", () => reject(new Error("abort"))),
+      );
+    },
+    (id, outcome) => updates.set(id, outcome),
+    String,
+    { limit: 2, signal: controller.signal },
+  );
+  await Promise.resolve();
+  controller.abort();
+  assert.deepEqual(await run, [1, 2, 3, 4, 5]);
+  assert.deepEqual(started, [1, 2]);
+  assert.deepEqual(updates.get(1), { status: "canceled" });
+  assert.deepEqual(updates.get(2), { status: "canceled" });
+  assert.equal(updates.has(3), false);
 });
