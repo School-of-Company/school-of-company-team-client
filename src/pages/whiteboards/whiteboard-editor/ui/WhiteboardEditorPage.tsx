@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectQueries } from "@/entities/project";
@@ -14,7 +14,9 @@ import {
   whiteboardQueries,
   type WhiteboardDetail,
 } from "@/entities/whiteboard";
+import { isHeadAdmin, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
+import { TemplateFormDialog } from "@/features/manage-whiteboard-template";
 import { routes } from "@/shared/config";
 import {
   Button,
@@ -22,6 +24,7 @@ import {
   ErrorState,
   Field,
   Icon,
+  IconButton,
   Input,
   Skeleton,
   StaleNotice,
@@ -29,14 +32,22 @@ import {
 } from "@/shared/ui";
 import { normalizeApiError } from "@/shared/api";
 import type { CanvasControls, SaveState } from "./Canvas";
+import { dismissStartGuide, startGuideDismissed } from "../model/guide";
 import { CommentsPanel } from "./CommentsPanel";
+import { ShortcutsDialog, StartGuide } from "./Guide";
+import { LinksPanel } from "./LinksPanel";
 import { RevisionsDialog } from "./RevisionsDialog";
+import { TemplateInsertDialog } from "./TemplateInsertDialog";
 
 // Excalidraw 는 window 를 바로 읽어 서버에서 그릴 수 없다.
 const Canvas = dynamic(() => import("./Canvas"), {
   ssr: false,
   loading: () => <Skeleton className="h-full" />,
 });
+// Mermaid 변환기는 편집기보다도 무겁다. 대화상자를 처음 열 때 받는다.
+const MermaidDialog = dynamic(() => import("./MermaidDialog"), { ssr: false });
+
+const noSubscribe = () => () => {};
 
 const saveLabels: Readonly<Record<SaveState, string>> = {
   saved: "저장됨",
@@ -52,7 +63,7 @@ export function WhiteboardEditorPage({
 }) {
   return (
     <AuthGuard require="work" fallback={<WhiteboardEditorSkeleton />}>
-      {() => <Editor whiteboardId={whiteboardId} />}
+      {(user) => <Editor whiteboardId={whiteboardId} user={user} />}
     </AuthGuard>
   );
 }
@@ -79,10 +90,19 @@ export function WhiteboardEditorSkeleton() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">Mermaid로 그리기</span>
+          </span>
+          <span className="ui-button ui-button-secondary">
             <span className="ui-skeleton-text">댓글</span>
           </span>
           <span className="ui-button ui-button-secondary">
+            <span className="ui-skeleton-text">연결</span>
+          </span>
+          <span className="ui-button ui-button-secondary">
             <span className="ui-skeleton-text">변경 이력</span>
+          </span>
+          <span className="ui-button ui-button-ghost ui-icon-button">
+            <span className="ui-skeleton-text">?</span>
           </span>
           <span className="ui-button ui-button-ghost">
             <span className="ui-skeleton-text">이름 바꾸기</span>
@@ -99,7 +119,13 @@ export function WhiteboardEditorSkeleton() {
   );
 }
 
-function Editor({ whiteboardId }: { readonly whiteboardId: string }) {
+function Editor({
+  whiteboardId,
+  user,
+}: {
+  readonly whiteboardId: string;
+  readonly user: User;
+}) {
   const board = useQuery(whiteboardQueries.detail(whiteboardId));
   if (board.isPending) return <WhiteboardEditorSkeleton />;
   // 5xx·네트워크 실패는 편집기를 두고 위에 안내만 띄운다. 403·404(권한 잃음, 삭제)는 편집기를 내린다.
@@ -115,12 +141,18 @@ function Editor({ whiteboardId }: { readonly whiteboardId: string }) {
   return (
     <>
       <StaleNotice query={board} />
-      <EditorContent key={board.data.id} initial={board.data} />
+      <EditorContent key={board.data.id} initial={board.data} user={user} />
     </>
   );
 }
 
-function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
+function EditorContent({
+  initial,
+  user,
+}: {
+  readonly initial: WhiteboardDetail;
+  readonly user: User;
+}) {
   const client = useQueryClient();
   const router = useRouter();
   const toast = useToast();
@@ -129,10 +161,35 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [gone, setGone] = useState<string | null>(null);
   const [selection, setSelection] = useState<readonly string[]>([]);
-  const [panel, setPanel] = useState<"comments" | null>(null);
+  const [panel, setPanel] = useState<"comments" | "links" | null>(null);
   const [dialog, setDialog] = useState<
-    "revisions" | "rename" | "delete" | null
+    | "revisions"
+    | "rename"
+    | "delete"
+    | "mermaid"
+    | "template"
+    | "shortcuts"
+    | "save-template"
+    | null
   >(null);
+  // 빈 보드 시작 안내: 처음 편집하면 닫히고, 사용자마다 한 번 닫으면 다시 뜨지 않는다.
+  // 서버 그림에는 띄우지 않고(저장소를 읽을 수 없다) 브라우저에서 읽는다. 캔버스 위에 떠 있어 자리가 밀리지 않는다.
+  const guideRemembered = useSyncExternalStore(
+    noSubscribe,
+    () => startGuideDismissed(user.id),
+    () => true,
+  );
+  const [guideClosed, setGuideClosed] = useState(
+    () =>
+      !initial.scene.elements.every(
+        (element) => (element as { isDeleted?: boolean }).isDeleted,
+      ),
+  );
+  const showGuide = meta.canEdit && !guideRemembered && !guideClosed;
+  const closeGuide = () => {
+    dismissStartGuide(user.id);
+    setGuideClosed(true);
+  };
   const controls = useRef<CanvasControls | null>(null);
   const lastError = useRef<string | null>(null);
   const project = useQuery({
@@ -181,16 +238,40 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {meta.canEdit && (
+            <Button variant="secondary" onClick={() => setDialog("mermaid")}>
+              Mermaid로 그리기
+            </Button>
+          )}
           <Button
             variant="secondary"
             aria-pressed={panel === "comments"}
-            onClick={() => setPanel(panel ? null : "comments")}
+            onClick={() => setPanel(panel === "comments" ? null : "comments")}
           >
             댓글
+          </Button>
+          <Button
+            variant="secondary"
+            aria-pressed={panel === "links"}
+            onClick={() => setPanel(panel === "links" ? null : "links")}
+          >
+            연결
           </Button>
           <Button variant="secondary" onClick={() => setDialog("revisions")}>
             변경 이력
           </Button>
+          <IconButton
+            aria-label="단축키"
+            variant="ghost"
+            onClick={() => setDialog("shortcuts")}
+          >
+            <Icon name="help" />
+          </IconButton>
+          {isHeadAdmin(user) && (
+            <Button variant="ghost" onClick={() => setDialog("save-template")}>
+              팀 템플릿으로 저장
+            </Button>
+          )}
           {meta.canEdit && (
             <Button variant="ghost" onClick={() => setDialog("rename")}>
               이름 바꾸기
@@ -205,6 +286,13 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
       </header>
       <div className="whiteboard-layout" data-panel={panel ?? undefined}>
         <div className="whiteboard-canvas">
+          {showGuide && (
+            <StartGuide
+              onTemplate={() => setDialog("template")}
+              onMermaid={() => setDialog("mermaid")}
+              onClose={closeGuide}
+            />
+          )}
           <Canvas
             board={initial}
             editable={meta.canEdit}
@@ -213,6 +301,7 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
             }}
             onSaveState={(state, message) => {
               setSaveState(state);
+              if (state === "dirty" && showGuide) closeGuide();
               // 같은 이유의 실패를 2초마다 띄우지 않는다.
               if (state === "error" && message && message !== lastError.current)
                 toast(message, "error");
@@ -221,6 +310,8 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
             onSelection={setSelection}
             onRemote={(remote) => {
               setMeta(remote);
+              // 다른 사람이 먼저 그렸다. 이번 화면에서만 안내를 내린다.
+              if (remote.scene.elements.length > 0) setGuideClosed(true);
               client.setQueryData(whiteboardKeys.detail(remote.id), remote);
             }}
             onGone={setGone}
@@ -232,6 +323,13 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
             canEdit={meta.canEdit}
             selection={selection}
             onFocus={(elementId) => controls.current?.focus(elementId)}
+            onClose={() => setPanel(null)}
+          />
+        )}
+        {panel === "links" && (
+          <LinksPanel
+            whiteboardId={meta.id}
+            canEdit={meta.canEdit}
             onClose={() => setPanel(null)}
           />
         )}
@@ -250,6 +348,37 @@ function EditorContent({ initial }: { readonly initial: WhiteboardDetail }) {
           );
         }}
       />
+      {dialog === "mermaid" && (
+        <MermaidDialog
+          onClose={() => setDialog(null)}
+          onInsert={(elements) => controls.current?.insert(elements)}
+        />
+      )}
+      <TemplateInsertDialog
+        open={dialog === "template"}
+        onClose={() => setDialog(null)}
+        onInsert={(template) =>
+          controls.current?.insert(template.scene.elements)
+        }
+      />
+      <ShortcutsDialog
+        open={dialog === "shortcuts"}
+        onClose={() => setDialog(null)}
+      />
+      {isHeadAdmin(user) && (
+        <TemplateFormDialog
+          open={dialog === "save-template"}
+          mode={{
+            kind: "create",
+            whiteboardId: meta.id,
+            blocked:
+              saveState === "saved"
+                ? undefined
+                : "저장하지 않은 변경이 있습니다. 머리글이 저장됨으로 바뀐 뒤 저장하세요.",
+          }}
+          onClose={() => setDialog(null)}
+        />
+      )}
       <RenameDialog
         open={dialog === "rename"}
         board={meta}
