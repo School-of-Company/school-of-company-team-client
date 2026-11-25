@@ -3180,7 +3180,7 @@ html[data-sidebar-closed~="account"]
 }
 
 /* 운영: 상태 배지, 합계, 서비스별 상태 표, 모니터링 설정, 최근 검사 그림. */
-/* 헬스 상태는 원의 채움(정상 꽉 참, 느림 반, 다운 빈 원, 확인 안 됨 점선)과 이름으로 읽힌다. */
+/* 헬스 상태는 원의 채움(정상 꽉 참, 불안정 반, 다운 빈 원, 확인 안 됨 점선)과 이름으로 읽힌다. */
 .ops-health {
   --status: var(--hue-green);
   --fill: 100%;
@@ -3266,8 +3266,14 @@ html[data-sidebar-closed~="account"]
 .ops-table-row {
   min-height: 4rem;
 }
+/* 넓은 화면에서는 머리글 줄이 칸 이름을 보여 주므로 칸 이름은 화면 읽기 프로그램에만 남긴다. */
 .ops-table-label {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 @media (max-width: 63.999rem) {
   .ops-table-head {
@@ -3278,7 +3284,11 @@ html[data-sidebar-closed~="account"]
     gap: var(--space-2) var(--space-3);
   }
   .ops-table-label {
-    display: inline;
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
     color: var(--muted);
   }
 }
@@ -3310,7 +3320,7 @@ html[data-sidebar-closed~="account"]
 .ops-chart-bar {
   fill: var(--hue-green);
 }
-/* 실패가 섞인 구간은 꽉 찬 막대(높이로도 구분), 실패만 있으면 빨강, 섞이면 주황. 기록 없는 구간은 바닥 선. */
+/* 모양으로 먼저 나뉜다(통 막대 = 모두 실패, 틈으로 나뉜 막대 = 일부 실패, 바닥 선 = 기록 없음). 색은 보조. */
 .ops-chart-bar[data-state="MIXED"] {
   fill: var(--hue-amber);
 }
