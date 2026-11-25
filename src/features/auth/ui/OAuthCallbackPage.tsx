@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { getMe, userDestination } from "@/entities/user";
+import { getMe } from "@/entities/user";
 import { completeOAuth, type OAuthProvider } from "../api/oauth";
 import { authErrorMessage } from "../model/error-message";
+import { postLoginDestination } from "../model/return-path";
 import { IdentityPanel } from "./IdentityPanel";
 import { OAuthButton } from "./OAuthButton";
 
@@ -27,7 +28,7 @@ export function OAuthCallbackPage({
       .then(async () => {
         client.clear();
         const user = await getMe();
-        if (active) router.replace(userDestination(user));
+        if (active) router.replace(postLoginDestination(user));
       })
       .catch((reason: unknown) => {
         if (active) setError(reason);

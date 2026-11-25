@@ -2,14 +2,18 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useMe, userDestination } from "@/entities/user";
-import { IdentityPanel, OAuthButton } from "@/features/auth";
+import { useMe } from "@/entities/user";
+import {
+  IdentityPanel,
+  OAuthButton,
+  postLoginDestination,
+} from "@/features/auth";
 
 export function LoginPage() {
   const me = useMe();
   const router = useRouter();
   useEffect(() => {
-    if (me.data) router.replace(userDestination(me.data));
+    if (me.data) router.replace(postLoginDestination(me.data));
   }, [me.data, router]);
   return (
     <IdentityPanel title="로그인" variant="login">
