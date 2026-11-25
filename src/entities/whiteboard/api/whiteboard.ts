@@ -1,7 +1,10 @@
-import { queryOptions } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 import type {
+  CreateWhiteboardTemplate,
+  UpdateWhiteboardTemplate,
   WhiteboardComment,
+  WhiteboardLinks,
   WhiteboardDetail,
   WhiteboardPresence,
   WhiteboardRevision,
@@ -23,7 +26,19 @@ export const whiteboardKeys = {
   templates: ["whiteboards", "templates"] as const,
   revisions: (id: string) => ["whiteboards", "revisions", id] as const,
   comments: (id: string) => ["whiteboards", "comments", id] as const,
+  links: (id: string) => ["whiteboards", "links", id] as const,
 };
+
+/** 연결 고르기에 쓰는 통합 검색 결과 한 줄(서버 s8 5절). */
+export type WhiteboardLinkCandidate = {
+  readonly id: string;
+  readonly title: string;
+  readonly key: string | null;
+  readonly context: string | null;
+};
+
+const templatePath = (templateId: string) =>
+  `${base}/templates/${encodeURIComponent(templateId)}`;
 
 export const whiteboardApi = {
   list: async (projectId: string | null) =>
@@ -36,6 +51,39 @@ export const whiteboardApi = {
     (await api.get<WhiteboardDetail>(path(id))).data,
   templates: async () =>
     (await api.get<readonly WhiteboardTemplate[]>(`${base}/templates`)).data,
+  createTemplate: async (body: CreateWhiteboardTemplate) =>
+    (await api.post<WhiteboardTemplate>(`${base}/templates`, body)).data,
+  updateTemplate: async (templateId: string, body: UpdateWhiteboardTemplate) =>
+    (await api.patch<WhiteboardTemplate>(templatePath(templateId), body)).data,
+  removeTemplate: async (templateId: string) => {
+    await api.delete(templatePath(templateId));
+  },
+  links: async (id: string) =>
+    (await api.get<WhiteboardLinks>(`${path(id)}/links`)).data,
+  addLink: async (
+    id: string,
+    target: { readonly taskId: string } | { readonly documentId: string },
+  ) => (await api.post<WhiteboardLinks>(`${path(id)}/links`, target)).data,
+  removeLink: async (id: string, linkId: string) => {
+    await api.delete(`${path(id)}/links/${encodeURIComponent(linkId)}`);
+  },
+  /** 읽을 수 있는 업무·문서만 돌아온다(검색이 읽기 정책을 건다). */
+  searchTargets: async (
+    type: "TASK" | "DOCUMENT",
+    query: string,
+    signal?: AbortSignal,
+  ) => {
+    const { data } = await api.get<{
+      readonly groups: readonly {
+        readonly type: string;
+        readonly items: readonly WhiteboardLinkCandidate[];
+      }[];
+    }>("/api/v1/search", {
+      params: { q: query, types: type, limit: 8 },
+      signal,
+    });
+    return data.groups.find((group) => group.type === type)?.items ?? [];
+  },
   create: async (body: {
     projectId: string | null;
     title: string;
@@ -121,5 +169,19 @@ export const whiteboardQueries = {
       queryKey: whiteboardKeys.comments(id),
       queryFn: () => whiteboardApi.comments(id),
       refetchInterval: 10_000,
+    }),
+  links: (id: string) =>
+    queryOptions({
+      queryKey: whiteboardKeys.links(id),
+      queryFn: () => whiteboardApi.links(id),
+    }),
+  linkCandidates: (type: "TASK" | "DOCUMENT", query: string) =>
+    queryOptions({
+      queryKey: ["whiteboards", "link-candidates", type, query] as const,
+      queryFn: ({ signal }) => whiteboardApi.searchTargets(type, query, signal),
+      enabled: query.length > 0,
+      placeholderData: keepPreviousData,
+      staleTime: 15_000,
+      retry: false,
     }),
 };

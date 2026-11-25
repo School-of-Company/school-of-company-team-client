@@ -93,6 +93,11 @@ export type KnowledgeDetail = KnowledgeSummary & {
   readonly canDelete: boolean;
   readonly createdAt: string;
   readonly publishedAt: string | null;
+  /** s16: 조회자가 읽을 수 있는 연결된 화이트보드(연결한 순). */
+  readonly whiteboards?: readonly {
+    readonly id: string;
+    readonly title: string;
+  }[];
 };
 
 export type KnowledgeFilter = {
