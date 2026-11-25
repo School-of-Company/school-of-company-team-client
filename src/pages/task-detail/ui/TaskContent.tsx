@@ -12,6 +12,7 @@ import Link from "next/link";
 import type { PlanningBucket } from "@/entities/project";
 import type { Milestone } from "@/entities/milestone";
 import { sprintStatusLabels } from "@/entities/sprint";
+import { WhiteboardChips } from "@/entities/whiteboard";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
 import { Select } from "@/shared/ui";
@@ -277,6 +278,14 @@ export function TaskProperties({
           <div>
             <dt>완료</dt>
             <dd>{formatDate(task.completedAt)}</dd>
+          </div>
+        )}
+        {!!task.whiteboards?.length && (
+          <div>
+            <dt>화이트보드</dt>
+            <dd>
+              <WhiteboardChips whiteboards={task.whiteboards} />
+            </dd>
           </div>
         )}
       </dl>
