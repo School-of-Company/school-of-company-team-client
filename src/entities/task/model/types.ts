@@ -97,6 +97,11 @@ export type TaskDetail = Omit<TaskCard, "reviewers"> & {
     readonly name: string;
     readonly dueDate: string | null;
   } | null;
+  /** s16: 조회자가 읽을 수 있는 연결된 화이트보드(연결한 순). 서버가 아직 보내지 않으면 없을 수 있다. */
+  readonly whiteboards?: readonly {
+    readonly id: string;
+    readonly title: string;
+  }[];
   readonly createdBy: string;
   readonly createdAt: string;
   readonly updatedAt: string;

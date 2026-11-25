@@ -1,11 +1,13 @@
 "use client";
 
 import "@excalidraw/excalidraw/index.css";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   CaptureUpdateAction,
   Excalidraw,
+  getCommonBounds,
   hashElementsVersion,
+  loadLibraryFromBlob,
   reconcileElements,
   restoreElements,
   viewportCoordsToSceneCoords,
@@ -27,9 +29,10 @@ import {
   type WhiteboardDetail,
   type WhiteboardScene,
 } from "@/entities/whiteboard";
-import { normalizeApiError } from "@/shared/api";
 import { readTheme, subscribeTheme } from "@/shared/lib";
+import { normalizeApiError } from "@/shared/api";
 import {
+  prepareInsert,
   restoreOnto,
   selectedIds,
   sharedAppState,
@@ -43,7 +46,18 @@ export type CanvasControls = {
   readonly focus: (elementId: string) => void;
   /** 이력의 scene 으로 바꾸고 곧바로 저장한다. */
   readonly restore: (scene: WhiteboardScene) => void;
+  /** 요소를 새 id 로 복제해 화면 가운데 넣고 고른다(템플릿, Mermaid). 저장은 평소처럼 2초 뒤. */
+  readonly insert: (elements: readonly unknown[]) => void;
 };
+
+/** 내장 도형 라이브러리. 같은 출처의 정적 파일이라 excalidraw.com 등 바깥을 부르지 않는다. 편집기를 열 때만 받는다. */
+const LIBRARY_URL = "/whiteboard/architecture.excalidrawlib";
+const loadLibrary = () =>
+  fetch(LIBRARY_URL)
+    .then((response) => (response.ok ? response.blob() : Promise.reject()))
+    .then((blob) => loadLibraryFromBlob(blob, "published"))
+    // 라이브러리는 덤이다. 못 받아도 그리기는 된다.
+    .catch(() => []);
 
 const SAVE_DELAY = 2_000;
 const PRESENCE_INTERVAL = 1_000;
@@ -81,6 +95,8 @@ export default function Canvas({
   onGone,
 }: Props) {
   const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
+  // 처음 그릴 때 한 번만 받는다(initialData 는 렌더마다 새로 만들어진다).
+  const [library] = useState(loadLibrary);
   const theme = useSyncExternalStore<"light" | "dark">(
     subscribeTheme,
     readTheme,
@@ -302,10 +318,44 @@ export default function Canvas({
             });
             void engine.current.save();
           },
+          insert(elements) {
+            const source = restore({ elements }).filter(
+              (element) => !element.isDeleted,
+            );
+            if (source.length === 0) return;
+            // 지금 보이는 화면 가운데에 넣는다.
+            const appState = api.getAppState();
+            const center = viewportCoordsToSceneCoords(
+              {
+                clientX: appState.offsetLeft + appState.width / 2,
+                clientY: appState.offsetTop + appState.height / 2,
+              },
+              appState,
+            );
+            const [minX, minY, maxX, maxY] = getCommonBounds(source);
+            const added = restore({
+              elements: prepareInsert(
+                source,
+                center.x - (minX + maxX) / 2,
+                center.y - (minY + maxY) / 2,
+              ),
+            });
+            api.updateScene({
+              elements: [...api.getSceneElementsIncludingDeleted(), ...added],
+              appState: {
+                selectedElementIds: Object.fromEntries(
+                  added.map((element) => [element.id, true] as const),
+                ),
+              },
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            });
+            api.scrollToContent(added, { fitToContent: true, animate: true });
+          },
         });
       }}
       initialData={{
         elements: restore(board.scene),
+        libraryItems: library,
         appState: { ...board.scene.appState, shouldCacheIgnoreZoom: false },
         scrollToContent: true,
       }}

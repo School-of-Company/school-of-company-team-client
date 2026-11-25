@@ -14,6 +14,7 @@ import {
   supersededBy,
   type KnowledgeDetail,
 } from "@/entities/knowledge";
+import { WhiteboardChips } from "@/entities/whiteboard";
 import { AuthGuard } from "@/features/auth";
 import {
   DeleteDocument,
@@ -250,6 +251,14 @@ function DocumentWorkspace({
                 <dt>수정한 날</dt>
                 <dd>{formatDate(document.updatedAt)}</dd>
               </div>
+              {!!document.whiteboards?.length && (
+                <div>
+                  <dt>화이트보드</dt>
+                  <dd>
+                    <WhiteboardChips whiteboards={document.whiteboards} />
+                  </dd>
+                </div>
+              )}
             </dl>
             {!document.canEdit && (
               <p className="text-xs text-muted">

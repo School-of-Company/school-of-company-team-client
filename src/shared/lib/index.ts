@@ -85,3 +85,4 @@ export {
   weekday,
   type DateBounds,
 } from "./date";
+export { localExcalidrawAssets } from "./excalidraw-assets";

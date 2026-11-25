@@ -91,3 +91,62 @@ export function selectedIds(
     .filter((id) => selected[id])
     .slice(0, 200);
 }
+
+type Insertable = {
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly groupIds?: readonly string[];
+  readonly frameId?: string | null;
+  readonly containerId?: string | null;
+  readonly boundElements?: readonly { readonly id: string }[] | null;
+  readonly startBinding?: { readonly elementId: string } | null;
+  readonly endBinding?: { readonly elementId: string } | null;
+  readonly isDeleted?: boolean;
+};
+
+/**
+ * 템플릿·Mermaid 요소를 지금 보드에 넣을 수 있게 만든다. 같은 템플릿을 두 번 넣어도 id 가 겹치지 않게
+ * 요소·묶음 id 를 새로 짓고(서로 가리키는 id 도 함께 바꾼다), (dx, dy)만큼 옮긴다. 지운 요소는 뺀다.
+ */
+export function prepareInsert<T extends Insertable>(
+  elements: readonly T[],
+  dx: number,
+  dy: number,
+  newId: () => string = () => crypto.randomUUID(),
+): T[] {
+  const live = elements.filter((element) => !element.isDeleted);
+  const ids = new Map(live.map((element) => [element.id, newId()]));
+  const groups = new Map<string, string>();
+  const group = (id: string) => {
+    if (!groups.has(id)) groups.set(id, newId());
+    return groups.get(id)!;
+  };
+  const mapId = (id: string | null | undefined) =>
+    id == null ? id : (ids.get(id) ?? null);
+  return live.map((element) => {
+    const next: Record<string, unknown> = {
+      ...element,
+      id: ids.get(element.id),
+      x: element.x + dx,
+      y: element.y + dy,
+      // 순서 색인은 Excalidraw 가 넣을 때 다시 매긴다.
+      index: null,
+    };
+    if (element.groupIds) next.groupIds = element.groupIds.map(group);
+    if ("frameId" in element) next.frameId = mapId(element.frameId);
+    if ("containerId" in element) next.containerId = mapId(element.containerId);
+    if (element.boundElements)
+      next.boundElements = element.boundElements
+        .filter((bound) => ids.has(bound.id))
+        .map((bound) => ({ ...bound, id: ids.get(bound.id) }));
+    for (const key of ["startBinding", "endBinding"] as const) {
+      const binding = element[key];
+      if (binding)
+        next[key] = ids.has(binding.elementId)
+          ? { ...binding, elementId: ids.get(binding.elementId) }
+          : null;
+    }
+    return next as T;
+  });
+}

@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# Excalidraw 글꼴(scripts/copy-excalidraw-assets.mjs 가 만든다)
+/public/excalidraw/
+
 # testing
 /coverage
 
