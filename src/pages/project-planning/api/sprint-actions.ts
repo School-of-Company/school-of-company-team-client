@@ -7,11 +7,6 @@ import {
   type RetroKind,
   type SprintInput,
 } from "@/entities/sprint";
-import {
-  milestoneApi,
-  milestoneKeys,
-  type MilestoneInput,
-} from "@/entities/milestone";
 import { taskKeys } from "@/entities/task";
 
 /** Sprint 상태·범위가 바뀌면 목록·상세·보드(sprint 필터)·업무 상세(sprint 속성)를 함께 맞춘다. */
@@ -132,35 +127,6 @@ export function useRetro(projectId: string, sprintId: string) {
     onError: (_error, _id, context) => {
       if (context?.previous) client.setQueryData(key, context.previous);
     },
-    onSettled: settle,
-  });
-  return { create, update, remove };
-}
-
-export function useMilestones(projectId: string) {
-  const client = useQueryClient();
-  const settle = () =>
-    Promise.all([
-      client.invalidateQueries({ queryKey: milestoneKeys.list(projectId) }),
-      client.invalidateQueries({ queryKey: taskKeys.all }),
-    ]);
-  const create = useMutation({
-    mutationFn: (input: MilestoneInput) =>
-      milestoneApi.create(projectId, input),
-    onSuccess: settle,
-  });
-  const update = useMutation({
-    mutationFn: ({
-      id,
-      input,
-    }: {
-      readonly id: string;
-      readonly input: MilestoneInput;
-    }) => milestoneApi.update(projectId, id, input),
-    onSuccess: settle,
-  });
-  const remove = useMutation({
-    mutationFn: (id: string) => milestoneApi.remove(projectId, id),
     onSettled: settle,
   });
   return { create, update, remove };
