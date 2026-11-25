@@ -109,9 +109,11 @@ export type SprintInput = {
   readonly startDate: string;
   readonly endDate: string;
   /** 배열이면 목록 전체 교체(보낸 순서가 position). id 없는 항목은 새로 만든다. */
+  /** 기존 항목은 achieved 도 보낸다: 서버는 수정 때 보낸 값(생략 = null)으로 덮어쓴다. */
   readonly goalItems: readonly {
     readonly id?: string;
     readonly text: string;
+    readonly achieved?: boolean | null;
   }[];
 };
 export type BurndownBasis = "WEIGHT" | "COUNT";
@@ -146,7 +148,7 @@ export type SprintStats = {
     readonly name: string;
     readonly startDate: string;
     readonly endDate: string;
-    readonly closedAt: string;
+    readonly closedAt: string | null;
   })[];
   /** 종료 Sprint가 없으면 모두 null. */
   readonly averages: {

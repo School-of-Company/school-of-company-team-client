@@ -5,11 +5,14 @@ import { goalItemsError, goalItemsRequest, percent } from "./goal-items";
 test("goal items drop blank rows and keep ids of existing items", () => {
   assert.deepEqual(
     goalItemsRequest([
-      { key: "G1", id: "G1", text: " 로그인 개편 배포 " },
+      { key: "G1", id: "G1", text: " 로그인 개편 배포 ", achieved: true },
       { key: "n1", text: "   " },
       { key: "n2", text: "새 항목" },
     ]),
-    [{ id: "G1", text: "로그인 개편 배포" }, { text: "새 항목" }],
+    [
+      { id: "G1", text: "로그인 개편 배포", achieved: true },
+      { text: "새 항목" },
+    ],
   );
 });
 

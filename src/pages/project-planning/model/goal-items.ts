@@ -5,6 +5,7 @@ export type GoalItemDraft = {
   readonly key: string;
   readonly id?: string;
   readonly text: string;
+  readonly achieved?: boolean | null;
 };
 
 export function goalItemDrafts(
@@ -14,17 +15,25 @@ export function goalItemDrafts(
     key: item.id,
     id: item.id,
     text: item.text,
+    achieved: item.achieved,
   }));
 }
 
-/** 빈 줄은 빼고 보낸다. 기존 항목은 id를 붙여 달성 기록을 지킨다(D14-j). */
+/**
+ * 빈 줄은 빼고 보낸다. 기존 항목은 id와 achieved를 같이 보내 달성 기록을 지킨다
+ * (서버는 수정 때 achieved 생략을 null로 저장한다).
+ */
 export function goalItemsRequest(
   drafts: readonly GoalItemDraft[],
 ): SprintInput["goalItems"] {
   return drafts.flatMap((draft) => {
     const text = draft.text.trim();
     if (!text) return [];
-    return [draft.id ? { id: draft.id, text } : { text }];
+    return [
+      draft.id
+        ? { id: draft.id, text, achieved: draft.achieved ?? null }
+        : { text },
+    ];
   });
 }
 
