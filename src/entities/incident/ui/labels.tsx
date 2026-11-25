@@ -3,6 +3,7 @@ import {
   severityDescriptions,
   severityLabels,
   type IncidentSeverity,
+  type IncidentSource,
   type IncidentStatus,
 } from "../model/types";
 
@@ -32,6 +33,26 @@ export function IncidentStatusLabel({
   return (
     <span className="incident-status" data-status={status}>
       {incidentStatusLabels[status]}
+    </span>
+  );
+}
+
+/** 헬스체크나 업타임 웹훅이 만든 사고에만 붙는다. */
+export function MonitorSourceBadge({
+  source,
+}: {
+  readonly source: IncidentSource;
+}) {
+  return source === "MANUAL" ? null : (
+    <span
+      className="ui-badge"
+      title={
+        source === "MONITOR_HEALTH"
+          ? "헬스체크가 다운을 감지해 만들었습니다"
+          : "업타임 웹훅이 다운을 알려 만들었습니다"
+      }
+    >
+      모니터링이 만듦
     </span>
   );
 }

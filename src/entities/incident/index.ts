@@ -18,5 +18,9 @@ export {
 } from "./model/types";
 export type * from "./model/types";
 export { formatDateTime } from "./model/time";
-export { IncidentStatusLabel, SeverityLabel } from "./ui/labels";
+export {
+  IncidentStatusLabel,
+  MonitorSourceBadge,
+  SeverityLabel,
+} from "./ui/labels";
 export { timelineEntryText, postmortemDisplaySections } from "./model/timeline";

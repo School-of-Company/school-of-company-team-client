@@ -11,6 +11,7 @@ import {
   incidentErrorMessage,
   incidentQueries,
   IncidentStatusLabel,
+  MonitorSourceBadge,
   postmortemStatusLabels,
   SeverityLabel,
   type IncidentStatus,
@@ -165,8 +166,9 @@ function IncidentTable({
               className="incident-table-row"
             >
               <span className="min-w-0">
-                <span className="block truncate font-medium">
-                  {incident.title}
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="truncate font-medium">{incident.title}</span>
+                  <MonitorSourceBadge source={incident.source} />
                 </span>
                 <span className="block truncate text-xs text-muted">
                   {incident.services.length

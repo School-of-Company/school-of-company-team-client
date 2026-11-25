@@ -9,6 +9,7 @@ import {
   incidentQueries,
   IncidentStatusLabel,
   isNotFound,
+  MonitorSourceBadge,
   postmortemStatusLabels,
   SeverityLabel,
   type IncidentDetail,
@@ -184,6 +185,7 @@ function IncidentWorkspace({
           <p className="mt-2 flex flex-wrap items-center gap-3">
             <SeverityLabel severity={incident.severity} />
             <IncidentStatusLabel status={incident.status} />
+            <MonitorSourceBadge source={incident.source} />
             {incident.postmortemStatus && (
               <span className="text-xs text-muted">
                 사후 검토 {postmortemStatusLabels[incident.postmortemStatus]}
