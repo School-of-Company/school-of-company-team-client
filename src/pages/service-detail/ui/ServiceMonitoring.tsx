@@ -215,8 +215,8 @@ function LinkRow({
 }
 
 /**
- * 최근 24시간, 15분 구간 96개(빈 구간 포함). 성공만 있는 구간은 중앙값 지연만큼, 실패가 섞이면 꽉 찬 막대에
- * 다른 색과 무늬로, 기록이 없으면 바닥 선만 그려 모양으로도 구분한다. 요약 문장과 표로도 읽힌다.
+ * 최근 24시간, 15분 구간 96개(빈 구간 포함). 성공만 있는 구간은 중앙값 지연만큼, 모두 실패면 통 막대,
+ * 일부 실패면 틈으로 나뉜 막대, 기록이 없으면 바닥 선으로 색 없이 모양만으로도 구분한다. 개수는 요약 문장과 표로 읽힌다.
  */
 function HealthChart({ serviceId }: { readonly serviceId: string }) {
   const history = useQuery(opsQueries.history(serviceId));
@@ -235,18 +235,58 @@ function HealthChart({ serviceId }: { readonly serviceId: string }) {
       ? "최근 24시간 검사 기록이 없습니다"
       : `최근 24시간 검사 ${totals.ok + totals.failed}회 중 성공 ${totals.ok}회, 실패 ${totals.failed}회`;
   const recorded = buckets.filter((bucket) => bucketState(bucket) !== "EMPTY");
+  const failBuckets = buckets.filter(
+    (bucket) => bucketState(bucket) === "FAIL",
+  ).length;
+  const mixedBuckets = buckets.filter(
+    (bucket) => bucketState(bucket) === "MIXED",
+  ).length;
+  const label =
+    failBuckets + mixedBuckets === 0
+      ? summary
+      : `${summary}. 15분 구간 ${buckets.length}개 중 모두 실패 ${failBuckets}개, 일부 실패 ${mixedBuckets}개`;
+  const gap = 4;
   return (
     <figure className="ops-chart grid gap-2">
       <StaleNotice query={history} />
       <svg
         role="img"
-        aria-label={summary}
+        aria-label={label}
         viewBox={`0 0 ${buckets.length * width} ${height}`}
         preserveAspectRatio="none"
         className="ops-chart-plot"
       >
         {buckets.map((bucket, index) => {
           const state = bucketState(bucket);
+          const x = index * width + 0.5;
+          // 일부 실패 구간은 막대를 둘로 나눈다(아래 실패 몫, 사이 틈, 위 성공 몫). 모두 실패면 통 막대 하나.
+          if (state === "MIXED") {
+            const total = bucket.okCount + bucket.failCount;
+            const fail = Math.max(
+              8,
+              Math.round((bucket.failCount / total) * (height - gap)),
+            );
+            return (
+              <g key={bucket.start}>
+                <rect
+                  x={x}
+                  y={height - fail}
+                  width={width - 1}
+                  height={fail}
+                  className="ops-chart-bar"
+                  data-state="MIXED"
+                />
+                <rect
+                  x={x}
+                  y={0}
+                  width={width - 1}
+                  height={Math.max(0, height - fail - gap)}
+                  className="ops-chart-bar"
+                  data-state="OK"
+                />
+              </g>
+            );
+          }
           const bar =
             state === "EMPTY"
               ? 2
@@ -263,7 +303,7 @@ function HealthChart({ serviceId }: { readonly serviceId: string }) {
           return (
             <rect
               key={bucket.start}
-              x={index * width + 0.5}
+              x={x}
               y={height - bar}
               width={width - 1}
               height={bar}
@@ -274,8 +314,8 @@ function HealthChart({ serviceId }: { readonly serviceId: string }) {
         })}
       </svg>
       <figcaption className="text-xs text-muted">
-        {summary}. 15분 구간마다 성공은 지연 중앙값만큼, 실패가 있으면 꽉 찬
-        막대로 그립니다.
+        {label}. 15분 구간마다 성공은 지연 중앙값만큼, 모두 실패한 구간은 통
+        막대, 일부 실패한 구간은 틈으로 나뉜 막대(아래가 실패 몫)로 그립니다.
       </figcaption>
       {recorded.length > 0 && (
         <details className="text-sm">
