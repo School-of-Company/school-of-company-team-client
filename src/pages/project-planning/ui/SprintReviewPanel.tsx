@@ -69,7 +69,11 @@ function ReviewContent({
     );
   if (review.isPending)
     return (
-      <div role="status" aria-label="결과 보고 불러오는 중" className="grid gap-2">
+      <div
+        role="status"
+        aria-label="결과 보고 불러오는 중"
+        className="grid gap-2"
+      >
         <Skeleton className="h-6 w-40" />
         <Skeleton className="h-48" />
       </div>
@@ -107,7 +111,25 @@ function ReviewContent({
   );
 }
 
+const discordLabels: Readonly<
+  Record<NonNullable<SprintReview["discordPost"]>["status"], string>
+> = {
+  PENDING: "Discord 공유 대기",
+  SENDING: "Discord 공유 중",
+  SENT: "Discord에 공유함",
+  SKIPPED: "Discord 공유 안 함",
+  FAILED: "Discord 공유 실패",
+};
+const discordReasons: Readonly<Record<string, string>> = {
+  DISCORD_NOT_CONFIGURED: "Discord가 설정되지 않았습니다",
+  DISCORD_CHANNEL_MISSING: "연결된 채널이 없습니다",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트입니다",
+  DISCORD_SEND_FAILED: "보내지 못했습니다",
+  DISCORD_RESULT_UNKNOWN: "결과를 알 수 없습니다",
+};
+
 function ReviewStamp({ review }: { readonly review: SprintReview }) {
+  const post = review.discordPost;
   return (
     <p className="sprint-meta">
       {review.publishedAt ? (
@@ -123,6 +145,14 @@ function ReviewStamp({ review }: { readonly review: SprintReview }) {
         {formatDate(review.updatedAt, { hour: "numeric", minute: "2-digit" })}{" "}
         저장
       </span>
+      {post && (
+        <span>
+          {discordLabels[post.status]}
+          {post.resultCode && discordReasons[post.resultCode]
+            ? `(${discordReasons[post.resultCode]})`
+            : ""}
+        </span>
+      )}
     </p>
   );
 }
@@ -231,7 +261,8 @@ function ReviewEditor({
         </div>
       )}
       <p id={`${id}-hint`} className="text-xs text-muted">
-        초안은 완료, 머지된 PR, 이월, 막힘 업무로 만듭니다. 비공개 원본 업무와
+        초안은 완료, 머지된 PR, 이월, 막힘 업무, 목표 체크리스트, 크기 합계로
+        만듭니다. 종료하면 초안이 저장 본문으로 들어갑니다. 비공개 원본 업무와
         비공개 저장소 PR은 게시 범위 때문에 넣지 않습니다.
       </p>
       {notice && (
@@ -266,9 +297,7 @@ function ReviewEditor({
           <Button
             loading={publish.isPending}
             disabled={busy || dirty || !current}
-            aria-describedby={
-              dirty || !current ? `${id}-publish-hint` : undefined
-            }
+            aria-describedby={`${id}-publish-hint`}
             onClick={() =>
               publish.mutate(undefined, {
                 onSuccess: () =>
@@ -284,9 +313,11 @@ function ReviewEditor({
           </Button>
         )}
       </div>
-      {!current?.publishedAt && (dirty || !current) && (
+      {!current?.publishedAt && (
         <p id={`${id}-publish-hint`} className="text-right text-xs text-muted">
-          저장한 본문만 게시할 수 있습니다.
+          {dirty || !current ? "저장한 본문만 게시할 수 있습니다. " : ""}
+          게시하면 프로젝트 참여자 모두가 보고 Discord 채널에도 한 번
+          공유됩니다.
         </p>
       )}
       <Dialog

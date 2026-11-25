@@ -6,6 +6,8 @@ import { normalizeApiError } from "@/shared/api";
 import { Button, DatePicker, Dialog, Field, Input } from "@/shared/ui";
 import { sprintFormErrors, validateSprint } from "../model/validation";
 import { SprintGoalEditor } from "./SprintGoalEditor";
+import { SprintGoalItemsEditor } from "./SprintGoalItemsEditor";
+import { goalItemDrafts, goalItemsRequest } from "../model/goal-items";
 
 /** Sprint 만들기·수정. 같은 양식이고 수정은 기존 값으로 채운다. */
 export function SprintFormDialog({
@@ -25,6 +27,9 @@ export function SprintFormDialog({
   const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<Readonly<Record<string, string>>>({});
   const [goal, setGoal] = useState(initial?.goal ?? "");
+  const [goalItems, setGoalItems] = useState(() =>
+    goalItemDrafts(initial?.goalItems),
+  );
   const [startDate, setStartDate] = useState(
     initial?.startDate ?? defaults.startDate,
   );
@@ -38,6 +43,7 @@ export function SprintFormDialog({
       goal: String(form.get("goal") ?? "").trim(),
       startDate: String(form.get("startDate") ?? ""),
       endDate: String(form.get("endDate") ?? ""),
+      goalItems: goalItemsRequest(goalItems),
     };
     const problems = validateSprint(input);
     setErrors(problems);
@@ -83,6 +89,12 @@ export function SprintFormDialog({
             value={goal}
             onChange={setGoal}
             error={errors.goal}
+          />
+          <SprintGoalItemsEditor
+            id={`${id}-goalItems`}
+            items={goalItems}
+            onChange={setGoalItems}
+            error={errors.goalItems}
           />
           <div className="grid items-start gap-4 sm:grid-cols-2">
             <Field

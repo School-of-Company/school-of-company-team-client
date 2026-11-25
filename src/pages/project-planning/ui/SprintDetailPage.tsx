@@ -23,6 +23,7 @@ import {
 } from "@/shared/ui";
 import { useSprintLifecycle, useUpdateSprint } from "../api/sprint-actions";
 import { formatRange, remainingLabel } from "../model/dates";
+import { percent } from "../model/goal-items";
 import { selectedSprintTab, sprintTabLabels, sprintTabs } from "../model/tabs";
 import { CloseSprintDialog } from "./CloseSprintDialog";
 import { ProgressBar } from "./ProgressBar";
@@ -177,6 +178,14 @@ function SprintScreen({
           {sprint.status === "CLOSED" && sprint.closedAt && (
             <span>{formatDate(sprint.closedAt)} 종료</span>
           )}
+          {sprint.goalItems.length > 0 && (
+            <span className="tabular-nums">
+              목표 {sprint.goalItems.filter((item) => item.achieved).length}/
+              {sprint.goalItems.length} 달성
+              {sprint.goalAchievedRate !== null &&
+                ` (${percent(sprint.goalAchievedRate)}%)`}
+            </span>
+          )}
         </p>
         {sprint.goal ? (
           <div className="sprint-goal">
@@ -305,7 +314,14 @@ function SprintScreen({
                 setClosing(false);
                 setMessage({
                   tone: "ok",
-                  text: `스프린트를 종료했습니다. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했습니다.`,
+                  text: [
+                    `스프린트를 종료했습니다. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했습니다.`,
+                    result.nextSprint &&
+                      `다음 스프린트 ${result.nextSprint.name}을(를) ${result.nextSprint.status === "ACTIVE" ? "만들고 시작했습니다" : "만들었습니다"}.`,
+                    "결과 보고 초안을 다듬어 게시하세요.",
+                  ]
+                    .filter(Boolean)
+                    .join(" "),
                 });
                 goTab("review");
               },

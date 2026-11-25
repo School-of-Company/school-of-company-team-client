@@ -3888,6 +3888,237 @@ a.search-option:hover {
   }
 }
 
+/* Sprint v2(s14): 목표 체크리스트, 크기 합계와 수용량, 번다운, 비교. */
+.goal-item-inputs {
+  display: grid;
+  gap: var(--space-2);
+}
+.goal-item-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+.goal-checklist {
+  display: grid;
+  border-top: 1px solid var(--border);
+}
+.goal-check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-md);
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.goal-check-mark {
+  width: 1em;
+  height: 1em;
+  border: 1.5px solid var(--border-input);
+  border-radius: var(--radius-sm);
+}
+.goal-check[data-achieved="true"] .goal-check-mark {
+  border-color: var(--success);
+  background: var(--success);
+}
+.goal-check[data-achieved="false"] .goal-check-mark {
+  border-color: var(--danger);
+}
+.goal-check-state {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.goal-check[data-achieved="false"] .goal-check-state {
+  color: var(--danger);
+}
+
+/* 크기 합계: 합계 줄, 편집 줄(같은 높이), 안내 한 줄을 늘 그린다. */
+.sprint-capacity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  min-height: calc(var(--control-sm) + 1lh + var(--space-1));
+  font-size: var(--text-sm);
+}
+.sprint-capacity-sum {
+  min-width: 0;
+}
+.sprint-capacity[data-over] .sprint-capacity-sum strong {
+  color: var(--danger);
+}
+.sprint-capacity-edit:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.sprint-capacity-input {
+  width: 6rem;
+  min-height: var(--control-sm);
+}
+.sprint-capacity-note {
+  grid-column: 1 / -1;
+  min-height: 1lh;
+}
+
+.burndown-basis {
+  margin-left: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
+/* 차트, 표, 대기, 빈 상태 모두 빈 상태 상자 높이 하나에 들어간다. */
+.burndown-box {
+  height: var(--empty-height);
+}
+.burndown-chart {
+  display: grid;
+  height: 100%;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--surface-box);
+}
+.burndown-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+}
+.burndown-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.burndown-swatch {
+  width: 1em;
+  height: 0;
+  border-top: 2px solid var(--foreground);
+}
+.burndown-swatch[data-line="ideal"] {
+  border-top: 2px dashed var(--muted);
+}
+.burndown-plot {
+  position: relative;
+  min-height: 0;
+}
+.burndown-plot svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.burndown-y {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--muted);
+  font-size: var(--text-caption);
+}
+.burndown-axis {
+  stroke: var(--border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.burndown-ideal,
+.burndown-remaining {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.burndown-ideal {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+.burndown-remaining {
+  stroke: var(--foreground);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.burndown-x {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: var(--text-caption);
+}
+.burndown-table-wrap {
+  height: 100%;
+  overflow-y: auto;
+  border-radius: var(--radius-xl);
+  background: var(--surface-box);
+}
+.burndown-table,
+.sprint-trend-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.burndown-table th,
+.burndown-table td,
+.sprint-trend-table th,
+.sprint-trend-table td {
+  height: var(--trend-row);
+  padding: 0 var(--space-3);
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+.burndown-table th:first-child,
+.sprint-trend-table th:first-child {
+  text-align: left;
+}
+.burndown-table thead th,
+.sprint-trend-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-box);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+/* 비교 표: 머리, 줄 수(--trend-rows), 평균 줄의 높이를 미리 잡는다. */
+.sprint-trend {
+  --trend-row: 2.25rem;
+  height: calc(var(--trend-row) * (var(--trend-rows) + 2));
+  overflow-x: auto;
+}
+.sprint-trend-table th:first-child {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sprint-trend-table tfoot th,
+.sprint-trend-table tfoot td {
+  border-bottom: 0;
+  color: var(--foreground-2);
+  font-weight: 600;
+}
+.sprint-trend-velocity {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.sprint-trend-bar {
+  width: 3rem;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+      to right,
+      var(--success) calc(var(--trend-ratio) * 100%),
+      transparent 0
+    )
+    var(--surface-active);
+}
+.burndown-table {
+  --trend-row: 2.25rem;
+}
+
 .review-toolbar {
   display: flex;
   flex-wrap: wrap;
