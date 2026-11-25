@@ -1,5 +1,7 @@
 "use client";
 
+// 먼저 읽어야 한다: Excalidraw 가 읽히기 전에 글꼴 주소(window.EXCALIDRAW_ASSET_PATH)를 정한다.
+import { readTheme, subscribeTheme } from "@/shared/lib";
 import "@excalidraw/excalidraw/index.css";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -30,7 +32,6 @@ import {
   type WhiteboardScene,
 } from "@/entities/whiteboard";
 import { normalizeApiError } from "@/shared/api";
-import { readTheme, subscribeTheme } from "@/shared/lib";
 import {
   prepareInsert,
   restoreOnto,

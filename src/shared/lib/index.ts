@@ -85,3 +85,4 @@ export {
   weekday,
   type DateBounds,
 } from "./date";
+export { EXCALIDRAW_ASSET_PATH } from "./excalidraw-assets";

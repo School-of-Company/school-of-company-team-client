@@ -3,15 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/copy-excalidraw-assets.mjs && next dev",
+    "build": "node scripts/copy-excalidraw-assets.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "lint:fsd": "steiger ./src",
     "format": "prettier --write .",
     "type-check": "next typegen && tsc --noEmit",
     "test": "bun test src",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "postinstall": "node scripts/copy-excalidraw-assets.mjs"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "0.18.1",
