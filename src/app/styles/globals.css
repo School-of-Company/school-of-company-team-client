@@ -5852,6 +5852,36 @@ a.search-option:hover {
   border-radius: var(--radius-xl);
   background: var(--surface-box);
 }
+/* 머리글 부제: 저장 상태, 실시간 상태, 함께 보는 사람. 실시간 상태는 색과 함께 늘 글자로 쓴다. */
+.whiteboard-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+.whiteboard-realtime {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.whiteboard-realtime::before {
+  content: "";
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: 50%;
+  background: var(--muted);
+}
+.whiteboard-realtime[data-status="live"]::before {
+  background: var(--hue-green);
+}
+.whiteboard-realtime[data-status="reconnecting"]::before {
+  background: var(--hue-orange);
+}
+.whiteboard-presence {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
 .whiteboard-panel {
   max-height: calc(100dvh - 12rem);
   overflow-y: auto;

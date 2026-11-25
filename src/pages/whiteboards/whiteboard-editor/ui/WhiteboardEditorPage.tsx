@@ -20,6 +20,7 @@ import { TemplateFormDialog } from "@/features/manage-whiteboard-template";
 import { routes } from "@/shared/config";
 import { localExcalidrawAssets } from "@/shared/lib";
 import {
+  Avatar,
   Button,
   Dialog,
   ErrorState,
@@ -32,7 +33,8 @@ import {
   useToast,
 } from "@/shared/ui";
 import { normalizeApiError } from "@/shared/api";
-import type { CanvasControls, SaveState } from "./Canvas";
+import type { CanvasControls, RealtimeView, SaveState } from "./Canvas";
+import type { RealtimeOffReason, RealtimeStatus } from "../model/realtime";
 import { dismissStartGuide, startGuideDismissed } from "../model/guide";
 import { CommentsPanel } from "./CommentsPanel";
 import { ShortcutsDialog, StartGuide } from "./Guide";
@@ -60,6 +62,23 @@ const saveLabels: Readonly<Record<SaveState, string>> = {
   saving: "저장 중",
   error: "저장 실패",
 };
+
+// 색만으로 구분하지 않게 늘 글자로 쓴다.
+const realtimeLabels: Readonly<Record<RealtimeStatus, string>> = {
+  connecting: "실시간 연결 중",
+  live: "실시간 연결됨",
+  reconnecting: "다시 연결 중",
+  off: "실시간 꺼짐",
+};
+
+/** 실시간이 꺼진 이유. 꺼져도 저장과 커서는 폴링으로 계속된다. */
+const offMessages: Readonly<Partial<Record<RealtimeOffReason, string>>> = {
+  revoked:
+    "이 화이트보드에 대한 권한이 바뀌어 실시간 연결을 끊었습니다. 상태를 다시 확인합니다.",
+  full: "동시에 편집하는 사람이 많아 실시간 연결 없이 계속합니다. 변경은 그대로 저장됩니다.",
+};
+
+const PRESENCE_AVATARS = 5;
 
 export function WhiteboardEditorPage({
   whiteboardId,
@@ -164,6 +183,16 @@ function EditorContent({
   // 캔버스는 처음 받은 scene 으로만 시작한다. 이후 머리글(제목·권한)만 최신으로 바꾼다.
   const [meta, setMeta] = useState(initial);
   const [saveState, setSaveState] = useState<SaveState>("saved");
+  const [realtime, setRealtime] = useState<RealtimeView>({
+    status: "connecting",
+    participants: [],
+  });
+  // 같은 사람이 탭 두 개로 들어와도 얼굴은 하나다.
+  const people = [
+    ...new Map(
+      realtime.participants.map((person) => [person.user.id, person.user]),
+    ).values(),
+  ];
   const [gone, setGone] = useState<string | null>(null);
   const [selection, setSelection] = useState<readonly string[]>([]);
   const [panel, setPanel] = useState<"comments" | "links" | null>(null);
@@ -238,8 +267,34 @@ function EditorContent({
             )}
           </p>
           <h1 className="truncate">{meta.title}</h1>
-          <p className="page-subtitle" aria-live="polite">
-            {meta.canEdit ? saveLabels[saveState] : "보기 전용"}
+          <p className="page-subtitle whiteboard-status">
+            <span aria-live="polite">
+              {meta.canEdit ? saveLabels[saveState] : "보기 전용"}
+            </span>
+            <span
+              className="whiteboard-realtime"
+              data-status={realtime.status}
+              role="status"
+            >
+              {realtimeLabels[realtime.status]}
+            </span>
+            {realtime.status === "live" && people.length > 0 && (
+              <span
+                className="whiteboard-presence"
+                aria-label={`함께 보는 사람 ${people.length}명`}
+              >
+                {people.slice(0, PRESENCE_AVATARS).map((person) => (
+                  <Avatar
+                    key={person.id}
+                    name={person.name}
+                    src={person.avatarUrl ?? undefined}
+                  />
+                ))}
+                {people.length > PRESENCE_AVATARS && (
+                  <span>+{people.length - PRESENCE_AVATARS}</span>
+                )}
+              </span>
+            )}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -320,6 +375,16 @@ function EditorContent({
               client.setQueryData(whiteboardKeys.detail(remote.id), remote);
             }}
             onGone={setGone}
+            onRealtime={(view) => {
+              setRealtime(view);
+              const message = view.reason && offMessages[view.reason];
+              if (view.status === "off" && message) toast(message, "info");
+            }}
+            onAccess={(canEdit) =>
+              setMeta((current) =>
+                current.canEdit === canEdit ? current : { ...current, canEdit },
+              )
+            }
           />
         </div>
         {panel === "comments" && (
