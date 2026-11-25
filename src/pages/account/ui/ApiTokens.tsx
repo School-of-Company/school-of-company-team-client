@@ -7,6 +7,7 @@ import { formatDate } from "@/shared/lib";
 import {
   Badge,
   Button,
+  CopyField,
   Dialog,
   EmptyState,
   ErrorState,
@@ -14,7 +15,6 @@ import {
   Input,
   ListSkeleton,
   Select,
-  Textarea,
 } from "@/shared/ui";
 import {
   apiTokensQueryKey,
@@ -43,57 +43,6 @@ function tokenErrorMessage(error: unknown) {
   if (problem.code === "TOKEN_LIMIT")
     return "활성 토큰은 10개까지 만들 수 있습니다. 쓰지 않는 토큰을 폐기한 뒤 다시 만드세요.";
   return problem.message;
-}
-
-function CopyField({
-  id,
-  label,
-  value,
-  multiline = false,
-}: {
-  readonly id: string;
-  readonly label: string;
-  readonly value: string;
-  readonly multiline?: boolean;
-}) {
-  const [copied, setCopied] = useState<"ok" | "failed" | null>(null);
-  const props = {
-    id,
-    readOnly: true,
-    value,
-    spellCheck: false,
-    className: "min-w-0 flex-1 font-mono text-xs",
-    onFocus: (event: { currentTarget: { select: () => void } }) =>
-      event.currentTarget.select(),
-  };
-  return (
-    <div className="grid gap-2">
-      <label htmlFor={id} className="text-sm font-medium">
-        {label}
-      </label>
-      <div className="flex flex-wrap items-start gap-2">
-        {multiline ? <Textarea rows={3} {...props} /> : <Input {...props} />}
-        <Button
-          variant="secondary"
-          onClick={() =>
-            void navigator.clipboard.writeText(value).then(
-              () => setCopied("ok"),
-              () => setCopied("failed"),
-            )
-          }
-        >
-          복사
-        </Button>
-      </div>
-      {copied && (
-        <p role="status" className="text-xs text-muted">
-          {copied === "ok"
-            ? "복사했습니다."
-            : "복사하지 못했습니다. 입력란을 선택해 직접 복사하세요."}
-        </p>
-      )}
-    </div>
-  );
 }
 
 function CreatedToken({ token }: { readonly token: CreatedApiToken }) {
