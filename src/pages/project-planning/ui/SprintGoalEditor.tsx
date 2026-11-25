@@ -6,11 +6,16 @@ export function SprintGoalEditor({
   value,
   onChange,
   error,
+  max = 500,
+  hint = "마크다운을 지원합니다.",
 }: {
   readonly id: string;
   readonly value: string;
   readonly onChange: (value: string) => void;
   readonly error?: string;
+  /** 마일스톤 목표는 2000자(s15). */
+  readonly max?: number;
+  readonly hint?: string;
 }) {
   const [mode, setMode] = useState<"write" | "preview">("write");
   return (
@@ -36,7 +41,7 @@ export function SprintGoalEditor({
         name="goal"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        maxLength={500}
+        maxLength={max}
         hidden={mode === "preview"}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error ${id}-hint` : `${id}-hint`}
@@ -54,8 +59,10 @@ export function SprintGoalEditor({
         id={`${id}-hint`}
         className="flex flex-wrap justify-between gap-2 text-xs text-muted"
       >
-        <span>마크다운을 지원합니다.</span>
-        <span className="tabular-nums">{value.length}/500자</span>
+        <span>{hint}</span>
+        <span className="tabular-nums">
+          {value.length}/{max}자
+        </span>
       </div>
       {error && (
         <p id={`${id}-error`} role="alert" className="text-sm text-danger">

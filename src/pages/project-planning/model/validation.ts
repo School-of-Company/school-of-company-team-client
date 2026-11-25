@@ -1,6 +1,5 @@
 import { sprintErrorMessage, type SprintInput } from "@/entities/sprint";
 import type { ApiError } from "@/shared/api";
-import type { MilestoneInput } from "@/entities/milestone";
 import { goalItemsError } from "./goal-items";
 
 /** 서버와 같은 기준(계약 DTO)으로 먼저 막는다. 키는 입력 이름. */
@@ -38,15 +37,6 @@ export function sprintFormErrors(
   if (error.code === "DUPLICATE_SPRINT_NAME")
     return { name: sprintErrorMessage(error) };
   return { form: sprintErrorMessage(error) };
-}
-
-export function validateMilestone(input: MilestoneInput) {
-  const errors: Record<string, string> = {};
-  if (!input.name || input.name.length > 100)
-    errors.name = "이름은 1~100자로 입력하세요.";
-  if (input.description.length > 5000)
-    errors.description = "설명은 5000자 이하로 입력하세요.";
-  return errors;
 }
 
 export function validateRetro(body: string) {
