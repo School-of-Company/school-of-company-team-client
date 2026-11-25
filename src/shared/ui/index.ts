@@ -33,3 +33,4 @@ export { ChipSelect } from "./chip-select";
 export type { ChipOption } from "./chip-select";
 export { restoreFocus } from "./focus-return";
 export { DatePicker, DateTimePicker } from "./date-picker";
+export { anchoredPosition, useAnchoredPosition } from "./anchored-position";

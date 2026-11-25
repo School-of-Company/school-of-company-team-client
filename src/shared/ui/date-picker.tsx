@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type KeyboardEvent,
-} from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import {
   addDays,
   addMonths,
@@ -20,6 +12,7 @@ import {
   toSeoulDateTime,
   weekday,
 } from "@/shared/lib";
+import { useAnchoredPosition } from "./anchored-position";
 import { Icon } from "./icons";
 
 const weekdays = ["일", "월", "화", "수", "목", "금", "토"] as const;
@@ -71,7 +64,6 @@ export function DatePicker({
 }) {
   const [open, setOpen] = useState(false);
   const [focus, setFocus] = useState(value || todayIso());
-  const [place, setPlace] = useState<CSSProperties>({ visibility: "hidden" });
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const popover = useRef<HTMLDivElement>(null);
@@ -89,39 +81,7 @@ export function DatePicker({
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [open]);
   // 달력은 화면 기준(fixed)으로 띄워 대화상자 스크롤 영역에 잘리지 않고, 대화상자를 스크롤하지도 않는다.
-  // 아래 공간이 모자라면 위로, 오른쪽이 모자라면 화면 안쪽으로 붙인다. 스크롤하거나 창 크기가 바뀌면 다시 맞춘다.
-  useLayoutEffect(() => {
-    if (!open) return;
-    const gap = 6;
-    const edge = 16;
-    const reposition = () => {
-      const box = trigger.current?.getBoundingClientRect();
-      const panel = popover.current;
-      if (!box || !panel) return;
-      const { innerWidth, innerHeight } = window;
-      const left = Math.max(
-        edge,
-        Math.min(box.left, innerWidth - edge - panel.offsetWidth),
-      );
-      const fitsBelow =
-        box.bottom + gap + panel.offsetHeight <= innerHeight - edge;
-      const fitsAbove = box.top - gap - panel.offsetHeight >= edge;
-      setPlace({
-        left,
-        top:
-          fitsBelow || !fitsAbove
-            ? box.bottom + gap
-            : box.top - gap - panel.offsetHeight,
-      });
-    };
-    reposition();
-    window.addEventListener("resize", reposition);
-    window.addEventListener("scroll", reposition, true);
-    return () => {
-      window.removeEventListener("resize", reposition);
-      window.removeEventListener("scroll", reposition, true);
-    };
-  }, [open]);
+  useAnchoredPosition(trigger, popover, { open, align: "start" });
   useEffect(() => {
     if (!open || !moveFocus.current) return;
     moveFocus.current = false;
@@ -131,7 +91,6 @@ export function DatePicker({
   }, [open, focus]);
 
   function show() {
-    setPlace({ visibility: "hidden" });
     moveFocus.current = true;
     setFocus(clampDate(value || today, bounds));
     setOpen(true);
@@ -233,7 +192,6 @@ export function DatePicker({
           aria-modal="true"
           aria-label={`${label} 선택`}
           className="ui-date-popover"
-          style={place}
           onKeyDown={onPopoverKey}
         >
           <div className="ui-date-head">
