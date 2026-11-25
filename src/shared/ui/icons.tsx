@@ -30,6 +30,7 @@ const paths = {
   calendar: "M4 6h16v15H4z M4 10h16 M8 3v4 M16 3v4",
   clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M12 7v5l3 2",
   minus: "M5 12h14",
+  chart: "M3 21h18 M6 17v-5 M11 17V7 M16 17v-8 M21 17V4",
   doc: "M6 3h8l5 5v13H6z M14 3v5h5 M9 13h7 M9 17h7",
   service: "M12 3 3 7.5l9 4.5 9-4.5z M3 12l9 4.5 9-4.5 M3 16.5 12 21l9-4.5",
   filter: "M4 6h16 M7 12h10 M10 18h4",

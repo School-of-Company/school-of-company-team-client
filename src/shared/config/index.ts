@@ -39,6 +39,7 @@ export const routes = {
   lab: (id: string) => `/labs/${encodeURIComponent(id)}`,
   whiteboards: "/whiteboards",
   whiteboard: (id: string) => `/whiteboards/${encodeURIComponent(id)}`,
+  stats: "/stats",
   culture: "/culture",
   guide: "/guide",
   doc: (id: string) => `/docs/${encodeURIComponent(id)}`,
