@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, type ReactNode } from "react";
 import { useAdminUsers, useAdminUserChange } from "../api/users";
 import { DiscordChannelForm } from "@/features/project-integrations";
 import { IntakeFormSettings } from "@/features/manage-intake-forms";
@@ -13,6 +14,7 @@ import {
   ErrorState,
   ListSkeleton,
   Spinner,
+  useAnchoredPosition,
 } from "@/shared/ui";
 
 export function AdminSettings({
@@ -115,22 +117,7 @@ export function AdminSettings({
                             </Badge>
                           </td>
                           <td>
-                            <button
-                              type="button"
-                              className="ui-button ui-button-secondary ui-button-sm"
-                              popoverTarget={`admin-actions-${item.id}`}
-                              aria-label={`${item.name} 관리`}
-                            >
-                              관리
-                            </button>
-                            <div
-                              popover="auto"
-                              id={`admin-actions-${item.id}`}
-                              className="admin-row-menu"
-                              onClick={(event) =>
-                                event.currentTarget.hidePopover()
-                              }
-                            >
+                            <AdminRowMenu id={item.id} name={item.name}>
                               <h3 className="font-semibold">
                                 {item.name} 관리
                               </h3>
@@ -233,7 +220,7 @@ export function AdminSettings({
                                   없습니다.
                                 </p>
                               )}
-                            </div>
+                            </AdminRowMenu>
                           </td>
                         </tr>
                       );
@@ -287,5 +274,42 @@ export function AdminSettings({
         </>
       )}
     </div>
+  );
+}
+
+/** 행의 '관리' 버튼과 그 옆에 붙는 popover. 열기, Esc, 바깥 클릭, 포커스 복귀는 네이티브 popover 가 맡는다. */
+function AdminRowMenu({
+  id,
+  name,
+  children,
+}: {
+  readonly id: string;
+  readonly name: string;
+  readonly children: ReactNode;
+}) {
+  const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  useAnchoredPosition(trigger, panel);
+  return (
+    <>
+      <button
+        ref={trigger}
+        type="button"
+        className="ui-button ui-button-secondary ui-button-sm"
+        popoverTarget={`admin-actions-${id}`}
+        aria-label={`${name} 관리`}
+      >
+        관리
+      </button>
+      <div
+        ref={panel}
+        popover="auto"
+        id={`admin-actions-${id}`}
+        className="admin-row-menu"
+        onClick={(event) => event.currentTarget.hidePopover()}
+      >
+        {children}
+      </div>
+    </>
   );
 }
