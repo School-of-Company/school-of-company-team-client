@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { anchoredPosition } from "./anchored-position";
+import { anchoredPosition, isOutOfView } from "./anchored-position";
 
 const viewport = { width: 1280, height: 900 };
 const menu = { width: 208, height: 400 };
@@ -53,4 +53,11 @@ test("on a 390px phone a right-aligned table button keeps the panel on screen", 
   const { top, left } = anchoredPosition(at(320, 300), wide, phone);
   assert.equal(top, 328);
   assert.ok(left >= 8 && left + wide.width <= phone.width - 8);
+});
+
+test("a trigger scrolled out of the viewport counts as out of view", () => {
+  assert.equal(isOutOfView(at(500, -30), viewport), true);
+  assert.equal(isOutOfView(at(500, 900), viewport), true);
+  assert.equal(isOutOfView(at(500, -10), viewport), false);
+  assert.equal(isOutOfView(at(500, 100), viewport), false);
 });

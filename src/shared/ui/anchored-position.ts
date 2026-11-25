@@ -39,10 +39,21 @@ export function anchoredPosition(
   return { top, left };
 }
 
+/** 트리거가 화면 밖으로 완전히 나갔는지. 이때 패널을 화면 가장자리에 붙여 두지 않고 닫거나 숨긴다. */
+export function isOutOfView(anchor: Box, viewport: Size) {
+  return (
+    anchor.bottom <= 0 ||
+    anchor.top >= viewport.height ||
+    anchor.right <= 0 ||
+    anchor.left >= viewport.width
+  );
+}
+
 /**
  * top layer(popover)나 position: fixed 로 뜬 패널을 trigger 옆에 붙이고, 스크롤과 창 크기 변화에 다시 맞춘다.
  * open 을 넘기면 그 값으로, 생략하면 패널의 네이티브 popover 열림(beforetoggle)을 따라간다.
  * 패널 CSS 는 position: fixed; inset: auto; margin: 0 이어야 한다.
+ * 네이티브 popover 는 보이기 전에 재므로 [data-anchor-measure] 일 때도 열린 때와 같은 display 를 준다.
  */
 export function useAnchoredPosition(
   trigger: RefObject<HTMLElement | null>,
@@ -53,43 +64,61 @@ export function useAnchoredPosition(
     const element = panel.current;
     const button = trigger.current;
     if (!element || !button) return;
+    const native = open === undefined;
+    // 크기는 레이아웃 크기(offset*)로 잰다. 등장 애니메이션의 scale 에 줄어든 값을 쓰지 않는다.
     function place() {
       if (!element || !button) return;
+      const anchor = button.getBoundingClientRect();
+      const viewport = { width: window.innerWidth, height: window.innerHeight };
+      if (isOutOfView(anchor, viewport)) {
+        if (native) element.hidePopover();
+        else element.style.setProperty("visibility", "hidden");
+        return;
+      }
       const { top, left } = anchoredPosition(
-        button.getBoundingClientRect(),
-        element.getBoundingClientRect(),
-        { width: window.innerWidth, height: window.innerHeight },
+        anchor,
+        { width: element.offsetWidth, height: element.offsetHeight },
+        viewport,
         align,
       );
-      element.style.top = `${top}px`;
-      element.style.left = `${left}px`;
+      element.style.setProperty("top", `${top}px`);
+      element.style.setProperty("left", `${left}px`);
+      element.style.removeProperty("visibility");
+    }
+    // 스크롤과 창 크기 변화만 프레임당 한 번으로 묶는다. 처음 자리는 보이기 전에 동기로 정한다.
+    let frame = 0;
+    function schedule() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(place);
     }
     function start() {
-      place();
-      window.addEventListener("resize", place);
-      window.addEventListener("scroll", place, true);
+      window.addEventListener("resize", schedule);
+      window.addEventListener("scroll", schedule, true);
     }
     function stop() {
-      window.removeEventListener("resize", place);
-      window.removeEventListener("scroll", place, true);
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, true);
     }
-    if (open !== undefined) {
+    if (!native) {
       if (!open) return;
+      place();
       start();
       return stop;
     }
-    // beforetoggle 은 패널이 보이기 직전에 온다. 다음 그리기 전(rAF)에 재어 붙이면 왼쪽 위에 번쩍이지 않는다.
-    let frame = 0;
-    function onToggle(event: Event) {
-      cancelAnimationFrame(frame);
-      if ((event as ToggleEvent).newState === "open")
-        frame = requestAnimationFrame(start);
-      else stop();
+    // beforetoggle 은 패널이 보이기 직전에 동기로 온다. 잠깐 측정용 display 를 주고 재어 자리를 정하면
+    // 첫 프레임부터 버튼 옆에 그려진다.
+    function onBeforeToggle(event: Event) {
+      if (!element) return;
+      if ((event as ToggleEvent).newState !== "open") return stop();
+      element.setAttribute("data-anchor-measure", "");
+      place();
+      element.removeAttribute("data-anchor-measure");
+      start();
     }
-    element.addEventListener("beforetoggle", onToggle);
+    element.addEventListener("beforetoggle", onBeforeToggle);
     return () => {
-      element.removeEventListener("beforetoggle", onToggle);
-      cancelAnimationFrame(frame);
+      element.removeEventListener("beforetoggle", onBeforeToggle);
       stop();
     };
   }, [trigger, panel, open, align]);

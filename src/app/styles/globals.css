@@ -760,14 +760,14 @@ html[data-sidebar-closed~="account"]
 .admin-user-table tbody th {
   font-weight: 500;
 }
-/* top layer(popover). 좌표는 useAnchoredPosition 이 '관리' 버튼 기준으로 정한다. */
-.admin-row-menu:popover-open {
+/* top layer(popover). 좌표는 useAnchoredPosition 이 '관리' 버튼 기준으로 정한다.
+   보이기 전에 재므로 [data-anchor-measure] 에도 열린 때와 같은 display 를 준다. */
+.admin-row-menu {
   position: fixed;
   inset: auto;
   margin: 0;
   max-height: calc(100dvh - 16px);
   overflow-y: auto;
-  display: grid;
   gap: var(--space-2);
   padding: var(--space-5);
   border: 0;
@@ -776,6 +776,9 @@ html[data-sidebar-closed~="account"]
   color: var(--foreground);
   box-shadow: var(--shadow-overlay);
   max-width: calc(100vw - 16px);
+}
+.admin-row-menu:is(:popover-open, [data-anchor-measure]) {
+  display: grid;
 }
 .sidebar-brand {
   display: flex;
