@@ -41,11 +41,11 @@
   --text-2xl: 1.625rem;
   --text-2xl--line-height: 1.35;
   --spacing: 0.25rem;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
 }
 
 /* ───────────────────────── Controls ───────────────────────── */
@@ -737,9 +737,10 @@ html[data-sidebar-closed~="account"]
 }
 .settings-card {
   min-width: 0;
-  padding: var(--space-6);
-  border-radius: var(--radius-xl);
-  background: var(--surface-box);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
 }
 .template-editor + .template-editor {
   border-top: 1px solid var(--border);
@@ -1210,13 +1211,16 @@ html[data-sidebar-closed~="account"]
 }
 .task-group {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-2);
+}
+.task-group > .list {
+  gap: var(--space-2);
 }
 .task-group-title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-4) var(--space-1);
+  padding: 0 var(--space-1);
   font-size: var(--text-sm);
   font-weight: 700;
 }
@@ -1224,10 +1228,24 @@ html[data-sidebar-closed~="account"]
   color: var(--faint);
   font-weight: 600;
 }
+/* 업무 한 건이 카드 한 장: 1px 테두리와 옅은 그림자로 이웃 업무와 나뉜다. 줄 전체가 링크다. */
 .my-task-row {
   display: grid;
+  min-height: 0;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-2);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-1) var(--ease-out);
+}
+.my-task-row:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-card-hover);
 }
 .my-task-row .list-row-main {
   width: 100%;
@@ -1237,18 +1255,22 @@ html[data-sidebar-closed~="account"]
   overflow-wrap: anywhere;
 }
 .my-task-row .list-row-meta {
+  position: static;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   margin-left: 0;
-  gap: var(--space-2) var(--space-4);
+  gap: var(--space-1) var(--space-3);
+}
+.my-task-row .list-row-key {
+  min-width: 0;
 }
 .task-group-more {
   justify-self: start;
-  margin-left: var(--space-3);
+  margin-left: var(--space-1);
 }
 .task-group-empty {
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-1);
   color: var(--muted);
   font-size: var(--text-sm);
 }
@@ -1533,13 +1555,16 @@ html[data-sidebar-closed~="account"]
 
 .board-card {
   padding: var(--space-3);
-  border: 0 !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-lg);
   background: var(--surface-raised);
   box-shadow: var(--shadow-card);
-  transition: box-shadow var(--dur-1) var(--ease-out);
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-1) var(--ease-out);
 }
 .board-card:hover {
+  border-color: var(--border-strong) !important;
   box-shadow: var(--shadow-card-hover);
 }
 .board-card:has([aria-expanded="true"]) {
@@ -2161,31 +2186,9 @@ html[data-sidebar-closed~="account"]
   overflow: clip;
   background: var(--background);
 }
-.ui-identity-glow {
-  position: absolute;
-  top: 42%;
-  left: 50%;
-  width: 44rem;
-  height: 32rem;
-  margin: -16rem 0 0 -22rem;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, var(--identity-glow), transparent);
-  pointer-events: none;
-  will-change: transform;
-}
 .ui-identity .ui-button {
   min-height: 40px;
   font-size: var(--text-md);
-}
-.ui-identity .ui-button-secondary,
-.ui-identity .ui-button-ghost {
-  border: 1px solid color-mix(in oklab, var(--border-strong) 70%, transparent);
-  background: color-mix(in oklab, var(--surface) 55%, transparent);
-  backdrop-filter: blur(8px);
-}
-.ui-identity .ui-button-secondary:hover:not(:disabled),
-.ui-identity .ui-button-ghost:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--surface) 80%, transparent);
 }
 .ui-identity-status {
   min-height: 3rem;
@@ -2198,41 +2201,14 @@ html[data-sidebar-closed~="account"]
   isolation: isolate;
   background: var(--surface-box);
 }
-.ui-login-backdrop {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: var(--login-grid-size) var(--login-grid-size);
-  mask-image: radial-gradient(ellipse at center, black, transparent 75%);
-}
-.ui-login-backdrop::before,
-.ui-login-backdrop::after {
-  content: "";
-  position: absolute;
-  width: var(--login-ambient-size);
-  height: var(--login-ambient-size);
-  border-radius: var(--radius-pill);
-  background: radial-gradient(closest-side, var(--surface-active), transparent);
-}
-.ui-login-backdrop::before {
-  top: -25%;
-  left: -15%;
-}
-.ui-login-backdrop::after {
-  bottom: -25%;
-  right: -15%;
-}
 .ui-identity.ui-identity-login main {
   animation: none;
   max-width: var(--login-width);
-  padding: var(--space-10) var(--space-8);
+  padding: var(--space-8) var(--space-6);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-xl);
   background: var(--surface-raised);
-  box-shadow: var(--shadow-overlay);
+  box-shadow: var(--shadow-card);
 }
 .ui-identity-login main > p {
   color: var(--foreground-2);
@@ -2244,7 +2220,6 @@ html[data-sidebar-closed~="account"]
 .ui-identity-login main .ui-button {
   min-height: var(--control-lg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
 }
 .ui-login-note {
   color: var(--foreground-2);
@@ -2290,20 +2265,7 @@ html[data-sidebar-closed~="account"]
     opacity: 0.45;
   }
 }
-@keyframes ui-login-drift {
-  50% {
-    transform: translate3d(var(--login-drift), var(--login-drift), 0);
-  }
-}
 @media (prefers-reduced-motion: no-preference) {
-  .ui-login-backdrop::before,
-  .ui-login-backdrop::after {
-    animation: ui-login-drift var(--login-ambient-duration) ease-in-out infinite;
-  }
-  .ui-login-backdrop::after {
-    animation-direction: reverse;
-    animation-delay: calc(var(--login-ambient-duration) / -2);
-  }
   .ui-identity-login main > * {
     animation: ui-fade-up var(--login-enter-duration) var(--ease-out) both;
   }
@@ -2622,8 +2584,8 @@ html[data-sidebar-closed~="account"]
 .notify-list {
   display: grid;
   min-width: 0;
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .notify-row {
@@ -3234,16 +3196,20 @@ html[data-sidebar-closed~="account"]
 .ops-health[data-status="UNKNOWN"]::before {
   border-style: dashed;
 }
+/* 수치 묶음: 타일 대신 1px 칸막이가 있는 한 줄. */
 .ops-totals {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 1px;
   margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--border);
 }
 .ops-totals > div {
-  padding: var(--space-3);
-  border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  padding: var(--space-2) var(--space-3);
+  background: var(--background);
 }
 .ops-totals dt {
   color: var(--muted);
@@ -3251,7 +3217,8 @@ html[data-sidebar-closed~="account"]
 }
 .ops-totals dd {
   font-size: var(--text-lg);
-  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 .ops-table {
   border-top: 1px solid var(--border);
@@ -3775,8 +3742,8 @@ a.search-option:hover {
   display: grid;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .sprint-current-head,
@@ -4014,8 +3981,8 @@ a.search-option:hover {
   min-width: 6.5rem;
   gap: 2px;
   padding: var(--space-2) var(--space-3);
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .sprint-counts dt {
@@ -4301,7 +4268,7 @@ a.search-option:hover {
   border-radius: var(--radius-pill);
   background: linear-gradient(
       to right,
-      var(--success) calc(var(--trend-ratio) * 100%),
+      var(--chart-bar) calc(var(--trend-ratio) * 100%),
       transparent 0
     )
     var(--surface-active);
@@ -4375,8 +4342,8 @@ a.search-option:hover {
   display: grid;
   gap: var(--space-2);
   padding: var(--space-3);
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .retro-entry-body {
@@ -4642,7 +4609,8 @@ a.search-option:hover {
   gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-xl);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   font-size: var(--text-sm);
 }
 
@@ -4847,9 +4815,9 @@ a.search-option:hover {
 }
 .home-panel {
   min-width: 0;
-  border: 0;
-  background: var(--surface-box);
-  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  border-radius: var(--radius-lg);
 }
 .home-panel-header {
   display: flex;
@@ -5601,7 +5569,8 @@ a.search-option:hover {
 .requirement-card {
   padding: var(--space-5);
   border-radius: var(--radius-xl);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
 }
 .requirement-submission,
 .requirement-section-list {
@@ -5712,7 +5681,8 @@ a.search-option:hover {
 .lab-metric {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
 }
 .lab-link {
   display: flex;
@@ -5757,18 +5727,21 @@ a.search-option:hover {
 }
 .stats-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1px;
   margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--border);
 }
 .stats-metric {
   display: grid;
   min-width: 0;
   align-content: start;
   gap: var(--space-1);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  padding: var(--space-3) var(--space-4);
+  background: var(--background);
 }
 .stats-metric dt {
   color: var(--foreground-2);
@@ -5781,7 +5754,7 @@ a.search-option:hover {
 .stats-metric-value {
   font-size: var(--text-xl);
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 600;
 }
 .stats-metric-detail,
 .stats-metric-help {
@@ -5806,18 +5779,16 @@ a.search-option:hover {
   display: flex;
   height: 6rem;
   align-items: flex-end;
-  gap: 3px;
-  padding: var(--space-2);
-  border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--border-strong);
 }
 .stats-bar {
   min-width: 0;
   flex: 1;
   height: calc(var(--bar-ratio) * 100%);
   min-height: 2px;
-  border-radius: 3px 3px 0 0;
-  background: var(--success);
+  border-radius: 2px 2px 0 0;
+  background: var(--chart-bar);
 }
 .stats-bars-axis {
   display: flex;
@@ -6020,7 +5991,8 @@ a.search-option:hover {
   gap: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   transition: box-shadow var(--dur-1) var(--ease-out);
 }
 .link-card[draggable="true"] {
