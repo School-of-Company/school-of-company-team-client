@@ -1026,6 +1026,68 @@ html[data-sidebar-closed~="account"]
   box-shadow: 0 1px 3px rgb(0 27 55 / 0.1);
 }
 
+/* 정보 아이콘 말풍선과 비활성 이유 말풍선. 마우스를 올리거나 초점을 주면 보인다. */
+.ui-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.ui-tip-button {
+  display: inline-grid;
+  width: var(--chip-height);
+  height: var(--chip-height);
+  place-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--faint);
+  cursor: help;
+}
+.ui-tip-button:hover,
+.ui-tip-button:focus-visible {
+  color: var(--foreground);
+}
+.ui-tip-button:focus-visible {
+  outline: 2px solid var(--brand);
+}
+.ui-tip-button svg {
+  width: 16px;
+  height: 16px;
+}
+/* 숨은 말풍선이 가로 스크롤을 만들지 않도록 display 로 숨긴다. */
+.ui-tip-bubble {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + var(--space-1));
+  left: 0;
+  display: none;
+  width: max-content;
+  max-width: min(20rem, 70vw);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-overlay);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  text-align: left;
+  white-space: normal;
+}
+.ui-tip[data-align="end"] .ui-tip-bubble {
+  right: 0;
+  left: auto;
+}
+.ui-tip:hover .ui-tip-bubble,
+.ui-tip:focus-within .ui-tip-bubble {
+  display: block;
+}
+.ui-tip-disabled {
+  border-radius: var(--radius-md);
+  cursor: not-allowed;
+}
+.ui-tip-disabled:focus-visible {
+  outline: 2px solid var(--brand);
+}
+
 /* Project headers stay fluid; only the settings form is centered. */
 .settings-page {
   max-width: var(--content-narrow);
