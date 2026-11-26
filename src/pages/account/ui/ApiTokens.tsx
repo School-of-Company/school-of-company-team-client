@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-query";
 import {
   agentQueries,
-  MAX_TOKEN_DAYS,
   ProjectPicker,
   projectKeysLabel,
   type AgentPolicy,
@@ -60,12 +59,6 @@ type Limits = Pick<
   AgentPolicy,
   "mcpEnabled" | "allowWriteTokens" | "maxTokenDays"
 >;
-// 정책을 못 읽으면 서버 한도로 둔다. 서버가 발급 때 다시 검사한다.
-const fallbackLimits: Limits = {
-  mcpEnabled: true,
-  allowWriteTokens: true,
-  maxTokenDays: MAX_TOKEN_DAYS,
-};
 
 const detail = (details: unknown, key: string) =>
   typeof details === "object" && details !== null && key in details
@@ -376,8 +369,15 @@ function PolicyLimits({
     return <p className="ui-skeleton-text min-h-[1lh] text-sm">정책</p>;
   if (policy.isError)
     return (
-      <p className="min-h-[1lh] text-sm text-muted">
-        팀 정책을 불러오지 못했어요. 만들 때 다시 확인해요.
+      <p className="flex min-h-[1lh] flex-wrap items-center gap-2 text-sm text-muted">
+        팀 정책을 불러오지 못해 토큰을 만들 수 없어요.
+        <button
+          type="button"
+          className="ui-link-button"
+          onClick={() => void policy.refetch()}
+        >
+          다시 시도
+        </button>
       </p>
     );
   const data = policy.data;
@@ -408,7 +408,8 @@ export function ApiTokens() {
     queryFn: listApiTokens,
   });
   const policy = useQuery(agentQueries.policy());
-  const limits = policy.data ?? fallbackLimits;
+  // 정책 한도를 알기 전에는 만들기를 열지 않는다(없는 한도로 고르게 하지 않는다).
+  const limits: Limits | undefined = policy.data;
   const [dialog, dispatch] = useReducer(tokenDialogReducer, closedTokenDialog);
   // 페이지가 Activity 로 숨겨지거나 떠나면 평문 토큰을 버린다(돌아와도 다시 보이지 않게).
   useEffect(() => discardTokenOnHide(dispatch), []);
@@ -425,7 +426,9 @@ export function ApiTokens() {
     <div className="grid gap-4">
       <PolicyLimits policy={policy} />
       <div className="flex flex-wrap items-center gap-3">
-        <Button onClick={() => dispatch({ type: "open" })}>토큰 만들기</Button>
+        <Button disabled={!limits} onClick={() => dispatch({ type: "open" })}>
+          토큰 만들기
+        </Button>
       </div>
       <SetupSnippets />
       {/* 재조회가 실패하면 캐시(폐기된 토큰이 남아 있을 수 있음) 대신 오류를 보인다. QueryState를 쓰지 않는다. */}
@@ -475,7 +478,8 @@ export function ApiTokens() {
             </Button>
           </div>
         ) : (
-          dialog.open && (
+          dialog.open &&
+          limits && (
             <CreateTokenForm
               limits={limits}
               onCreated={(token) =>

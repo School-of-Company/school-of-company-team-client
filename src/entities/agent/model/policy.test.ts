@@ -6,6 +6,7 @@ import {
   policyDraft,
   policyRequest,
   resultLabel,
+  targetTypeLabel,
   validatePolicy,
   type AgentPolicy,
 } from "./policy";
@@ -150,4 +151,10 @@ test("result codes read as Korean labels, unknown codes stay as-is", () => {
   assert.equal(resultLabel("GITHUB_NOT_PULL_REQUEST"), "PR이 아닌 번호");
   assert.equal(resultLabel("AGENT_POLICY_DENIED"), "팀 정책으로 막힘");
   assert.equal(resultLabel("SOMETHING_NEW"), "SOMETHING_NEW");
+});
+
+test("target types read as Korean nouns, unknown types stay as-is", () => {
+  assert.equal(targetTypeLabel("TASK"), "업무");
+  assert.equal(targetTypeLabel("REQUIREMENT"), "요구사항");
+  assert.equal(targetTypeLabel("NEW_KIND"), "NEW_KIND");
 });

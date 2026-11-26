@@ -312,13 +312,12 @@ function AccountContent({ user }: { readonly user: User }) {
           aria-labelledby="api-tokens-title"
           className="settings-card grid gap-4"
         >
-          <h2
-            id="api-tokens-title"
-            className="flex items-center gap-1 text-lg font-semibold"
-          >
-            API 토큰
+          <div className="flex items-center gap-1">
+            <h2 id="api-tokens-title" className="text-lg font-semibold">
+              API 토큰
+            </h2>
             <ApiTokensInfo />
-          </h2>
+          </div>
           <ApiTokens />
         </section>
       )}

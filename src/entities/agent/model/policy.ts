@@ -168,6 +168,20 @@ export const resultLabels: Readonly<Record<string, string>> = {
 
 export const resultLabel = (code: string) => resultLabels[code] ?? code;
 
+const targetTypeLabels: Readonly<Record<string, string>> = {
+  TASK: "업무",
+  COMMENT: "댓글",
+  SPRINT: "스프린트",
+  MILESTONE: "마일스톤",
+  DOCUMENT: "문서",
+  INCIDENT: "장애",
+  REQUIREMENT: "요구사항",
+  PROJECT: "프로젝트",
+};
+
+/** 감사 기록 대상 종류. 모르는 종류는 그대로 보인다. */
+export const targetTypeLabel = (type: string) => targetTypeLabels[type] ?? type;
+
 export interface AgentActivity {
   readonly id: string;
   readonly at: string;

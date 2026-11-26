@@ -137,7 +137,10 @@ export const discardTokenOnHide =
 export const mcpEndpoint = (apiUrl: string) =>
   `${apiUrl.replace(/\/+$/, "")}/mcp`;
 
-// 서버 docs/spec/s20-mcp-v2.md 5절. 토큰은 셸 변수(HUB_TOKEN)에만 두고 설정 파일에 적지 않는다.
+// 서버 docs/spec/s20-mcp-v2.md 5절. 둘 다 토큰을 HUB_TOKEN 셸 변수로 받는다.
+// Claude Code 는 add 할 때 셸이 펼친 헤더 값(토큰 원문)을 사용자 설정(~/.claude.json)에 저장한다.
+// 그래서 저장소에 남는 .mcp.json(project 범위) 대신 --scope user 로 넣는다.
+// Codex 는 설정에 변수 이름만 두고 실행할 때 환경 변수에서 읽는다.
 export const claudeCodeSnippet = (endpoint: string) =>
   `claude mcp add --scope user --transport http hub "${endpoint}" --header "Authorization: Bearer $HUB_TOKEN"`;
 

@@ -1,6 +1,10 @@
 import { formatDate } from "@/shared/lib";
 import { Badge } from "@/shared/ui";
-import { resultLabel, type AgentActivity } from "../model/policy";
+import {
+  resultLabel,
+  targetTypeLabel,
+  type AgentActivity,
+} from "../model/policy";
 
 const dateTime: Intl.DateTimeFormatOptions = {
   month: "short",
@@ -48,6 +52,11 @@ export function AgentActivityTable({
                 </span>
               </td>
               <td className="break-all">
+                {item.targetType && (
+                  <span className="block text-xs text-muted">
+                    {targetTypeLabel(item.targetType)}
+                  </span>
+                )}
                 {item.targetRef ?? <span className="text-muted">없음</span>}
               </td>
               <td>
@@ -58,11 +67,12 @@ export function AgentActivityTable({
                 >
                   {resultLabel(item.resultCode)}
                 </Badge>
-                {item.resultCode !== "OK" && (
-                  <span className="block font-mono text-xs text-muted">
-                    {item.resultCode}
-                  </span>
-                )}
+                {resultLabel(item.resultCode) !== item.resultCode &&
+                  item.resultCode !== "OK" && (
+                    <span className="block font-mono text-xs text-muted">
+                      {item.resultCode}
+                    </span>
+                  )}
               </td>
               <td className="font-mono text-xs break-all text-muted">
                 {item.argsSummary}

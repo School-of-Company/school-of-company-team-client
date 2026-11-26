@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { statusLabels } from "@/entities/task";
 import { normalizeApiError } from "@/shared/api";
 import { formatDate } from "@/shared/lib";
-import { Badge, ListSkeleton, QueryState } from "@/shared/ui";
+import { Badge, QueryState, Skeleton } from "@/shared/ui";
 import { commentQueries } from "../api/comments";
 
 const dateTime: Intl.DateTimeFormatOptions = {
@@ -18,16 +18,25 @@ export function TaskHistory({ taskId }: { readonly taskId: string }) {
   return (
     <QueryState
       query={history}
+      // 실제 이력 줄과 같은 높이의 한 줄 자리(빈 상태 높이의 ListSkeleton 은 이력보다 훨씬 커서 아래가 밀린다).
       skeleton={
-        <ListSkeleton
-          label="변경 이력 불러오는 중"
-          rows={2}
-          rowClassName="h-6"
-        />
+        <ol
+          className="task-history"
+          role="status"
+          aria-label="변경 이력 불러오는 중"
+        >
+          <li>
+            <Skeleton className="h-5 w-64" />
+          </li>
+        </ol>
       }
       errorMessage={(error) => normalizeApiError(error).message}
       // 업무는 만들 때 첫 줄이 생기므로 빈 이력은 V34 이전 업무뿐이다.
-      empty={<p className="text-sm text-muted">기록된 상태 변경이 없어요.</p>}
+      empty={
+        <p className="task-history text-sm text-muted">
+          기록된 상태 변경이 없어요.
+        </p>
+      }
     >
       {(entries) => (
         <ol className="task-history" aria-label="상태 변경 이력">

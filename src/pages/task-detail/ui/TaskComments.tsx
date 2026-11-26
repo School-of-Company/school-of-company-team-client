@@ -55,6 +55,7 @@ function CommentForm({
   const [body, setBody] = useState(initial);
   const [invalid, setInvalid] = useState<string | null>(null);
   const message = invalid ?? (error ? normalizeApiError(error).message : null);
+  const over = body.length > COMMENT_MAX_LENGTH;
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending) return;
@@ -74,13 +75,20 @@ function CommentForm({
       <Textarea
         id={id}
         value={body}
-        maxLength={COMMENT_MAX_LENGTH}
         placeholder="마크다운으로 쓸 수 있어요"
         disabled={pending}
-        aria-invalid={!!message || undefined}
-        aria-describedby={message ? `${id}-error` : undefined}
+        aria-invalid={!!message || over || undefined}
+        aria-describedby={message ? `${id}-count ${id}-error` : `${id}-count`}
         onChange={(event) => setBody(event.target.value)}
       />
+      {/* 붙여 넣은 글을 조용히 자르지 않고 글자 수를 보여 준다. 줄은 늘 있어 높이가 바뀌지 않는다. */}
+      <p
+        id={`${id}-count`}
+        className={`text-right text-xs ${over ? "text-danger" : "text-muted"}`}
+      >
+        {body.length.toLocaleString("ko-KR")} /{" "}
+        {COMMENT_MAX_LENGTH.toLocaleString("ko-KR")}자
+      </p>
       {message && (
         <p id={`${id}-error`} role="alert" className="text-sm text-danger">
           {message}

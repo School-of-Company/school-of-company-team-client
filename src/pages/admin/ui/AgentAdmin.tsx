@@ -57,11 +57,10 @@ export function AgentAdmin() {
         className="settings-card grid gap-5"
         aria-labelledby="agent-policy-heading"
       >
-        <h2
-          id="agent-policy-heading"
-          className="flex items-center gap-1 text-xl font-semibold"
-        >
-          에이전트 정책
+        <div className="flex items-center gap-1">
+          <h2 id="agent-policy-heading" className="text-xl font-semibold">
+            에이전트 정책
+          </h2>
           <InfoTip label="에이전트 정책 설명">
             <span className="block">
               팀 전체에 하나인 정책이에요. 에이전트가 쓸 수 있는 범위는 토큰
@@ -69,7 +68,7 @@ export function AgentAdmin() {
             </span>
             <span className="block">저장하면 다음 요청부터 바로 적용돼요.</span>
           </InfoTip>
-        </h2>
+        </div>
         <PolicySection />
       </section>
       <section
@@ -85,18 +84,17 @@ export function AgentAdmin() {
         className="settings-card grid gap-5"
         aria-labelledby="agent-activity-heading"
       >
-        <h2
-          id="agent-activity-heading"
-          className="flex items-center gap-1 text-xl font-semibold"
-        >
-          에이전트 활동
+        <div className="flex items-center gap-1">
+          <h2 id="agent-activity-heading" className="text-xl font-semibold">
+            에이전트 활동
+          </h2>
           <InfoTip label="에이전트 활동 설명">
             <span className="block">
               MCP 쓰기 도구 호출을 성공과 실패 모두 남겨요. 읽기 도구는 남기지
               않아요. 90일이 지나면 지워져요.
             </span>
           </InfoTip>
-        </h2>
+        </div>
         <Activity />
       </section>
     </div>
@@ -120,22 +118,35 @@ function PolicySection() {
         onRetry={() => void policy.refetch()}
       />
     );
-  // 저장한 응답으로 폼을 새로 연다(서버가 정리한 값으로 맞춘다).
-  return (
-    <PolicyForm key={policy.data.updatedAt ?? "default"} policy={policy.data} />
-  );
+  return <PolicyForm policy={policy.data} />;
 }
 
 function PolicyForm({ policy }: { readonly policy: AgentPolicy }) {
   const client = useQueryClient();
   const toast = useToast();
   const projects = useQuery(projectQueries.list(true));
+  // base: 고치기 시작한 정책. 재조회로 서버 값이 바뀌어도 고친 내용은 지우지 않는다.
+  const [base, setBase] = useState(policy);
   const [draft, setDraft] = useState<PolicyDraft>(() => policyDraft(policy));
   const [errors, setErrors] = useState<PolicyErrors>({});
+  const dirty = JSON.stringify(draft) !== JSON.stringify(policyDraft(base));
+  if (policy.updatedAt !== base.updatedAt && !dirty) {
+    // 고친 것이 없으면 새 값으로 조용히 맞춘다.
+    setBase(policy);
+    setDraft(policyDraft(policy));
+  }
+  const changedElsewhere = policy.updatedAt !== base.updatedAt;
+  const reload = () => {
+    setBase(policy);
+    setDraft(policyDraft(policy));
+    setErrors({});
+  };
   const save = useMutation({
     mutationFn: agentApi.updatePolicy,
     onSuccess: (saved) => {
       client.setQueryData(agentKeys.policy, saved);
+      setBase(saved);
+      setDraft(policyDraft(saved));
       toast("에이전트 정책을 저장했어요.", "success");
     },
   });
@@ -146,10 +157,24 @@ function PolicyForm({ policy }: { readonly policy: AgentPolicy }) {
     if (save.isPending) return;
     const found = validatePolicy(draft, policy.maxAccess);
     setErrors(found);
-    if (!hasPolicyErrors(found)) save.mutate(policyRequest(draft, policy));
+    // 영역은 시작한 값과 비교해 내가 바꾼 것만 보낸다(다른 사람이 바꾼 영역을 되돌리지 않는다).
+    if (!hasPolicyErrors(found)) save.mutate(policyRequest(draft, base));
   }
   return (
     <form className="grid gap-6" onSubmit={submit} noValidate>
+      {changedElsewhere && (
+        <div
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-box p-4 text-sm"
+        >
+          <span>
+            다른 곳에서 정책이 바뀌었어요. 저장하면 고친 항목만 덮어써요.
+          </span>
+          <Button variant="secondary" className="ui-button-sm" onClick={reload}>
+            새 값 불러오기
+          </Button>
+        </div>
+      )}
       <div className="grid gap-3">
         <label className="flex items-center gap-2 text-sm font-medium">
           <Checkbox
@@ -250,9 +275,13 @@ function PolicyForm({ policy }: { readonly policy: AgentPolicy }) {
           </p>
         )}
       </div>
-      <fieldset className="grid gap-3">
-        <legend className="mb-2 flex items-center gap-1 text-sm font-medium">
-          영역
+      <div
+        role="group"
+        aria-labelledby="agent-areas-label"
+        className="grid gap-3"
+      >
+        <div className="mb-2 flex items-center gap-1 text-sm font-medium">
+          <span id="agent-areas-label">영역</span>
           <InfoTip label="영역 설명">
             <span className="block">
               끔이면 그 영역 도구가 에이전트 목록에서 사라지고, 읽기면 쓰기
@@ -266,7 +295,7 @@ function PolicyForm({ policy }: { readonly policy: AgentPolicy }) {
               이상이어야 써요.
             </span>
           </InfoTip>
-        </legend>
+        </div>
         {agentAreas.map((area) => (
           <div key={area} className="grid gap-1">
             <div className="agent-area-row">
@@ -310,7 +339,7 @@ function PolicyForm({ policy }: { readonly policy: AgentPolicy }) {
             )}
           </div>
         ))}
-      </fieldset>
+      </div>
       {save.isError && (
         <p role="alert" className="text-sm text-danger">
           {normalizeApiError(save.error).message}
@@ -332,6 +361,7 @@ function PolicyForm({ policy }: { readonly policy: AgentPolicy }) {
 
 function AllTokens() {
   const client = useQueryClient();
+  const toast = useToast();
   const tokens = useQuery(agentQueries.adminTokens());
   const [revoking, setRevoking] = useState<AdminApiToken | null>(null);
   const revoke = useMutation({
@@ -339,6 +369,14 @@ function AllTokens() {
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: agentKeys.adminTokens });
       setRevoking(null);
+    },
+    onError: (error) => {
+      // 이미 폐기된 토큰이면 목록을 새로 받아 사라지게 한다.
+      if (normalizeApiError(error).status === 404) {
+        void client.invalidateQueries({ queryKey: agentKeys.adminTokens });
+        setRevoking(null);
+        toast("이미 폐기된 토큰이에요.", "success");
+      }
     },
   });
   return (
@@ -483,7 +521,12 @@ function Activity() {
   };
   const [tool, setTool] = useState(filters.tool ?? "");
   const users = useQuery(activeUsersQueryOptions());
-  const activity = useQuery(agentQueries.activity("admin", filters));
+  const rangeInvalid =
+    !!filters.from && !!filters.to && filters.from > filters.to;
+  const activity = useQuery({
+    ...agentQueries.activity("admin", filters),
+    enabled: !rangeInvalid,
+  });
   function change(key: keyof typeof filterParams, value: string) {
     const next = new URLSearchParams(search?.toString());
     if (value) next.set(filterParams[key], value);
@@ -491,8 +534,6 @@ function Activity() {
     router.replace(`${pathname}?${next.toString()}`, { scroll: false });
   }
   const filtered = Object.values(filters).some(Boolean);
-  const rangeInvalid =
-    !!filters.from && !!filters.to && filters.from > filters.to;
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-end gap-3">
