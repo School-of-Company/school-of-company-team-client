@@ -158,13 +158,27 @@ test("summaries read as short Korean phrases", () => {
   );
   assert.equal(resultMessage("NEW_CODE"), "NEW_CODE");
   assert.equal(
-    resultMessage("PRIVATE_SOURCE_RESTRICTED", "SKIPPED"),
-    "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.",
+    resultMessage(
+      "PRIVATE_SOURCE_RESTRICTED",
+      "SKIPPED",
+      "TASK_BLOCKED",
+      "NOTIFY_DISCORD",
+    ),
+    "비공개 원본 업무라 공유 채널에 게시하지 않았어요.",
+  );
+  assert.equal(
+    resultMessage(
+      "PRIVATE_SOURCE_RESTRICTED",
+      "SKIPPED",
+      "TASK_BLOCKED",
+      "CREATE_TASK",
+    ),
+    "비공개 원본 업무의 제목이 새 업무로 옮겨 가지 않게 업무를 만들지 않았어요.",
   );
   // 서버가 SKIPPED 사유를 새로 더해도 문장으로 보인다(M1: 비공개 원본 공유 채널 게시 금지).
   assert.equal(
     resultMessage("SHARING_RESTRICTED_TASK", "SKIPPED"),
-    "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.",
+    "비공개 원본 업무라 실행하지 않았어요.",
   );
   assert.equal(
     resultMessage("SOMETHING_NEW", "SKIPPED"),

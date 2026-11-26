@@ -412,8 +412,6 @@ export const dayLabels: Readonly<Record<DayOfWeek, string>> = {
 export const daysOfWeek = Object.keys(dayLabels) as readonly DayOfWeek[];
 
 const resultMessages: Readonly<Record<string, string>> = {
-  PRIVATE_SOURCE_RESTRICTED:
-    "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.",
   ALREADY_APPLIED: "이미 적용되어 있었습니다.",
   REVIEWER_NOT_APPLICABLE: "개발 업무가 아니라 리뷰어를 지정하지 않았습니다.",
   TASK_REVIEWER_IS_ASSIGNEE:
@@ -438,6 +436,14 @@ function tasklessResultMessage(code: string, event: RuleEvent) {
     return "Discord 프로젝트 채널이 연결되지 않았습니다.";
   return undefined;
 }
+/** 비공개 원본 제한(s21 5절): 알림은 공유 채널 게시를, 업무 만들기는 제목이 옮겨 가는 것을 막는다. */
+function privateSourceMessage(action?: RuleAction) {
+  if (action === "NOTIFY_DISCORD")
+    return "비공개 원본 업무라 공유 채널에 게시하지 않았어요.";
+  if (action === "CREATE_TASK")
+    return "비공개 원본 업무의 제목이 새 업무로 옮겨 가지 않게 업무를 만들지 않았어요.";
+  return "비공개 원본 업무라 실행하지 않았어요.";
+}
 /**
  * 실행 결과 code 의 한국어 이유. 서버가 새 code 를 더해도 원문 code 만 덩그러니 보이지 않게,
  * 비공개 원본 공유 제한 계열은 그 뜻으로, 나머지는 상태에 맞는 문장 + code 로 보여 준다.
@@ -446,15 +452,16 @@ export function resultMessage(
   code: string | null,
   status?: RuleRunStatus,
   event?: RuleEvent,
+  action?: RuleAction,
 ): string | null {
   if (!code) return null;
+  if (/PRIVATE|RESTRICT|SHARING/.test(code) && !resultMessages[code])
+    return privateSourceMessage(action);
   const known =
     (event && isTasklessEvent(event)
       ? tasklessResultMessage(code, event)
       : undefined) ?? resultMessages[code];
   if (known) return known;
-  if (/PRIVATE|RESTRICT|SHARING/.test(code))
-    return "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.";
   if (status === "SKIPPED")
     return `조건이 맞지 않아 실행하지 않았습니다(${code}).`;
   if (status === "FAILED") return `실행하지 못했습니다(${code}).`;
@@ -764,7 +771,11 @@ export function toggleRequest(
   rule: AutomationRule,
   enabled: boolean,
 ): SaveRuleRequest {
-  return formToRequest({ ...ruleToForm(rule), enabled });
+  return {
+    ...formToRequest({ ...ruleToForm(rule), enabled }),
+    // 폼이 모르는 조건 필드(서버가 새로 더한 것)도 켜고 끄는 사이에 지워지지 않게 받은 그대로 보낸다.
+    conditions: rule.conditions.map(({ field, value }) => ({ field, value })),
+  };
 }
 
 /** 지워진 파트·버킷 조건, 지워진 동작 대상. 이런 규칙은 저장(켜기·끄기 포함)이 서버에서 거절된다. */

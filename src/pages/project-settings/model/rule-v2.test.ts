@@ -356,3 +356,18 @@ test("new run codes and taskless targets read in Korean", () => {
   assert.equal(runTargetFallback("DEPLOY_FAILED"), "서비스");
   assert.equal(runTargetFallback("TASK_STALE"), "삭제된 업무");
 });
+
+test("toggling keeps condition fields the client does not know", () => {
+  const rule = {
+    ...v2Rule,
+    event: "TASK_BLOCKED" as const,
+    conditions: [
+      { field: "PRIORITY", value: "P1", label: null },
+      { field: "FUTURE_FIELD", value: "x", label: null },
+    ],
+  } as unknown as AutomationRule;
+  assert.deepEqual(toggleRequest(rule, true).conditions, [
+    { field: "PRIORITY", value: "P1" },
+    { field: "FUTURE_FIELD", value: "x" },
+  ]);
+});

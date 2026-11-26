@@ -70,6 +70,8 @@ export function RuleRuns({
     ruleQueries.runs(projectId, { ruleId: selectedRule, status }),
   );
   const items = runs.data?.pages.flatMap((page) => page.items) ?? [];
+  // ponytail: 실행 기록에 action 이 없어 지금 규칙의 동작을 쓴다. 실행 뒤 동작을 바꿨으면 문구가 어긋난다(서버가 run.action 을 주면 그걸로).
+  const actionOf = new Map(rules.map((rule) => [rule.id, rule.action]));
   return (
     <section className="grid gap-4" aria-labelledby="rule-runs-heading">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -192,11 +194,21 @@ export function RuleRuns({
                       <span className="truncate">{run.createdTask.title}</span>
                     </Link>
                   )}
-                  {resultMessage(run.resultCode, run.status, run.event) && (
+                  {resultMessage(
+                    run.resultCode,
+                    run.status,
+                    run.event,
+                    actionOf.get(run.ruleId),
+                  ) && (
                     <p
                       className={`text-xs ${run.status === "FAILED" ? "text-danger" : "text-muted"}`}
                     >
-                      {resultMessage(run.resultCode, run.status, run.event)}
+                      {resultMessage(
+                        run.resultCode,
+                        run.status,
+                        run.event,
+                        actionOf.get(run.ruleId),
+                      )}
                     </p>
                   )}
                 </div>

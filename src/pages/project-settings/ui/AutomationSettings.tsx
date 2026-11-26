@@ -315,6 +315,7 @@ function RuleRow({
               rule.lastRun.resultCode,
               rule.lastRun.status,
               rule.event,
+              rule.action,
             ) && (
               <span
                 className={`block text-xs ${rule.lastRun.status === "FAILED" ? "text-danger" : "text-muted"}`}
@@ -323,6 +324,7 @@ function RuleRow({
                   rule.lastRun.resultCode,
                   rule.lastRun.status,
                   rule.event,
+                  rule.action,
                 )}
               </span>
             )}
