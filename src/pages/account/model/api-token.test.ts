@@ -6,9 +6,12 @@ import {
   claudeCodeSnippet,
   closedTokenDialog,
   codexSnippet,
+  defaultExpiry,
   discardTokenOnHide,
+  expiryOptions,
   mcpEndpoint,
   tokenDialogReducer,
+  tokenRequest,
   type CreatedApiToken,
   type TokenDialog,
   type TokenDialogAction,
@@ -20,6 +23,7 @@ const created: CreatedApiToken = {
   scope: "READ",
   prefix: "sct_ab12",
   token: "sct_ab12_secret-value",
+  projectKeys: null,
   expiresAt: "2026-12-24T00:00:00Z",
   createdAt: "2026-11-24T00:00:00Z",
 };
@@ -139,16 +143,71 @@ test("creating a token leaves no plaintext in the query or mutation cache", asyn
   assert.ok(!caches.includes(created.token));
 });
 
-test("setup snippets carry the endpoint and bearer token", () => {
+test("setup snippets carry the endpoint and read the token from HUB_TOKEN", () => {
   const endpoint = mcpEndpoint("https://api.example.com/");
   assert.equal(endpoint, "https://api.example.com/mcp");
   assert.equal(
-    claudeCodeSnippet(endpoint, "tok"),
-    'claude mcp add --transport http hub https://api.example.com/mcp --header "Authorization: Bearer tok"',
+    claudeCodeSnippet(endpoint),
+    'claude mcp add --scope user --transport http hub "https://api.example.com/mcp" --header "Authorization: Bearer $HUB_TOKEN"',
   );
-  assert.match(
-    codexSnippet(endpoint, "tok"),
-    /url = "https:\/\/api\.example\.com\/mcp"/,
+  assert.equal(
+    codexSnippet(endpoint),
+    '[mcp_servers.hub]\nurl = "https://api.example.com/mcp"\nbearer_token_env_var = "HUB_TOKEN"',
   );
-  assert.match(codexSnippet(endpoint, "tok"), /Authorization = "Bearer tok"/);
+});
+
+test("token request omits projectKeys for an unrestricted token", () => {
+  assert.deepEqual(
+    tokenRequest({
+      name: "  노트북 ",
+      scope: "WRITE",
+      expiresInDays: 30,
+      restricted: false,
+      projectKeys: ["HUB"],
+    }),
+    { body: { name: "노트북", scope: "WRITE", expiresInDays: 30 } },
+  );
+});
+
+test("token request upper-cases, dedupes and bounds project keys to 1-20", () => {
+  const input = {
+    name: "agent",
+    scope: "READ" as const,
+    expiresInDays: 7,
+    restricted: true,
+  };
+  assert.deepEqual(
+    tokenRequest({ ...input, projectKeys: ["hub", "HUB ", "web"] }),
+    {
+      body: {
+        ...{ name: "agent", scope: "READ", expiresInDays: 7 },
+        projectKeys: ["HUB", "WEB"],
+      },
+    },
+  );
+  assert.ok("error" in tokenRequest({ ...input, projectKeys: [] }));
+  const many = Array.from({ length: 21 }, (_, index) => `P${index}`);
+  assert.ok("error" in tokenRequest({ ...input, projectKeys: many }));
+  assert.ok(
+    "body" in tokenRequest({ ...input, projectKeys: many.slice(0, 20) }),
+  );
+  assert.ok(
+    "error" in tokenRequest({ ...input, name: "  ", projectKeys: ["HUB"] }),
+  );
+});
+
+test("expiry options follow the team policy limit", () => {
+  assert.deepEqual(expiryOptions(90), [
+    { days: 7, allowed: true },
+    { days: 30, allowed: true },
+    { days: 90, allowed: true },
+  ]);
+  assert.deepEqual(expiryOptions(14), [
+    { days: 7, allowed: true },
+    { days: 14, allowed: true },
+    { days: 30, allowed: false },
+    { days: 90, allowed: false },
+  ]);
+  assert.equal(defaultExpiry(90), 30);
+  assert.equal(defaultExpiry(14), 14);
 });

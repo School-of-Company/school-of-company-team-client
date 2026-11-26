@@ -5,6 +5,8 @@ export interface ApiToken {
   readonly name: string;
   readonly scope: ApiTokenScope;
   readonly prefix: string;
+  /** null = 모든 프로젝트, [] = 한정 프로젝트가 모두 지워져 아무것도 못 본다. */
+  readonly projectKeys: readonly string[] | null;
   readonly createdAt: string;
   readonly expiresAt: string;
   readonly lastUsedAt: string | null;
@@ -15,6 +17,8 @@ export interface CreateApiToken {
   readonly name: string;
   readonly scope: ApiTokenScope;
   readonly expiresInDays: number;
+  /** 생략 = 모든 프로젝트. 있으면 1~20개. */
+  readonly projectKeys?: readonly string[];
 }
 
 export interface CreatedApiToken {
@@ -23,6 +27,7 @@ export interface CreatedApiToken {
   readonly scope: ApiTokenScope;
   readonly prefix: string;
   readonly token: string;
+  readonly projectKeys: readonly string[] | null;
   readonly expiresAt: string;
   readonly createdAt: string;
 }
@@ -32,7 +37,52 @@ export const scopeLabels: Record<ApiTokenScope, string> = {
   WRITE: "쓰기",
 };
 
-export const expiryOptions = [7, 30, 90] as const;
+export const MAX_TOKEN_PROJECTS = 20;
+
+const presetDays = [7, 30, 90] as const;
+
+/** 만료 선택지. 팀 정책 한도를 넘는 값은 막고, 한도가 목록에 없으면 한도 자체를 고를 수 있게 더한다. */
+export function expiryOptions(maxTokenDays: number) {
+  const days = [...new Set([...presetDays, maxTokenDays])]
+    .filter((value) => value >= 1 && value <= 90)
+    .sort((a, b) => a - b);
+  return days.map((value) => ({ days: value, allowed: value <= maxTokenDays }));
+}
+
+/** 서버 기본값과 같다: min(30, maxTokenDays). */
+export const defaultExpiry = (maxTokenDays: number) =>
+  Math.min(30, maxTokenDays);
+
+export interface TokenFormInput {
+  readonly name: string;
+  readonly scope: ApiTokenScope;
+  readonly expiresInDays: number;
+  readonly restricted: boolean;
+  readonly projectKeys: readonly string[];
+}
+
+/** 만들기 요청. 프로젝트를 지정했으면 1~20개여야 한다. */
+export function tokenRequest(
+  input: TokenFormInput,
+): { readonly body: CreateApiToken } | { readonly error: string } {
+  const name = input.name.trim();
+  if (!name) return { error: "이름을 적어 주세요." };
+  const keys = [
+    ...new Set(input.projectKeys.map((key) => key.trim().toUpperCase())),
+  ].filter(Boolean);
+  if (input.restricted && keys.length === 0)
+    return { error: "프로젝트를 하나 이상 골라 주세요." };
+  if (input.restricted && keys.length > MAX_TOKEN_PROJECTS)
+    return { error: `프로젝트는 ${MAX_TOKEN_PROJECTS}개까지 고를 수 있어요.` };
+  return {
+    body: {
+      name,
+      scope: input.scope,
+      expiresInDays: input.expiresInDays,
+      ...(input.restricted ? { projectKeys: keys } : {}),
+    },
+  };
+}
 
 /**
  * 만들기 대화상자 상태. 평문 토큰은 `created` 에만 있고, 닫거나 화면을 떠나면 통째로 버린다.
@@ -87,9 +137,9 @@ export const discardTokenOnHide =
 export const mcpEndpoint = (apiUrl: string) =>
   `${apiUrl.replace(/\/+$/, "")}/mcp`;
 
-export const claudeCodeSnippet = (endpoint: string, token: string) =>
-  `claude mcp add --transport http hub ${endpoint} --header "Authorization: Bearer ${token}"`;
+// 서버 docs/spec/s20-mcp-v2.md 5절. 토큰은 셸 변수(HUB_TOKEN)에만 두고 설정 파일에 적지 않는다.
+export const claudeCodeSnippet = (endpoint: string) =>
+  `claude mcp add --scope user --transport http hub "${endpoint}" --header "Authorization: Bearer $HUB_TOKEN"`;
 
-// ponytail: 서버 docs/spec/s13-mcp.md 가 아직 없어 Codex streamable HTTP 설정(url + http_headers)을 그대로 쓴다.
-export const codexSnippet = (endpoint: string, token: string) =>
-  `[mcp_servers.hub]\nurl = "${endpoint}"\nhttp_headers = { Authorization = "Bearer ${token}" }`;
+export const codexSnippet = (endpoint: string) =>
+  `[mcp_servers.hub]\nurl = "${endpoint}"\nbearer_token_env_var = "HUB_TOKEN"`;
