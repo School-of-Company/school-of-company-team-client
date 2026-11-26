@@ -100,7 +100,7 @@ export function WhiteboardEditorSkeleton() {
     <div
       role="status"
       aria-label="화이트보드 불러오는 중"
-      className="whiteboard-page grid min-w-0 gap-3"
+      className="whiteboard-page grid min-w-0 grid-cols-1 gap-3"
     >
       <header aria-hidden="true" className="page-header">
         <div className="min-w-0">
@@ -252,7 +252,7 @@ function EditorContent({
     );
 
   return (
-    <div className="whiteboard-page grid min-w-0 gap-3">
+    <div className="whiteboard-page grid min-w-0 grid-cols-1 gap-3">
       <header className="page-header">
         <div className="min-w-0">
           <p className="board-breadcrumb flex-wrap">

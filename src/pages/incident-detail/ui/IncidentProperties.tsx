@@ -107,12 +107,12 @@ export function IncidentProperties({
             {incident.services.length === 0 ? (
               <span className="text-muted">없음</span>
             ) : (
-              <ul className="grid gap-1">
+              <ul className="grid grid-cols-1 gap-1">
                 {incident.services.map((service) => (
                   <li key={service.id} className="flex items-center gap-2">
                     <Link
                       href={routes.service(service.key)}
-                      className="truncate hover:underline"
+                      className="min-w-0 truncate hover:underline"
                     >
                       {service.name}
                     </Link>
