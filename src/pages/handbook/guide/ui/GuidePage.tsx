@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AuthGuard } from "@/features/auth";
 import { routes } from "@/shared/config";
 import { Markdown, PageHeader, Select } from "@/shared/ui";
+import { activeSection } from "../model/scroll-spy";
 import { guideSections } from "../model/sections";
 
 /** 사용법: 기능별 짧은 안내. 왼쪽 목차, 오른쪽 본문. */
@@ -15,49 +16,42 @@ export function GuidePage() {
 function GuideContent() {
   const [active, setActive] = useState(guideSections[0].id);
   const content = useRef<HTMLDivElement>(null);
+  // 목차를 누른 뒤에는 사용자가 직접 스크롤할 때까지 강조를 누른 절에 고정한다.
+  // 부드러운 스크롤이 지나가는 절마다 강조가 옮겨 다니거나, 끝까지 못 가는 절을 눌렀을 때 마지막 절로 바뀌지 않게 한다.
+  const locked = useRef(false);
   useEffect(() => {
     const root = content.current;
     if (!root) return;
-    const atEnd = () =>
-      root.scrollTop + root.clientHeight >= root.scrollHeight - 1;
     const onScroll = () => {
-      if (atEnd()) setActive(guideSections[guideSections.length - 1].id);
+      if (locked.current) return;
+      const next = activeSection(
+        guideSections.map(({ id }) => ({
+          id,
+          top: sectionTop(root, root.querySelector(`#${id}`)),
+        })),
+        root,
+      );
+      if (next) setActive(next);
     };
-    const visible = new Map<string, number>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (atEnd()) {
-          onScroll();
-          return;
-        }
-        for (const entry of entries) {
-          if (entry.isIntersecting)
-            visible.set(entry.target.id, entry.boundingClientRect.top);
-          else visible.delete(entry.target.id);
-        }
-        const first = [...visible].sort((a, b) => a[1] - b[1])[0];
-        if (first) setActive(first[0]);
-      },
-      { root, rootMargin: "0px 0px -55% 0px", threshold: 0 },
-    );
-    root
-      .querySelectorAll("section")
-      .forEach((section) => observer.observe(section));
+    const release = () => {
+      locked.current = false;
+    };
+    const input = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
     root.addEventListener("scroll", onScroll, { passive: true });
+    for (const type of input)
+      root.addEventListener(type, release, { passive: true });
     return () => {
-      observer.disconnect();
       root.removeEventListener("scroll", onScroll);
+      for (const type of input) root.removeEventListener(type, release);
     };
   }, []);
   const goTo = (id: string) => {
     const root = content.current;
     const section = root?.querySelector<HTMLElement>(`#${id}`);
     if (!root || !section) return;
+    locked.current = true;
     root.scrollTo({
-      top:
-        root.scrollTop +
-        section.getBoundingClientRect().top -
-        root.getBoundingClientRect().top,
+      top: sectionTop(root, section),
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
         ? "instant"
         : "smooth",
@@ -137,5 +131,15 @@ function GuideContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** 스크롤 영역 맨 위 기준 절 위치(지금 스크롤 값을 더해 스크롤과 무관한 값). */
+function sectionTop(root: HTMLElement, section: Element | null) {
+  if (!section) return Number.POSITIVE_INFINITY;
+  return (
+    root.scrollTop +
+    section.getBoundingClientRect().top -
+    root.getBoundingClientRect().top
   );
 }
