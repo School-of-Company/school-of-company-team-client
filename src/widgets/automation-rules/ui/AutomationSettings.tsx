@@ -64,6 +64,7 @@ export function AutomationSettings({
       .filter((member) => activeUserIds.has(member.userId))
       .map((member) => ({ value: member.userId, label: member.name })),
     projects: [],
+    archivedProjects: [],
   };
   return (
     <AutomationRules
@@ -81,7 +82,7 @@ export function AutomationSettings({
 
 /** 관리자 설정 > 팀 규칙. 헤드 어드민만 본다(서버 LEAD 전용). 아카이브가 아닌 모든 프로젝트, 또는 고른 프로젝트에 걸린다. */
 export function TeamRules() {
-  const projects = useQuery(projectQueries.list());
+  const projects = useQuery(projectQueries.list(true));
   const users = useQuery(activeUsersQueryOptions());
   const context: RuleEditorContext = {
     target: { scope: "TEAM" },
@@ -92,12 +93,8 @@ export function TeamRules() {
       value: user.id,
       label: user.name,
     })),
-    projects: (projects.data ?? [])
-      .filter((project) => !project.archived)
-      .map((project) => ({
-        value: project.id,
-        label: `${project.key} ${project.name}`,
-      })),
+    projects: projectOptions(projects.data ?? [], false),
+    archivedProjects: projectOptions(projects.data ?? [], true),
   };
   return (
     <AutomationRules
@@ -243,6 +240,7 @@ function AutomationRules({
       <RuleRuns
         target={target}
         projects={context.projects}
+        archivedProjects={context.archivedProjects}
         rules={list}
         ruleId={runRuleId}
         onRuleChange={setRunRuleId}
@@ -439,4 +437,21 @@ function RuleRow({
       )}
     </li>
   );
+}
+
+function projectOptions(
+  projects: readonly {
+    readonly id: string;
+    readonly key: string;
+    readonly name: string;
+    readonly archived: boolean;
+  }[],
+  archived: boolean,
+) {
+  return projects
+    .filter((project) => project.archived === archived)
+    .map((project) => ({
+      value: project.id,
+      label: `${project.key} ${project.name}`,
+    }));
 }

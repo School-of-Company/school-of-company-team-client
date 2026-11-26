@@ -172,6 +172,8 @@ export function useRuleChange(target: RuleTarget) {
   const client = useQueryClient();
   const key = ruleKeys.rules(target);
   return useMutation({
+    // 결과에 비밀값이 있을 수 있어 reset·언마운트 뒤 MutationCache 에 남기지 않는다.
+    gcTime: 0,
     mutationFn: async (change: RuleChange) => {
       switch (change.kind) {
         case "create": {
@@ -227,6 +229,7 @@ export function useRuleChange(target: RuleTarget) {
 /** 웹훅 비밀값 재발급. 이전 값은 바로 무효다. 결과는 화면 상태로만 넘기고 reset() 한다. */
 export function useRotateWebhookSecret(target: RuleTarget) {
   return useMutation({
+    gcTime: 0,
     mutationFn: async (ruleId: string) =>
       (
         await api.post<{ readonly webhookSecret: string }>(

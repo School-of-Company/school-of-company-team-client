@@ -56,12 +56,17 @@ const time: Intl.DateTimeFormatOptions = {
 export function RuleRuns({
   target,
   projects,
+  archivedProjects,
   rules,
   ruleId,
   onRuleChange,
 }: {
   readonly target: RuleTarget;
   /** 팀 규칙 기록에서 어느 프로젝트의 계기인지 보여 줄 이름. */
+  readonly archivedProjects: readonly {
+    readonly value: string;
+    readonly label: string;
+  }[];
   readonly projects: readonly {
     readonly value: string;
     readonly label: string;
@@ -79,6 +84,7 @@ export function RuleRuns({
   const items = runs.data?.pages.flatMap((page) => page.items) ?? [];
   // ponytail: 실행 기록에 action 이 없어 지금 규칙의 동작을 쓴다. 실행 뒤 동작을 바꿨으면 문구가 어긋난다(서버가 run.action 을 주면 그걸로).
   const actionOf = new Map(rules.map((rule) => [rule.id, rule.action]));
+  const archivedIds = new Set(archivedProjects.map((project) => project.value));
   const projectName = new Map(
     projects.map((project) => [project.value, project.label]),
   );
@@ -158,7 +164,12 @@ export function RuleRuns({
                   <p className="truncate text-sm font-medium">{run.ruleName}</p>
                   <p className="truncate text-xs text-muted">
                     {target.scope === "TEAM" && run.projectId
-                      ? `${projectName.get(run.projectId) ?? "삭제된 프로젝트"}, `
+                      ? `${
+                          projectName.get(run.projectId) ??
+                          (archivedIds.has(run.projectId)
+                            ? "보관된 프로젝트"
+                            : "삭제된 프로젝트")
+                        }, `
                       : ""}
                     {eventLabel(run.event)}
                   </p>

@@ -86,8 +86,10 @@ export type RuleEditorContext = {
   readonly sprints: readonly Option[];
   /** 리뷰어·담당자·담당자 조건·DM 받을 사람 후보(활성 사용자). */
   readonly people: readonly Option[];
-  /** 팀 규칙만: 프로젝트 필터와 미리볼 프로젝트. */
+  /** 팀 규칙만: 프로젝트 필터와 미리볼 프로젝트(아카이브 아님). */
   readonly projects: readonly Option[];
+  /** 팀 규칙만: 아카이브된 프로젝트. 필터에 남아 있으면 뺄 수 있게, 기록에는 보관됨으로 보인다. */
+  readonly archivedProjects: readonly Option[];
 };
 
 /** 서명 확인 방법(서버 runbook 14절). */
@@ -212,9 +214,15 @@ function RuleEditorForm({
   );
   const [errors, setErrors] = useState<RuleFormErrors>({});
   const preview = useRulePreview(context.target);
-  const [previewProject, setPreviewProject] = useState(
-    () => form.projectIds[0] ?? context.projects[0]?.value ?? "",
-  );
+  // 고르기 전에는 그릴 때마다 정한다: 프로젝트 목록이 편집 창을 연 뒤에 와도 비어 있지 않게.
+  const [chosenPreview, setPreviewProject] = useState("");
+  const previewProject =
+    chosenPreview ||
+    form.projectIds.find((id) =>
+      context.projects.some((project) => project.value === id),
+    ) ||
+    context.projects[0]?.value ||
+    "";
   // 미리보기를 보낸 본문. 폼이 바뀌면 결과가 지난 것임을 알린다.
   const [previewed, setPreviewed] = useState("");
   const set = (patch: Partial<RuleForm>) =>
@@ -333,7 +341,15 @@ function RuleEditorForm({
           id={id("projects")}
           label="프로젝트"
           tip="고르지 않으면 아카이브가 아닌 모든 프로젝트에 걸려요. 서비스, 배포, 장애 이벤트는 여러 프로젝트에 연결돼 있어도 한 번만 실행해요."
-          options={context.projects}
+          options={[
+            ...context.projects,
+            ...context.archivedProjects
+              .filter((project) => form.projectIds.includes(project.value))
+              .map((project) => ({
+                ...project,
+                label: `${project.label}, 보관됨`,
+              })),
+          ]}
           empty="프로젝트가 없어요."
           selected={form.projectIds}
           onToggle={(value) =>
