@@ -125,7 +125,7 @@ export function BoardCard({
         </p>
       )}
       {task.blocked && (
-        <p className="board-card-note break-words text-danger">
+        <p className="board-card-note wrap-anywhere text-danger">
           막힘{task.blockedReason ? ": " + task.blockedReason : ""}
         </p>
       )}

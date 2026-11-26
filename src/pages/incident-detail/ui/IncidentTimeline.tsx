@@ -21,7 +21,7 @@ export function IncidentTimeline({
     <>
       {incident.summary && (
         <section aria-label="요약">
-          <p className="text-md break-words whitespace-pre-wrap">
+          <p className="text-md wrap-anywhere whitespace-pre-wrap">
             {incident.summary}
           </p>
         </section>
@@ -56,7 +56,7 @@ export function IncidentTimeline({
                     {entry.author?.name ?? "알 수 없음"}
                   </span>
                 </p>
-                <p className="mt-1 break-words whitespace-pre-wrap">
+                <p className="mt-1 wrap-anywhere whitespace-pre-wrap">
                   {timelineEntryText(entry)}
                 </p>
               </div>

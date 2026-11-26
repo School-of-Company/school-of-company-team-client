@@ -33,7 +33,7 @@ export function SprintGoalChecklist({ sprint }: { readonly sprint: Sprint }) {
               data-achieved={String(item.achieved)}
             >
               <span className="goal-check-mark" aria-hidden="true" />
-              <span className="min-w-0 break-words">{item.text}</span>
+              <span className="min-w-0 wrap-anywhere">{item.text}</span>
               <span className="goal-check-state">{state}</span>
             </li>
           );

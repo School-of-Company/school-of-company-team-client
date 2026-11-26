@@ -117,14 +117,16 @@ export function ProjectHeading({
               {item.href ? (
                 <Link href={item.href}>{item.label}</Link>
               ) : (
-                <span className="min-w-0 break-words">{item.label}</span>
+                <span className="min-w-0 wrap-anywhere">{item.label}</span>
               )}
             </span>
           ))}
         </p>
         <div className="flex min-w-0 items-center gap-3">
           <ProjectAvatar project={project} />
-          <h1 className="text-xl font-semibold break-words">{project.name}</h1>
+          <h1 className="text-xl font-semibold wrap-anywhere">
+            {project.name}
+          </h1>
         </div>
       </header>
       {project.archived && (

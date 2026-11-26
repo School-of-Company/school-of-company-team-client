@@ -134,7 +134,7 @@ function ExperimentView({
           <p className="board-breadcrumb">
             <Link href={routes.labs}>실험실</Link>
           </p>
-          <h1 className="break-words">{experiment.title}</h1>
+          <h1 className="wrap-anywhere">{experiment.title}</h1>
           <p className="page-subtitle flex flex-wrap items-center gap-2">
             <ExperimentStatusLabel status={experiment.status} />
             {experiment.outcome && (

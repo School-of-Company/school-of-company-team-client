@@ -134,11 +134,11 @@ function ProfileForm({ user }: { readonly user: User }) {
         <dl className="grid gap-4 text-sm">
           <div>
             <dt className="text-muted">이름</dt>
-            <dd className="mt-1 break-words">{user.name}</dd>
+            <dd className="mt-1 wrap-anywhere">{user.name}</dd>
           </div>
           <div>
             <dt className="text-muted">전공</dt>
-            <dd className="mt-1 break-words">
+            <dd className="mt-1 wrap-anywhere">
               {user.major || "등록하지 않음"}
             </dd>
           </div>

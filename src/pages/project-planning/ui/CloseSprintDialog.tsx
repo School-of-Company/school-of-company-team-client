@@ -208,7 +208,7 @@ export function CloseSprintDialog({
             <ul className="close-rows">
               {sprint.goalItems.map((item) => (
                 <li key={item.id} className="close-row">
-                  <span className="close-row-title min-w-0 break-words">
+                  <span className="close-row-title min-w-0 wrap-anywhere">
                     {item.text}
                   </span>
                   <span
@@ -373,7 +373,7 @@ export function CloseSprintDialog({
                     <span className="font-mono text-xs text-muted">
                       {task.key}
                     </span>
-                    <span className="min-w-0 break-words">{task.title}</span>
+                    <span className="min-w-0 wrap-anywhere">{task.title}</span>
                   </span>
                   <Select
                     aria-label={`${task.key} 이월 대상`}

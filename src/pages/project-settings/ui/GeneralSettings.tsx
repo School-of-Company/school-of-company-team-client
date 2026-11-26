@@ -39,11 +39,11 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
           </div>
           <div>
             <dt className="text-muted">이름</dt>
-            <dd className="mt-1 break-words">{project.name}</dd>
+            <dd className="mt-1 wrap-anywhere">{project.name}</dd>
           </div>
           <div>
             <dt className="text-muted">설명</dt>
-            <dd className="mt-1 break-words whitespace-pre-wrap">
+            <dd className="mt-1 wrap-anywhere whitespace-pre-wrap">
               {project.description || "설명이 없습니다."}
             </dd>
           </div>

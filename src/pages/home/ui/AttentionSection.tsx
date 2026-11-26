@@ -199,7 +199,7 @@ function AttentionRow({
           className="home-row-title"
         >
           <span className="home-row-key">{sprint.projectKey}</span>
-          <span className="min-w-0 break-words">{sprint.name}</span>
+          <span className="min-w-0 wrap-anywhere">{sprint.name}</span>
         </Link>
         <span className="home-row-meta">
           <span

@@ -56,7 +56,7 @@ export function TaskRow({
         >
           {task.key ?? source}
         </span>
-        <span className="min-w-0 break-words">{task.title}</span>
+        <span className="min-w-0 wrap-anywhere">{task.title}</span>
       </Link>
       {children && <span className="home-row-meta">{children}</span>}
     </li>

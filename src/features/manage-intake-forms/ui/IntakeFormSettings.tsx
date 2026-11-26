@@ -130,7 +130,7 @@ export function IntakeFormSettings({
               className="grid gap-3 rounded-xl bg-surface-box p-4"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold break-words">
+                <span className="font-semibold wrap-anywhere">
                   {form.publicTitle}
                 </span>
                 {form.active ? (

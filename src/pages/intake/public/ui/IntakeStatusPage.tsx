@@ -196,7 +196,7 @@ function StatusDetail({
         {data.formTitle && (
           <p className="text-sm text-muted">{data.formTitle}</p>
         )}
-        <h1 className="public-title break-words">{data.title}</h1>
+        <h1 className="public-title wrap-anywhere">{data.title}</h1>
         <p className="flex flex-wrap items-center gap-3 text-sm text-muted">
           <RequirementStatusBadge
             status={data.status}
@@ -231,7 +231,7 @@ function StatusDetail({
               <dt className="text-sm font-medium text-muted">
                 {section.label}
               </dt>
-              <dd className="text-sm break-words whitespace-pre-wrap">
+              <dd className="text-sm wrap-anywhere whitespace-pre-wrap">
                 {section.body}
               </dd>
             </div>
@@ -283,7 +283,7 @@ function StatusDetail({
                     minute: "2-digit",
                   })}
                 </p>
-                <p className="text-sm break-words whitespace-pre-wrap">
+                <p className="text-sm wrap-anywhere whitespace-pre-wrap">
                   {message.body}
                 </p>
               </li>
