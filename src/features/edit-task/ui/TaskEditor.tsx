@@ -277,7 +277,7 @@ export function TaskEditor({
           </div>
         )}
         <p id={`${prefix}-description-hint`} className="text-xs text-muted">
-          마크다운을 지원합니다. (## 제목, - 목록, `코드`, [링크](url))
+          마크다운을 쓸 수 있어요.
         </p>
       </div>
       <fieldset className="min-w-0">
@@ -323,7 +323,7 @@ export function TaskEditor({
       <div className="grid items-start gap-4 sm:grid-cols-2">
         <Field
           id={`${prefix}-start`}
-          label="시작일 (선택)"
+          label="시작일"
           error={dateError.startDate}
         >
           <DatePicker

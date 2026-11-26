@@ -56,8 +56,8 @@ export function DiscordChannelForm({
         </div>
       )}
       <p className="text-sm text-muted">
-        Discord 역할, 채널, 기존 스레드 권한은 자동으로 변경되지 않습니다. 공개
-        범위나 참여자가 바뀌면 관리자가 직접 점검한 뒤 다시 연결하세요.
+        Discord 권한은 자동으로 바뀌지 않아요. 공개 범위나 참여자가 바뀌면
+        권한을 확인하고 다시 연결해 주세요.
       </p>
       {!disabled && !editing && (
         <Button
@@ -106,7 +106,7 @@ export function DiscordChannelForm({
             <Field
               id={prefix}
               label="Discord 채널 ID"
-              hint="Discord 개발자 모드 → 채널 우클릭 → ID 복사"
+              hint="Discord 개발자 모드에서 채널을 우클릭하고 ID 복사"
             >
               <Input
                 id={prefix}

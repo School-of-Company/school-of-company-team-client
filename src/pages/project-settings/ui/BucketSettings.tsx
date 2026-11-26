@@ -13,6 +13,7 @@ import {
   Field,
   Icon,
   IconButton,
+  InfoTip,
   Input,
   ListSkeleton,
   StaleNotice,
@@ -41,17 +42,13 @@ export function BucketSettings({ project, user }: SettingsProps) {
   const [validation, setValidation] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const intro = (
-    <div className="grid gap-1 text-sm text-muted">
-      <p>
-        버킷은 프로젝트 안에서 업무를 이름 붙인 묶음으로 나누는 기능이에요.
-        상태와는 따로 움직이고, 업무 하나는 버킷 하나에만 들어가요.
-      </p>
-      <p>
-        예: 다음 주기, 아이디어, 보류, 기술 부채. 보드에서 버킷별로 묶어 보고
-        레인 사이로 끌어 옮겨요.
-        {!manage && " 버킷 관리는 헤드 어드민 또는 PM이 해요."}
-      </p>
-    </div>
+    <p className="text-sm text-muted">
+      업무를 다음 주기, 보류, 기술 부채처럼 이름 붙인 묶음으로 나눠요.{" "}
+      <InfoTip label="버킷 설명">
+        상태와 따로 움직이고, 업무 하나는 버킷 하나에만 들어가요. 보드에서
+        버킷별로 묶어 보고 레인 사이로 끌어 옮길 수 있어요.
+      </InfoTip>
+    </p>
   );
   // 안내 문단은 바로 그리고 목록 자리만 빈 상태 높이로 잡아, 버킷이 와도 아래가 밀리지 않는다.
   if (buckets.isPending)

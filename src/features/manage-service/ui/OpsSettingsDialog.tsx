@@ -74,7 +74,7 @@ export function OpsSettingsDialog({
               <Field
                 id="ops-health-url"
                 label="주소"
-                hint="https 주소만 됩니다. 서버는 리다이렉트를 따라가지 않고, 주소를 바꾸면 검사 기록을 지웁니다."
+                hint="https 주소만 돼요. 리다이렉트는 따라가지 않고, 주소를 바꾸면 검사 기록이 지워져요."
               >
                 <Input
                   id="ops-health-url"
@@ -179,16 +179,11 @@ export function OpsSettingsDialog({
               />
             </Field>
           ))}
-          <Field
-            id="ops-runbook"
-            label="Runbook"
-            hint="장애 때 따라 할 Runbook 문서를 고릅니다."
-          >
+          <Field id="ops-runbook" label="Runbook">
             <Select
               id="ops-runbook"
               value={form.runbookDocumentId}
               disabled={disabled || runbooks.isPending}
-              aria-describedby="ops-runbook-hint"
               onChange={(event) => set("runbookDocumentId", event.target.value)}
             >
               <option value="">없음</option>

@@ -130,8 +130,8 @@ export function Messages({
           label={visibility === "PUBLIC" ? "요청자에게 보낼 답변" : "내부 메모"}
           hint={
             visibility === "PUBLIC"
-              ? "요청자 상태 페이지에 '팀' 이름으로 보입니다."
-              : "팀원에게만 보입니다."
+              ? "요청자 상태 페이지에 '팀' 이름으로 보여요."
+              : "팀원에게만 보여요."
           }
           error={error ?? undefined}
         >

@@ -80,8 +80,8 @@ export function WebhookPanel({
       </div>
       <p className="text-sm text-muted">
         {ops.webhook.configured
-          ? `비밀값 발급됨${ops.webhook.rotatedAt ? `, ${formatDate(ops.webhook.rotatedAt)} 마지막 발급` : ""}. 모니터링 도구가 다운을 알리면 장애가 자동으로 만들어집니다.`
-          : "비밀값을 발급하면 모니터링 도구가 이 주소로 다운과 복구를 알릴 수 있습니다."}
+          ? `비밀값 발급됨${ops.webhook.rotatedAt ? `, ${formatDate(ops.webhook.rotatedAt)} 마지막 발급` : ""}`
+          : "비밀값을 발급하면 모니터링 도구가 이 주소로 다운과 복구를 알려요."}
       </p>
       <CopyField id="ops-webhook-url" label="웹훅 주소" value={url} />
       {error !== null && !confirming && (
@@ -122,7 +122,7 @@ export function WebhookPanel({
       <ConfirmDialog
         open={confirming}
         title="비밀값을 재발급할까요?"
-        description="새 비밀값을 만들면 이전 값은 바로 쓸 수 없습니다. 모니터링 도구의 설정도 새 값으로 바꿔야 합니다."
+        description="새 비밀값을 만들면 이전 값은 바로 못 써요. 모니터링 도구 설정도 새 값으로 바꿔야 해요."
         confirmLabel="재발급"
         pending={pending}
         error={error !== null ? serviceErrorMessage(error) : undefined}

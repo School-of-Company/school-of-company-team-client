@@ -17,7 +17,7 @@ import type { User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { ExperimentFormDialog } from "@/features/manage-experiment";
 import { routes } from "@/shared/config";
-import { formatDate, keepPreviousKey } from "@/shared/lib";
+import { formatDate, keepPreviousKey, settledData } from "@/shared/lib";
 import {
   Button,
   EmptyState,
@@ -59,11 +59,18 @@ function LabListContent({ user }: { readonly user: User }) {
     placeholderData: keepPreviousKey(experimentKeys.list(view)),
   });
   const label = views.find((item) => item.value === view)?.label ?? "";
+  const count = settledData(experiments)?.length;
   return (
     <div className="grid gap-5">
       <PageHeader
         title="실험실"
-        subtitle="작게 해 보고, 결과를 남기고, 효과가 있으면 프로젝트로 옮깁니다."
+        subtitle={
+          count !== undefined
+            ? `${label} ${count}개`
+            : experiments.isError && !experiments.data
+              ? "실험 집계를 불러오지 못했어요"
+              : "집계 중"
+        }
         actions={
           <Button onClick={() => setCreating(true)}>
             <Icon name="plus" className="inline-block" /> 새 실험

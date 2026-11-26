@@ -113,8 +113,7 @@ function TemplateForm({
     <form onSubmit={submit} className="grid gap-4" noValidate>
       {mode.kind === "create" && (
         <p className="text-sm text-muted">
-          지금 저장된 내용을 복사합니다. 이후 이 화이트보드를 고쳐도 템플릿은
-          그대로입니다. 팀원 모두가 볼 수 있습니다.
+          지금 내용을 복사해요. 보드를 나중에 고쳐도 템플릿은 그대로예요.
         </p>
       )}
       <Field id="template-name" label="이름" error={errors.name}>

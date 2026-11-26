@@ -235,7 +235,7 @@ function IncidentForm({
         <Field
           id={`${id}-started`}
           label="시작 시각"
-          hint={incident ? undefined : "비우면 지금으로 기록합니다."}
+          hint={incident ? undefined : "비우면 지금 시각으로 기록해요."}
           error={server.startedAt}
         >
           <DateTimePicker
@@ -293,7 +293,7 @@ function IncidentForm({
       <Field
         id={`${id}-summary`}
         label="요약"
-        hint="Discord에는 보내지 않습니다."
+        hint="Discord에는 보내지 않아요."
       >
         <Textarea
           id={`${id}-summary`}

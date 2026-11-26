@@ -140,7 +140,7 @@ function ExperimentForm({
       <Field
         id={`${id}-hypothesis`}
         label="가설"
-        hint="무엇을 하면 어떻게 될 거라고 생각하는지 한두 문장으로 적습니다."
+        hint="무엇을 하면 어떻게 될지 한두 문장으로 적어요."
         error={shown.hypothesis}
       >
         <Textarea
@@ -156,7 +156,7 @@ function ExperimentForm({
       <Field
         id={`${id}-metric`}
         label="측정 기준"
-        hint="무엇을 보면 성공인지 미리 정해 둡니다. 나중에 채워도 됩니다."
+        hint="무엇을 보면 성공인지 적어요. 나중에 채워도 돼요."
       >
         <Textarea
           id={`${id}-metric`}
@@ -169,7 +169,7 @@ function ExperimentForm({
       <Field
         id={`${id}-method`}
         label="해볼 것"
-        hint="마크다운을 쓸 수 있습니다."
+        hint="마크다운을 쓸 수 있어요."
       >
         <Textarea
           id={`${id}-method`}

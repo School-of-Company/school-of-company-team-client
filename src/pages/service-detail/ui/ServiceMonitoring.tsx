@@ -100,8 +100,8 @@ function MonitoringBody({
         </p>
         <p className="text-sm text-muted">
           {ops.healthCheck
-            ? `${ops.healthCheck.url} 를 ${ops.healthCheck.intervalSeconds}초마다 검사합니다. 3회 연속 실패하면 다운이고, 다운이 되면 장애가 자동으로 만들어집니다.`
-            : "헬스체크가 꺼져 있습니다. 주소를 정하면 서버가 주기적으로 검사합니다."}
+            ? `${ops.healthCheck.intervalSeconds}초마다 ${ops.healthCheck.url} 검사. 3회 연속 실패하면 다운으로 보고 장애를 만들어요.`
+            : "헬스체크가 꺼져 있어요."}
         </p>
         {ops.openIncident && (
           <p className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
@@ -166,14 +166,13 @@ function MonitoringBody({
         </dl>
         {ops.sentry.status === "NOT_CONFIGURED" && (
           <p className="text-sm text-muted">
-            서버에 Sentry 토큰이 없습니다(NOT_CONFIGURED). 운영자가 토큰을
-            넣으면 수치가 나타납니다.
+            서버에 Sentry 토큰이 없어요. 토큰을 넣으면 수치가 보여요.
           </p>
         )}
         {ops.sentry.status === "ERROR" && ops.sentry.errorCode && (
           <p className="text-sm text-muted">
-            최근 갱신에 실패했습니다({ops.sentry.errorCode}). 마지막으로 받은
-            수치를 보여 줍니다.
+            최근 갱신에 실패해서 마지막 수치를 보여 줘요. 오류 코드{" "}
+            {ops.sentry.errorCode}
           </p>
         )}
       </section>

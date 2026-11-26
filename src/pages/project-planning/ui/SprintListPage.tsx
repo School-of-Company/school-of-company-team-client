@@ -99,10 +99,10 @@ function SprintList({ project, manages }: PlanningContext) {
               />
             ) : (
               <p className="planning-note">
-                진행 중인 스프린트가 없습니다.
+                진행 중인 스프린트가 없어요.
                 {manages &&
                   planned.length > 0 &&
-                  " 예정 스프린트를 열어 시작하세요."}
+                  " 예정 스프린트를 열어 시작해요."}
               </p>
             )}
             <SprintRows projectId={project.id} title="예정" sprints={planned} />

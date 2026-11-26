@@ -181,8 +181,7 @@ export function ServiceReleases({
   return (
     <section aria-label="릴리스" className="grid gap-3">
       <p className="text-sm text-muted">
-        직전 릴리스 이후 merge된 PR과 그 PR에 연결된 업무를 보여 줍니다. 업무
-        상태는 바꾸지 않습니다.
+        직전 릴리스 이후 머지된 PR과 연결된 업무예요.
       </p>
       <ReleasesState service={service} query={releases}>
         {(items) => (

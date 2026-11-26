@@ -94,7 +94,7 @@ export function BoardCreateDialog({
               <Field
                 id="new-task-repository"
                 label="발행 저장소"
-                hint="저장소를 지정하면 등록 즉시 Issue로 발행합니다. 공개 저장소를 선택하면 업무 내용이 공개됩니다."
+                hint="고르면 등록하자마자 Issue로 발행해요. 공개 저장소면 업무 내용도 공개돼요."
               >
                 <Select
                   id="new-task-repository"

@@ -124,8 +124,8 @@ export function IncidentDiscord({
         <div className="grid gap-2">
           <Field
             id={`${id}-thread`}
-            label="복구할 기존 스레드 ID(선택)"
-            hint="비우고 복구하면 기존 연결을 해제합니다. 원본 대화는 지우지 않습니다."
+            label="복구할 기존 스레드 ID"
+            hint="비우고 복구하면 기존 연결만 끊어요. 원래 대화는 남아요."
           >
             <Input
               id={`${id}-thread`}

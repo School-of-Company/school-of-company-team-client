@@ -76,7 +76,7 @@ export function SprintRetro({
   return (
     <div className="grid gap-3">
       {!canWrite && !project.archived && (
-        <p className="planning-note">회고는 프로젝트 참여자가 씁니다.</p>
+        <p className="planning-note">회고는 프로젝트 참여자가 써요.</p>
       )}
       {error && (
         <p role="alert" className="text-sm text-danger">

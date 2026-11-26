@@ -123,7 +123,7 @@ function SearchContent() {
       {!q ? (
         <EmptyState
           title="검색어를 입력하세요"
-          description="업무 키(HUB-142)나 제목, 문서, 장애 제목, 서비스 이름, 스프린트 이름으로 찾습니다. 어디서든 ⌘K 또는 Ctrl+K로 열 수 있습니다."
+          description="업무 키나 제목, 문서, 장애, 서비스, 스프린트 이름으로 찾아요. 어디서든 ⌘K 또는 Ctrl+K로 열 수 있어요."
         />
       ) : search.isPending ? (
         <ListSkeleton label="검색하는 중" rowClassName="h-10" />

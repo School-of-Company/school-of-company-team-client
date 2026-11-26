@@ -19,6 +19,7 @@ import {
   Button,
   Dialog,
   ErrorState,
+  InfoTip,
   Markdown,
   Select,
   StaleNotice,
@@ -165,7 +166,7 @@ function MilestoneBody({
             <MilestoneRiskBadge milestone={milestone} />
             <span className="text-xs text-muted">
               {milestone.statusSource === "MANUAL"
-                ? `수동 지정 (자동 계산은 ${milestoneStatusLabels[milestone.autoStatus]})`
+                ? `수동 지정, 자동이면 ${milestoneStatusLabels[milestone.autoStatus]}`
                 : "자동 계산"}
             </span>
           </dd>
@@ -181,7 +182,13 @@ function MilestoneBody({
           <dd>{milestoneDateLabel(milestone)}</dd>
         </div>
         <div>
-          <dt>진행</dt>
+          <dt>
+            진행{" "}
+            <InfoTip label="진행 설명">
+              연결한 스프린트의 업무와 직접 연결한 업무를 한 번씩만 세요. 내가
+              볼 수 있는 업무만 들어가요.
+            </InfoTip>
+          </dt>
           <dd className="grid gap-1">
             <ProgressBar
               done={progress.done}
@@ -212,10 +219,6 @@ function MilestoneBody({
           </dd>
         </div>
       </dl>
-      <p className="planning-note">
-        진행률에는 연결한 스프린트의 업무와 직접 연결한 업무가 함께 들어가요. 두
-        곳에 모두 걸린 업무도 한 번만 들어가고, 내가 볼 수 있는 업무만 반영돼요.
-      </p>
       {milestone.goal && (
         <section className="grid gap-2" aria-label="목표">
           <h3 className="planning-subhead">목표</h3>

@@ -47,7 +47,7 @@ export function MemberSettings({
           <Field
             id="project-pm"
             label="PM"
-            hint="PM은 한 명이며, 교체하거나 해제한 기존 PM은 참여자로 남습니다."
+            hint="PM은 한 명이에요. 바뀐 PM은 참여자로 남아요."
           >
             <Select
               id="project-pm"

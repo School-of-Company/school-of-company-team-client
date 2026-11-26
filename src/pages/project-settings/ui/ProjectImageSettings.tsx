@@ -44,7 +44,7 @@ export function ProjectImageSettings({
           <Field
             id="project-image"
             label="프로젝트 이미지"
-            hint="PNG, JPEG, WebP (최대 2MB)"
+            hint="PNG, JPEG, WebP, 최대 2MB"
           >
             <Input
               ref={input}

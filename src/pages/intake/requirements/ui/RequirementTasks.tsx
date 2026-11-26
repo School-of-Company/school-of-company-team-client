@@ -250,9 +250,8 @@ function CreateTasksDialog({
     >
       <form noValidate onSubmit={onSubmit} className="grid gap-4">
         <p className="text-sm text-muted">
-          업무는 검토 필요 상태로 만들어집니다. 설명에는 요구사항 링크와 기능
-          항목, 수용 기준만 들어가고 요청자 정보는 들어가지 않습니다. 하나라도
-          실패하면 아무것도 만들지 않습니다.
+          검토 필요 상태로 만들고 요청자 정보는 넣지 않아요. 하나라도 실패하면
+          아무것도 만들지 않아요.
         </p>
         {publicDefault && (
           <p role="alert" className="rounded-xl bg-surface-box p-4 text-sm">
@@ -424,8 +423,8 @@ function LinkTaskDialog({
           label="업무 주소"
           hint={
             requirement.projectId
-              ? "같은 프로젝트의 업무만 연결합니다. 업무 상세 주소를 붙여 넣으세요."
-              : "팀 공용 업무만 연결합니다. 업무 상세 주소를 붙여 넣으세요."
+              ? "같은 프로젝트 업무만 연결할 수 있어요."
+              : "팀 공용 업무만 연결할 수 있어요."
           }
           error={error ?? undefined}
         >

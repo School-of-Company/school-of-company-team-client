@@ -132,8 +132,8 @@ export function NotificationSettingsForm({
         })}
       </fieldset>
       <p className="text-xs text-muted">
-        알림은 Discord로만 보내고 같은 내용은 하루 한 번만 보냅니다. 개인 업무와
-        비공개 원본 업무는 보내지 않습니다.
+        같은 알림은 하루 한 번만 Discord로 가요. 개인 업무와 비공개 원본 업무는
+        보내지 않아요.
       </p>
       {update.isError && (
         <p role="alert" className="text-sm text-danger">

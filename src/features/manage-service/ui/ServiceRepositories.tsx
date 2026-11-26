@@ -120,8 +120,8 @@ export function ServiceRepositories({
       )}
       {hidden > 0 && (
         <p className="text-xs text-muted">
-          비공개 저장소 {hidden}개는 GitHub 원본 권한이 있는 사람에게만
-          이름, 릴리스, 배포가 보입니다.
+          비공개 저장소 {hidden}개는 GitHub 원본 권한이 있는 사람에게만 이름,
+          릴리스, 배포가 보입니다.
         </p>
       )}
       {linking && (
@@ -199,9 +199,7 @@ function LinkRepositoryDialog({
         }}
       >
         <p className="text-sm text-muted">
-          GitHub App 설치에서 허용한 저장소 중 공개 저장소와 내가 원본 권한을
-          가진 비공개 저장소만 보입니다. 저장소 하나는 서비스 하나에만
-          연결됩니다.
+          저장소 하나는 서비스 하나에만 연결돼요.
         </p>
         {installable.isPending ? (
           <Spinner label="저장소 불러오는 중" />
@@ -304,7 +302,7 @@ function RepositorySettingsDialog({
         <Field
           id="deploy-workflow"
           label="배포 워크플로 이름"
-          hint="GitHub Actions 워크플로 이름과 정확히 같아야 그 실행을 배포로 기록합니다. 비우면 deployment 이벤트만 받습니다."
+          hint="GitHub Actions 워크플로 이름과 똑같이 적어야 배포로 기록돼요. 비우면 deployment 이벤트만 받아요."
         >
           <Input
             id="deploy-workflow"
