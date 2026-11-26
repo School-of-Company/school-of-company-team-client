@@ -24,12 +24,13 @@ export function ConnectDiscordPage() {
   const ready = useSessionReady();
   const restriction = useAccountRestriction();
   const router = useRouter();
+  // 이미 연결한 사용자는 이동할 곳으로 보낸다. 그 사이 연결 안내를 그렸다 지우지 않고 확인 중 문구를 그대로 둔다.
+  const leaving = !!me.data && userDestination(me.data) !== "/connect-discord";
   useEffect(() => {
     if (restriction) router.replace(`/pending?status=${restriction}`);
     else if (ready && !token) router.replace("/login");
-    else if (me.data && userDestination(me.data) !== "/connect-discord")
-      router.replace(postLoginDestination(me.data));
-  }, [ready, token, me.data, router, restriction]);
+    else if (leaving && me.data) router.replace(postLoginDestination(me.data));
+  }, [ready, token, me.data, leaving, router, restriction]);
   return (
     <IdentityPanel title="Discord 계정을 연결해 주세요">
       {me.isError ? (
@@ -39,7 +40,7 @@ export function ConnectDiscordPage() {
             void me.refetch();
           }}
         />
-      ) : !me.data || !token ? (
+      ) : !me.data || !token || leaving ? (
         <p className="min-h-12 text-sm leading-6 text-foreground-2">
           계정 상태를 확인하고 있어요.
         </p>
