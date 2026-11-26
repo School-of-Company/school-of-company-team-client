@@ -62,6 +62,15 @@ test("toggling sends the full definition back with only enabled changed", () => 
     priority: null,
     titleTemplate: null,
     messageTemplate: null,
+    projectIds: null,
+    status: null,
+    sprintId: null,
+    days: null,
+    dmUserId: null,
+    channel: null,
+    digestHour: null,
+    webhookUrl: null,
+    escalation: null,
   });
 });
 
@@ -102,10 +111,13 @@ test("incident rules carry no conditions and can only mention the PM", () => {
   assert.deepEqual(allowedActions("INCIDENT_CREATED"), [
     "NOTIFY_DISCORD",
     "CREATE_TASK",
+    "DISCORD_DM",
+    "WEBHOOK",
+    "ESCALATE",
   ]);
 });
 
-test("there is no status-changing or external write action, and the incident event is offered", () => {
+test("task events offer every action except the incident ones, and the incident event is offered", () => {
   assert.deepEqual(allowedActions("TASK_STATUS_CHANGED"), [
     "NOTIFY_DISCORD",
     "MARK_ATTENTION",
@@ -114,6 +126,15 @@ test("there is no status-changing or external write action, and the incident eve
     "ASSIGN_USER",
     "SET_PRIORITY",
     "CREATE_TASK",
+    "MOVE_STATUS",
+    "ADD_TO_SPRINT",
+    "SET_DEADLINE",
+    "ADD_COMMENT",
+    "CREATE_SUBTASK",
+    "DISCORD_DM",
+    "WEBHOOK",
+    "ASSIGN_TO_AGENT",
+    "ESCALATE",
   ]);
   assert.ok(selectableEvents.includes("INCIDENT_CREATED"));
 });
@@ -246,8 +267,8 @@ test("incident runs explain reasons without task wording", () => {
   );
 });
 
+// 장애 이벤트는 에스컬레이션도 받아 rule-v2.test 의 서버 표에서 본다.
 const tasklessEvents = [
-  "INCIDENT_CREATED",
   "REQUIREMENT_SUBMITTED",
   "REQUIREMENT_REPLIED",
   "SPRINT_STARTED",
@@ -262,8 +283,8 @@ test("requirement and sprint events are taskless like the server's TASKLESS_EVEN
     assert.deepEqual(
       allowedActions(event),
       event.startsWith("REQUIREMENT_")
-        ? ["NOTIFY_DISCORD"]
-        : ["NOTIFY_DISCORD", "CREATE_TASK"],
+        ? ["NOTIFY_DISCORD", "WEBHOOK"]
+        : ["NOTIFY_DISCORD", "CREATE_TASK", "DISCORD_DM", "WEBHOOK"],
     );
     const body = formToRequest(
       changeEvent({ ...ruleToForm(rule), action: "MOVE_BUCKET" }, event),
