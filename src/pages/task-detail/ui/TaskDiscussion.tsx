@@ -12,22 +12,22 @@ const PRIVATE_SOURCE_NOTICE =
 
 const messages: Readonly<Record<string, string>> = {
   DISCORD_NOT_CONFIGURED:
-    "Discord 연동이 설정되지 않았습니다. 운영자에게 문의해 주세요.",
+    "Discord 연동이 설정되지 않았어요. 운영자에게 문의해 주세요.",
   DISCORD_CHANNEL_NOT_CONFIGURED:
-    "논의 채널이 없습니다. 관리자에게 채널 연결을 요청해 주세요.",
+    "논의 채널이 없어요. 관리자에게 채널 연결을 요청해 주세요.",
   DISCORD_LINK_DISABLED:
-    "연결이 비활성화되었습니다. 관리자가 Discord 채널, 스레드의 역할과 사용자 권한을 직접 정리한 후 채널을 다시 연결해야 합니다.",
+    "연결이 비활성화됐어요. 관리자가 Discord 채널, 스레드의 역할과 사용자 권한을 직접 정리한 후 채널을 다시 연결해야 해요.",
   DISCORD_THREAD_CREATING:
-    "스레드를 생성하고 있습니다. 잠시 후 다시 시도해 주세요.",
+    "스레드를 생성하고 있어요. 잠시 후 다시 시도해 주세요.",
   DISCORD_RESULT_UNKNOWN:
-    "요청 결과를 확인 중입니다. 잠시 후 다시 시도해 주세요.",
+    "요청 결과를 확인 중이에요. 잠시 후 다시 시도해 주세요.",
   DISCORD_THREAD_NEEDS_CHECK:
-    "스레드 확인이 필요합니다. 관리자에게 복구를 요청해 주세요.",
+    "스레드 확인이 필요해요. 관리자에게 복구를 요청해 주세요.",
   DISCORD_THREAD_DELETED:
-    "스레드가 삭제되었습니다. 관리자에게 복구를 요청해 주세요.",
+    "스레드가 삭제됐어요. 관리자에게 복구를 요청해 주세요.",
   DISCORD_BOT_MISSING_PERMISSIONS:
-    "봇의 채널, 스레드 접근 권한이 부족합니다. 관리자에게 권한 점검을 요청해 주세요.",
-  PROJECT_ARCHIVED: "아카이브된 프로젝트에는 새 스레드를 만들 수 없습니다.",
+    "봇의 채널, 스레드 접근 권한이 부족해요. 관리자에게 권한 점검을 요청해 주세요.",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트에는 새 스레드를 만들 수 없어요.",
 };
 
 export function TaskDiscussion({
@@ -75,7 +75,7 @@ export function TaskDiscussion({
       await taskDiscordApi.recover(taskId, threadId || null);
       setDiscussion(null);
       setRecovery(false);
-      toast("복구했습니다. 논의 열기를 다시 눌러 주세요.", "success");
+      toast("복구했어요. 논의 열기를 다시 눌러 주세요.", "success");
     } catch (cause) {
       setError(normalizeApiError(cause).message);
     } finally {
@@ -99,15 +99,15 @@ export function TaskDiscussion({
           </a>
           {discussion.archived && (
             <p className="text-sm text-muted">
-              보관된 스레드입니다.{" "}
+              보관된 스레드예요.{" "}
               {discussion.locked
-                ? "잠겨 있어 관리자의 재개방이 필요합니다."
-                : "Discord에서 메시지를 보내면 다시 열 수 있습니다."}
+                ? "잠겨 있어 관리자의 재개방이 필요해요."
+                : "Discord에서 메시지를 보내면 다시 열 수 있어요."}
             </p>
           )}
           {!discussion.verified && (
             <p className="text-sm text-muted">
-              저장된 링크입니다. 원본 스레드 상태는 확인하지 않았습니다.
+              저장된 링크예요. 원본 스레드 상태는 확인하지 않았어요.
             </p>
           )}
         </div>
@@ -123,7 +123,7 @@ export function TaskDiscussion({
       )}
       {!restricted && (
         <p className="text-sm text-muted">
-          최초 클릭 시 스레드를 만들고, 이후 같은 스레드로 이동합니다.
+          처음 누르면 스레드를 만들고, 그다음부터는 그 스레드로 가요.
         </p>
       )}
       {error && (
@@ -135,8 +135,8 @@ export function TaskDiscussion({
         <div className="grid gap-3">
           <Field
             id="recovery-thread"
-            label="복구할 기존 스레드 ID (선택)"
-            hint="비우고 복구하면 기존 연결을 해제합니다. 이후 논의 열기로 새 스레드를 만듭니다. 원본 대화는 삭제하지 않습니다."
+            label="복구할 기존 스레드 ID"
+            hint="비우고 복구하면 기존 연결만 끊어요. 원래 대화는 남고, 논의 열기로 새 스레드를 만들 수 있어요."
           >
             <Input
               id="recovery-thread"

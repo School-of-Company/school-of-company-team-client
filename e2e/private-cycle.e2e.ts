@@ -147,7 +147,7 @@ test("같은 화면에서 비공개 → 공개 → 비공개를 3번 되풀이�
     await card.getByRole("link", { name: issueTitle }).click();
     const panel = page.getByRole("dialog", { name: "업무 상세" });
     await expect(
-      panel.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+      panel.getByText("업무를 찾을 수 없거나 접근할 수 없어요"),
     ).toBeVisible();
     // 패널 뒤 보드에서 그 카드가 3초 안에 빠진다(다음 폴링을 기다리지 않는다).
     await expect(card, `${round}회차: 패널 뒤 카드 제외`).toHaveCount(0, {

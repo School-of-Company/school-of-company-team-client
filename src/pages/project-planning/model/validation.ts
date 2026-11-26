@@ -13,7 +13,7 @@ export function validateSprint(input: SprintInput) {
   if (!input.startDate) errors.startDate = "시작일을 고르세요.";
   if (!input.endDate) errors.endDate = "종료일을 고르세요.";
   else if (input.startDate && input.endDate < input.startDate)
-    errors.endDate = "종료일은 시작일과 같거나 뒤여야 합니다.";
+    errors.endDate = "종료일은 시작일과 같거나 뒤여야 해요.";
   return errors;
 }
 

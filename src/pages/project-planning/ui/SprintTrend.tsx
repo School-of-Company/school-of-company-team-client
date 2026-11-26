@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { sprintErrorMessage, sprintQueries } from "@/entities/sprint";
 import { normalizeApiError } from "@/shared/api";
 import { routes } from "@/shared/config";
-import { ErrorState, Skeleton, StaleNotice } from "@/shared/ui";
+import { ErrorState, InfoTip, Skeleton, StaleNotice } from "@/shared/ui";
 import { percent } from "../model/goal-items";
 
 const LIMIT = 6;
@@ -37,8 +37,13 @@ export function SprintTrend({
   );
   return (
     <section className="grid gap-2" aria-labelledby={headingId}>
-      <h3 id={headingId} className="planning-subhead">
-        최근 스프린트 비교 <span className="tabular-nums">최근 {rows}개</span>
+      <h3 className="planning-subhead">
+        <span id={headingId}>
+          최근 스프린트 비교 <span className="tabular-nums">최근 {rows}개</span>
+        </span>{" "}
+        <InfoTip label="속도 설명">
+          속도는 끝낸 크기 합계예요(S=1, M=2, L=4, XL=8).
+        </InfoTip>
       </h3>
       <StaleNotice query={stats} />
       <div className="sprint-trend" style={style}>
@@ -106,9 +111,6 @@ export function SprintTrend({
           </table>
         )}
       </div>
-      <p className="planning-note">
-        속도는 완료한 크기 합계(S=1, M=2, L=4, XL=8)입니다.
-      </p>
     </section>
   );
 }

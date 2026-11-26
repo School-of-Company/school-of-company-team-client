@@ -47,7 +47,7 @@ export function MemberSettings({
           <Field
             id="project-pm"
             label="PM"
-            hint="PM은 한 명이며, 교체하거나 해제한 기존 PM은 참여자로 남습니다."
+            hint="PM은 한 명이에요. 바뀐 PM은 참여자로 남아요."
           >
             <Select
               id="project-pm"
@@ -68,7 +68,7 @@ export function MemberSettings({
         </div>
       )}
       {project.members.length === 0 ? (
-        <EmptyState title="참여자가 없습니다" />
+        <EmptyState title="참여자가 없어요" />
       ) : (
         <ul className="divide-y divide-border">
           {project.members.map((member) => (
@@ -86,7 +86,7 @@ export function MemberSettings({
                   disabled={pending || member.userId === project.pmUserId}
                   title={
                     member.userId === project.pmUserId
-                      ? "PM은 먼저 교체하거나 해제해야 합니다."
+                      ? "PM은 먼저 교체하거나 해제해야 해요."
                       : undefined
                   }
                   aria-label={`${member.name} 참여자 제외`}
@@ -143,8 +143,8 @@ export function MemberSettings({
             참여자 추가
           </Button>
           <p className="text-sm text-muted">
-            PM을 제외하려면 헤드 어드민이 먼저 교체하거나 해제해야 합니다.
-            참여자 제외 시 기록은 보존되며 업무 배정, 파트 소속은 해제됩니다.
+            PM을 제외하려면 헤드 어드민이 먼저 교체하거나 해제해야 해요. 참여자
+            제외 시 기록은 보존되며 업무 배정, 파트 소속은 해제돼요.
           </p>
         </form>
       )}

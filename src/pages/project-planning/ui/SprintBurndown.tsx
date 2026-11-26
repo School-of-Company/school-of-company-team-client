@@ -82,8 +82,8 @@ export function SprintBurndown({
           />
         ) : data.days.length === 0 ? (
           <EmptyState
-            title="아직 기록이 없습니다"
-            description="진행 중인 스프린트는 하루에 한 번 남은 양을 기록합니다."
+            title="아직 기록이 없어요"
+            description="진행 중인 스프린트는 하루에 한 번 남은 양을 기록해요."
           />
         ) : view === "table" ? (
           <div className="burndown-table-wrap">
@@ -162,7 +162,7 @@ function BurndownChart({
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
           role="img"
-          aria-label={`번다운: 남은 양 ${last?.value ?? 0}${unit}, 시작 ${points.max}${unit}${points.endX < 1 ? ", 종료 예정일이 지났습니다" : ""}. 값은 표 보기에서 읽을 수 있습니다.`}
+          aria-label={`번다운: 남은 양 ${last?.value ?? 0}${unit}, 시작 ${points.max}${unit}${points.endX < 1 ? ", 종료 예정일이 지났어요" : ""}. 값은 표 보기에서 읽을 수 있어요.`}
         >
           <line x1="0" y1="100" x2="100" y2="100" className="burndown-axis" />
           {points.endX < 1 && (

@@ -48,13 +48,12 @@ export function RepositorySettings({
   return (
     <div className="grid gap-4">
       <p className="text-sm text-muted">
-        GitHub 로그인은 본인 확인에 사용하며, 저장소 접근은 별도 GitHub App
-        설치가 필요합니다. 설치에서 허용한 저장소만 연결할 수 있습니다. 기본
-        발행 저장소는 신규 업무의 선택 기본값이며 기존 업무를 발행하지 않습니다.
+        GitHub App 설치에서 허용한 저장소만 연결할 수 있어요. 기본 발행 저장소는
+        새 업무의 기본값이고, 기존 업무를 발행하지는 않아요.
       </p>
       {repositories.data.length === 0 ? (
         <EmptyState
-          title="연결된 저장소가 없습니다"
+          title="연결된 저장소가 없어요"
           description="GitHub App 설치에서 저장소를 허용한 뒤 연결하세요."
         />
       ) : (
@@ -173,7 +172,7 @@ export function RepositorySettings({
       )}
       {change.isSuccess && (
         <p role="status" className="text-sm">
-          저장소 설정을 변경했습니다.
+          저장소 설정을 변경했어요.
         </p>
       )}
     </div>

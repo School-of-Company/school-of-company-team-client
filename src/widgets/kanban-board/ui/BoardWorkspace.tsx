@@ -225,7 +225,7 @@ export function BoardWorkspace({
       readonly move: MoveTask;
     }) => taskApi.move(id, move),
     onSuccess: async () => {
-      setMessage("업무를 이동했습니다.");
+      setMessage("업무를 이동했어요.");
       await queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
     onError: async (cause) => {
@@ -280,7 +280,7 @@ export function BoardWorkspace({
         !access?.editable &&
         !project.data?.archived && (
           <p className="text-sm text-muted">
-            참여자만 업무를 등록하거나 수정할 수 있습니다.
+            참여자만 업무를 등록하거나 수정할 수 있어요.
           </p>
         )}
       {aside}

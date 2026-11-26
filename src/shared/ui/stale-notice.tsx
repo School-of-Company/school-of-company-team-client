@@ -19,7 +19,7 @@ export function StaleNotice({
       role="status"
       className="ui-notice flex flex-wrap items-center justify-between gap-2 text-sm"
     >
-      <span>최신 정보를 불러오지 못해 마지막으로 받은 내용을 보여 줍니다.</span>
+      <span>최신 정보를 불러오지 못해 마지막으로 받은 내용을 보여 줘요.</span>
       <Button
         variant="ghost"
         className="ui-button-sm"

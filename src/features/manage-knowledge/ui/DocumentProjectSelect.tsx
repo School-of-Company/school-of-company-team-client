@@ -76,7 +76,7 @@ export function DocumentProjectSelect({
       )}
       {details.some((detail) => detail.isError) && (
         <p role="alert" className="text-xs text-danger">
-          일부 프로젝트의 권한을 확인하지 못해 이동 대상에서 제외했습니다.{" "}
+          일부 프로젝트의 권한을 확인하지 못해 이동 대상에서 제외했어요.{" "}
           <Button
             variant="ghost"
             onClick={() => {
@@ -92,7 +92,7 @@ export function DocumentProjectSelect({
       {projects.isError && (
         <>
           <p role="alert" className="text-xs text-danger">
-            프로젝트를 불러오지 못했습니다.
+            프로젝트를 불러오지 못했어요.
           </p>
           <Button variant="ghost" onClick={() => void projects.refetch()}>
             다시 시도
@@ -106,7 +106,7 @@ export function DocumentProjectSelect({
       )}
       {move.isSuccess && (
         <p role="status" className="text-xs text-muted">
-          프로젝트를 변경했습니다.
+          프로젝트를 변경했어요.
         </p>
       )}
     </div>

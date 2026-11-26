@@ -98,14 +98,14 @@ export function RequirementInbox({
         errorMessage={requirementErrorMessage}
         empty={
           status || org ? (
-            <EmptyState title="조건에 맞는 요구사항이 없습니다" />
+            <EmptyState title="조건에 맞는 요구사항이 없어요" />
           ) : (
             <EmptyState
-              title="접수된 요구사항이 없습니다"
+              title="접수된 요구사항이 없어요"
               description={
                 projectId
                   ? "프로젝트 설정의 접수 양식 탭에서 링크를 만들어 요청자에게 전달하세요."
-                  : "외부 요청자가 접수 양식으로 제출하면 여기에 쌓입니다."
+                  : "외부 요청자가 접수 양식으로 제출하면 여기에 쌓여요."
               }
             />
           )

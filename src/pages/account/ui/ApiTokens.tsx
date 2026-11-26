@@ -41,7 +41,7 @@ const endpoint = mcpEndpoint(process.env.NEXT_PUBLIC_API_URL ?? "");
 function tokenErrorMessage(error: unknown) {
   const problem = normalizeApiError(error);
   if (problem.code === "TOKEN_LIMIT")
-    return "활성 토큰은 10개까지 만들 수 있습니다. 쓰지 않는 토큰을 폐기한 뒤 다시 만드세요.";
+    return "활성 토큰은 10개까지 만들 수 있어요. 쓰지 않는 토큰을 폐기한 뒤 다시 만드세요.";
   return problem.message;
 }
 
@@ -52,8 +52,8 @@ function CreatedToken({ token }: { readonly token: CreatedApiToken }) {
         role="alert"
         className="rounded-xl bg-surface-box p-4 text-sm leading-6 font-semibold"
       >
-        이 토큰은 지금 한 번만 보여 드립니다. 창을 닫으면 다시 볼 수 없습니다.
-        레포, 이슈, PR, Discord에 붙여 넣지 마세요.
+        이 토큰은 지금 한 번만 보여 드려요. 창을 닫으면 다시 볼 수 없어요. 레포,
+        이슈, PR, Discord에 붙여 넣지 마세요.
       </p>
       <CopyField id="api-token-value" label="토큰" value={token.token} />
       <CopyField
@@ -109,11 +109,7 @@ function CreateTokenForm({
   }
   return (
     <form onSubmit={submit} className="grid gap-5">
-      <Field
-        id="api-token-name"
-        label="이름"
-        hint="어디에 쓰는지 알아볼 수 있게 적으세요. 예: 노트북 Claude Code"
-      >
+      <Field id="api-token-name" label="이름" hint="예: 노트북 Claude Code">
         <Input
           id="api-token-name"
           name="name"
@@ -128,7 +124,7 @@ function CreateTokenForm({
       <Field
         id="api-token-scope"
         label="권한"
-        hint="읽기는 업무와 프로젝트 조회만, 쓰기는 업무 상태 변경과 생성도 할 수 있습니다."
+        hint="읽기는 조회만, 쓰기는 업무 생성과 상태 변경까지 할 수 있어요."
       >
         <Select
           id="api-token-scope"
@@ -138,7 +134,7 @@ function CreateTokenForm({
           disabled={pending}
         >
           <option value="READ">읽기</option>
-          <option value="WRITE">쓰기 (업무 상태 변경, 생성 가능)</option>
+          <option value="WRITE">쓰기</option>
         </Select>
       </Field>
       <Field id="api-token-expiry" label="만료">
@@ -223,10 +219,9 @@ export function ApiTokens() {
   return (
     <div className="grid gap-4">
       <p className="text-sm text-muted">
-        Claude Code와 Codex 같은 AI 도구가 MCP로 내 업무를 읽고 고칠 때 쓰는
-        개인 토큰입니다. 토큰은 내 권한으로 동작하니 다른 사람과 공유하지
-        마세요. MCP 주소는{" "}
-        <span className="font-mono break-all">{endpoint}</span> 입니다.
+        Claude Code, Codex 같은 도구가 MCP로 내 업무를 다룰 때 쓰는 토큰이에요.
+        내 권한으로 동작하니 다른 사람과 공유하지 마세요. MCP 주소:{" "}
+        <span className="font-mono break-all">{endpoint}</span>
       </p>
       <Button
         className="justify-self-start"
@@ -247,7 +242,7 @@ export function ApiTokens() {
           onRetry={() => void tokens.refetch()}
         />
       ) : tokens.data.length === 0 ? (
-        <EmptyState title="만든 토큰이 없습니다." />
+        <EmptyState title="만든 토큰이 없어요." />
       ) : (
         <ul className="list" aria-label="API 토큰 목록">
           {tokens.data.map((token) => (
@@ -265,7 +260,7 @@ export function ApiTokens() {
       <Dialog
         open={dialog.open}
         onClose={() => dispatch({ type: "close" })}
-        title={created ? "토큰을 만들었습니다" : "API 토큰 만들기"}
+        title={created ? "토큰을 만들었어요" : "API 토큰 만들기"}
       >
         {created ? (
           <div className="grid gap-5">
@@ -301,8 +296,8 @@ export function ApiTokens() {
       >
         <div className="grid gap-5">
           <p className="text-sm leading-6 text-muted">
-            {revoking?.name} 토큰을 쓰는 도구는 바로 연결이 끊깁니다. 되돌릴 수
-            없습니다.
+            {revoking?.name} 토큰을 쓰는 도구는 바로 연결이 끊겨요. 되돌릴 수
+            없어요.
           </p>
           {revoke.isError && (
             <p role="alert" className="text-sm text-danger">

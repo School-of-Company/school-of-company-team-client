@@ -69,8 +69,7 @@ export function Requester({
           요청자
         </h2>
         <p className="text-sm text-muted">
-          {formatDate(requirement.requesterPurgedAt)}에 요청자 정보를
-          지웠습니다.
+          {formatDate(requirement.requesterPurgedAt)}에 요청자 정보를 지웠어요.
         </p>
       </section>
     );

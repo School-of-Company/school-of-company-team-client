@@ -53,10 +53,10 @@ export function IntakeFormPage({ formToken }: { readonly formToken: string }) {
       <ErrorState
         title={
           problem.status === 410
-            ? "접수가 마감되었습니다"
+            ? "접수가 마감됐어요"
             : problem.status === 404
-              ? "양식을 찾을 수 없습니다"
-              : "양식을 불러오지 못했습니다"
+              ? "양식을 찾을 수 없어요"
+              : "양식을 불러오지 못했어요"
         }
         description={requirementErrorMessage(form.error)}
         onRetry={
@@ -137,7 +137,7 @@ function IntakeFormBody({
           </p>
         )}
         <p className="text-sm text-muted">
-          파일 첨부는 받지 않습니다. 자료는 링크로 남겨 주세요.
+          파일 첨부는 받지 않아요. 자료는 링크로 남겨 주세요.
         </p>
       </header>
 
@@ -163,7 +163,7 @@ function IntakeFormBody({
           요청자 정보
         </h2>
         <p className="text-sm text-muted">
-          회신 연락에만 쓰며 PM과 헤드 어드민만 봅니다.
+          회신 연락에만 쓰며 PM과 헤드 어드민만 봐요.
         </p>
         {requesterFields.map((field) => (
           <Field
@@ -216,7 +216,7 @@ function IntakeFormBody({
         </h2>
         {form.consentReviewRequired && (
           <p role="note" className="text-sm text-muted">
-            아래 문구는 개인정보 담당 확인 전 초안입니다.
+            아래 문구는 개인정보 담당 확인 전 초안이에요.
           </p>
         )}
         <p className="rounded-xl bg-surface-box p-4 text-sm whitespace-pre-wrap">
@@ -236,7 +236,7 @@ function IntakeFormBody({
               }))
             }
           />
-          위 내용에 동의합니다 (필수)
+          위 내용에 동의해요 (필수)
         </label>
         {err("consent") && (
           <p
@@ -419,11 +419,11 @@ function Submitted({ token }: { readonly token: string }) {
   return (
     <section className="grid gap-5" aria-labelledby="intake-done">
       <h1 id="intake-done" className="public-title">
-        요구사항이 접수되었습니다
+        요구사항이 접수됐어요
       </h1>
       <p className="text-sm text-foreground-2">
-        팀이 검토한 뒤 상태 페이지에 답변을 남깁니다. 진행 상황과 답변은 아래
-        링크에서만 볼 수 있습니다.
+        팀이 검토한 뒤 상태 페이지에 답변을 남겨요. 진행 상황과 답변은 아래
+        링크에서만 볼 수 있어요.
       </p>
       <StatusLinkOnce token={token} />
     </section>
@@ -441,11 +441,11 @@ function IntakeFormSkeleton() {
         </h1>
         <p className="text-sm">
           <span className="ui-skeleton-text">
-            양식 설명을 불러오는 중입니다. 잠시만 기다려 주세요.
+            양식 설명을 불러오는 중이에요. 잠시만 기다려 주세요.
           </span>
         </p>
         <p className="text-sm text-muted">
-          파일 첨부는 받지 않습니다. 자료는 링크로 남겨 주세요.
+          파일 첨부는 받지 않아요. 자료는 링크로 남겨 주세요.
         </p>
       </header>
       {[4, 3].map((fields, section) => (

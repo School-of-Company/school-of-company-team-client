@@ -13,6 +13,8 @@ import {
   ChipSelect,
   EmptyState,
   ErrorState,
+  Icon,
+  InfoTip,
   ListSkeleton,
   PageHeader,
   PageSkeleton,
@@ -69,11 +71,7 @@ function StatsContent() {
     <div className="grid gap-5">
       <PageHeader
         title="통계"
-        subtitle={
-          scope === "me"
-            ? "나만 보여요. 다른 팀원은 이 숫자를 볼 수 없습니다."
-            : "팀 전체의 흐름입니다. 사람별 숫자는 없습니다."
-        }
+        subtitle={`최근 ${ranges.find((item) => item.value === range)?.label}`}
       />
       <div className="page-toolbar">
         <SegmentedLinks
@@ -86,7 +84,15 @@ function StatsContent() {
             },
             {
               href: href({ view: "me" }),
-              label: "내 통계 (나만 보여요)",
+              label: (
+                <>
+                  내 통계
+                  <span title="나만 보여요" className="stats-private">
+                    <Icon name="lock" width={14} height={14} />
+                    <span className="sr-only">, 나만 보여요</span>
+                  </span>
+                </>
+              ),
               active: scope === "me",
             },
           ]}
@@ -158,8 +164,8 @@ function StatsBody({
       error={(error, retry) =>
         isProjectNotFound(error) ? (
           <EmptyState
-            title="프로젝트를 찾을 수 없습니다"
-            description="없거나 볼 수 없는 프로젝트입니다. 전체 프로젝트로 돌아가 보세요."
+            title="프로젝트를 찾을 수 없어요"
+            description="없거나 볼 수 없는 프로젝트예요."
             action={
               <Link
                 href={allProjectsHref}
@@ -178,10 +184,9 @@ function StatsBody({
         <div className="stats-page">
           {data.flow.cycleTime.approximateCount > 0 && (
             <p className="stats-notice" role="note">
-              상태 기록을 시작하기 전에 진행을 시작한 업무{" "}
-              {data.flow.cycleTime.approximateCount}개는 만든 시각부터 계산해
-              사이클 타임이 실제보다 길게 나올 수 있습니다. 그 전의 리뷰 대기와
-              막힘은 일부 빠져 있습니다.
+              업무 {data.flow.cycleTime.approximateCount}개는 상태 기록 전에
+              시작해서 사이클 타임이 길게 나오고 리뷰 대기와 막힘이 일부 빠질 수
+              있어요.
             </p>
           )}
           <FlowSection stats={data} />
@@ -193,12 +198,12 @@ function StatsBody({
             </>
           ) : (
             <p className="planning-note">
-              장애, 배포, 프로젝트 진행은 팀 전체 통계에서만 봅니다.
+              장애, 배포, 프로젝트 진행은 팀 전체에서 봐요.
             </p>
           )}
           <p className="planning-note">
-            숫자는 최대 1분 늦게 반영됩니다. 비공개 원본 업무
-            {scope === "team" && "와 비공개 저장소 배포"}는 세지 않습니다.
+            최대 1분 늦게 반영돼요. 비공개 원본 업무
+            {scope === "team" && "와 비공개 저장소 배포"}는 세지 않아요.
           </p>
         </div>
       )}
@@ -208,16 +213,19 @@ function StatsBody({
 
 function Section({
   title,
+  info,
   children,
 }: {
   readonly title: string;
+  readonly info?: ReactNode;
   readonly children: ReactNode;
 }) {
   const id = useId();
   return (
     <section className="stats-section" aria-labelledby={id}>
-      <h2 id={id} className="stats-section-title">
-        {title}
+      <h2 className="stats-section-title">
+        <span id={id}>{title}</span>
+        {info && <InfoTip label={`${title} 설명`}>{info}</InfoTip>}
       </h2>
       {children}
     </section>
@@ -237,10 +245,11 @@ function Metric({
 }) {
   return (
     <div className="stats-metric">
-      <dt>{label}</dt>
+      <dt>
+        {label} <InfoTip label={`${label} 설명`}>{help}</InfoTip>
+      </dt>
       <dd className="stats-metric-value">{value}</dd>
       <dd className="stats-metric-detail">{detail ?? " "}</dd>
-      <dd className="stats-metric-help">{help}</dd>
     </div>
   );
 }
@@ -276,7 +285,7 @@ function FlowSection({ stats }: { readonly stats: TeamStats }) {
         <Metric
           label="진행 중"
           value={`${flow.wip}개`}
-          help="지금 진행 중인 업무 수(WIP)"
+          help="지금 진행 중인 업무 수"
         />
       </dl>
       <WeekBars title="주별 완료" weeks={flow.completedPerWeek} unit="개" />
@@ -288,11 +297,20 @@ function SprintSection({ stats }: { readonly stats: TeamStats }) {
   const { sprints, averages } = stats.sprint;
   const top = Math.max(1, ...sprints.map((item) => item.velocity));
   return (
-    <Section title="스프린트">
+    <Section
+      title="스프린트"
+      info={
+        <ul>
+          <li>완료율: 스프린트에 넣은 업무 중 끝낸 비율</li>
+          <li>속도: 끝낸 크기 합계(S=1, M=2, L=4, XL=8)</li>
+          <li>이월: 못 끝내고 다음으로 넘긴 업무 비율</li>
+        </ul>
+      }
+    >
       {sprints.length === 0 ? (
         <EmptyState
-          title="끝난 스프린트가 없습니다"
-          description="이 기간에 종료한 스프린트가 생기면 완료율과 속도가 보입니다."
+          title="끝난 스프린트가 없어요"
+          description="이 기간에 끝난 스프린트가 생기면 완료율과 속도가 보여요."
         />
       ) : (
         <div className="stats-table-wrap">
@@ -361,11 +379,6 @@ function SprintSection({ stats }: { readonly stats: TeamStats }) {
           </table>
         </div>
       )}
-      <ul className="stats-help-list">
-        <li>완료율: 스프린트에 넣은 업무 중 완료한 비율</li>
-        <li>속도: 완료한 크기 합계(S=1, M=2, L=4, XL=8)</li>
-        <li>이월: 끝내지 못해 다음으로 넘긴 업무의 비율</li>
-      </ul>
     </Section>
   );
 }
@@ -376,7 +389,7 @@ function OpsSection({ stats }: { readonly stats: TeamStats }) {
     <Section title="운영">
       {!ops ? (
         <p className="planning-note">
-          장애와 배포는 조직 단위라 프로젝트를 고르면 보이지 않습니다.
+          장애와 배포는 조직 단위라 프로젝트를 고르면 안 보여요.
         </p>
       ) : (
         <>
@@ -424,13 +437,16 @@ function ProjectSection({
   readonly projects: TeamStats["projects"];
 }) {
   return (
-    <Section title="프로젝트 진행">
+    <Section
+      title="프로젝트 진행"
+      info="마일스톤에 묶인 업무 기준이라 마일스톤 화면과 숫자가 같아요."
+    >
       {!projects ? (
         <p className="planning-note">
-          이 조건에서는 프로젝트 진행을 받지 못했습니다.
+          이 조건에서는 프로젝트 진행을 불러오지 못했어요.
         </p>
       ) : projects.length === 0 ? (
-        <EmptyState title="진행 중인 프로젝트가 없습니다" />
+        <EmptyState title="진행 중인 프로젝트가 없어요" />
       ) : (
         <ul className="list">
           {projects.map((project) => {
@@ -482,9 +498,6 @@ function ProjectSection({
           })}
         </ul>
       )}
-      <p className="planning-note">
-        진행은 마일스톤에 묶인 업무 기준이라 마일스톤 화면과 같은 숫자입니다.
-      </p>
     </Section>
   );
 }

@@ -67,7 +67,7 @@ export function PartRows({
             </>
           )}
           {part.memberUserIds.length === 0 ? (
-            <p className="text-sm text-muted">배정된 구성원이 없습니다.</p>
+            <p className="text-sm text-muted">배정된 구성원이 없어요.</p>
           ) : (
             <ul className="grid gap-2">
               {part.memberUserIds.map((userId) => (
@@ -152,7 +152,7 @@ export function PartRows({
           {editing && permissions.manage && (
             <div className="grid gap-2">
               <p className="text-sm text-muted">
-                파트를 삭제해도 업무는 보존되며 해당 파트 배정만 해제됩니다.
+                파트를 삭제해도 업무는 보존되며 해당 파트 배정만 해제돼요.
               </p>
               <Button
                 variant="ghost"

@@ -31,14 +31,14 @@ const sections: readonly {
   readonly label: string;
   readonly empty: string;
 }[] = [
-  { key: "summary", label: "요약", empty: "요약이 비어 있습니다." },
-  { key: "impact", label: "영향", empty: "영향이 비어 있습니다." },
+  { key: "summary", label: "요약", empty: "요약이 비어 있어요." },
+  { key: "impact", label: "영향", empty: "영향이 비어 있어요." },
   {
     key: "rootCause",
     label: "원인",
-    empty: "원인은 사람이 씁니다. 아직 비어 있습니다.",
+    empty: "원인은 사람이 써요. 아직 비어 있어요.",
   },
-  { key: "timeline", label: "타임라인", empty: "타임라인이 비어 있습니다." },
+  { key: "timeline", label: "타임라인", empty: "타임라인이 비어 있어요." },
 ];
 
 /** 사고당 하나. 만들 때 사고 사실(시각·영향 서비스·타임라인)로 결정적 초안을 채운다(LLM 없음, D7-6). */
@@ -65,11 +65,11 @@ export function PostmortemPanel({
   if (!postmortem.data && isNotFound(postmortem.error, "POSTMORTEM_NOT_FOUND"))
     return (
       <EmptyState
-        title="사후 검토가 아직 없습니다"
+        title="사후 검토가 아직 없어요"
         description={
           incident.canEdit
-            ? "시작하면 장애 시각, 영향 서비스, 타임라인으로 요약, 영향, 타임라인 초안을 채웁니다. 원인은 직접 씁니다."
-            : "장애 작성자, 대응 책임자, 영향 서비스 소유자, 헤드 어드민이 시작할 수 있습니다."
+            ? "시작하면 장애 시각, 영향 서비스, 타임라인으로 요약, 영향, 타임라인 초안을 채워요. 원인은 직접 써요."
+            : "장애 작성자, 대응 책임자, 영향 서비스 소유자, 헤드 어드민이 시작할 수 있어요."
         }
         action={
           incident.canEdit && (

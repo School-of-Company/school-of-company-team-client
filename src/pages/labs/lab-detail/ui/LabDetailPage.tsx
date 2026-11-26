@@ -237,20 +237,20 @@ function ExperimentView({
           title="결과"
           empty={
             finished
-              ? "결과가 적혀 있지 않습니다."
-              : "끝나면 측정한 값과 결과를 적습니다."
+              ? "결과가 적혀 있지 않아요."
+              : "끝나면 측정한 값과 결과를 적어요."
           }
         />
         <EditableSection
           experiment={experiment}
           field="learnings"
           title="배운 점"
-          empty="성공이든 실패든 다음에 참고할 점을 남깁니다."
+          empty="성공이든 실패든 다음에 참고할 점을 남겨요."
         />
         {experiment.outcome === "SUCCESS" && !experiment.promotedProjectId && (
           <div className="lab-promote">
             <p>
-              효과가 확인된 실험입니다. 제대로 만들 거라면 프로젝트로 옮겨
+              효과가 확인된 실험이에요. 제대로 만들 거라면 프로젝트로 옮겨
               보세요.
             </p>
             {isHeadAdmin(user) && (

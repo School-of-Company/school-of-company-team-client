@@ -36,7 +36,7 @@ export function Messages({
     >
       <h2 id="req-messages">메시지</h2>
       {requirement.messages.length === 0 ? (
-        <p className="text-sm text-muted">아직 메시지가 없습니다.</p>
+        <p className="text-sm text-muted">아직 메시지가 없어요.</p>
       ) : (
         <ol className="grid gap-3">
           {requirement.messages.map((message) => (
@@ -130,8 +130,8 @@ export function Messages({
           label={visibility === "PUBLIC" ? "요청자에게 보낼 답변" : "내부 메모"}
           hint={
             visibility === "PUBLIC"
-              ? "요청자 상태 페이지에 '팀' 이름으로 보입니다."
-              : "팀원에게만 보입니다."
+              ? "요청자 상태 페이지에 '팀' 이름으로 보여요."
+              : "팀원에게만 보여요."
           }
           error={error ?? undefined}
         >

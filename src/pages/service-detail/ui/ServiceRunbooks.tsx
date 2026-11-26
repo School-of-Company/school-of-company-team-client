@@ -61,8 +61,8 @@ export function ServiceRunbooks({
         />
       ) : runbooks.data.length === 0 ? (
         <EmptyState
-          title="게시된 Runbook이 없습니다"
-          description="장애 때 따라 할 절차를 Runbook으로 남기면 이 서비스의 장애 화면에도 나옵니다."
+          title="게시된 Runbook이 없어요"
+          description="장애 때 따라 할 절차를 Runbook으로 남기면 이 서비스의 장애 화면에도 나와요."
           action={create || undefined}
         />
       ) : (
@@ -88,7 +88,7 @@ export function ServiceRunbooks({
         open={creating}
         kind="RUNBOOK"
         serviceIds={[service.id]}
-        context={`${service.name} 서비스에 연결합니다. 게시하면 이 탭에 나옵니다.`}
+        context={`${service.name} 서비스에 연결해요. 게시하면 이 탭에 나와요.`}
         onClose={() => setCreating(false)}
         onCreated={(document) => {
           setCreating(false);

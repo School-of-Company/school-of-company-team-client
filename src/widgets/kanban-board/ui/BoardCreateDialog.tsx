@@ -94,7 +94,7 @@ export function BoardCreateDialog({
               <Field
                 id="new-task-repository"
                 label="발행 저장소"
-                hint="저장소를 지정하면 등록 즉시 Issue로 발행합니다. 공개 저장소를 선택하면 업무 내용이 공개됩니다."
+                hint="고르면 등록하자마자 Issue로 발행해요. 공개 저장소면 업무 내용도 공개돼요."
               >
                 <Select
                   id="new-task-repository"
@@ -115,8 +115,8 @@ export function BoardCreateDialog({
               </Field>
               {repositories.isError && (
                 <ErrorState
-                  title="발행 저장소를 불러오지 못했습니다"
-                  description="저장소 없이 업무를 등록하거나 다시 시도할 수 있습니다."
+                  title="발행 저장소를 불러오지 못했어요"
+                  description="저장소 없이 업무를 등록하거나 다시 시도할 수 있어요."
                   onRetry={() => void repositories.refetch()}
                 />
               )}
@@ -135,14 +135,14 @@ export function BoardCreateDialog({
               setSaving(true);
               try {
                 const created = await taskApi.create(body);
-                let message = "업무를 등록했습니다.";
+                let message = "업무를 등록했어요.";
                 let warning = false;
                 if (selected) {
                   try {
                     await taskGithubApi.target(created.id, selected);
                   } catch (cause) {
                     warning = true;
-                    message = `업무는 등록했지만 GitHub 발행 저장소를 지정하지 못했습니다. 업무 상세에서 다시 설정해 주세요. ${normalizeApiError(cause).message}`;
+                    message = `업무는 등록했지만 GitHub 발행 저장소를 지정하지 못했어요. 업무 상세에서 다시 설정해 주세요. ${normalizeApiError(cause).message}`;
                   }
                 }
                 await onCreated(message, warning);

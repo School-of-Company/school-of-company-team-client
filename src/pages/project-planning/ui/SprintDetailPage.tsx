@@ -65,8 +65,8 @@ function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
         <ErrorState
           title={
             problem.status === 404
-              ? "스프린트를 찾을 수 없습니다"
-              : "스프린트를 불러오지 못했습니다"
+              ? "스프린트를 찾을 수 없어요"
+              : "스프린트를 불러오지 못했어요"
           }
           description={sprintErrorMessage(problem)}
           onRetry={
@@ -149,7 +149,7 @@ function SprintScreen({
                       onSuccess: () => {
                         setMessage({
                           tone: "ok",
-                          text: "스프린트를 시작했습니다.",
+                          text: "스프린트를 시작했어요.",
                         });
                         goTab("progress");
                       },
@@ -198,16 +198,14 @@ function SprintScreen({
           // 목표가 있을 때(Markdown)와 같은 줄 높이를 쓴다.
           <div className="sprint-goal">
             <div className="ui-markdown">
-              <p className="text-muted">목표가 없습니다.</p>
+              <p className="text-muted">목표가 없어요.</p>
             </div>
           </div>
         )}
         {/* 진행률 줄과 안내 줄은 상태와 상관없이 자리를 둔다(대기 자리와 같은 높이, 안내가 늦게 끼지 않음). */}
         <div className="sprint-progress-slot">
           {sprint.status === "PLANNED" ? (
-            <span className="planning-note">
-              시작하면 완료 비율을 보여 줍니다.
-            </span>
+            <span className="planning-note">시작하면 완료 비율이 보여요.</span>
           ) : (
             <ProgressBar
               done={progress.done}
@@ -222,20 +220,20 @@ function SprintScreen({
         >
           {startBlocked ? (
             <>
-              진행 중인 스프린트(
+              진행 중인 스프린트{" "}
               <Link
                 href={routes.projectSprint(project.id, startBlocked.id)}
                 className="underline"
               >
                 {startBlocked.name}
               </Link>
-              )를 종료한 뒤 시작할 수 있습니다.
+              부터 종료해야 시작할 수 있어요.
             </>
           ) : (
             !manages &&
             sprint.status !== "CLOSED" &&
             !project.archived &&
-            "스프린트 범위와 시작, 종료는 PM 또는 헤드 어드민이 정합니다."
+            "범위와 시작, 종료는 PM이나 헤드 어드민이 정해요."
           )}
         </p>
       </section>
@@ -298,7 +296,7 @@ function SprintScreen({
           onClose={() => setEditing(false)}
           onSubmit={async (input) => {
             await update.mutateAsync(input);
-            setMessage({ tone: "ok", text: "스프린트를 수정했습니다." });
+            setMessage({ tone: "ok", text: "스프린트를 수정했어요." });
           }}
         />
       )}
@@ -318,9 +316,9 @@ function SprintScreen({
                 setMessage({
                   tone: "ok",
                   text: [
-                    `스프린트를 종료했습니다. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했습니다.`,
+                    `스프린트를 종료했어요. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했어요.`,
                     result.nextSprint &&
-                      `다음 스프린트 ${result.nextSprint.name}을(를) ${result.nextSprint.status === "ACTIVE" ? "만들고 시작했습니다" : "만들었습니다"}.`,
+                      `다음 스프린트 ${result.nextSprint.name}을(를) ${result.nextSprint.status === "ACTIVE" ? "만들고 시작했어요" : "만들었어요"}.`,
                     "결과 보고 초안을 다듬어 게시하세요.",
                   ]
                     .filter(Boolean)
@@ -341,8 +339,7 @@ function SprintScreen({
         title="스프린트를 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          {sprint.name}을(를) 삭제하면 넣어 둔 업무는 스프린트에서만 빠지고
-          그대로 남습니다.
+          넣어 둔 업무는 스프린트에서만 빠지고 그대로 남아요.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

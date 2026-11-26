@@ -51,7 +51,7 @@ export function useTaskDetail(taskId: string) {
     mutationFn: (planningBucketId: string) =>
       taskApi.update(taskId, { planningBucketId }),
     onSuccess: async () => {
-      toast("계획 버킷을 변경했습니다.", "success");
+      toast("계획 버킷을 변경했어요.", "success");
       await client.invalidateQueries({ queryKey: taskKeys.all });
     },
     onError: (cause) => {
@@ -63,7 +63,7 @@ export function useTaskDetail(taskId: string) {
   const changeSize = useMutation({
     mutationFn: (size: TaskSize | null) => taskApi.update(taskId, { size }),
     onSuccess: async () => {
-      toast("크기를 변경했습니다.", "success");
+      toast("크기를 변경했어요.", "success");
       await Promise.all([
         client.invalidateQueries({ queryKey: taskKeys.all }),
         // Sprint 크기 합계가 바뀐다.
@@ -82,7 +82,7 @@ export function useTaskDetail(taskId: string) {
     mutationFn: (milestoneId: string) =>
       taskApi.update(taskId, { milestoneId }),
     onSuccess: async () => {
-      toast("마일스톤을 변경했습니다.", "success");
+      toast("마일스톤을 변경했어요.", "success");
       await Promise.all([
         client.invalidateQueries({ queryKey: taskKeys.all }),
         // 진행률이 바뀐다.
@@ -129,7 +129,7 @@ export function useTaskDetail(taskId: string) {
     mutationFn: (status: Parameters<typeof taskApi.move>[1]["status"]) =>
       taskApi.move(taskId, { status, prevId: null, nextId: null }),
     onSuccess: async () => {
-      toast("상태를 변경했습니다.", "success");
+      toast("상태를 변경했어요.", "success");
       await client.invalidateQueries({ queryKey: taskKeys.all });
     },
     onError: (cause) => {

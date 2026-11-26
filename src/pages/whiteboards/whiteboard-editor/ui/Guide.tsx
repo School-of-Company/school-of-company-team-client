@@ -45,7 +45,7 @@ export function StartGuide({
         </IconButton>
       </div>
       <p className="text-sm text-muted">
-        템플릿을 넣거나 Mermaid 코드를 붙여 넣어 시작하세요. 바로 그려도 됩니다.
+        템플릿을 넣거나 Mermaid 코드를 붙여 넣어 시작하세요. 바로 그려도 돼요.
       </p>
       <div className="flex flex-wrap gap-2">
         <Button variant="primary" className="ui-button-sm" onClick={onTemplate}>
@@ -76,8 +76,8 @@ export function ShortcutsDialog({
       <div className="grid gap-3">
         <ShortcutList items={shortcuts} />
         <p className="text-xs text-muted">
-          Mac 에서는 Ctrl 대신 ⌘ 를 누릅니다. 캔버스에서 ? 를 누르면 전체
-          단축키가 나옵니다.
+          Mac 에서는 Ctrl 대신 ⌘ 를 눌러요. 캔버스에서 ? 를 누르면 전체 단축키가
+          나와요.
         </p>
       </div>
     </Dialog>

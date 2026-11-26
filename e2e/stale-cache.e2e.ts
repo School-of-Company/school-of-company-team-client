@@ -155,7 +155,7 @@ test("일시 장애(503)면 60초까지만 마지막 목록을 두고, 넘으면
   await expect(reviews.getByText(prTitle)).toBeHidden({ timeout: 70_000 });
   expect(Date.now() - lastSuccess).toBeGreaterThanOrEqual(59_000);
   await expect(
-    reviews.getByRole("alert").getByText(/최신 정보를 불러오지 못했습니다/),
+    reviews.getByRole("alert").getByText(/최신 정보를 불러오지 못했어요/),
   ).toBeVisible();
 });
 
@@ -184,7 +184,7 @@ test("상세가 404가 된 업무는 뒤로 가도 내 보드·리뷰 요청 캐
   await call("DELETE", `/api/v1/tasks/${taskId}`, seed.member.tokens);
   await reviews.getByRole("link", { name: new RegExp(taskTitle) }).click();
   await expect(
-    page.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+    page.getByText("업무를 찾을 수 없거나 접근할 수 없어요"),
   ).toBeVisible();
   // 같은 문서에서 뒤로 가므로, 돌아오는 동안 그 제목이 한 번이라도 그려지는지 지켜본다.
   await page.evaluate((title) => {

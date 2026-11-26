@@ -43,14 +43,11 @@ export function PartSettings({ project, user, onSaved }: SettingsProps) {
           {editing ? "편집 마침" : "파트 편집"}
         </Button>
       )}
-      <p className="text-sm text-muted">
-        참여자는 여러 파트에 속할 수 있습니다. 파트와 구성원 배정은 헤드 어드민
-        또는 PM이 관리합니다.
-      </p>
+      <p className="text-sm text-muted">참여자는 여러 파트에 속할 수 있어요.</p>
       {project.parts.length === 0 && (
         <EmptyState
-          title="파트가 없습니다"
-          description="헤드 어드민 또는 PM이 파트를 만들 수 있습니다."
+          title="파트가 없어요"
+          description="헤드 어드민 또는 PM이 파트를 만들 수 있어요."
         />
       )}
       <PartRows

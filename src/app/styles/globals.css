@@ -41,11 +41,11 @@
   --text-2xl: 1.625rem;
   --text-2xl--line-height: 1.35;
   --spacing: 0.25rem;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
 }
 
 /* ───────────────────────── Controls ───────────────────────── */
@@ -424,6 +424,63 @@ select.ui-input {
   background: var(--surface-raised);
   box-shadow: var(--shadow-overlay);
 }
+/* 설명 i 버튼과 설명 패널(top layer). 좌표는 useAnchoredPosition 이 버튼 기준으로 정한다. */
+.ui-info-tip {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: -0.25rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--faint);
+  vertical-align: middle;
+  cursor: pointer;
+}
+/* 터치에서는 자리를 바꾸지 않고 누를 수 있는 면만 44px 로 넓힌다. */
+@media (pointer: coarse) {
+  .ui-info-tip {
+    position: relative;
+  }
+  .ui-info-tip::after {
+    position: absolute;
+    inset: calc((var(--control-touch) - 1.5rem) / -2);
+    content: "";
+  }
+}
+.ui-info-tip:hover {
+  background: var(--surface-hover);
+  color: var(--foreground-2);
+}
+.ui-info-panel {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 16px));
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--foreground-2);
+  box-shadow: var(--shadow-overlay);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: normal;
+}
+.ui-info-panel[data-anchor-measure] {
+  display: block;
+}
+.ui-info-panel ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 .ui-date-head {
   display: flex;
   align-items: center;
@@ -737,9 +794,10 @@ html[data-sidebar-closed~="account"]
 }
 .settings-card {
   min-width: 0;
-  padding: var(--space-6);
-  border-radius: var(--radius-xl);
-  background: var(--surface-box);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
 }
 .template-editor + .template-editor {
   border-top: 1px solid var(--border);
@@ -1219,13 +1277,16 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
 }
 .task-group {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-2);
+}
+.task-group > .list {
+  gap: var(--space-2);
 }
 .task-group-title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-4) var(--space-1);
+  padding: 0 var(--space-1);
   font-size: var(--text-sm);
   font-weight: 700;
 }
@@ -1233,10 +1294,24 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
   color: var(--faint);
   font-weight: 600;
 }
+/* 업무 한 건이 카드 한 장: 1px 테두리와 옅은 그림자로 이웃 업무와 나뉜다. 줄 전체가 링크다. */
 .my-task-row {
   display: grid;
+  min-height: 0;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-2);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-1) var(--ease-out);
+}
+.my-task-row:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-card-hover);
 }
 .my-task-row .list-row-main {
   width: 100%;
@@ -1246,18 +1321,22 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
   overflow-wrap: anywhere;
 }
 .my-task-row .list-row-meta {
+  position: static;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   margin-left: 0;
-  gap: var(--space-2) var(--space-4);
+  gap: var(--space-1) var(--space-3);
+}
+.my-task-row .list-row-key {
+  min-width: 0;
 }
 .task-group-more {
   justify-self: start;
-  margin-left: var(--space-3);
+  margin-left: var(--space-1);
 }
 .task-group-empty {
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-1);
   color: var(--muted);
   font-size: var(--text-sm);
 }
@@ -1542,13 +1621,16 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
 
 .board-card {
   padding: var(--space-3);
-  border: 0 !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-lg);
   background: var(--surface-raised);
   box-shadow: var(--shadow-card);
-  transition: box-shadow var(--dur-1) var(--ease-out);
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-1) var(--ease-out);
 }
 .board-card:hover {
+  border-color: var(--border-strong) !important;
   box-shadow: var(--shadow-card-hover);
 }
 .board-card:has([aria-expanded="true"]) {
@@ -2172,31 +2254,9 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
   overflow: clip;
   background: var(--background);
 }
-.ui-identity-glow {
-  position: absolute;
-  top: 42%;
-  left: 50%;
-  width: 44rem;
-  height: 32rem;
-  margin: -16rem 0 0 -22rem;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, var(--identity-glow), transparent);
-  pointer-events: none;
-  will-change: transform;
-}
 .ui-identity .ui-button {
   min-height: 40px;
   font-size: var(--text-md);
-}
-.ui-identity .ui-button-secondary,
-.ui-identity .ui-button-ghost {
-  border: 1px solid color-mix(in oklab, var(--border-strong) 70%, transparent);
-  background: color-mix(in oklab, var(--surface) 55%, transparent);
-  backdrop-filter: blur(8px);
-}
-.ui-identity .ui-button-secondary:hover:not(:disabled),
-.ui-identity .ui-button-ghost:hover:not(:disabled) {
-  background: color-mix(in oklab, var(--surface) 80%, transparent);
 }
 .ui-identity-status {
   min-height: 3rem;
@@ -2209,41 +2269,14 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
   isolation: isolate;
   background: var(--surface-box);
 }
-.ui-login-backdrop {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: var(--login-grid-size) var(--login-grid-size);
-  mask-image: radial-gradient(ellipse at center, black, transparent 75%);
-}
-.ui-login-backdrop::before,
-.ui-login-backdrop::after {
-  content: "";
-  position: absolute;
-  width: var(--login-ambient-size);
-  height: var(--login-ambient-size);
-  border-radius: var(--radius-pill);
-  background: radial-gradient(closest-side, var(--surface-active), transparent);
-}
-.ui-login-backdrop::before {
-  top: -25%;
-  left: -15%;
-}
-.ui-login-backdrop::after {
-  bottom: -25%;
-  right: -15%;
-}
 .ui-identity.ui-identity-login main {
   animation: none;
   max-width: var(--login-width);
-  padding: var(--space-10) var(--space-8);
+  padding: var(--space-8) var(--space-6);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-xl);
   background: var(--surface-raised);
-  box-shadow: var(--shadow-overlay);
+  box-shadow: var(--shadow-card);
 }
 .ui-identity-login main > p {
   color: var(--foreground-2);
@@ -2255,7 +2288,6 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
 .ui-identity-login main .ui-button {
   min-height: var(--control-lg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
 }
 .ui-login-note {
   color: var(--foreground-2);
@@ -2263,6 +2295,120 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
   line-height: var(--leading-body);
   word-break: keep-all;
   text-wrap: pretty;
+}
+/* Pending approval: steps, live status and the waiting account inside the login card. */
+.ui-pending-lead {
+  min-height: 1lh;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+.ui-pending-steps {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--surface-box);
+  list-style: none;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-align: left;
+}
+.ui-pending-steps li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-md);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+}
+.ui-pending-steps li[aria-current="step"] {
+  background: var(--surface-raised);
+  color: var(--foreground);
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+}
+.ui-pending-step-marker {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+[aria-current="step"] > .ui-pending-step-marker {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+.ui-pending-step-tag {
+  flex: none;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-fill);
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.ui-pending-check {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.ui-pending-status {
+  min-width: 0;
+  min-height: 1lh;
+  color: var(--foreground-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  text-align: left;
+}
+.ui-pending-status-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ui-live-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--success);
+}
+.ui-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  opacity: 0;
+}
+.ui-identity-login main .ui-pending-check .ui-button {
+  min-height: var(--control-sm);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  font-size: var(--text-sm);
+}
+.ui-pending-account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.ui-pending-account .ui-avatar {
+  width: 20px;
+  height: 20px;
 }
 .ui-identity-login .ui-button:focus-visible {
   outline: 2px solid var(--brand);
@@ -2296,25 +2442,26 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
     transform: translateY(-4px) scale(0.98);
   }
 }
+@keyframes ui-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ui-live-ping {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+}
 @keyframes ui-breathe {
   50% {
     opacity: 0.45;
   }
 }
-@keyframes ui-login-drift {
-  50% {
-    transform: translate3d(var(--login-drift), var(--login-drift), 0);
-  }
-}
 @media (prefers-reduced-motion: no-preference) {
-  .ui-login-backdrop::before,
-  .ui-login-backdrop::after {
-    animation: ui-login-drift var(--login-ambient-duration) ease-in-out infinite;
-  }
-  .ui-login-backdrop::after {
-    animation-direction: reverse;
-    animation-delay: calc(var(--login-ambient-duration) / -2);
-  }
   .ui-identity-login main > * {
     animation: ui-fade-up var(--login-enter-duration) var(--ease-out) both;
   }
@@ -2351,6 +2498,12 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
   }
   .ui-identity-status {
     animation: ui-breathe 1.6s var(--ease-in-out) infinite;
+  }
+  .ui-pending-status-text {
+    animation: ui-fade-in var(--dur-2) var(--ease-out);
+  }
+  .ui-live-dot::after {
+    animation: ui-live-ping 2s var(--ease-out) infinite;
   }
 }
 
@@ -2633,8 +2786,8 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
 .notify-list {
   display: grid;
   min-width: 0;
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .notify-row {
@@ -3245,16 +3398,20 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
 .ops-health[data-status="UNKNOWN"]::before {
   border-style: dashed;
 }
+/* 수치 묶음: 타일 대신 1px 칸막이가 있는 한 줄. */
 .ops-totals {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 1px;
   margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--border);
 }
 .ops-totals > div {
-  padding: var(--space-3);
-  border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  padding: var(--space-2) var(--space-3);
+  background: var(--background);
 }
 .ops-totals dt {
   color: var(--muted);
@@ -3262,7 +3419,8 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
 }
 .ops-totals dd {
   font-size: var(--text-lg);
-  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 .ops-table {
   border-top: 1px solid var(--border);
@@ -3420,6 +3578,61 @@ html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
   background: var(--brand-soft);
   color: var(--foreground);
   font-weight: 600;
+}
+.rule-schedule {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.rule-hour.ui-input {
+  width: auto;
+}
+.rule-template-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+/* 미리보기 자리는 결과가 있든 없든 같은 높이다(창이 흔들리지 않게). 넘치면 안에서 스크롤한다. */
+.rule-preview {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  height: var(--empty-height);
+  padding: var(--space-3) var(--space-4);
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  background: var(--surface-box);
+}
+.rule-preview[data-stale] .rule-preview-list {
+  opacity: 0.6;
+}
+.rule-preview-item {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+}
+.rule-template-list {
+  display: grid;
+  gap: var(--space-2);
+}
+.rule-template {
+  display: grid;
+  width: 100%;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-box);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.rule-template:hover {
+  background: var(--surface-hover);
 }
 .rule-list {
   border-top: 1px solid var(--border);
@@ -3786,8 +3999,8 @@ a.search-option:hover {
   display: grid;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .sprint-current-head,
@@ -4025,8 +4238,8 @@ a.search-option:hover {
   min-width: 6.5rem;
   gap: 2px;
   padding: var(--space-2) var(--space-3);
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .sprint-counts dt {
@@ -4312,7 +4525,7 @@ a.search-option:hover {
   border-radius: var(--radius-pill);
   background: linear-gradient(
       to right,
-      var(--success) calc(var(--trend-ratio) * 100%),
+      var(--chart-bar) calc(var(--trend-ratio) * 100%),
       transparent 0
     )
     var(--surface-active);
@@ -4386,8 +4599,8 @@ a.search-option:hover {
   display: grid;
   gap: var(--space-2);
   padding: var(--space-3);
-  border: 0;
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   border-radius: var(--radius-xl);
 }
 .retro-entry-body {
@@ -4653,7 +4866,8 @@ a.search-option:hover {
   gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-xl);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   font-size: var(--text-sm);
 }
 
@@ -4858,9 +5072,9 @@ a.search-option:hover {
 }
 .home-panel {
   min-width: 0;
-  border: 0;
-  background: var(--surface-box);
-  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  border-radius: var(--radius-lg);
 }
 .home-panel-header {
   display: flex;
@@ -5612,7 +5826,8 @@ a.search-option:hover {
 .requirement-card {
   padding: var(--space-5);
   border-radius: var(--radius-xl);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
 }
 .requirement-submission,
 .requirement-section-list {
@@ -5723,7 +5938,8 @@ a.search-option:hover {
 .lab-metric {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
 }
 .lab-link {
   display: flex;
@@ -5768,18 +5984,21 @@ a.search-option:hover {
 }
 .stats-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1px;
   margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--border);
 }
 .stats-metric {
   display: grid;
   min-width: 0;
   align-content: start;
   gap: var(--space-1);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  padding: var(--space-3) var(--space-4);
+  background: var(--background);
 }
 .stats-metric dt {
   color: var(--foreground-2);
@@ -5792,14 +6011,11 @@ a.search-option:hover {
 .stats-metric-value {
   font-size: var(--text-xl);
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
-}
-.stats-metric-detail,
-.stats-metric-help {
-  color: var(--muted);
-  font-size: var(--text-xs);
+  font-weight: 600;
 }
 .stats-metric-detail {
+  color: var(--muted);
+  font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
 }
 .stats-charts {
@@ -5817,18 +6033,16 @@ a.search-option:hover {
   display: flex;
   height: 6rem;
   align-items: flex-end;
-  gap: 3px;
-  padding: var(--space-2);
-  border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--border-strong);
 }
 .stats-bar {
   min-width: 0;
   flex: 1;
   height: calc(var(--bar-ratio) * 100%);
   min-height: 2px;
-  border-radius: 3px 3px 0 0;
-  background: var(--success);
+  border-radius: 2px 2px 0 0;
+  background: var(--chart-bar);
 }
 .stats-bars-axis {
   display: flex;
@@ -5847,14 +6061,9 @@ a.search-option:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.stats-help-list {
-  display: grid;
-  gap: var(--space-1);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.stats-private {
+  display: inline-flex;
   color: var(--muted);
-  font-size: var(--text-xs);
 }
 .stats-project-row {
   flex-wrap: wrap;
@@ -6031,7 +6240,8 @@ a.search-option:hover {
   gap: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-lg);
-  background: var(--surface-box);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
   transition: box-shadow var(--dur-1) var(--ease-out);
 }
 .link-card[draggable="true"] {

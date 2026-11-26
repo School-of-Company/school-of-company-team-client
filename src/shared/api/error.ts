@@ -43,11 +43,11 @@ export function normalizeApiError(error: unknown): ApiError {
       status,
       error.code ?? "REQUEST_FAILED",
       status
-        ? "요청을 처리하지 못했습니다."
-        : "서버에 연결할 수 없습니다. 네트워크를 확인해 주세요.",
+        ? "요청을 처리하지 못했어요."
+        : "서버에 연결할 수 없어요. 네트워크를 확인해 주세요.",
     );
   }
-  return new ApiError(0, "UNKNOWN", "알 수 없는 오류가 발생했습니다.");
+  return new ApiError(0, "UNKNOWN", "알 수 없는 오류가 발생했어요.");
 }
 
 /**

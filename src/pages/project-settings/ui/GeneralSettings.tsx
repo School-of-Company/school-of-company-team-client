@@ -44,7 +44,7 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
           <div>
             <dt className="text-muted">설명</dt>
             <dd className="mt-1 wrap-anywhere whitespace-pre-wrap">
-              {project.description || "설명이 없습니다."}
+              {project.description || "설명이 없어요."}
             </dd>
           </div>
           <div>
@@ -130,7 +130,7 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
         <Field
           id="project-visibility"
           label="공개 범위"
-          hint="참여자만 공개로 바꾸면 Discord 연결이 비활성화됩니다. 관리자가 채널, 기존 스레드 권한을 점검한 뒤 다시 연결해야 합니다."
+          hint="참여자만 공개로 바꾸면 Discord 연결이 꺼져요. 채널과 스레드 권한을 확인한 뒤 다시 연결해야 해요."
         >
           <Select
             id="project-visibility"

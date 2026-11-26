@@ -69,7 +69,7 @@ export function RunHealthCheck({ serviceId }: { readonly serviceId: string }) {
       </span>
       {wait > 0 && (
         <span className="text-xs text-muted tabular-nums">
-          {wait}초 뒤 다시 검사할 수 있습니다
+          {wait}초 뒤 다시 검사할 수 있어요
         </span>
       )}
       <Button

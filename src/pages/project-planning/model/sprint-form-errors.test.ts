@@ -5,10 +5,10 @@ import { sprintFormErrors, validateSprint } from "./validation";
 
 test("server date validation is attached to endDate rather than a form alert", () => {
   const error = new ApiError(400, "VALIDATION_ERROR", "입력 오류", {
-    endDate: "종료일은 시작일과 같거나 뒤여야 합니다.",
+    endDate: "종료일은 시작일과 같거나 뒤여야 해요.",
   });
   assert.deepEqual(sprintFormErrors(error), {
-    endDate: "종료일은 시작일과 같거나 뒤여야 합니다.",
+    endDate: "종료일은 시작일과 같거나 뒤여야 해요.",
   });
 });
 

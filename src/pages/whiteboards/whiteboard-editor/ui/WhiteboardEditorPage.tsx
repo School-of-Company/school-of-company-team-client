@@ -74,10 +74,10 @@ const realtimeLabels: Readonly<Record<RealtimeStatus, string>> = {
 /** 실시간이 꺼진 이유. 꺼져도 저장과 커서는 폴링으로 계속된다. */
 const offMessages: Readonly<Partial<Record<RealtimeOffReason, string>>> = {
   denied:
-    "이 화이트보드를 볼 권한이 없어 실시간으로 연결하지 못했습니다. 상태를 다시 확인합니다.",
+    "이 화이트보드를 볼 권한이 없어 실시간으로 연결하지 못했어요. 상태를 다시 확인해요.",
   revoked:
-    "이 화이트보드에 대한 권한이 바뀌어 실시간 연결을 끊었습니다. 상태를 다시 확인합니다.",
-  full: "동시에 편집하는 사람이 많아 실시간 연결 없이 계속합니다. 변경은 그대로 저장됩니다.",
+    "이 화이트보드에 대한 권한이 바뀌어 실시간 연결을 끊었어요. 상태를 다시 확인해요.",
+  full: "동시에 편집하는 사람이 많아 실시간 연결 없이 계속해요. 변경은 그대로 저장돼요.",
 };
 
 const PRESENCE_AVATARS = 5;
@@ -240,7 +240,7 @@ function EditorContent({
     onSuccess: async () => {
       client.removeQueries({ queryKey: whiteboardKeys.detail(meta.id) });
       await client.invalidateQueries({ queryKey: whiteboardKeys.all });
-      toast("화이트보드를 지웠습니다.", "success");
+      toast("화이트보드를 지웠어요.", "success");
       router.push(listHref);
     },
     onError: (error) => toast(whiteboardErrorMessage(error), "error"),
@@ -415,7 +415,7 @@ function EditorContent({
           controls.current?.restore(scene);
           setDialog(null);
           toast(
-            "이 이력으로 되돌렸습니다. 되돌린 것도 이력에 남습니다.",
+            "이 이력으로 되돌렸어요. 되돌린 것도 이력에 남아요.",
             "success",
           );
         }}
@@ -446,7 +446,7 @@ function EditorContent({
             blocked:
               saveState === "saved"
                 ? undefined
-                : "저장하지 않은 변경이 있습니다. 머리글이 저장됨으로 바뀐 뒤 저장하세요.",
+                : "저장하지 않은 변경이 있어요. 머리글이 저장됨으로 바뀐 뒤 저장하세요.",
           }}
           onClose={() => setDialog(null)}
         />
@@ -466,8 +466,7 @@ function EditorContent({
         title="화이트보드 지우기"
       >
         <p className="text-sm">
-          「{meta.title}」와 변경 이력, 댓글이 모두 지워집니다. 되돌릴 수
-          없습니다.
+          「{meta.title}」와 변경 이력, 댓글이 모두 지워져요. 되돌릴 수 없어요.
         </p>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setDialog(null)}>
@@ -514,7 +513,7 @@ function RenameDialog({
     const value = title.trim();
     if (!value) return setError("제목을 입력하세요.");
     if (value.length > WHITEBOARD_TITLE_MAX)
-      return setError(`제목은 ${WHITEBOARD_TITLE_MAX}자까지 쓸 수 있습니다.`);
+      return setError(`제목은 ${WHITEBOARD_TITLE_MAX}자까지 쓸 수 있어요.`);
     setError(undefined);
     rename.mutate(value);
   }

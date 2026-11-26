@@ -165,7 +165,7 @@ export function QueryState<T>({
 }
 
 export function ErrorState({
-  title = "불러오지 못했습니다",
+  title = "불러오지 못했어요",
   description = "잠시 후 다시 시도해 주세요.",
   onRetry,
 }: {

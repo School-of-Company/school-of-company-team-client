@@ -39,7 +39,7 @@ export function goalItemsRequest(
 
 export function goalItemsError(items: SprintInput["goalItems"]) {
   if (items.length > GOAL_ITEM_LIMIT)
-    return `목표 항목은 ${GOAL_ITEM_LIMIT}개까지 쓸 수 있습니다.`;
+    return `목표 항목은 ${GOAL_ITEM_LIMIT}개까지 쓸 수 있어요.`;
   if (items.some((item) => item.text.length > 200))
     return "목표 항목은 200자 이하로 입력하세요.";
   return undefined;

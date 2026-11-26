@@ -88,10 +88,10 @@ export function RequirementActions({
           <>
             <p className="mb-6 text-sm text-muted">
               {confirm === "token"
-                ? "요청자가 링크를 잃었을 때 씁니다. 이전 링크는 바로 열리지 않습니다."
+                ? "요청자가 링크를 잃었을 때 써요. 이전 링크는 바로 열리지 않아요."
                 : confirm === "purge"
-                  ? "이름, 소속, 이메일, 연락처를 바로 지웁니다. 제출 내용은 남습니다. 되돌릴 수 없습니다."
-                  : "제출 내용, 메시지, 기록을 모두 지웁니다. 스팸이면 상태를 스팸으로 두면 30일 뒤 자동으로 지워집니다. 되돌릴 수 없습니다."}
+                  ? "이름, 소속, 이메일, 연락처를 바로 지워요. 제출 내용은 남아요. 되돌릴 수 없어요."
+                  : "제출 내용, 메시지, 기록을 모두 지워요. 스팸이면 상태를 스팸으로 두면 30일 뒤 자동으로 지워져요. 되돌릴 수 없어요."}
             </p>
             <div className="flex flex-wrap justify-end gap-2">
               <Button
@@ -119,14 +119,14 @@ export function RequirementActions({
                     purge.mutate(undefined, {
                       onSuccess: () => {
                         setConfirm(null);
-                        toast("요청자 정보를 지웠습니다.", "success");
+                        toast("요청자 정보를 지웠어요.", "success");
                       },
                       onError,
                     });
                   else
                     remove.mutate(undefined, {
                       onSuccess: () => {
-                        toast("요구사항을 삭제했습니다.", "success");
+                        toast("요구사항을 삭제했어요.", "success");
                         router.replace(routes.requirements);
                       },
                       onError,
@@ -174,7 +174,7 @@ function MoveForm({
         move.mutate(projectId, {
           onSuccess: () => {
             setProjectId("");
-            toast("프로젝트를 지정했습니다.", "success");
+            toast("프로젝트를 지정했어요.", "success");
           },
           onError: (error) => toast(requirementErrorMessage(error), "error"),
         });

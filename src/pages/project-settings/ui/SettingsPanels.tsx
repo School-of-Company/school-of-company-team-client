@@ -69,12 +69,12 @@ export function SettingsPanels(props: SettingsProps) {
       </nav>
       {props.project.archived && (
         <p role="status" className="rounded-md bg-surface-hover p-4 text-sm">
-          아카이브된 프로젝트입니다. 설정을 변경하려면 먼저 복원하세요.
+          아카이브된 프로젝트예요. 설정을 변경하려면 먼저 복원하세요.
         </p>
       )}
       {!manager && (
         <p className="text-sm text-muted">
-          설정은 읽기 전용입니다. 헤드 어드민 또는 PM이 변경할 수 있습니다.
+          설정은 읽기 전용이에요. 헤드 어드민 또는 PM이 변경할 수 있어요.
         </p>
       )}
       {tab === "general" && (
@@ -140,8 +140,8 @@ export function SettingsPanels(props: SettingsProps) {
             </>
           ) : (
             <EmptyState
-              title="연동 설정 권한이 없습니다"
-              description="저장소와 채널 연동은 헤드 어드민 또는 PM이 관리합니다."
+              title="연동 설정 권한이 없어요"
+              description="저장소와 채널 연동은 헤드 어드민 또는 PM이 관리해요."
             />
           )}
         </div>

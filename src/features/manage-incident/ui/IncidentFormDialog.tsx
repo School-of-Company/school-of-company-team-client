@@ -126,7 +126,7 @@ function IncidentForm({
     const next: typeof errors = {};
     if (!values.title.trim()) next.title = "제목을 입력하세요.";
     else if (values.title.trim().length > 200)
-      next.title = "제목은 200자까지 쓸 수 있습니다.";
+      next.title = "제목은 200자까지 쓸 수 있어요.";
     if (!values.severity) next.severity = "심각도를 고르세요.";
     setErrors(next);
     if (Object.keys(next).length) return;
@@ -235,7 +235,7 @@ function IncidentForm({
         <Field
           id={`${id}-started`}
           label="시작 시각"
-          hint={incident ? undefined : "비우면 지금으로 기록합니다."}
+          hint={incident ? undefined : "비우면 지금 시각으로 기록해요."}
           error={server.startedAt}
         >
           <DateTimePicker
@@ -254,12 +254,12 @@ function IncidentForm({
           <Spinner label="서비스 불러오는 중" />
         ) : services.isError ? (
           <p role="alert" className="text-sm text-danger">
-            서비스 목록을 불러오지 못했습니다. 영향 서비스는 나중에 고칠 수
-            있습니다.
+            서비스 목록을 불러오지 못했어요. 영향 서비스는 나중에 고칠 수
+            있어요.
           </p>
         ) : serviceOptions.length === 0 ? (
           <p className="text-sm text-muted">
-            등록된 서비스가 없습니다. 영향 서비스 없이 등록할 수 있습니다.
+            등록된 서비스가 없어요. 영향 서비스 없이 등록할 수 있어요.
           </p>
         ) : (
           <div className="incident-checklist">
@@ -293,7 +293,7 @@ function IncidentForm({
       <Field
         id={`${id}-summary`}
         label="요약"
-        hint="Discord에는 보내지 않습니다."
+        hint="Discord에는 보내지 않아요."
       >
         <Textarea
           id={`${id}-summary`}

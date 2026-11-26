@@ -143,7 +143,7 @@ export function LinksPanel({
         <>
           {full && canEdit && (
             <p role="status" className="text-sm text-muted">
-              {WHITEBOARD_LINK_LIMIT}개까지 연결할 수 있습니다. 하나를 끊은 뒤
+              {WHITEBOARD_LINK_LIMIT}개까지 연결할 수 있어요. 하나를 끊은 뒤
               더하세요.
             </p>
           )}
@@ -152,7 +152,7 @@ export function LinksPanel({
               업무
             </h3>
             {data.tasks.length === 0 ? (
-              <p className="text-sm text-muted">연결된 업무가 없습니다.</p>
+              <p className="text-sm text-muted">연결된 업무가 없어요.</p>
             ) : (
               <ul className="grid gap-1">
                 {data.tasks.map(({ linkId, task }) => (
@@ -177,7 +177,7 @@ export function LinksPanel({
               문서
             </h3>
             {data.documents.length === 0 ? (
-              <p className="text-sm text-muted">연결된 문서가 없습니다.</p>
+              <p className="text-sm text-muted">연결된 문서가 없어요.</p>
             ) : (
               <ul className="grid gap-1">
                 {data.documents.map(({ linkId, document }) => (
@@ -284,7 +284,7 @@ function TargetPicker({
             {whiteboardErrorMessage(candidates.error)}
           </p>
         ) : results && results.length === 0 && !candidates.isFetching ? (
-          <p className="text-sm text-muted">연결할 {noun}가 없습니다.</p>
+          <p className="text-sm text-muted">연결할 {noun}가 없어요.</p>
         ) : (
           <ul
             className="grid gap-1"

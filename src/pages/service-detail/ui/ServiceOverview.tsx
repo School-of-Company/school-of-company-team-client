@@ -43,7 +43,7 @@ export function ServiceOverview({
                 {service.description}
               </p>
             ) : (
-              <p className="text-sm text-muted">설명이 없습니다.</p>
+              <p className="text-sm text-muted">설명이 없어요.</p>
             )}
           </section>
           <ServiceRepositories service={service} />
@@ -100,7 +100,7 @@ export function ServiceOverview({
           </dl>
           {!service.canEdit && !service.archived && (
             <p className="text-xs text-muted">
-              소유자와 헤드 어드민이 수정할 수 있습니다.
+              소유자와 헤드 어드민이 수정할 수 있어요.
             </p>
           )}
         </aside>

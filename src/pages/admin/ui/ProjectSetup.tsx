@@ -36,14 +36,12 @@ export function ProjectSetup({
   return (
     <div className="grid gap-6">
       <p role="status" className="text-sm">
-        {project.name} 프로젝트를 생성했습니다.
+        {project.name} 프로젝트를 생성했어요.
       </p>
       <ol className="ui-steps" aria-label="프로젝트 생성 단계">
         <li>기본 정보</li>
         <li aria-current={step === "team" ? "step" : undefined}>팀원, PM</li>
-        <li aria-current={step === "team" ? undefined : "step"}>
-          저장소 연결 (선택)
-        </li>
+        <li aria-current={step === "team" ? undefined : "step"}>저장소 연결</li>
       </ol>
       {step === "team" ? (
         <>
@@ -51,7 +49,7 @@ export function ProjectSetup({
             <ListSkeleton label="팀원 설정 불러오는 중" rowClassName="h-11" />
           ) : detail.isError || users.isError ? (
             <ErrorState
-              description="팀원 설정을 불러오지 못했습니다. 프로젝트는 생성되어 있습니다."
+              description="팀원 설정을 불러오지 못했어요. 프로젝트는 생성되어 있어요."
               onRetry={() => {
                 void detail.refetch();
                 void users.refetch();
@@ -71,7 +69,7 @@ export function ProjectSetup({
       ) : (
         <>
           <p className="text-sm text-muted">
-            저장소 연결은 건너뛰고 프로젝트 설정에서 이어갈 수 있습니다.
+            건너뛰고 나중에 프로젝트 설정에서 연결해도 돼요.
           </p>
           <RepositorySettings
             projectId={project.id}
@@ -144,8 +142,8 @@ function ProjectTeamStep({
         <legend className="mb-2 text-sm font-medium">참여할 활성 팀원</legend>
         {users.length === 0 && (
           <EmptyState
-            title="추가할 활성 팀원이 없습니다"
-            description="프로젝트 설정에서 나중에 추가할 수 있습니다."
+            title="추가할 활성 팀원이 없어요"
+            description="프로젝트 설정에서 나중에 추가할 수 있어요."
           />
         )}
         {users.map((user) => (
@@ -168,11 +166,7 @@ function ProjectTeamStep({
             </span>
           </label>
         ))}
-        <Field
-          id="create-project-pm"
-          label="PM (선택)"
-          hint="PM은 참여자에도 포함됩니다. 나중에 설정할 수 있습니다."
-        >
+        <Field id="create-project-pm" label="PM" hint="나중에 정해도 돼요.">
           <Select
             id="create-project-pm"
             value={pm}
@@ -190,7 +184,7 @@ function ProjectTeamStep({
       </fieldset>
       {save.isError && (
         <p role="alert" className="text-sm text-danger">
-          {phase} 저장에 실패했습니다. 프로젝트와 저장된 팀원은 유지됩니다.{" "}
+          {phase} 저장에 실패했어요. 프로젝트와 저장된 팀원은 유지돼요.{" "}
           {settingsErrorMessage(normalizeApiError(save.error))}
         </p>
       )}
