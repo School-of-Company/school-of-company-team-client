@@ -180,6 +180,18 @@ export function RuleRuns({
                       {run.attempts}회 시도
                     </span>
                   )}
+                  {run.createdTask && (
+                    <Link
+                      href={routes.task(run.createdTask.id)}
+                      className="rule-run-task text-xs"
+                    >
+                      <span className="shrink-0 text-muted">만든 업무</span>
+                      <span className="shrink-0 text-muted tabular-nums">
+                        {run.createdTask.key}
+                      </span>
+                      <span className="truncate">{run.createdTask.title}</span>
+                    </Link>
+                  )}
                   {resultMessage(run.resultCode, run.status, run.event) && (
                     <p
                       className={`text-xs ${run.status === "FAILED" ? "text-danger" : "text-muted"}`}
