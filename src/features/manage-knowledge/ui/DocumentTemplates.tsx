@@ -122,7 +122,6 @@ function TemplateEditor({
           {formatDate(base.updatedAt, {
             hour: "2-digit",
             minute: "2-digit",
-            second: "2-digit",
           })}
           , {base.updatedBy?.name ?? "알 수 없음"}
         </p>
