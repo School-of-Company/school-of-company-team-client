@@ -56,6 +56,12 @@ test("toggling sends the full definition back with only enabled changed", () => 
     bucketId: null,
     reviewerId: null,
     mentions: { assignees: true, reviewers: false, pm: true },
+    staleDays: null,
+    schedule: null,
+    assigneeId: null,
+    priority: null,
+    titleTemplate: null,
+    messageTemplate: null,
   });
 });
 
@@ -93,7 +99,10 @@ test("incident rules carry no conditions and can only mention the PM", () => {
     reviewers: false,
     pm: true,
   });
-  assert.deepEqual(allowedActions("INCIDENT_CREATED"), ["NOTIFY_DISCORD"]);
+  assert.deepEqual(allowedActions("INCIDENT_CREATED"), [
+    "NOTIFY_DISCORD",
+    "CREATE_TASK",
+  ]);
 });
 
 test("there is no status-changing or external write action, and the incident event is offered", () => {
@@ -102,6 +111,9 @@ test("there is no status-changing or external write action, and the incident eve
     "MARK_ATTENTION",
     "ASSIGN_REVIEWER",
     "MOVE_BUCKET",
+    "ASSIGN_USER",
+    "SET_PRIORITY",
+    "CREATE_TASK",
   ]);
   assert.ok(selectableEvents.includes("INCIDENT_CREATED"));
 });
@@ -233,7 +245,12 @@ test("requirement and sprint events are taskless like the server's TASKLESS_EVEN
   for (const event of tasklessEvents) {
     assert.ok(isTasklessEvent(event), event);
     assert.ok(selectableEvents.includes(event), event);
-    assert.deepEqual(allowedActions(event), ["NOTIFY_DISCORD"]);
+    assert.deepEqual(
+      allowedActions(event),
+      event.startsWith("REQUIREMENT_")
+        ? ["NOTIFY_DISCORD"]
+        : ["NOTIFY_DISCORD", "CREATE_TASK"],
+    );
     const body = formToRequest(
       changeEvent({ ...ruleToForm(rule), action: "MOVE_BUCKET" }, event),
     );
