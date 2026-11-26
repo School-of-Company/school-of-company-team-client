@@ -31,7 +31,7 @@ export function LabDeleteDialog({
       title="실험을 삭제할까요?"
     >
       <p className="mb-6 text-sm text-muted">
-        가설과 결과 기록이 모두 사라집니다. 연결된 업무, 문서는 그대로 남습니다.
+        가설과 결과 기록이 모두 사라져요. 연결된 업무, 문서는 그대로 남아요.
       </p>
       {remove.isError && (
         <p role="alert" className="mb-4 text-sm text-danger">

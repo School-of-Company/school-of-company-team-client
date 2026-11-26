@@ -45,7 +45,7 @@ export function BoardHeader({
               {board
                 ? `업무 ${boardTotal(board)}개`
                 : failed
-                  ? "업무 수를 불러오지 못했습니다"
+                  ? "업무 수를 불러오지 못했어요"
                   : "업무 집계 중"}
             </p>
           )}
@@ -71,7 +71,7 @@ export function BoardHeader({
       </header>
       {project?.archived && (
         <p role="status" className="text-sm text-muted">
-          아카이브된 프로젝트입니다. 조회만 가능합니다.
+          아카이브된 프로젝트예요. 조회만 가능해요.
         </p>
       )}
     </>

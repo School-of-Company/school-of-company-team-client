@@ -66,7 +66,7 @@ export function IncidentDiscord({
       setRecovery(false);
       setThreadId("");
       setMessage({
-        text: "복구했습니다. 스레드 열기를 다시 눌러 주세요.",
+        text: "복구했어요. 스레드 열기를 다시 눌러 주세요.",
         error: false,
       });
       await client.invalidateQueries({
@@ -101,15 +101,15 @@ export function IncidentDiscord({
       )}
       {discussion?.archived && (
         <p className="text-xs text-muted">
-          보관된 스레드입니다.{" "}
+          보관된 스레드예요.{" "}
           {discussion.locked
-            ? "잠겨 있어 관리자의 재개방이 필요합니다."
-            : "Discord에서 메시지를 보내면 다시 열립니다."}
+            ? "잠겨 있어 관리자의 재개방이 필요해요."
+            : "Discord에서 메시지를 보내면 다시 열려요."}
         </p>
       )}
       {!url && (
         <p className="text-xs text-muted">
-          팀 채널에 제목, 심각도, 상태와 이 화면 링크만 올립니다.
+          팀 채널에 제목, 심각도, 상태와 이 화면 링크만 올려요.
         </p>
       )}
       {message && (

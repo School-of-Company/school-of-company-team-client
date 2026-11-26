@@ -82,19 +82,19 @@ export function RequirementTasks({
       </div>
       {requirement.canManage && !requirement.projectId && (
         <p className="text-sm text-muted">
-          조직 단위 요구사항은 프로젝트를 지정한 뒤 업무를 만들 수 있습니다. 팀
-          공용 업무는 연결할 수 있습니다.
+          조직 단위 요구사항은 프로젝트를 지정한 뒤 업무를 만들 수 있어요. 팀
+          공용 업무는 연결할 수 있어요.
         </p>
       )}
       {requirement.canManage &&
         requirement.projectId &&
         !canCreateTasksIn(requirement.status) && (
           <p className="text-sm text-muted">
-            수락하거나 진행 중일 때 업무를 만들 수 있습니다.
+            수락하거나 진행 중일 때 업무를 만들 수 있어요.
           </p>
         )}
       {requirement.tasks.length === 0 && hidden <= 0 ? (
-        <p className="text-sm text-muted">연결된 업무가 없습니다.</p>
+        <p className="text-sm text-muted">연결된 업무가 없어요.</p>
       ) : (
         <ul className="list" aria-label="연결 업무">
           {requirement.tasks.map((task) => (
@@ -133,7 +133,7 @@ export function RequirementTasks({
       )}
       {hidden > 0 && (
         <p className="text-sm text-muted">
-          볼 수 없는 업무 {hidden}개가 더 연결되어 있습니다.
+          볼 수 없는 업무 {hidden}개가 더 연결되어 있어요.
         </p>
       )}
       {creating && requirement.projectId && (
@@ -210,17 +210,15 @@ function CreateTasksDialog({
     if (selected.length === 0)
       return setError("만들 업무를 하나 이상 고르세요.");
     if (selected.length > MAX_TASKS_PER_REQUEST)
-      return setError(
-        `한 번에 ${MAX_TASKS_PER_REQUEST}개까지 만들 수 있습니다.`,
-      );
+      return setError(`한 번에 ${MAX_TASKS_PER_REQUEST}개까지 만들 수 있어요.`);
     if (
       selected.some(
         (row) => row.featureIndex === undefined && !row.title.trim(),
       )
     )
-      return setError("직접 추가한 업무에는 제목이 필요합니다.");
+      return setError("직접 추가한 업무에는 제목이 필요해요.");
     if (selected.some((row) => row.title.trim().length > 200))
-      return setError("제목은 200자 이하입니다.");
+      return setError("제목은 200자 이하예요.");
     create.mutate(
       selected.map((row) => ({
         ...(row.title.trim() ? { title: row.title.trim() } : {}),
@@ -232,7 +230,7 @@ function CreateTasksDialog({
       })),
       {
         onSuccess: () => {
-          toast(`업무 ${selected.length}개를 만들었습니다.`, "success");
+          toast(`업무 ${selected.length}개를 만들었어요.`, "success");
           onClose();
         },
         onError: (problem) => setError(requirementErrorMessage(problem)),
@@ -256,10 +254,10 @@ function CreateTasksDialog({
         {publicDefault && (
           <p role="alert" className="rounded-xl bg-surface-box p-4 text-sm">
             <span className="font-semibold">공개 저장소 주의. </span>
-            기본 발행 저장소 {repositoryName(publicDefault)}는 공개
-            저장소입니다. 업무가 진행 예정 이상이 되면 제목과 설명(기능 항목,
-            수용 기준)이 누구나 볼 수 있는 Issue로 발행됩니다. 고객 정보가
-            제목에 들어가지 않았는지 확인하세요.
+            기본 발행 저장소 {repositoryName(publicDefault)}는 공개 저장소예요.
+            업무가 진행 예정 이상이 되면 제목과 설명(기능 항목, 수용 기준)이
+            누구나 볼 수 있는 Issue로 발행돼요. 고객 정보가 제목에 들어가지
+            않았는지 확인하세요.
           </p>
         )}
         <ul className="grid gap-3" aria-label="만들 업무">
@@ -411,7 +409,7 @@ function LinkTaskDialog({
           if (link.isPending) return;
           link.mutate(taskId, {
             onSuccess: () => {
-              toast("업무를 연결했습니다.", "success");
+              toast("업무를 연결했어요.", "success");
               close();
             },
             onError: (problem) => setError(requirementErrorMessage(problem)),

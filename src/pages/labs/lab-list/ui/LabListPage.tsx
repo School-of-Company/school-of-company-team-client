@@ -99,11 +99,11 @@ function LabListContent({ user }: { readonly user: User }) {
         empty={
           view === "ACTIVE" ? (
             <EmptyState
-              title="진행 중인 실험이 없습니다"
+              title="진행 중인 실험이 없어요"
               description="해 보고 싶은 기술, 방식이 있으면 가설과 측정 기준을 적고 작게 시작해 보세요."
             />
           ) : (
-            <EmptyState title={`${label} 실험이 없습니다`} />
+            <EmptyState title={`${label} 실험이 없어요`} />
           )
         }
       >

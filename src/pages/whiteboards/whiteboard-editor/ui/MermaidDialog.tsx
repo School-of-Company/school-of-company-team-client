@@ -36,7 +36,7 @@ async function convert(definition: string): Promise<Converted> {
     if (files && Object.keys(files).length > 0)
       return {
         error:
-          "이 종류는 도형으로 바꿀 수 없습니다. flowchart, sequenceDiagram, classDiagram 으로 쓰세요.",
+          "이 종류는 도형으로 바꿀 수 없어요. flowchart, sequenceDiagram, classDiagram 으로 쓰세요.",
       };
     return {
       elements: convertToExcalidrawElements(

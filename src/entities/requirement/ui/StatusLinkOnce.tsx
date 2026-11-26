@@ -29,8 +29,8 @@ export function StatusLinkOnce({
     <div className="grid gap-3 rounded-xl bg-surface-box p-4">
       <p role="alert" className="text-sm font-semibold">
         {audience === "requester"
-          ? "이 링크는 지금 한 번만 보여 드립니다. 복사해 안전한 곳에 보관하세요. 잃어버리면 담당자에게 재발급을 요청해야 합니다."
-          : "새 상태 링크입니다. 이전 링크는 더 이상 열리지 않습니다. 이 링크는 지금 한 번만 보이니 요청자에게 바로 전달하세요."}
+          ? "이 링크는 지금 한 번만 보여 드려요. 복사해 안전한 곳에 보관하세요. 잃어버리면 담당자에게 재발급을 요청해야 해요."
+          : "새 상태 링크예요. 이전 링크는 더 이상 열리지 않아요. 이 링크는 지금 한 번만 보이니 요청자에게 바로 전달하세요."}
       </p>
       <label htmlFor="status-link" className="text-sm font-medium">
         상태 링크
@@ -58,10 +58,10 @@ export function StatusLinkOnce({
       </div>
       <p role="status" className="text-sm text-muted">
         {copied === "ok"
-          ? "복사했습니다."
+          ? "복사했어요."
           : copied === "failed"
-            ? "복사하지 못했습니다. 입력란을 선택해 직접 복사하세요."
-            : "링크를 아는 사람은 누구나 진행 상황을 보고 답글을 달 수 있습니다. 다른 사람과 공유하지 마세요."}
+            ? "복사하지 못했어요. 입력란을 선택해 직접 복사하세요."
+            : "링크를 아는 사람은 누구나 진행 상황을 보고 답글을 달 수 있어요. 다른 사람과 공유하지 마세요."}
       </p>
       {audience === "requester" && link && (
         <p className="text-sm">

@@ -25,7 +25,7 @@ export function DocumentTemplates() {
       <div>
         <h2 id="document-templates-title">문서 템플릿</h2>
         <p className="text-sm text-muted">
-          새 문서의 기본 본문입니다. 기존 문서는 바뀌지 않습니다.
+          새 문서의 기본 본문이에요. 기존 문서는 바뀌지 않아요.
         </p>
       </div>
       {templates.isPending ? (
@@ -96,7 +96,7 @@ function TemplateEditor({
       </div>
       {preview ? (
         <div className="postmortem-preview">
-          <Markdown>{body || "본문이 비어 있습니다."}</Markdown>
+          <Markdown>{body || "본문이 비어 있어요."}</Markdown>
         </div>
       ) : (
         <Textarea
@@ -113,12 +113,12 @@ function TemplateEditor({
       )}
       {save.isError && (
         <p role="alert" className="text-sm text-danger">
-          {knowledgeErrorMessage(save.error)} 작성 내용은 유지됩니다.
+          {knowledgeErrorMessage(save.error)} 작성 내용은 유지돼요.
         </p>
       )}
       {save.isSuccess && (
         <p role="status" className="text-sm text-muted">
-          템플릿을 저장했습니다.{" "}
+          템플릿을 저장했어요.{" "}
           {formatDate(base.updatedAt, {
             hour: "2-digit",
             minute: "2-digit",

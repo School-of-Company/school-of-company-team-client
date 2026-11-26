@@ -17,7 +17,7 @@ export function MutationFeedback({
   if (success)
     return (
       <p role="status" className="text-sm">
-        변경사항을 저장했습니다.
+        변경사항을 저장했어요.
       </p>
     );
   return null;

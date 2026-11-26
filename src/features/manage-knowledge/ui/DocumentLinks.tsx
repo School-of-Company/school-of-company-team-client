@@ -93,7 +93,7 @@ export function DocumentLinks({
       </div>
       {total === 0 && links.referencedBy.length === 0 && (
         <p className="text-sm text-muted">
-          연결된 서비스, 장애, 업무, 문서가 없습니다.
+          연결된 서비스, 장애, 업무, 문서가 없어요.
         </p>
       )}
       <LinkGroup title="서비스" count={links.services.length}>
@@ -354,11 +354,11 @@ function AddLinkForm({
         <Spinner label={`${targetLabels[target]} 불러오는 중`} />
       ) : loadError ? (
         <p role="alert" className="text-sm text-danger">
-          목록을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.
+          목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.
         </p>
       ) : options.length === 0 ? (
         <p className="text-sm text-muted">
-          연결할 수 있는 {targetLabels[target]}가 없습니다.
+          연결할 수 있는 {targetLabels[target]}가 없어요.
         </p>
       ) : (
         <Field id={`${id}-value`} label={targetLabels[target]} error={error}>
@@ -399,7 +399,7 @@ function AddLinkForm({
           </div>
           {relation === "SUPERSEDES" && (
             <p className="text-sm text-muted">
-              이 문서가 고른 문서를 대체합니다. 고른 문서의 상태는 바꾸지 않으니
+              이 문서가 고른 문서를 대체해요. 고른 문서의 상태는 바꾸지 않으니
               필요하면 직접 폐기로 바꾸세요.
             </p>
           )}

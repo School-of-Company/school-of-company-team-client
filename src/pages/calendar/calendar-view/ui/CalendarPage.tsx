@@ -174,7 +174,7 @@ function Month({
       <StaleNotice query={items} />
       {items.isError && !items.data ? (
         <ErrorState
-          title="달력을 불러오지 못했습니다"
+          title="달력을 불러오지 못했어요"
           description={calendarErrorMessage(normalizeApiError(items.error))}
           onRetry={() => void items.refetch()}
         />
@@ -238,7 +238,7 @@ function Month({
         {day && (
           <div className="grid gap-4">
             {itemsOn(items.data ?? [], day).length === 0 ? (
-              <p className="text-sm text-muted">이 날에는 항목이 없습니다.</p>
+              <p className="text-sm text-muted">이 날에는 항목이 없어요.</p>
             ) : (
               <ul className="list" aria-label="이 날 항목">
                 {itemsOn(items.data ?? [], day).map((item) => (
@@ -392,7 +392,7 @@ function EventDialog({
         item
           ? calendarApi.update(item.id, input)
           : calendarApi.create(input, projectId),
-      item ? "일정을 고쳤습니다." : "일정을 만들었습니다.",
+      item ? "일정을 고쳤어요." : "일정을 만들었어요.",
     );
   }
   if (item && !item.canEdit)
@@ -409,7 +409,7 @@ function EventDialog({
           </div>
         </dl>
         <p className="mt-4 text-sm whitespace-pre-wrap">
-          {item.description ?? "설명이 없습니다."}
+          {item.description ?? "설명이 없어요."}
         </p>
       </Dialog>
     );
@@ -510,7 +510,7 @@ function EventDialog({
             role="group"
             aria-label="삭제 확인"
           >
-            <p className="text-sm">이 일정을 지울까요? 되돌릴 수 없습니다.</p>
+            <p className="text-sm">이 일정을 지울까요? 되돌릴 수 없어요.</p>
             <div className="flex flex-wrap justify-end gap-2">
               <Button
                 variant="secondary"
@@ -525,7 +525,7 @@ function EventDialog({
                 onClick={() =>
                   void run(
                     () => calendarApi.remove(item!.id),
-                    "일정을 지웠습니다.",
+                    "일정을 지웠어요.",
                   )
                 }
               >

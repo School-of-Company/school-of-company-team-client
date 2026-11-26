@@ -116,10 +116,10 @@ function ExperimentForm({
     const next: Record<string, string> = {};
     if (!title.trim()) next.title = "제목을 입력하세요.";
     else if (title.trim().length > 120)
-      next.title = "제목은 120자까지 쓸 수 있습니다.";
+      next.title = "제목은 120자까지 쓸 수 있어요.";
     if (!hypothesis.trim()) next.hypothesis = "가설을 입력하세요.";
     if (startDate && endDate && endDate < startDate)
-      next.endDate = "끝나는 날은 시작일보다 앞설 수 없습니다.";
+      next.endDate = "끝나는 날은 시작일보다 앞설 수 없어요.";
     setErrors(next);
     if (Object.keys(next).length) return;
     save.mutate(undefined, { onSuccess: (saved) => saved && onSaved(saved) });

@@ -162,9 +162,9 @@ export function itemMeta(item: SearchItem): readonly string[] {
 }
 
 const searchErrors: Readonly<Record<string, string>> = {
-  ONBOARDING_REQUIRED: "가입 승인과 Discord 연결을 마친 뒤 검색할 수 있습니다.",
-  SUSPENDED: "이용이 중지된 계정은 검색할 수 없습니다.",
-  REJECTED: "가입이 거절된 계정은 검색할 수 없습니다.",
+  ONBOARDING_REQUIRED: "가입 승인과 Discord 연결을 마친 뒤 검색할 수 있어요.",
+  SUSPENDED: "이용이 중지된 계정은 검색할 수 없어요.",
+  REJECTED: "가입이 거절된 계정은 검색할 수 없어요.",
   VALIDATION_ERROR: `검색어는 1~${SEARCH_MAX_LENGTH}자로 입력하세요.`,
 };
 export function searchErrorMessage(error: {

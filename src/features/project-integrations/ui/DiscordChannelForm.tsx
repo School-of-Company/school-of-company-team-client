@@ -46,7 +46,7 @@ export function DiscordChannelForm({
       <div className="flex flex-wrap items-center gap-3">
         <Badge>{statusLabels[channel.data.status]}</Badge>
         <span className="text-sm break-all text-muted">
-          {channel.data.channelId ?? "연결된 채널이 없습니다."}
+          {channel.data.channelId ?? "연결된 채널이 없어요."}
         </span>
       </div>
       {channel.data.status === "DISABLED" && (
@@ -73,7 +73,7 @@ export function DiscordChannelForm({
       )}
       {link.isSuccess && !editing && (
         <p role="status" className="text-sm">
-          채널 검증을 마쳤습니다. 현재 상태: {statusLabels[link.data.status]}
+          채널 검증을 마쳤어요. 현재 상태: {statusLabels[link.data.status]}
         </p>
       )}
       {editing && (
@@ -127,7 +127,7 @@ export function DiscordChannelForm({
                 />
                 <span>
                   이 채널을 볼 수 있는 역할, 사용자를 프로젝트 참여자로
-                  제한했고, 기존 스레드 권한도 직접 점검했습니다.
+                  제한했고, 기존 스레드 권한도 직접 점검했어요.
                 </span>
               </label>
             )}
@@ -160,8 +160,7 @@ export function DiscordChannelForm({
           )}
           {link.isSuccess && (
             <p role="status" className="text-sm">
-              채널 검증을 마쳤습니다. 현재 상태:{" "}
-              {statusLabels[link.data.status]}
+              채널 검증을 마쳤어요. 현재 상태: {statusLabels[link.data.status]}
             </p>
           )}
         </form>

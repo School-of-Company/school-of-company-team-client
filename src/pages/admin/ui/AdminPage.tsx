@@ -27,8 +27,8 @@ export function AdminPage() {
           </Suspense>
         ) : (
           <ErrorState
-            title="관리자 권한이 필요합니다"
-            description="헤드 어드민만 조직 사용자와 프로젝트를 관리할 수 있습니다."
+            title="관리자 권한이 필요해요"
+            description="헤드 어드민만 조직 사용자와 프로젝트를 관리할 수 있어요."
           />
         )
       }

@@ -108,7 +108,7 @@ function ServiceDetailContent({
   )
     return (
       <ErrorState
-        title="서비스를 찾을 수 없습니다"
+        title="서비스를 찾을 수 없어요"
         description="키가 바뀌지 않으므로 주소를 확인하거나 서비스 목록에서 다시 고르세요."
       />
     );

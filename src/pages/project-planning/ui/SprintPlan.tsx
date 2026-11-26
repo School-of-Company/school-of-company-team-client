@@ -122,7 +122,7 @@ export function SprintPlan({
     change(
       Object.fromEntries(ids.map((id) => [id, "add" as const])),
       { action: "add", taskIds: ids },
-      `${ids.length}개를 스프린트에 넣었습니다.`,
+      `${ids.length}개를 스프린트에 넣었어요.`,
     );
     setChecked([]);
   }
@@ -130,7 +130,7 @@ export function SprintPlan({
     change(
       { [task.id]: "remove" },
       { action: "remove", taskId: task.id },
-      `${task.key}을(를) 스프린트에서 뺐습니다.`,
+      `${task.key}을(를) 스프린트에서 뺐어요.`,
     );
   }
   function handleDrop(event: DragEvent, target: "in" | "out") {

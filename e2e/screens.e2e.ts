@@ -126,7 +126,7 @@ const screens: readonly {
     path: () => "/me?priority=P0",
     ready: (p) =>
       expect(
-        p.getByRole("heading", { name: "조건에 맞는 업무가 없습니다" }),
+        p.getByRole("heading", { name: "조건에 맞는 업무가 없어요" }),
       ).toBeVisible(),
   },
   {
@@ -179,7 +179,7 @@ const screens: readonly {
     path: () => `/projects/${seed.project.id}`,
     ready: (p) =>
       expect(
-        p.getByText("프로젝트를 찾을 수 없거나 접근할 수 없습니다"),
+        p.getByText("프로젝트를 찾을 수 없거나 접근할 수 없어요"),
       ).toBeVisible(),
   },
   {
@@ -210,7 +210,7 @@ const screens: readonly {
     name: "admin-denied",
     who: "member",
     path: () => "/admin",
-    ready: (p) => expect(p.getByText("관리자 권한이 필요합니다")).toBeVisible(),
+    ready: (p) => expect(p.getByText("관리자 권한이 필요해요")).toBeVisible(),
   },
   {
     name: "account",

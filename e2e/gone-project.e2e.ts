@@ -49,12 +49,12 @@ test("업무는 200, 프로젝트 상세만 404면 안내를 보이고 20초 동
   await signIn(page, seed.member.tokens);
   await page.goto(`/tasks/${task.id}`);
   await expect(
-    page.getByText("프로젝트를 찾을 수 없거나 접근할 수 없습니다"),
+    page.getByText("프로젝트를 찾을 수 없거나 접근할 수 없어요"),
   ).toBeVisible();
   await page.waitForTimeout(20_000);
   console.log(`[프로젝트만 404] 20초 프로젝트 요청 ${hits.length}회`);
   expect(hits.length).toBeLessThanOrEqual(2);
   await expect(
-    page.getByText("프로젝트를 찾을 수 없거나 접근할 수 없습니다"),
+    page.getByText("프로젝트를 찾을 수 없거나 접근할 수 없어요"),
   ).toBeVisible();
 });

@@ -150,14 +150,14 @@ test("다 채운 양식은 통과하고, 길이·개수·형식은 상한에서 
     },
     requester: { ...draft.requester, email: "메일", phone: "1".repeat(31) },
   });
-  assert.equal(errors["sections.title"], "200자 이하여야 합니다.");
-  assert.equal(errors["sections.features"], "30개 이하여야 합니다.");
+  assert.equal(errors["sections.title"], "200자 이하여야 해요.");
+  assert.equal(errors["sections.features"], "30개 이하여야 해요.");
   assert.ok(errors.priority);
   assert.ok(errors.desiredDate);
   assert.ok(errors["references[0]"]);
   assert.equal(errors["references[1]"], undefined);
-  assert.equal(errors["requester.email"], "이메일 형식이 아닙니다.");
-  assert.equal(errors["requester.phone"], "30자 이하여야 합니다.");
+  assert.equal(errors["requester.email"], "이메일 형식이 아니에요.");
+  assert.equal(errors["requester.phone"], "30자 이하여야 해요.");
 });
 
 test("제출 본문: 섹션·별도 필드를 나누고 빈 줄은 빼며 서명과 숨은 입력란을 그대로 보낸다", () => {
@@ -183,9 +183,9 @@ test("제출 본문: 섹션·별도 필드를 나누고 빈 줄은 빼며 서명
 
 test("서버 VALIDATION_ERROR details 는 문자열 메시지만 남긴다", () => {
   assert.deepEqual(
-    serverFieldErrors({ "sections.goal": "필수 항목입니다.", body: 3 }),
+    serverFieldErrors({ "sections.goal": "필수 항목이에요.", body: 3 }),
     {
-      "sections.goal": "필수 항목입니다.",
+      "sections.goal": "필수 항목이에요.",
     },
   );
   assert.deepEqual(serverFieldErrors(null), {});

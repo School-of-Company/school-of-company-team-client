@@ -44,7 +44,7 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
           <div>
             <dt className="text-muted">설명</dt>
             <dd className="mt-1 break-words whitespace-pre-wrap">
-              {project.description || "설명이 없습니다."}
+              {project.description || "설명이 없어요."}
             </dd>
           </div>
           <div>

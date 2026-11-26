@@ -40,20 +40,20 @@ const render = (filtered: boolean, onCreate?: () => void) =>
 
 test("an empty board without filters offers the first task, not a filter change", () => {
   const html = render(false, () => {});
-  assert.match(html, /업무가 없습니다/);
+  assert.match(html, /업무가 없어요/);
   assert.match(html, /업무 추가/);
   assert.doesNotMatch(html, /필터/);
 });
 
 test("an empty board without filters and no create right shows no action", () => {
   const html = render(false);
-  assert.match(html, /업무가 없습니다/);
+  assert.match(html, /업무가 없어요/);
   assert.doesNotMatch(html, /<button/);
 });
 
 test("an empty filtered board offers to reset the filters", () => {
   const html = render(true, () => {});
-  assert.match(html, /조건에 맞는 업무가 없습니다/);
+  assert.match(html, /조건에 맞는 업무가 없어요/);
   assert.match(html, /필터 초기화/);
   assert.doesNotMatch(html, /업무 추가/);
 });

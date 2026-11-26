@@ -92,7 +92,7 @@ export function DocumentEditor({
             {body.trim() ? (
               <Markdown>{body}</Markdown>
             ) : (
-              <p className="text-sm text-muted">본문이 비어 있습니다.</p>
+              <p className="text-sm text-muted">본문이 비어 있어요.</p>
             )}
           </div>
         )}

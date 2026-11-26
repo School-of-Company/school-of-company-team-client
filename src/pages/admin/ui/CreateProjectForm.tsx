@@ -63,7 +63,7 @@ export function CreateProjectForm({
           <li>저장소 연결</li>
         </ol>
         <p className="text-sm">
-          기본 정보를 저장하면 프로젝트가 생성됩니다. 이후 팀원과 저장소를
+          기본 정보를 저장하면 프로젝트가 생성돼요. 이후 팀원과 저장소를
           설정하세요.
         </p>
         <Field id="create-project-name" label="프로젝트 이름 (필수)">

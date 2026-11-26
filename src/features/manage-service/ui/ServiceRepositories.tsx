@@ -54,11 +54,11 @@ export function ServiceRepositories({
       </div>
       {service.repositories.length === 0 ? (
         <EmptyState
-          title="연결된 저장소가 없습니다"
+          title="연결된 저장소가 없어요"
           description={
             service.canEdit
-              ? "GitHub App 설치에서 허용한 저장소를 연결하면 릴리스와 배포가 쌓입니다."
-              : "소유자가 저장소를 연결하면 릴리스와 배포가 여기에 쌓입니다."
+              ? "GitHub App 설치에서 허용한 저장소를 연결하면 릴리스와 배포가 쌓여요."
+              : "소유자가 저장소를 연결하면 릴리스와 배포가 여기에 쌓여요."
           }
         />
       ) : (
@@ -121,7 +121,7 @@ export function ServiceRepositories({
       {hidden > 0 && (
         <p className="text-xs text-muted">
           비공개 저장소 {hidden}개는 GitHub 원본 권한이 있는 사람에게만 이름,
-          릴리스, 배포가 보입니다.
+          릴리스, 배포가 보여요.
         </p>
       )}
       {linking && (
@@ -140,7 +140,7 @@ export function ServiceRepositories({
       <ConfirmDialog
         open={unlinking !== null}
         title="저장소 연결 해제"
-        description={`이 서비스에서 ${unlinking?.fullName ?? "비공개 저장소"} 연결을 해제합니다. 쌓인 릴리스, 배포 기록은 지우지 않고, 다시 연결하면 보입니다.`}
+        description={`이 서비스에서 ${unlinking?.fullName ?? "비공개 저장소"} 연결을 해제해요. 쌓인 릴리스, 배포 기록은 지우지 않고, 다시 연결하면 보여요.`}
         confirmLabel="연결 해제"
         pending={unlink.isPending}
         error={unlink.error ? serviceErrorMessage(unlink.error) : undefined}
@@ -218,7 +218,7 @@ function LinkRepositoryDialog({
           </div>
         ) : available.length === 0 ? (
           <p className="text-sm text-muted">
-            새로 연결할 수 있는 저장소가 없습니다. 설치에 허용된 저장소와 보관
+            새로 연결할 수 있는 저장소가 없어요. 설치에 허용된 저장소와 보관
             여부를 확인하세요.
           </p>
         ) : (

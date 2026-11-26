@@ -22,10 +22,9 @@ import { Panel, RetryNote, TaskRow } from "./parts";
 
 const projectErrors: Readonly<Record<string, string>> = {
   PROJECT_FORBIDDEN:
-    "이 프로젝트의 확인 필요 항목은 PM과 헤드 어드민만 볼 수 있습니다.",
-  PROJECT_NOT_FOUND: "프로젝트를 찾을 수 없거나 접근할 수 없습니다.",
-  PROJECT_ARCHIVED:
-    "아카이브된 프로젝트는 확인 필요 항목을 보여 주지 않습니다.",
+    "이 프로젝트의 확인 필요 항목은 PM과 헤드 어드민만 볼 수 있어요.",
+  PROJECT_NOT_FOUND: "프로젝트를 찾을 수 없거나 접근할 수 없어요.",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트는 확인 필요 항목을 보여 주지 않아요.",
 };
 
 /**
@@ -108,7 +107,7 @@ export function AttentionSection({
       {projectId && kept.stale && (
         <RetryNote
           role="status"
-          message="최신 목록을 불러오지 못해 마지막으로 받은 목록을 보여 줍니다."
+          message="최신 목록을 불러오지 못해 마지막으로 받은 목록을 보여 줘요."
           onRetry={() => void project.refetch()}
         />
       )}
@@ -128,7 +127,7 @@ export function AttentionSection({
         />
       ) : attention && attention.items.length === 0 ? (
         projectId ? (
-          <p className="home-note">이 프로젝트에 확인할 항목이 없습니다.</p>
+          <p className="home-note">이 프로젝트에 확인할 항목이 없어요.</p>
         ) : null
       ) : (
         attention &&
@@ -172,7 +171,7 @@ function ProjectError({
   ) : (
     <RetryNote
       role="alert"
-      message={`최신 정보를 불러오지 못했습니다. ${problem.message}`}
+      message={`최신 정보를 불러오지 못했어요. ${problem.message}`}
       onRetry={onRetry}
     />
   );
@@ -261,7 +260,7 @@ function AttentionRow({
         </>
       )}
       {item.rule === "MERGED_NOT_DONE" && (
-        <SignalChip tone="merged" icon="merge" title="PR이 merge됐습니다">
+        <SignalChip tone="merged" icon="merge" title="PR이 merge됐어요">
           완료로 옮기세요
         </SignalChip>
       )}

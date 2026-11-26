@@ -129,7 +129,7 @@ export function ProjectHeading({
       </header>
       {project.archived && (
         <p role="status" className="text-sm text-muted">
-          아카이브된 프로젝트입니다. 조회만 가능합니다.
+          아카이브된 프로젝트예요. 조회만 가능해요.
         </p>
       )}
       <ProjectNav project={project} user={user} />

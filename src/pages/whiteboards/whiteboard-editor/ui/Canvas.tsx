@@ -476,7 +476,7 @@ export default function Canvas({
         toldTooLarge.current = true;
         callbacks.current.onSaveState(
           "error",
-          "변경이 커서 실시간으로 보내지 못했습니다. 일반 저장으로 보냅니다.",
+          "변경이 커서 실시간으로 보내지 못했어요. 일반 저장으로 보내요.",
         );
       }
       // 폴링으로 떨어졌다. 보내지 못한 변경은 REST 로 저장한다(baseVersion 은 마지막 saved/joined version).

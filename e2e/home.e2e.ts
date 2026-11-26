@@ -383,7 +383,7 @@ test("홈 API가 404를 주면 다음 조회에서 바로 마지막 내용을 �
     timeout: 15_000,
   });
   await expect(
-    page.getByRole("heading", { name: "최신 정보를 불러오지 못했습니다" }),
+    page.getByRole("heading", { name: "최신 정보를 불러오지 못했어요" }),
   ).toBeVisible();
 });
 
@@ -411,7 +411,7 @@ test("홈에서 연 업무가 404가 되면 뒤로 가도 홈 캐시에서 다�
   await call("DELETE", `/api/v1/tasks/${created.id}`, seed.member.tokens);
   await today.getByRole("link", { name: new RegExp(title) }).click();
   await expect(
-    page.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+    page.getByText("업무를 찾을 수 없거나 접근할 수 없어요"),
   ).toBeVisible();
   await page.evaluate((text) => {
     const w = window as unknown as { reappeared: boolean };

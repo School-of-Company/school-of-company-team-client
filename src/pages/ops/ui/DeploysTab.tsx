@@ -79,8 +79,8 @@ export function DeploysTab() {
         errorMessage={serviceErrorMessage}
         empty={
           <EmptyState
-            title="등록된 서비스가 없습니다"
-            description="서비스를 등록하고 저장소를 연결하면 배포와 릴리스가 여기에 쌓입니다."
+            title="등록된 서비스가 없어요"
+            description="서비스를 등록하고 저장소를 연결하면 배포와 릴리스가 여기에 쌓여요."
           />
         }
       >
@@ -111,7 +111,7 @@ function ServiceDelivery({
   if (lookup.notFound)
     return (
       <EmptyState
-        title="서비스를 찾을 수 없습니다"
+        title="서비스를 찾을 수 없어요"
         description="목록에서 서비스를 다시 고르세요."
       />
     );

@@ -41,7 +41,7 @@ for (const surface of ["page", "panel"] as const)
     await expect(detail.getByText("문서를 볼 권한이 없습니다.")).toBeVisible();
     await expect(
       detail.getByRole("heading", {
-        name: "GitHub 연결을 불러오지 못했습니다",
+        name: "GitHub 연결을 불러오지 못했어요",
       }),
     ).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('[aria-label="업무를 불러오는 중"]')).toHaveCount(

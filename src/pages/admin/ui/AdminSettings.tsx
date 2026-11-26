@@ -29,8 +29,8 @@ export function AdminSettings({
   if (user.role !== "LEAD")
     return (
       <ErrorState
-        title="관리자 권한이 필요합니다"
-        description="헤드 어드민만 조직 사용자와 프로젝트를 관리할 수 있습니다."
+        title="관리자 권한이 필요해요"
+        description="헤드 어드민만 조직 사용자와 프로젝트를 관리할 수 있어요."
       />
     );
   if (section === "users" && users.isError)
@@ -69,7 +69,7 @@ export function AdminSettings({
               rowClassName="h-12"
             />
           ) : users.data?.length === 0 ? (
-            <EmptyState title="조직 사용자가 없습니다" />
+            <EmptyState title="조직 사용자가 없어요" />
           ) : (
             <div className="admin-user-table-wrap">
               <table className="admin-user-table">
@@ -210,13 +210,13 @@ export function AdminSettings({
                               {lastLead && (
                                 <p className="text-sm text-muted">
                                   마지막 활성 헤드 어드민이므로 해제, 이용
-                                  중지가 차단됩니다.
+                                  중지가 차단돼요.
                                 </p>
                               )}
                               {self && !lastLead && (
                                 <p className="text-sm text-muted">
                                   자기 계정의 관리자 해제, 이용 중지는 할 수
-                                  없습니다.
+                                  없어요.
                                 </p>
                               )}
                             </AdminRowMenu>
@@ -236,7 +236,7 @@ export function AdminSettings({
           )}
           {change.isSuccess && (
             <p role="status" className="text-sm">
-              사용자 상태를 변경했습니다.
+              사용자 상태를 변경했어요.
             </p>
           )}
         </section>

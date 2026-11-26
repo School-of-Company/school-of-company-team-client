@@ -63,7 +63,7 @@ export function RevisionsDialog({
           onRetry={() => void revisions.refetch()}
         />
       ) : revisions.data.length === 0 ? (
-        <EmptyState title="변경 이력이 없습니다" />
+        <EmptyState title="변경 이력이 없어요" />
       ) : (
         <ul className="list" aria-label="변경 이력">
           {revisions.data.map((revision, index) => (

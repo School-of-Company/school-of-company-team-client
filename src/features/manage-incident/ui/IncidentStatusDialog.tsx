@@ -101,7 +101,7 @@ function StatusForm({
             </label>
           ))}
         </div>
-        {same && <p className="text-sm text-muted">지금 상태와 같습니다.</p>}
+        {same && <p className="text-sm text-muted">지금 상태와 같아요.</p>}
       </fieldset>
       <Field
         id={`${id}-at`}

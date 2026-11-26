@@ -19,7 +19,7 @@ export function PullRequestSignals({
           신호 없음
         </SignalChip>
         <span className="text-xs text-muted">
-          이 PR의 GitHub 웹훅을 아직 받지 못했습니다.
+          이 PR의 GitHub 웹훅을 아직 받지 못했어요.
         </span>
       </p>
     );
@@ -43,7 +43,7 @@ export function PullRequestSignals({
           title={
             signal.ci.completedAt
               ? `완료 ${formatDate(signal.ci.completedAt, time)}`
-              : "이 커밋의 완료된 CI 결과가 없습니다"
+              : "이 커밋의 완료된 CI 결과가 없어요"
           }
         >
           <CiChip status={signal.ci.status} />
