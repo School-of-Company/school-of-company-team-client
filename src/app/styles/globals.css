@@ -560,6 +560,15 @@ select.ui-input {
   margin-top: var(--space-2);
 }
 
+/* 정책 등으로 막힌 세그먼트 칸. 이유는 칸의 title 과 아래 안내 줄에 둔다. */
+.ui-segmented-option:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ui-segmented-option:has(input:disabled) input {
+  cursor: not-allowed;
+}
+
 /* Dialog */
 .ui-dialog {
   position: fixed;
@@ -2250,6 +2259,37 @@ html[data-sidebar-closed~="account"]
   font-size: var(--text-xs);
   color: var(--muted);
 }
+.task-history {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+}
+/* 줄 높이를 배지 높이에 맞춰 고정한다(스켈레톤 한 줄과 실제 첫 줄이 같은 높이). */
+.task-history li {
+  min-height: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+.task-comments {
+  display: grid;
+  gap: var(--space-5);
+}
+.task-comment {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.task-comment-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  min-height: var(--control-sm);
+  font-size: var(--text-sm);
+}
 .task-github-disclosure > summary {
   width: fit-content;
   cursor: pointer;
@@ -2505,6 +2545,73 @@ html[data-sidebar-closed~="account"]
 }
 
 /* ───────────────────────── Account ───────────────────────── */
+
+/* 에이전트 표(토큰, 활동 기록): 좁으면 표 안에서만 가로로 스크롤한다. */
+.agent-table-wrap {
+  overflow-x: auto;
+}
+.agent-table {
+  width: 100%;
+  min-width: var(--agent-table-min);
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  text-align: left;
+}
+.agent-table th,
+.agent-table td {
+  padding: var(--space-3);
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+.agent-table thead {
+  color: var(--muted);
+}
+.agent-table thead th {
+  font-weight: 500;
+  white-space: nowrap;
+}
+/* 프로젝트 고르기: 높이를 고정한 체크 목록(고른 개수가 늘어도 폼이 밀리지 않는다). */
+.agent-project-picker {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  height: var(--agent-picker-height);
+  overflow-y: auto;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--surface-box);
+}
+.agent-project-picker label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-sm);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+.agent-project-picker label:hover {
+  background: var(--surface-hover);
+}
+.agent-area-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 9rem;
+  align-items: center;
+  gap: var(--space-3);
+}
+.agent-limits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  font-size: var(--text-sm);
+}
+.agent-limits dt {
+  color: var(--muted);
+}
+.agent-limits div {
+  display: flex;
+  gap: var(--space-2);
+}
 
 .ui-theme-select {
   display: grid;

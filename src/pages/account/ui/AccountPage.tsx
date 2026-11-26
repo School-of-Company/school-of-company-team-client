@@ -15,7 +15,8 @@ import {
 } from "@/entities/user";
 import { AuthGuard, authErrorMessage, OAuthButton } from "@/features/auth";
 import { unlinkDiscord } from "../api/unlink-discord";
-import { ApiTokens } from "./ApiTokens";
+import { ApiTokens, ApiTokensInfo } from "./ApiTokens";
+import { MyAgentActivity } from "./MyAgentActivity";
 import { normalizeApiError } from "@/shared/api";
 import {
   Avatar,
@@ -305,10 +306,24 @@ function AccountContent({ user }: { readonly user: User }) {
           aria-labelledby="api-tokens-title"
           className="settings-card grid gap-4"
         >
-          <h2 id="api-tokens-title" className="text-lg font-semibold">
-            API 토큰
-          </h2>
+          <div className="flex items-center gap-1">
+            <h2 id="api-tokens-title" className="text-lg font-semibold">
+              API 토큰
+            </h2>
+            <ApiTokensInfo />
+          </div>
           <ApiTokens />
+        </section>
+      )}
+      {userDestination(user) === "/" && (
+        <section
+          aria-labelledby="agent-activity-title"
+          className="settings-card grid gap-4"
+        >
+          <h2 id="agent-activity-title" className="text-lg font-semibold">
+            에이전트 활동
+          </h2>
+          <MyAgentActivity />
         </section>
       )}
       <section
