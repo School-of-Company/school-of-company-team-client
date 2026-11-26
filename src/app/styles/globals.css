@@ -935,6 +935,13 @@ html[data-sidebar-closed~="account"]
   padding-top: var(--space-3);
   border-color: var(--border);
 }
+/* 내 정보 조회 중인 관리자 메뉴: 토큰 역할이 LEAD면 첫 그림부터 자리를 잡아 응답 뒤에 아래 메뉴가 밀리지 않는다. */
+.ui-nav-link[data-provisional] {
+  display: none;
+}
+html[data-session-role="LEAD"] .ui-nav-link[data-provisional] {
+  display: flex;
+}
 .app-user {
   display: flex;
   min-width: 0;

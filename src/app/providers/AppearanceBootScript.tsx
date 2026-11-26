@@ -1,5 +1,6 @@
 "use client";
 
+import { sessionRoleBootScript } from "@/entities/user";
 import { sidebarBootScript, themeBootScript } from "@/shared/lib";
 
 export function AppearanceBootScript() {
@@ -8,7 +9,9 @@ export function AppearanceBootScript() {
       id="appearance-boot"
       type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
       suppressHydrationWarning
-      dangerouslySetInnerHTML={{ __html: themeBootScript + sidebarBootScript }}
+      dangerouslySetInnerHTML={{
+        __html: themeBootScript + sidebarBootScript + sessionRoleBootScript,
+      }}
     />
   );
 }

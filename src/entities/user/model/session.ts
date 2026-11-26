@@ -9,6 +9,12 @@ const RESTRICTION_KEY = "soc.account-restriction";
 const listeners = new Set<() => void>();
 const sessionChangeListeners = new Set<() => void>();
 
+/**
+ * 첫 그림 전에(app/layout.tsx head) 액세스 토큰의 role 클레임을 html data-session-role 에 적는다.
+ * 내 정보가 오기 전 관리자 메뉴 자리를 잡는 화면 표시용 짐작이며 권한 판단에 쓰지 않는다(서버와 화면이 따로 검사한다).
+ */
+export const sessionRoleBootScript = `(function(){try{var t=sessionStorage.getItem("${ACCESS_KEY}"),p=t&&t.split(".")[1],r=p&&JSON.parse(atob(p.replace(/-/g,"+").replace(/_/g,"/"))).role;if(typeof r==="string")document.documentElement.dataset.sessionRole=r}catch(e){}})();`;
+
 export function subscribeSessionChanges(listener: () => void) {
   sessionChangeListeners.add(listener);
   return () => {

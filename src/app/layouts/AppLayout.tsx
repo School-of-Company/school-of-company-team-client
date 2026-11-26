@@ -10,7 +10,7 @@ export function AppLayout({ children }: { readonly children: ReactNode }) {
   const me = useMe();
   return (
     <AppShell
-      isHeadAdmin={isHeadAdmin(me.data)}
+      isHeadAdmin={me.isPending ? undefined : isHeadAdmin(me.data)}
       userSlot={
         <div className="app-user">
           <span className="flex min-w-0 items-center gap-2">
