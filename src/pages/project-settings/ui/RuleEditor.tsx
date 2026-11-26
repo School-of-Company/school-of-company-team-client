@@ -256,7 +256,8 @@ function RuleEditorForm({
           {form.event === "TASK_STALE" && (
             <Field
               id={id("stale")}
-              label="멈춘 일수(1~30일)"
+              label="멈춘 일수"
+              hint="1일부터 30일까지 정할 수 있어요."
               error={errors.staleDays}
             >
               <Input
@@ -268,9 +269,12 @@ function RuleEditorForm({
                 step={1}
                 value={form.staleDays}
                 aria-invalid={!!errors.staleDays || undefined}
-                aria-describedby={
-                  errors.staleDays ? `${id("stale")}-error` : undefined
-                }
+                aria-describedby={[
+                  `${id("stale")}-hint`,
+                  errors.staleDays ? `${id("stale")}-error` : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 onChange={(event) => set({ staleDays: event.target.value })}
               />
             </Field>
@@ -420,6 +424,9 @@ function RuleEditorForm({
                 id={id("bucket")}
                 value={form.bucketId}
                 aria-invalid={!!errors.bucketId || undefined}
+                aria-describedby={
+                  errors.bucketId ? `${id("bucket")}-error` : undefined
+                }
                 onChange={(event) => set({ bucketId: event.target.value })}
               >
                 <option value="">버킷 선택</option>
@@ -461,6 +468,9 @@ function RuleEditorForm({
                 id={id("priority")}
                 value={form.priority}
                 aria-invalid={!!errors.priority || undefined}
+                aria-describedby={
+                  errors.priority ? `${id("priority")}-error` : undefined
+                }
                 onChange={(event) =>
                   set({ priority: event.target.value as RuleForm["priority"] })
                 }
@@ -495,13 +505,13 @@ function RuleEditorForm({
           {acceptsMessageTemplate(form.event) && (
             <TemplateInput
               id={id("message")}
-              label="문구(선택)"
+              label="문구"
               multiline
               value={form.messageTemplate}
               max={MESSAGE_TEMPLATE_MAX}
               error={errors.messageTemplate}
               variables={variables}
-              hint="비우면 기본 문구를 씁니다. @everyone, @here, <@…>, <#…> 같은 멘션 문법은 저장할 수 없습니다."
+              hint="쓰지 않아도 돼요. 비우면 기본 문구로 보내요. @everyone, @here, <@…>, <#…> 같은 멘션 문법은 저장할 수 없어요."
               onChange={(messageTemplate) => set({ messageTemplate })}
             />
           )}
@@ -596,6 +606,7 @@ function ParticipantSelect(props: {
         id={props.id}
         value={props.value}
         aria-invalid={!!props.error || undefined}
+        aria-describedby={props.error ? `${props.id}-error` : undefined}
         onChange={(event) => props.onChange(event.target.value)}
       >
         <option value="">참여자 선택</option>
@@ -622,6 +633,8 @@ function TemplateInput(props: {
   readonly onChange: (value: string) => void;
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
+  const [blocked, setBlocked] = useState("");
+  const left = props.max - props.value.length;
   const describedBy = [
     `${props.id}-count`,
     props.variables.length ? `${props.id}-vars` : "",
@@ -636,7 +649,11 @@ function TemplateInput(props: {
     const start = element?.selectionStart ?? props.value.length;
     const end = element?.selectionEnd ?? props.value.length;
     const next = props.value.slice(0, start) + text + props.value.slice(end);
-    if (next.length > props.max) return;
+    if (next.length > props.max) {
+      setBlocked(`${text}를 넣으면 ${props.max}자를 넘어서 넣지 않았어요.`);
+      return;
+    }
+    setBlocked("");
     props.onChange(next);
     requestAnimationFrame(() => {
       element?.focus();
@@ -650,8 +667,10 @@ function TemplateInput(props: {
     maxLength: props.max,
     "aria-invalid": !!props.error || undefined,
     "aria-describedby": describedBy,
-    onChange: (event: { target: { value: string } }) =>
-      props.onChange(event.target.value),
+    onChange: (event: { target: { value: string } }) => {
+      setBlocked("");
+      props.onChange(event.target.value);
+    },
   };
   return (
     <Field
@@ -692,11 +711,15 @@ function TemplateInput(props: {
         <span
           id={`${props.id}-count`}
           className="text-xs text-muted tabular-nums"
-          aria-live="polite"
         >
           {props.value.trim().length}/{props.max}
         </span>
       </div>
+      {blocked && <p className="text-xs text-danger">{blocked}</p>}
+      {/* 글자를 칠 때마다 읽지 않고, 한도에 가까워졌거나 넣지 못했을 때만 알린다. */}
+      <p className="sr-only" aria-live="polite">
+        {blocked || (left <= 20 ? `${left}자 남았어요.` : "")}
+      </p>
     </Field>
   );
 }
@@ -706,6 +729,16 @@ const previewTime: Intl.DateTimeFormatOptions = {
   hour: "2-digit",
   minute: "2-digit",
 };
+
+function previewSummary(preview: ReturnType<typeof useRulePreview>) {
+  if (preview.isPending) return "";
+  if (preview.isError)
+    return ruleErrorMessage(normalizeApiError(preview.error));
+  const data = preview.data;
+  if (!data) return "";
+  if (!data.supported) return "이 이벤트는 미리볼 수 없어요.";
+  return `미리보기 결과 ${data.items.length}건이에요.`;
+}
 
 /** 미리보기 결과. 자리는 늘 같은 높이로 잡아 두어 결과가 와도 창이 흔들리지 않는다. */
 function RulePreviewPanel({
@@ -719,7 +752,7 @@ function RulePreviewPanel({
   let body: ReactNode;
   if (preview.isError)
     body = (
-      <p role="alert" className="text-sm text-danger">
+      <p className="text-sm text-danger">
         {ruleErrorMessage(normalizeApiError(preview.error))}
       </p>
     );
@@ -734,9 +767,8 @@ function RulePreviewPanel({
   else if (!data.supported)
     body = (
       <p className="text-sm text-muted">
-        이 이벤트는 미리보기를 지원하지 않습니다. 지난 일을 다시 찾아볼 기록이
-        남지 않는 이벤트라서입니다. 저장한 뒤에는 실행 기록에서 결과를 볼 수
-        있습니다.
+        이 이벤트는 지난 기록이 남지 않아 미리볼 수 없어요. 저장한 뒤 실행
+        기록에서 결과를 확인하세요.
       </p>
     );
   else if (data.items.length === 0)
@@ -769,11 +801,21 @@ function RulePreviewPanel({
               <div className="min-w-0">
                 <p className="truncate text-sm">{item.subject}</p>
                 <p className="text-xs text-muted">{item.detail}</p>
-                {resultMessage(item.resultCode, item.status, item.event) && (
+                {resultMessage(
+                  item.resultCode,
+                  item.status,
+                  item.event,
+                  item.action,
+                ) && (
                   <p
                     className={`text-xs ${item.status === "FAILED" ? "text-danger" : "text-muted"}`}
                   >
-                    {resultMessage(item.resultCode, item.status, item.event)}
+                    {resultMessage(
+                      item.resultCode,
+                      item.status,
+                      item.event,
+                      item.action,
+                    )}
                   </p>
                 )}
               </div>
@@ -798,6 +840,10 @@ function RulePreviewPanel({
         </p>
       )}
       {body}
+      {/* 결과 목록 전체 대신 한 줄 요약만 읽는다. */}
+      <p className="sr-only" aria-live="polite">
+        {previewSummary(preview)}
+      </p>
     </section>
   );
 }
