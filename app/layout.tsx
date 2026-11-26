@@ -16,8 +16,18 @@ const monoFont = JetBrains_Mono({
   display: "swap",
 });
 
+// 공유 미리보기(app/opengraph-image.png)의 절대 URL 기준. 서버에서만 읽는다.
+const siteUrl = process.env.SITE_URL;
+
 export const metadata: Metadata = {
+  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
   title: "School of Company",
+  openGraph: {
+    type: "website",
+    siteName: "School of Company",
+    title: "School of Company",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
