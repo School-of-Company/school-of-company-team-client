@@ -21,6 +21,7 @@ import {
   EmptyState,
   ErrorState,
   Field,
+  InfoTip,
   Input,
   Skeleton,
   Textarea,
@@ -105,12 +106,15 @@ export function IntakeFormSettings({
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          링크를 받은 외부 요청자가 로그인 없이 요구사항을 제출합니다.
-          {projectId
-            ? " 접수되면 이 프로젝트의 요구사항 탭에 쌓입니다."
-            : " 프로젝트가 아직 없는 요청용이며 헤드 어드민만 봅니다."}
-        </p>
+        <span className="flex items-center gap-1 text-sm text-muted">
+          양식 {forms.data.length}개
+          <InfoTip label="접수 양식 설명">
+            링크를 받은 외부 요청자가 로그인 없이 요구사항을 제출해요.
+            {projectId
+              ? " 접수되면 이 프로젝트의 요구사항 탭에 쌓여요."
+              : " 프로젝트가 아직 없는 요청용이고 헤드 어드민만 봐요."}
+          </InfoTip>
+        </span>
         {editable && (
           <Button variant="secondary" onClick={() => setEditing("new")}>
             양식 만들기
