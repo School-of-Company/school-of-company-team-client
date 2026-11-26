@@ -139,6 +139,7 @@ function CommentItem({
         <Avatar name={author} src={avatarSrc(comment.author?.avatarUrl)} />
         <span className="font-semibold">{author}</span>
         {comment.viaAgent && <Badge className="badge-blue">에이전트</Badge>}
+        {comment.viaAutomation && <Badge>자동화</Badge>}
         <time className="text-xs text-muted" dateTime={comment.createdAt}>
           {formatDate(comment.createdAt, dateTime)}
         </time>

@@ -39,6 +39,8 @@ export type {
   UpdateTask,
   MoveTask,
 } from "./model/types";
+export { agentQueueLabel } from "./model/agent-queue";
+export type { TaskAgentQueue } from "./model/agent-queue";
 export { ciLabels, reviewLabels, suggestsDone } from "./model/dev-signal";
 export type { CiStatus, DevSignal, ReviewSignal } from "./model/dev-signal";
 export { SignalChip, CiChip, ReviewChip } from "./ui/SignalChip";
