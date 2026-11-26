@@ -56,6 +56,12 @@ test("toggling sends the full definition back with only enabled changed", () => 
     bucketId: null,
     reviewerId: null,
     mentions: { assignees: true, reviewers: false, pm: true },
+    staleDays: null,
+    schedule: null,
+    assigneeId: null,
+    priority: null,
+    titleTemplate: null,
+    messageTemplate: null,
   });
 });
 
@@ -93,7 +99,10 @@ test("incident rules carry no conditions and can only mention the PM", () => {
     reviewers: false,
     pm: true,
   });
-  assert.deepEqual(allowedActions("INCIDENT_CREATED"), ["NOTIFY_DISCORD"]);
+  assert.deepEqual(allowedActions("INCIDENT_CREATED"), [
+    "NOTIFY_DISCORD",
+    "CREATE_TASK",
+  ]);
 });
 
 test("there is no status-changing or external write action, and the incident event is offered", () => {
@@ -102,6 +111,9 @@ test("there is no status-changing or external write action, and the incident eve
     "MARK_ATTENTION",
     "ASSIGN_REVIEWER",
     "MOVE_BUCKET",
+    "ASSIGN_USER",
+    "SET_PRIORITY",
+    "CREATE_TASK",
   ]);
   assert.ok(selectableEvents.includes("INCIDENT_CREATED"));
 });
@@ -146,13 +158,27 @@ test("summaries read as short Korean phrases", () => {
   );
   assert.equal(resultMessage("NEW_CODE"), "NEW_CODE");
   assert.equal(
-    resultMessage("PRIVATE_SOURCE_RESTRICTED", "SKIPPED"),
-    "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.",
+    resultMessage(
+      "PRIVATE_SOURCE_RESTRICTED",
+      "SKIPPED",
+      "TASK_BLOCKED",
+      "NOTIFY_DISCORD",
+    ),
+    "비공개 원본 업무라 공유 채널에 게시하지 않았어요.",
+  );
+  assert.equal(
+    resultMessage(
+      "PRIVATE_SOURCE_RESTRICTED",
+      "SKIPPED",
+      "TASK_BLOCKED",
+      "CREATE_TASK",
+    ),
+    "비공개 원본 업무의 제목이 새 업무로 옮겨 가지 않게 업무를 만들지 않았어요.",
   );
   // 서버가 SKIPPED 사유를 새로 더해도 문장으로 보인다(M1: 비공개 원본 공유 채널 게시 금지).
   assert.equal(
     resultMessage("SHARING_RESTRICTED_TASK", "SKIPPED"),
-    "비공개 원본 업무라 공유 채널에 게시하지 않았습니다.",
+    "비공개 원본 업무라 실행하지 않았어요.",
   );
   assert.equal(
     resultMessage("SOMETHING_NEW", "SKIPPED"),
@@ -233,7 +259,12 @@ test("requirement and sprint events are taskless like the server's TASKLESS_EVEN
   for (const event of tasklessEvents) {
     assert.ok(isTasklessEvent(event), event);
     assert.ok(selectableEvents.includes(event), event);
-    assert.deepEqual(allowedActions(event), ["NOTIFY_DISCORD"]);
+    assert.deepEqual(
+      allowedActions(event),
+      event.startsWith("REQUIREMENT_")
+        ? ["NOTIFY_DISCORD"]
+        : ["NOTIFY_DISCORD", "CREATE_TASK"],
+    );
     const body = formToRequest(
       changeEvent({ ...ruleToForm(rule), action: "MOVE_BUCKET" }, event),
     );

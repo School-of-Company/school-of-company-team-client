@@ -9,8 +9,10 @@ import { api } from "@/shared/api";
 import { BOARD_POLL_INTERVAL } from "@/shared/config";
 import type {
   AutomationRule,
+  RulePreview,
   RuleRunPage,
   RuleRunStatus,
+  RuleTemplate,
   SaveRuleRequest,
 } from "../model/rule";
 
@@ -27,6 +29,7 @@ export const ruleKeys = {
   rules: (projectId: string) => ["automation", projectId, "rules"] as const,
   runs: (projectId: string, filter: RunFilter) =>
     ["automation", projectId, "runs", filter.ruleId, filter.status] as const,
+  templates: () => ["automation", "rule-templates"] as const,
 };
 
 export const ruleQueries = {
@@ -61,6 +64,24 @@ export const ruleQueries = {
       retry: false,
     }),
 };
+
+/** 내장 템플릿은 서버 고정 목록이라 한 번 읽으면 다시 읽지 않는다. */
+export const ruleTemplatesQuery = queryOptions({
+  queryKey: ruleKeys.templates(),
+  queryFn: async () =>
+    (await api.get<readonly RuleTemplate[]>("/api/v1/rule-templates")).data,
+  staleTime: Infinity,
+  retry: false,
+});
+
+/** 저장하지 않고 지난 14일 계기에 걸렸을지 본다. 서버는 아무것도 쓰지 않는다. */
+export function useRulePreview(projectId: string) {
+  return useMutation({
+    mutationFn: async (body: SaveRuleRequest) =>
+      (await api.post<RulePreview>(`${base(projectId)}/rules/preview`, body))
+        .data,
+  });
+}
 
 export type RuleChange =
   | { readonly kind: "create"; readonly body: SaveRuleRequest }
