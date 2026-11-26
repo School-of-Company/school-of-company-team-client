@@ -27,8 +27,10 @@ import {
   triggerText,
   type AutomationRule,
   type RuleConditionField,
+  type RuleForm,
 } from "../model/rule";
 import { RuleEditor } from "./RuleEditor";
+import { RuleTemplatePicker } from "./RuleTemplatePicker";
 import { RuleRuns, RunStatus } from "./RuleRuns";
 
 /**
@@ -48,21 +50,27 @@ export function AutomationSettings({
   const rules = useQuery(ruleQueries.rules(project.id));
   const buckets = useQuery(projectQueries.buckets(project.id));
   const change = useRuleChange(project.id);
-  const [editing, setEditing] = useState<AutomationRule | null | undefined>();
+  // rule = null 은 새 규칙, initial 은 템플릿으로 채운 값.
+  const [editing, setEditing] = useState<
+    | { readonly rule: AutomationRule | null; readonly initial?: RuleForm }
+    | undefined
+  >();
+  const [picking, setPicking] = useState(false);
   const [deleting, setDeleting] = useState<AutomationRule | null>(null);
   const [runRuleId, setRunRuleId] = useState("");
   const [toggling, setToggling] = useState<{
     readonly ruleId: string;
     readonly enabled: boolean;
   } | null>(null);
-  const reviewers = project.members
+  const participants = project.members
     .filter((member) => activeUserIds.has(member.userId))
     .map((member) => ({ value: member.userId, label: member.name }));
 
   const intro = (
     <p className="max-w-xl text-sm text-muted">
-      업무 이벤트나 장애가 생기면 조건에 맞을 때 동작 하나를 실행합니다. 업무
-      상태는 바꾸지 않고, 개인, 팀 공용 업무에는 걸리지 않습니다.
+      업무, 장애, 배포, 스프린트 같은 일이 생기거나 정한 시각이 되면 조건에 맞을
+      때 동작 하나를 실행합니다. 업무 상태는 바꾸지 않고, 개인, 팀 공용 업무에는
+      걸리지 않습니다.
     </p>
   );
   // 안내 문단은 바로 그리고 목록 자리만 빈 상태 높이로 잡는다.
@@ -86,8 +94,13 @@ export function AutomationSettings({
   const list = rules.data;
   const now = rules.dataUpdatedAt;
   const create = editable && (
-    <Button onClick={() => setEditing(null)}>
+    <Button onClick={() => setEditing({ rule: null })}>
       <Icon name="plus" className="inline-block" /> 규칙 추가
+    </Button>
+  );
+  const fromTemplate = editable && (
+    <Button variant="secondary" onClick={() => setPicking(true)}>
+      템플릿에서 만들기
     </Button>
   );
   return (
@@ -95,7 +108,10 @@ export function AutomationSettings({
       <div className="grid gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           {intro}
-          {list.length > 0 && create}
+          <span className="flex flex-wrap gap-2">
+            {fromTemplate}
+            {list.length > 0 && create}
+          </span>
         </div>
         <StaleNotice query={rules} />
         {list.length === 0 ? (
@@ -134,7 +150,7 @@ export function AutomationSettings({
                 }}
                 onEdit={() => {
                   change.reset();
-                  setEditing(rule);
+                  setEditing({ rule });
                 }}
                 onDelete={() => setDeleting(rule)}
                 onShowRuns={() => {
@@ -160,12 +176,22 @@ export function AutomationSettings({
         ruleId={runRuleId}
         onRuleChange={setRunRuleId}
       />
+      <RuleTemplatePicker
+        open={picking}
+        onClose={() => setPicking(false)}
+        onPick={(initial) => {
+          setPicking(false);
+          change.reset();
+          setEditing({ rule: null, initial });
+        }}
+      />
       <RuleEditor
         open={editing !== undefined}
         project={project}
         buckets={buckets.data ?? []}
-        reviewers={reviewers}
-        rule={editing ?? null}
+        participants={participants}
+        rule={editing?.rule ?? null}
+        initial={editing?.initial}
         onClose={() => setEditing(undefined)}
       />
       <Dialog

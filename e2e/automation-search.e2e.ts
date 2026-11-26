@@ -112,6 +112,9 @@ test("PM·헤드 어드민이 규칙을 만들고 끄고 켠다", async ({ page 
     "확인 필요로 표시",
     "리뷰어 지정",
     "버킷으로 옮기기",
+    "담당자 지정",
+    "우선순위 변경",
+    "업무 만들기",
   ]);
   await dialog.getByLabel("이름").fill("P0 막힘이면 PM 호출");
   await dialog.getByLabel("언제").selectOption("TASK_BLOCKED");

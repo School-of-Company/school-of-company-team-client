@@ -3410,6 +3410,61 @@ html[data-sidebar-closed~="account"]
   color: var(--foreground);
   font-weight: 600;
 }
+.rule-schedule {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.rule-hour.ui-input {
+  width: auto;
+}
+.rule-template-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+/* 미리보기 자리는 결과가 있든 없든 같은 높이다(창이 흔들리지 않게). 넘치면 안에서 스크롤한다. */
+.rule-preview {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  height: var(--empty-height);
+  padding: var(--space-3) var(--space-4);
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  background: var(--surface-box);
+}
+.rule-preview[data-stale] .rule-preview-list {
+  opacity: 0.6;
+}
+.rule-preview-item {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+}
+.rule-template-list {
+  display: grid;
+  gap: var(--space-2);
+}
+.rule-template {
+  display: grid;
+  width: 100%;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-box);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.rule-template:hover {
+  background: var(--surface-hover);
+}
 .rule-list {
   border-top: 1px solid var(--border);
 }
