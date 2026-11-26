@@ -436,3 +436,32 @@ test("웹훅 전달 기록은 시도 수와 마지막 응답을 한 줄로 쓴�
   );
   assert.equal(deliveryText({ attempts: 1 }), null);
 });
+
+test("DM 규칙은 편집과 켜기, 끄기 사이에 받는 사람과 문구를 그대로 돌려보낸다", () => {
+  const dm: AutomationRule = {
+    ...teamRule,
+    scope: "PROJECT",
+    projectId: "P1",
+    projects: null,
+    conditions: [],
+    action: "DISCORD_DM",
+    escalation: null,
+    mentions: { assignees: true, reviewers: false, pm: true },
+    dmUser: { id: "U9", name: "김하나" },
+    messageTemplate: "{task.key} 확인해 주세요",
+    disabledReason: null,
+  };
+  const form = ruleToForm(dm);
+  assert.deepEqual(form.mentions, dm.mentions);
+  assert.equal(form.dmUserId, "U9");
+  assert.deepEqual(validateRuleForm(form), {});
+  for (const body of [formToRequest(form), toggleRequest(dm, true)]) {
+    assert.equal(body.action, "DISCORD_DM");
+    assert.deepEqual(body.mentions, dm.mentions);
+    assert.equal(body.dmUserId, "U9");
+    assert.equal(body.messageTemplate, "{task.key} 확인해 주세요");
+    assert.equal(body.escalation, null);
+  }
+  assert.equal(toggleRequest(dm, false).enabled, false);
+  assert.equal(actionText(dm), "Discord DM 보내기: 담당자, PM, 김하나");
+});
