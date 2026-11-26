@@ -35,6 +35,7 @@ import {
   fieldLabels,
   formToRequest,
   isTasklessEvent,
+  acceptsMessageTemplate,
   MESSAGE_TEMPLATE_MAX,
   resultMessage,
   ruleErrorMessage,
@@ -491,17 +492,19 @@ function RuleEditorForm({
       )}
       {form.action === "NOTIFY_DISCORD" && (
         <>
-          <TemplateInput
-            id={id("message")}
-            label="문구(선택)"
-            multiline
-            value={form.messageTemplate}
-            max={MESSAGE_TEMPLATE_MAX}
-            error={errors.messageTemplate}
-            variables={variables}
-            hint="비우면 기본 문구를 씁니다. @everyone, @here, <@…>, <#…> 같은 멘션 문법은 저장할 수 없습니다."
-            onChange={(messageTemplate) => set({ messageTemplate })}
-          />
+          {acceptsMessageTemplate(form.event) && (
+            <TemplateInput
+              id={id("message")}
+              label="문구(선택)"
+              multiline
+              value={form.messageTemplate}
+              max={MESSAGE_TEMPLATE_MAX}
+              error={errors.messageTemplate}
+              variables={variables}
+              hint="비우면 기본 문구를 씁니다. @everyone, @here, <@…>, <#…> 같은 멘션 문법은 저장할 수 없습니다."
+              onChange={(messageTemplate) => set({ messageTemplate })}
+            />
+          )}
           <fieldset className="grid gap-2">
             <legend className="text-sm font-medium">멘션</legend>
             <div className="flex flex-wrap gap-x-5 gap-y-2">

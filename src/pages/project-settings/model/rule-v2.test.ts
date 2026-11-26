@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  acceptsMessageTemplate,
   actionText,
   allowedActions,
   changeEvent,
@@ -162,6 +163,18 @@ test("form becomes a request with only the fields the event and action use", () 
     }).priority,
     "P1",
   );
+});
+
+test("requirement events never send or validate a message template", () => {
+  const form = {
+    ...emptyRuleForm(),
+    event: "REQUIREMENT_SUBMITTED" as const,
+    messageTemplate: "@everyone {task.key}",
+  };
+  assert.equal(acceptsMessageTemplate(form.event), false);
+  assert.equal(acceptsMessageTemplate("TASK_BLOCKED"), true);
+  assert.equal(formToRequest(form).messageTemplate, null);
+  assert.equal(validateRuleForm(form).messageTemplate, undefined);
 });
 
 test("templates reject unknown variables and mention syntax like the server", () => {

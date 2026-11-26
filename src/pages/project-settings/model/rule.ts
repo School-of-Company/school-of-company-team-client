@@ -208,7 +208,7 @@ const eventSpecs: Readonly<
   },
   TASK_STALE: {
     label: "업무가 멈춰 있을 때",
-    help: "끝나지 않은 업무가 정한 일수 동안 바뀌지 않으면 실행합니다.",
+    help: "끝나지 않은 업무가 정한 일수 동안 바뀌지 않으면 실행합니다. 규칙이 만든 업무는 빼고 봅니다.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
@@ -344,6 +344,10 @@ export function eventHelp(event: string): string {
 export function isTasklessEvent(event: string): boolean {
   const kind = specOf(event)?.kind;
   return kind === "taskless" || kind === "requirement";
+}
+/** 요구사항 이벤트는 고정 본문이라 Discord 문구 템플릿을 받지 않는다(서버 RULE_ACTION_NOT_APPLICABLE). */
+export function acceptsMessageTemplate(event: string): boolean {
+  return specOf(event)?.kind !== "requirement";
 }
 /** 그 이벤트의 템플릿에서 쓸 수 있는 변수(중괄호 없이). */
 export function templateVariables(event: string): readonly string[] {
@@ -658,7 +662,10 @@ export function formToRequest(form: RuleForm): SaveRuleRequest {
     priority: form.action === "SET_PRIORITY" ? form.priority || null : null,
     titleTemplate:
       form.action === "CREATE_TASK" ? form.titleTemplate.trim() || null : null,
-    messageTemplate: notify ? form.messageTemplate.trim() || null : null,
+    messageTemplate:
+      notify && acceptsMessageTemplate(form.event)
+        ? form.messageTemplate.trim() || null
+        : null,
   };
 }
 
@@ -737,7 +744,11 @@ export function validateRuleForm(form: RuleForm): RuleFormErrors {
         errors.titleTemplate = title ? problem : "만들 업무 제목을 입력하세요.";
     }
   }
-  if (form.action === "NOTIFY_DISCORD" && form.messageTemplate.trim()) {
+  if (
+    form.action === "NOTIFY_DISCORD" &&
+    acceptsMessageTemplate(form.event) &&
+    form.messageTemplate.trim()
+  ) {
     const message = form.messageTemplate.trim();
     errors.messageTemplate =
       message.length > MESSAGE_TEMPLATE_MAX

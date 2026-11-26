@@ -46,8 +46,7 @@ export function RuleTemplatePicker({
               >
                 <span className="text-sm font-semibold">{template.name}</span>
                 <span className="text-xs text-muted">
-                  {/* ponytail: 서버 설명에 가운뎃점이 섞여 와도 UI 문구 규칙(구분자 · 금지)에 맞춘다. */}
-                  {template.description.replaceAll("·", ", ")}
+                  {template.description}
                 </span>
               </button>
             </li>
