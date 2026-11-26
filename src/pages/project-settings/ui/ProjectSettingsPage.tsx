@@ -44,7 +44,7 @@ export function ProjectSettingsSkeleton() {
         </p>
         <div className="flex min-w-0 items-center gap-3">
           <span className="ui-avatar" />
-          <h1 className="break-words">
+          <h1 className="wrap-anywhere">
             <span className="ui-skeleton-text">프로젝트 이름</span>
           </h1>
         </div>
@@ -136,7 +136,7 @@ function ProjectSettingsContent({
         </p>
         <div className="flex min-w-0 items-center gap-3">
           <ProjectAvatar project={project.data} />
-          <h1 className="break-words">{project.data.name}</h1>
+          <h1 className="wrap-anywhere">{project.data.name}</h1>
         </div>
       </header>
       <ProjectNav project={project.data} user={user} />

@@ -14,6 +14,7 @@ export {
   getRefreshToken,
   rotateSession,
   replaceSession,
+  sessionRoleBootScript,
   subscribeSessionChanges,
   useAccessToken,
   useSessionReady,

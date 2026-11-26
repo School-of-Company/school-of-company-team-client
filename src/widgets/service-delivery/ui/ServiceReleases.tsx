@@ -147,7 +147,7 @@ export function ReleaseRow({
         <span className="flex flex-wrap items-center gap-2">
           <span className="font-medium break-all">{release.tag}</span>
           {release.name && release.name !== release.tag && (
-            <span className="text-sm break-words text-foreground-2">
+            <span className="text-sm wrap-anywhere text-foreground-2">
               {release.name}
             </span>
           )}

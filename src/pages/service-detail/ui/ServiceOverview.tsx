@@ -39,7 +39,7 @@ export function ServiceOverview({
         <div className="task-main">
           <section aria-label="설명">
             {service.description ? (
-              <p className="text-md break-words whitespace-pre-wrap">
+              <p className="text-md wrap-anywhere whitespace-pre-wrap">
                 {service.description}
               </p>
             ) : (

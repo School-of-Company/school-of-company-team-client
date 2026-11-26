@@ -7,7 +7,7 @@ export function TaskDescription({ task }: { readonly task: TaskDetail }) {
       {task.blocked && (
         <section>
           <h2 className="task-section-title">막힌 사유</h2>
-          <p className="text-sm break-words whitespace-pre-wrap text-danger">
+          <p className="text-sm wrap-anywhere whitespace-pre-wrap text-danger">
             {task.blockedReason || "사유가 적혀 있지 않아요."}
           </p>
         </section>

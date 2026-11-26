@@ -44,6 +44,7 @@ export type AppShellProps = {
   readonly children: ReactNode;
   readonly userSlot?: ReactNode;
   readonly mobileUserSlot?: ReactNode;
+  /** `undefined`는 아직 모름(내 정보 조회 중): 토큰의 역할로 첫 그림에 자리를 잡는다(`sessionRoleBootScript`). */
   readonly isHeadAdmin?: boolean;
 };
 
@@ -51,7 +52,7 @@ export function AppShell({
   children,
   userSlot,
   mobileUserSlot,
-  isHeadAdmin = false,
+  isHeadAdmin,
 }: AppShellProps) {
   const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
@@ -217,6 +218,8 @@ export function AppShell({
     readonly icon: IconName;
     /** Other paths that belong to the same entry (내 업무 목록 / 보드, 운영 아래 상세). */
     readonly also?: readonly string[];
+    /** 내 정보가 오기 전 토큰 역할로만 보이는 항목(CSS가 html[data-session-role]로 보이고 숨긴다). */
+    readonly provisional?: boolean;
   };
   // 순서와 그룹은 AGENTS.md의 정보 구조 규칙을 따른다. 관리자·설정은 맨 아래.
   const workLinks: readonly NavLink[] = [
@@ -245,13 +248,20 @@ export function AppShell({
     { href: routes.guide, label: "사용법", icon: "help" },
   ];
   const accountLinks: readonly NavLink[] = [
-    ...(isHeadAdmin
-      ? [{ href: routes.admin, label: "관리자", icon: "shield" } as const]
+    ...(isHeadAdmin !== false
+      ? [
+          {
+            href: routes.admin,
+            label: "관리자",
+            icon: "shield",
+            provisional: isHeadAdmin === undefined,
+          } as const,
+        ]
       : []),
     { href: routes.account, label: "설정", icon: "settings" },
   ];
   const navLinks = (links: readonly NavLink[]) =>
-    links.map(({ href, label, icon, also }) => {
+    links.map(({ href, label, icon, also, provisional }) => {
       const active =
         pathname === href ||
         (href !== "/" && pathname.startsWith(`${href}/`)) ||
@@ -265,6 +275,7 @@ export function AppShell({
           aria-current={active ? "page" : undefined}
           onClick={() => setMenuOpen(false)}
           className="ui-nav-link flex items-center"
+          data-provisional={provisional || undefined}
         >
           <Icon name={icon} className="shrink-0" />
           {label}

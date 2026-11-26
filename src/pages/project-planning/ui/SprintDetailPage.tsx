@@ -128,7 +128,10 @@ function SprintScreen({
       <section className="sprint-head" aria-labelledby="sprint-title">
         <div className="sprint-head-row">
           <div className="sprint-head-title">
-            <h2 id="sprint-title" className="text-lg font-semibold break-words">
+            <h2
+              id="sprint-title"
+              className="text-lg font-semibold wrap-anywhere"
+            >
               {sprint.name}
             </h2>
             <SprintStatusBadge status={sprint.status} />

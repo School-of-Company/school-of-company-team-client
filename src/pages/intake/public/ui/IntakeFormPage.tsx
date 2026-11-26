@@ -130,7 +130,7 @@ function IntakeFormBody({
     <form noValidate onSubmit={onSubmit} className="grid gap-8">
       <header className="grid gap-2">
         <p className="text-sm text-muted">요구사항 접수</p>
-        <h1 className="public-title break-words">{form.title}</h1>
+        <h1 className="public-title wrap-anywhere">{form.title}</h1>
         {form.description && (
           <p className="text-sm whitespace-pre-wrap text-foreground-2">
             {form.description}

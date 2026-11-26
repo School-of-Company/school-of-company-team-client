@@ -273,7 +273,7 @@ function CreateTasksDialog({
                     update(row.key, { selected: event.target.checked })
                   }
                 />
-                <span className="min-w-0 break-words">
+                <span className="min-w-0 wrap-anywhere">
                   {row.feature ?? `직접 추가 ${index + 1 - features.length}`}
                 </span>
               </label>

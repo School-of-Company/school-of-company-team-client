@@ -70,7 +70,7 @@ export function Messages({
                   </Button>
                 )}
               </p>
-              <p className="text-sm break-words whitespace-pre-wrap">
+              <p className="text-sm wrap-anywhere whitespace-pre-wrap">
                 {message.body}
               </p>
             </li>

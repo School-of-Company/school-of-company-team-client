@@ -35,7 +35,7 @@ export function TaskDetailHeader({
           aria-label={`${boardName} 보드로 돌아가기`}
         >
           <Icon name="chevronLeft" aria-hidden />
-          {boardName}
+          <span className="min-w-0 truncate">{boardName}</span>
         </Link>
       )}
       <header className="grid min-w-0 flex-1 gap-1">

@@ -66,7 +66,7 @@ export function ActionItems({
         <ul className="action-items">
           {items.map((item) => (
             <li key={item.id}>
-              <span className="min-w-0 break-words">{item.title}</span>
+              <span className="min-w-0 wrap-anywhere">{item.title}</span>
               <span className="flex flex-wrap items-center gap-2">
                 <ActionItemTask item={item} />
                 {postmortem.canEdit && !item.task && (
@@ -225,7 +225,7 @@ function CreateTaskForm({
     <form className="grid gap-5" onSubmit={submit} noValidate>
       <div className="grid gap-1">
         <p className="text-sm text-muted">업무 제목</p>
-        <p className="break-words">{item.title}</p>
+        <p className="wrap-anywhere">{item.title}</p>
         <p className="text-xs text-muted">TASK 종류, 백로그 상태로 만들어요.</p>
       </div>
       <fieldset className="grid gap-2">

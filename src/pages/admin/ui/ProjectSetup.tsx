@@ -164,7 +164,7 @@ function ProjectTeamStep({
                 )
               }
             />
-            <span className="min-w-0 break-words">
+            <span className="min-w-0 wrap-anywhere">
               {user.name} <span className="text-muted">({user.username})</span>
             </span>
           </label>

@@ -415,7 +415,7 @@ function AllTokens() {
               {tokens.data.map((token) => (
                 <tr key={token.id}>
                   <th scope="row" className="font-medium">
-                    <span className="break-words">{token.name}</span>
+                    <span className="wrap-anywhere">{token.name}</span>
                     <span className="block font-mono text-xs font-normal text-muted">
                       {token.prefix}…
                     </span>
@@ -428,7 +428,7 @@ function AllTokens() {
                       {token.scope === "WRITE" ? "쓰기" : "읽기"}
                     </Badge>
                   </td>
-                  <td className="break-words">
+                  <td className="wrap-anywhere">
                     {projectKeysLabel(token.projectKeys)}
                   </td>
                   <td className="whitespace-nowrap">

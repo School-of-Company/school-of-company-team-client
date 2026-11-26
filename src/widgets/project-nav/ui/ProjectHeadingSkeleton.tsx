@@ -15,7 +15,7 @@ export function ProjectHeadingSkeleton({
         </p>
         <div className="flex min-w-0 items-center gap-3">
           <span className="ui-avatar ui-skeleton-text" />
-          <h1 className="text-xl font-semibold break-words">
+          <h1 className="text-xl font-semibold wrap-anywhere">
             <span className="ui-skeleton-text">프로젝트 불러오는 중</span>
           </h1>
         </div>

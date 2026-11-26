@@ -33,7 +33,7 @@ export function BoardHeader({
           )}
           <div className="flex items-center gap-3">
             {project && <ProjectAvatar project={project} />}
-            <h1 className="min-w-0 break-words">
+            <h1 className="min-w-0 wrap-anywhere">
               {project?.name ??
                 (scope === "PERSONAL" ? "내 업무" : "팀 공용 보드")}
             </h1>
