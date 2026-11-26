@@ -135,9 +135,6 @@ function CarryOvers({
       <h3 id="carry-overs" className="planning-subhead">
         이월 기록
       </h3>
-      <p className="planning-note">
-        종료할 때 남은 업무를 어디로 옮겼는지 남긴 기록입니다.
-      </p>
       {records.isPending ? (
         <ListSkeleton
           label="이월 기록 불러오는 중"

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 /** Segmented control whose options are pages (e.g. 목록 / 보드 views of one screen). */
 export function SegmentedLinks({
@@ -8,7 +9,7 @@ export function SegmentedLinks({
   readonly label: string;
   readonly items: readonly {
     readonly href: string;
-    readonly label: string;
+    readonly label: ReactNode;
     readonly active: boolean;
   }[];
 }) {

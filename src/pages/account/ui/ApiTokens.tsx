@@ -109,11 +109,7 @@ function CreateTokenForm({
   }
   return (
     <form onSubmit={submit} className="grid gap-5">
-      <Field
-        id="api-token-name"
-        label="이름"
-        hint="어디에 쓰는지 알아볼 수 있게 적으세요. 예: 노트북 Claude Code"
-      >
+      <Field id="api-token-name" label="이름" hint="예: 노트북 Claude Code">
         <Input
           id="api-token-name"
           name="name"
@@ -128,7 +124,7 @@ function CreateTokenForm({
       <Field
         id="api-token-scope"
         label="권한"
-        hint="읽기는 업무와 프로젝트 조회만, 쓰기는 업무 상태 변경과 생성도 할 수 있습니다."
+        hint="읽기는 조회만, 쓰기는 업무 생성과 상태 변경까지 할 수 있어요."
       >
         <Select
           id="api-token-scope"
@@ -138,7 +134,7 @@ function CreateTokenForm({
           disabled={pending}
         >
           <option value="READ">읽기</option>
-          <option value="WRITE">쓰기 (업무 상태 변경, 생성 가능)</option>
+          <option value="WRITE">쓰기</option>
         </Select>
       </Field>
       <Field id="api-token-expiry" label="만료">
@@ -223,10 +219,9 @@ export function ApiTokens() {
   return (
     <div className="grid gap-4">
       <p className="text-sm text-muted">
-        Claude Code와 Codex 같은 AI 도구가 MCP로 내 업무를 읽고 고칠 때 쓰는
-        개인 토큰입니다. 토큰은 내 권한으로 동작하니 다른 사람과 공유하지
-        마세요. MCP 주소는{" "}
-        <span className="font-mono break-all">{endpoint}</span> 입니다.
+        Claude Code, Codex 같은 도구가 MCP로 내 업무를 다룰 때 쓰는 토큰이에요.
+        내 권한으로 동작하니 다른 사람과 공유하지 마세요. MCP 주소:{" "}
+        <span className="font-mono break-all">{endpoint}</span>
       </p>
       <Button
         className="justify-self-start"

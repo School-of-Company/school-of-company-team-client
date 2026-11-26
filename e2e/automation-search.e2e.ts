@@ -360,7 +360,7 @@ test("남의 개인 업무와 참여하지 않은 프로젝트 업무는 검색�
   await page.keyboard.press("ControlOrMeta+k");
   const palette = page.getByRole("dialog", { name: "검색" });
   await palette.getByRole("combobox", { name: "검색어" }).fill(personalTitle);
-  await expect(palette.getByText("검색 결과가 없습니다")).toBeVisible();
+  await expect(palette.getByText("검색 결과가 없어요")).toBeVisible();
   await capture(page, "search-empty-1440");
 
   type Search = { groups: { type: string; items: { title: string }[] }[] };

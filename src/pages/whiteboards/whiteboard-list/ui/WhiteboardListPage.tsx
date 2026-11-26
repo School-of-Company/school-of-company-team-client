@@ -120,7 +120,7 @@ function Boards({
       ) : (
         <PageHeader
           title="화이트보드"
-          subtitle="팀 공용 보드입니다. 활성 팀원 누구나 그리고 고칠 수 있습니다."
+          subtitle="팀원 누구나 고칠 수 있어요"
           actions={createButton}
         />
       )}

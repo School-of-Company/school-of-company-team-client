@@ -202,9 +202,7 @@ function SprintScreen({
         {/* 진행률 줄과 안내 줄은 상태와 상관없이 자리를 둔다(대기 자리와 같은 높이, 안내가 늦게 끼지 않음). */}
         <div className="sprint-progress-slot">
           {sprint.status === "PLANNED" ? (
-            <span className="planning-note">
-              시작하면 완료 비율을 보여 줍니다.
-            </span>
+            <span className="planning-note">시작하면 완료 비율이 보여요.</span>
           ) : (
             <ProgressBar
               done={progress.done}
@@ -219,20 +217,20 @@ function SprintScreen({
         >
           {startBlocked ? (
             <>
-              진행 중인 스프린트(
+              진행 중인 스프린트{" "}
               <Link
                 href={routes.projectSprint(project.id, startBlocked.id)}
                 className="underline"
               >
                 {startBlocked.name}
               </Link>
-              )를 종료한 뒤 시작할 수 있습니다.
+              부터 종료해야 시작할 수 있어요.
             </>
           ) : (
             !manages &&
             sprint.status !== "CLOSED" &&
             !project.archived &&
-            "스프린트 범위와 시작, 종료는 PM 또는 헤드 어드민이 정합니다."
+            "범위와 시작, 종료는 PM이나 헤드 어드민이 정해요."
           )}
         </p>
       </section>
@@ -338,8 +336,7 @@ function SprintScreen({
         title="스프린트를 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          {sprint.name}을(를) 삭제하면 넣어 둔 업무는 스프린트에서만 빠지고
-          그대로 남습니다.
+          넣어 둔 업무는 스프린트에서만 빠지고 그대로 남아요.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

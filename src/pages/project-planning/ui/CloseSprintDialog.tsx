@@ -337,8 +337,8 @@ export function CloseSprintDialog({
             ))}
           </Select>
           <p id={`${id}-hint`} className="text-xs text-muted">
-            목록에 없는 업무(볼 수 없는 업무)도 기본 대상으로 옮깁니다. 완료
-            업무는 이 스프린트에 남습니다.
+            내가 볼 수 없어 목록에 없는 업무도 함께 옮겨요. 완료 업무는 이
+            스프린트에 남아요.
             {planned.length === 0 &&
               !createNext &&
               " 다음 스프린트로 옮기려면 다음 스프린트 만들기를 켜세요."}

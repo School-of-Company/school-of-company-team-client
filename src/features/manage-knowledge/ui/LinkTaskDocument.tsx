@@ -86,17 +86,12 @@ function LinkForm({
       ) : options.length === 0 ? (
         <p className="text-sm text-muted">연결할 수 있는 문서가 없습니다.</p>
       ) : (
-        <Field
-          id={`${id}-doc`}
-          label="문서"
-          hint="문서 작성자, 연결된 서비스 소유자, 헤드 어드민만 관계를 바꿀 수 있습니다."
-          error={error}
-        >
+        <Field id={`${id}-doc`} label="문서" error={error}>
           <Select
             id={`${id}-doc`}
             value={documentId}
             aria-invalid={error ? true : undefined}
-            aria-describedby={`${id}-doc-hint${error ? ` ${id}-doc-error` : ""}`}
+            aria-describedby={error ? `${id}-doc-error` : undefined}
             onChange={(event) => setDocumentId(event.target.value)}
           >
             <option value="" disabled>

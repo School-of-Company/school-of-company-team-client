@@ -69,9 +69,7 @@ export function CalendarPage({ projectId }: { readonly projectId?: string }) {
               <div className="min-w-0">
                 <h1>달력</h1>
                 {/* 부제는 390폭에서도 한 줄이다(머리 높이가 다른 화면과 같다). */}
-                <p className="page-subtitle">
-                  볼 수 있는 일정과 마감을 모아 봅니다
-                </p>
+                <p className="page-subtitle">일정과 마감</p>
               </div>
             }
           />

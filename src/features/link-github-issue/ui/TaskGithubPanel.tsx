@@ -169,11 +169,7 @@ export function TaskGithubPanel({
           <Field
             id="publication-target"
             label="Issue 발행 저장소"
-            hint={
-              publication
-                ? undefined
-                : "저장소를 고르면 바로 Issue로 발행됩니다."
-            }
+            hint={publication ? undefined : "고르는 즉시 Issue로 발행돼요."}
           >
             <Select
               id="publication-target"

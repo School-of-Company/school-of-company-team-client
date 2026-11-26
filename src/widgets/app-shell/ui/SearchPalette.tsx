@@ -124,9 +124,7 @@ function PaletteBody({ onClose }: { readonly onClose: () => void }) {
           : ""}
       </p>
       {!term ? (
-        <p className="search-hint">
-          검색어를 입력하세요. 위아래 화살표로 고르고 Enter로 엽니다.
-        </p>
+        <p className="search-hint">위아래 화살표로 고르고 Enter로 열어요.</p>
       ) : search.isPending ? (
         <div className="search-hint">
           <Spinner label="검색하는 중" />
@@ -144,7 +142,7 @@ function PaletteBody({ onClose }: { readonly onClose: () => void }) {
         </div>
       ) : items.length === 0 ? (
         <p className="search-hint">
-          ‘{search.data?.query ?? term}’ 검색 결과가 없습니다.
+          ‘{search.data?.query ?? term}’ 검색 결과가 없어요.
         </p>
       ) : (
         <div

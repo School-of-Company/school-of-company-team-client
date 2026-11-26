@@ -38,10 +38,6 @@ export function SprintReviewPanel({
 }) {
   return (
     <section className="grid gap-4" aria-label="스프린트 결과 보고">
-      <p className="planning-note">
-        스프린트에서 끝낸 것, 머지된 PR, 이월, 막힌 업무를 모은 결과 보고예요.
-        PM이 다듬어 게시하면 프로젝트 참여자 모두가 보고 Discord에도 공유돼요.
-      </p>
       <ReviewContent project={project} sprint={sprint} manages={manages} />
     </section>
   );
@@ -261,9 +257,8 @@ function ReviewEditor({
         </div>
       )}
       <p id={`${id}-hint`} className="text-xs text-muted">
-        초안은 완료, 머지된 PR, 이월, 막힘 업무, 목표 체크리스트, 크기 합계로
-        만듭니다. 종료하면 초안이 저장 본문으로 들어갑니다. 비공개 원본 업무와
-        비공개 저장소 PR은 게시 범위 때문에 넣지 않습니다.
+        종료하면 초안이 본문으로 저장돼요. 비공개 원본 업무와 비공개 저장소 PR은
+        넣지 않아요.
       </p>
       {notice && (
         <p
@@ -315,9 +310,8 @@ function ReviewEditor({
       </div>
       {!current?.publishedAt && (
         <p id={`${id}-publish-hint`} className="text-right text-xs text-muted">
-          {dirty || !current ? "저장한 본문만 게시할 수 있습니다. " : ""}
-          게시하면 프로젝트 참여자 모두가 보고 Discord 채널에도 한 번
-          공유됩니다.
+          {dirty || !current ? "저장한 본문만 게시할 수 있어요. " : ""}
+          게시하면 프로젝트 참여자 모두가 보고 Discord 채널에도 한 번 올라가요.
         </p>
       )}
       <Dialog

@@ -16,7 +16,13 @@ import {
 } from "@/entities/service";
 import { routes } from "@/shared/config";
 import { settledData } from "@/shared/lib";
-import { EmptyState, ListSkeleton, PageHeader, QueryState } from "@/shared/ui";
+import {
+  EmptyState,
+  InfoTip,
+  ListSkeleton,
+  PageHeader,
+  QueryState,
+} from "@/shared/ui";
 import { OpsTabs } from "./OpsTabs";
 
 /** 운영 개요. 30초마다 조용히 다시 받고, 실패하면 마지막 값을 두고 StaleNotice 를 띄운다(QueryState). */
@@ -26,20 +32,23 @@ export function StatusTab() {
   return (
     <div className="grid gap-5">
       <PageHeader
-        title="운영"
+        title={
+          <>
+            운영{" "}
+            <InfoTip label="운영 설명">
+              헬스체크나 모니터링이 다운을 알리면 장애가 자동으로 만들어져요.
+            </InfoTip>
+          </>
+        }
         subtitle={
           totals
             ? `서비스 ${totals.services}개 중 정상 ${totals.up}개`
             : overview.isError && !overview.data
-              ? "운영 상태를 불러오지 못했습니다"
+              ? "운영 상태를 불러오지 못했어요"
               : "운영 상태 집계 중"
         }
       />
       <OpsTabs active="status" />
-      <p className="text-sm text-muted">
-        운영은 우리가 돌리는 서비스의 상태, 장애, 배포를 한곳에서 보는 곳이에요.
-        헬스체크나 모니터링이 다운을 알리면 장애가 자동으로 만들어져요.
-      </p>
       <OpsTotals totals={totals} />
       <QueryState
         query={overview}
@@ -50,8 +59,8 @@ export function StatusTab() {
         isEmpty={(data) => data.services.length === 0}
         empty={
           <EmptyState
-            title="등록된 서비스가 없습니다"
-            description="서비스 탭에서 서비스를 등록하고 헬스체크를 켜면 상태가 여기에 모입니다."
+            title="등록된 서비스가 없어요"
+            description="서비스 탭에서 서비스를 등록하고 헬스체크를 켜면 상태가 여기 보여요."
           />
         }
       >

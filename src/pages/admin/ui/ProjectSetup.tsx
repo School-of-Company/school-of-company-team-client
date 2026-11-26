@@ -41,9 +41,7 @@ export function ProjectSetup({
       <ol className="ui-steps" aria-label="프로젝트 생성 단계">
         <li>기본 정보</li>
         <li aria-current={step === "team" ? "step" : undefined}>팀원, PM</li>
-        <li aria-current={step === "team" ? undefined : "step"}>
-          저장소 연결 (선택)
-        </li>
+        <li aria-current={step === "team" ? undefined : "step"}>저장소 연결</li>
       </ol>
       {step === "team" ? (
         <>
@@ -71,7 +69,7 @@ export function ProjectSetup({
       ) : (
         <>
           <p className="text-sm text-muted">
-            저장소 연결은 건너뛰고 프로젝트 설정에서 이어갈 수 있습니다.
+            건너뛰고 나중에 프로젝트 설정에서 연결해도 돼요.
           </p>
           <RepositorySettings
             projectId={project.id}
@@ -168,11 +166,7 @@ function ProjectTeamStep({
             </span>
           </label>
         ))}
-        <Field
-          id="create-project-pm"
-          label="PM (선택)"
-          hint="PM은 참여자에도 포함됩니다. 나중에 설정할 수 있습니다."
-        >
+        <Field id="create-project-pm" label="PM" hint="나중에 정해도 돼요.">
           <Select
             id="create-project-pm"
             value={pm}

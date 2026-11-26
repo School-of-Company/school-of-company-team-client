@@ -60,8 +60,7 @@ export function AdminSettings({
             사용자 관리
           </h2>
           <p className="text-sm text-muted">
-            승인 대기 사용자를 먼저 표시합니다. 이용 중지는 기록을 보존하고 담당
-            배정을 해제합니다.
+            이용 중지하면 기록은 남고 담당 배정은 풀려요.
           </p>
           {users.isPending ? (
             <ListSkeleton

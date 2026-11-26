@@ -84,7 +84,7 @@ export function RequirementStatusForm({
       <Field
         id={`${id}-reason`}
         label={needsReason ? "사유 (필수)" : "사유"}
-        hint="요청자 상태 페이지에 보입니다. 비우면 지웁니다."
+        hint="요청자 상태 페이지에 보여요. 비우면 지워져요."
         error={error ?? undefined}
       >
         <Textarea

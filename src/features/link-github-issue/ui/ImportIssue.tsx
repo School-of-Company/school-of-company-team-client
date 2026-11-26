@@ -53,9 +53,9 @@ export function ImportIssueForm({
         label="Issue URL"
         hint={
           (projectId
-            ? "공개 Issue의 제목과 본문을 프로젝트 업무로 복사합니다."
-            : "Issue의 제목과 본문을 본인 개인 업무로 복사합니다.") +
-          " 같은 Issue를 다시 가져오면 기존 업무로 이동합니다."
+            ? "공개 Issue의 제목과 본문을 프로젝트 업무로 가져와요."
+            : "Issue의 제목과 본문을 내 개인 업무로 가져와요.") +
+          " 이미 가져온 Issue면 그 업무로 가요."
         }
       >
         <Input

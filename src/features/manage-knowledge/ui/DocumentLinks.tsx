@@ -337,7 +337,7 @@ function AddLinkForm({
         <Field
           id={`${id}-task`}
           label="업무 주소 또는 ID"
-          hint="업무 화면 주소를 붙여 넣으세요. 개인 업무와 볼 수 없는 업무는 연결되지 않습니다."
+          hint="개인 업무와 볼 수 없는 업무는 연결할 수 없어요."
           error={error}
         >
           <Input

@@ -123,7 +123,7 @@ export function TaskDiscussion({
       )}
       {!restricted && (
         <p className="text-sm text-muted">
-          최초 클릭 시 스레드를 만들고, 이후 같은 스레드로 이동합니다.
+          처음 누르면 스레드를 만들고, 그다음부터는 그 스레드로 가요.
         </p>
       )}
       {error && (
@@ -135,8 +135,8 @@ export function TaskDiscussion({
         <div className="grid gap-3">
           <Field
             id="recovery-thread"
-            label="복구할 기존 스레드 ID (선택)"
-            hint="비우고 복구하면 기존 연결을 해제합니다. 이후 논의 열기로 새 스레드를 만듭니다. 원본 대화는 삭제하지 않습니다."
+            label="복구할 기존 스레드 ID"
+            hint="비우고 복구하면 기존 연결만 끊어요. 원래 대화는 남고, 논의 열기로 새 스레드를 만들 수 있어요."
           >
             <Input
               id="recovery-thread"
