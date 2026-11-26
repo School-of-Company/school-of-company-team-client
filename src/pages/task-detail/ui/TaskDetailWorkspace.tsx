@@ -7,7 +7,9 @@ import { taskApi, taskKeys, TaskError } from "@/entities/task";
 import { projectAccess } from "@/entities/project";
 import { TaskEditor } from "@/features/edit-task";
 import { TaskGithubPanel } from "@/features/link-github-issue";
+import { TaskComments } from "./TaskComments";
 import { TaskDiscussion } from "./TaskDiscussion";
+import { TaskHistory } from "./TaskHistory";
 import { TaskDocuments } from "./TaskDocuments";
 import { normalizeApiError } from "@/shared/api";
 import { formatDate } from "@/shared/lib";
@@ -165,7 +167,9 @@ export function TaskDetailWorkspace({
                 <dd>{formatDate(data.updatedAt)}</dd>
               </div>
             </dl>
+            <TaskHistory taskId={data.id} />
           </section>
+          <TaskComments taskId={data.id} viewer={user} />
           {data.scope !== "PERSONAL" && (
             <TaskDiscussion
               taskId={data.id}

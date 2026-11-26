@@ -8,6 +8,7 @@ import { projectKeys } from "@/entities/project";
 import { isHeadAdmin, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { AdminSettings } from "./AdminSettings";
+import { AgentAdmin } from "./AgentAdmin";
 import {
   ErrorState,
   PageHeader,
@@ -67,6 +68,7 @@ function AdminContent({ user }: { readonly user: User }) {
               { id: "users", label: "사용자 관리" },
               { id: "integrations", label: "연동" },
               { id: "templates", label: "문서 템플릿" },
+              { id: "agent", label: "에이전트" },
             ].map((item) => ({
               href: `/admin?tab=${item.id}`,
               label: item.label,
@@ -79,6 +81,8 @@ function AdminContent({ user }: { readonly user: User }) {
         <CreateProjectForm onSaved={refresh} />
       ) : tab === "templates" ? (
         <DocumentTemplates />
+      ) : tab === "agent" ? (
+        <AgentAdmin />
       ) : (
         <AdminSettings
           user={user}
