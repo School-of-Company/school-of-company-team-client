@@ -80,12 +80,12 @@ for (const board of boards)
     await card.getByRole("link", { name: title }).click();
     const panel = page.getByRole("dialog", { name: "업무 상세" });
     await expect(
-      panel.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+      panel.getByText("업무를 찾을 수 없거나 접근할 수 없어요"),
     ).toBeVisible();
     await page.waitForTimeout(20_000);
     // 패널은 열린 채 안내를 유지한다(언마운트·재마운트 없음).
     await expect(
-      panel.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+      panel.getByText("업무를 찾을 수 없거나 접근할 수 없어요"),
     ).toBeVisible();
     console.log(`[${board.name}] 20초 상세 요청 ${hits.length}회`);
     expect(hits.length).toBeLessThanOrEqual(2);
@@ -108,7 +108,7 @@ test("상세 페이지: 사라진 업무를 열면 404 안내를 보이고 20초
   const hits = countDetail(page, task.id);
   await page.goto(`/tasks/${task.id}`);
   await expect(
-    page.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+    page.getByText("업무를 찾을 수 없거나 접근할 수 없어요"),
   ).toBeVisible();
   await page.waitForTimeout(20_000);
   console.log(`[상세 페이지] 20초 상세 요청 ${hits.length}회`);
@@ -134,7 +134,7 @@ test("권한이 돌아오면 같은 화면의 404 안내에서 다시 시도로 
     ).toBeVisible();
     await visibility("MEMBERS");
     // 다음 폴링(10초)에 404 안내로 바뀐다.
-    const notice = page.getByText(/찾을 수 없거나 접근할 수 없습니다/);
+    const notice = page.getByText(/찾을 수 없거나 접근할 수 없어요/);
     await expect(notice).toBeVisible({ timeout: 20_000 });
     await visibility("TEAM");
     await page.getByRole("button", { name: "다시 시도" }).click();

@@ -70,9 +70,7 @@ export function PlanTaskList({
         </ul>
         {tasks.length === 0 && (
           <EmptyState
-            title={
-              candidate ? "넣을 업무가 없습니다" : "아직 넣은 업무가 없습니다"
-            }
+            title={candidate ? "넣을 업무가 없어요" : "아직 넣은 업무가 없어요"}
             description={
               candidate
                 ? "원천을 바꿔 다른 업무를 찾아보세요."

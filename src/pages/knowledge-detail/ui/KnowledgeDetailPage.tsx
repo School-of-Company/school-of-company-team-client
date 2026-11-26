@@ -110,8 +110,8 @@ function KnowledgeDetailContent({
   if (detail.error && normalizeApiError(detail.error).status === 404)
     return (
       <ErrorState
-        title="문서를 찾을 수 없습니다"
-        description="삭제되었거나 주소가 잘못되었습니다. 문서 목록에서 다시 고르세요."
+        title="문서를 찾을 수 없어요"
+        description="삭제되었거나 주소가 잘못됐어요. 문서 목록에서 다시 고르세요."
       />
     );
   if (!detail.data && detail.isError)
@@ -198,7 +198,7 @@ function DocumentWorkspace({
                 <Markdown>{document.body}</Markdown>
               </article>
             ) : (
-              <p className="text-sm text-muted">본문이 비어 있습니다.</p>
+              <p className="text-sm text-muted">본문이 비어 있어요.</p>
             )}
           </div>
           <aside className="task-props" aria-label="문서 속성">
@@ -262,7 +262,7 @@ function DocumentWorkspace({
             </dl>
             {!document.canEdit && (
               <p className="text-xs text-muted">
-                작성자, 연결된 서비스 소유자, 헤드 어드민이 수정할 수 있습니다.
+                작성자, 연결된 서비스 소유자, 헤드 어드민이 수정할 수 있어요.
               </p>
             )}
             <DocumentLinks document={document} />

@@ -17,6 +17,7 @@ import {
   EmptyState,
   ErrorState,
   Icon,
+  InfoTip,
   ListSkeleton,
   QueryState,
   SegmentedLinks,
@@ -68,8 +69,12 @@ function Milestones({ project, manages }: PlanningContext) {
   return (
     <section className="grid gap-5" aria-labelledby="milestones-heading">
       <div className="planning-section-head">
-        <h2 id="milestones-heading" className="text-lg font-semibold">
-          마일스톤
+        <h2 className="text-lg font-semibold">
+          <span id="milestones-heading">마일스톤</span>{" "}
+          <InfoTip label="마일스톤 설명">
+            이번 출시에 들어갈 결과물이에요. 스프린트를 연결하면 그 업무가
+            진행률에 자동으로 들어가요.
+          </InfoTip>
         </h2>
         <div className="flex flex-wrap items-center gap-2">
           <SegmentedLinks
@@ -90,10 +95,6 @@ function Milestones({ project, manages }: PlanningContext) {
           )}
         </div>
       </div>
-      <p className="planning-note">
-        마일스톤은 이번 출시에 들어갈 결과물이에요. 스프린트를 연결하면 그
-        업무가 진행률에 자동으로 들어가요.
-      </p>
       <QueryState
         query={milestones}
         skeleton={

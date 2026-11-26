@@ -81,7 +81,7 @@ export function ProjectImageSettings({
               </p>
             ) : (
               <p role="status" className="text-xs text-muted">
-                {image.isSuccess ? "저장했어요" : "PNG, JPEG, WebP, 2MB 이하"}
+                {image.isSuccess ? "저장했어요" : "PNG, JPEG, WebP, 최대 2MB"}
               </p>
             )}
           </div>

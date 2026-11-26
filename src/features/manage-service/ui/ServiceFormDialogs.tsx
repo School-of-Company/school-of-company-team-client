@@ -152,7 +152,7 @@ export function CreateServiceDialog({
           hint={
             errors.key
               ? undefined
-              : "주소와 그래프에 쓰는 불변 이름입니다. 예: team-server"
+              : "주소와 그래프에 쓰고 나중에 못 바꿔요. 예: team-server"
           }
         >
           <Input
@@ -346,8 +346,8 @@ export function OwnersDialog({
         }}
       >
         <p className="text-sm text-muted">
-          소유자와 헤드 어드민이 이 서비스를 수정할 수 있습니다. 주 소유자는 한
-          명입니다.
+          주 소유자는 한 명이에요. 소유자와 헤드 어드민이 서비스를 고칠 수
+          있어요.
         </p>
         <OwnerFields
           value={owners}

@@ -33,7 +33,7 @@ export function RequirementStatusForm({
   if (targets.length === 0)
     return (
       <p className="text-sm text-muted">
-        {requirementStatusLabels[requirement.status]} 상태는 바꿀 수 없습니다.
+        {requirementStatusLabels[requirement.status]} 상태는 바꿀 수 없어요.
       </p>
     );
   const needsReason = reasonRequired(status);
@@ -46,11 +46,11 @@ export function RequirementStatusForm({
         event.preventDefault();
         const text = reason.trim();
         if (needsReason && !text) {
-          setError("보류, 반려에는 사유가 필요합니다. 요청자에게 보입니다.");
+          setError("보류, 반려에는 사유가 필요해요. 요청자에게 보여요.");
           return;
         }
         if (text.length > 1000) {
-          setError("사유는 1000자 이하입니다.");
+          setError("사유는 1000자 이하예요.");
           return;
         }
         if (change.isPending) return;
@@ -59,7 +59,7 @@ export function RequirementStatusForm({
           {
             onSuccess: () => {
               setError(null);
-              toast("상태를 바꿨습니다.", "success");
+              toast("상태를 바꿨어요.", "success");
               onSaved();
             },
             onError: (problem) => setError(requirementErrorMessage(problem)),
@@ -84,7 +84,7 @@ export function RequirementStatusForm({
       <Field
         id={`${id}-reason`}
         label={needsReason ? "사유 (필수)" : "사유"}
-        hint="요청자 상태 페이지에 보입니다. 비우면 지웁니다."
+        hint="요청자 상태 페이지에 보여요. 비우면 지워져요."
         error={error ?? undefined}
       >
         <Textarea

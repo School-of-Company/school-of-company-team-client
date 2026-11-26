@@ -47,8 +47,8 @@ export function CopyField({
       {copied && (
         <p role="status" className="text-xs text-muted">
           {copied === "ok"
-            ? "복사했습니다."
-            : "복사하지 못했습니다. 입력란을 선택해 직접 복사하세요."}
+            ? "복사했어요."
+            : "복사하지 못했어요. 입력란을 선택해 직접 복사하세요."}
         </p>
       )}
     </div>

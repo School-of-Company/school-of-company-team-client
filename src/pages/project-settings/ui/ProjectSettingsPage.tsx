@@ -101,7 +101,7 @@ function ProjectSettingsContent({
   if (!project.data || (project.isError && isAccessLost(project.error)))
     return (
       <ErrorState
-        title="프로젝트를 표시할 수 없습니다"
+        title="프로젝트를 표시할 수 없어요"
         description={settingsErrorMessage(normalizeApiError(project.error))}
         onRetry={() => void project.refetch()}
       />

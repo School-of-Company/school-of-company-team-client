@@ -63,7 +63,7 @@ export function CreateProjectForm({
           <li>저장소 연결</li>
         </ol>
         <p className="text-sm">
-          기본 정보를 저장하면 프로젝트가 생성됩니다. 이후 팀원과 저장소를
+          기본 정보를 저장하면 프로젝트가 생성돼요. 이후 팀원과 저장소를
           설정하세요.
         </p>
         <Field id="create-project-name" label="프로젝트 이름 (필수)">
@@ -82,7 +82,7 @@ export function CreateProjectForm({
         <Field
           id="create-project-key"
           label="프로젝트 키"
-          hint="대문자로 시작하는 대문자, 숫자 2~10자. 생성 후 변경할 수 없습니다."
+          hint="대문자로 시작하는 대문자와 숫자 2~10자. 만든 뒤에는 못 바꿔요."
         >
           <Input
             id="create-project-key"
@@ -124,7 +124,7 @@ export function CreateProjectForm({
         <Field
           id="create-project-workflow"
           label="진행 방식"
-          hint="새 개발은 Sprint, 운영 중인 프로젝트는 Kanban. 단계는 검토로 시작합니다."
+          hint="새로 개발하면 Sprint, 운영 중이면 Kanban을 골라요."
         >
           <Select
             id="create-project-workflow"

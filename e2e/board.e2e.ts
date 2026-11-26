@@ -77,7 +77,7 @@ test("카드를 끌어 진행 중으로 옮긴다", async ({ page }) => {
   const target = column(page, "IN_PROGRESS");
   await card(column(page, "PLANNED"), title).dragTo(target);
   await expect(
-    page.getByRole("status").filter({ hasText: "업무를 이동했습니다." }),
+    page.getByRole("status").filter({ hasText: "업무를 이동했어요." }),
   ).toBeVisible();
   await expect(card(target, title)).toBeVisible();
   expect(
@@ -128,7 +128,7 @@ test("상세에서 제목·설명을 고치고 막힘을 표시한 뒤 완료한
   ]);
 
   await panel.getByLabel("상태 변경").selectOption({ label: "완료" });
-  await expect(panel.getByText("상태를 변경했습니다.")).toBeVisible();
+  await expect(panel.getByText("상태를 변경했어요.")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
   await expect(card(column(page, "DONE"), edited)).toBeVisible();
@@ -181,17 +181,17 @@ test("참여하지 않은 사용자는 비공개 프로젝트와 관리자 화�
 
   await page.goto(`/projects/${seed.project.id}`);
   await expect(
-    page.getByText("프로젝트를 찾을 수 없거나 접근할 수 없습니다"),
+    page.getByText("프로젝트를 찾을 수 없거나 접근할 수 없어요"),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "업무 등록" })).toHaveCount(0);
 
   await page.goto(`/tasks/${taskId}`);
   await expect(
-    page.getByText("업무를 찾을 수 없거나 접근할 수 없습니다"),
+    page.getByText("업무를 찾을 수 없거나 접근할 수 없어요"),
   ).toBeVisible();
 
   await page.goto("/admin");
-  await expect(page.getByText("관리자 권한이 필요합니다")).toBeVisible();
+  await expect(page.getByText("관리자 권한이 필요해요")).toBeVisible();
 });
 
 test("10초 폴링과 탭 재조회 동안 카드가 사라지거나 스켈레톤으로 바뀌지 않는다", async ({
@@ -354,7 +354,7 @@ test("빈 보드 안내는 필터 유무에 따라 다르고, legacy 계정은 D
   await signIn(page, seed.outsider.tokens);
   await page.goto("/me");
   await expect(
-    page.getByRole("heading", { name: "업무가 없습니다" }),
+    page.getByRole("heading", { name: "업무가 없어요" }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "필터 초기화" })).toHaveCount(
     0,
@@ -363,7 +363,7 @@ test("빈 보드 안내는 필터 유무에 따라 다르고, legacy 계정은 D
 
   await page.goto("/me?priority=P0");
   await expect(
-    page.getByRole("heading", { name: "조건에 맞는 업무가 없습니다" }),
+    page.getByRole("heading", { name: "조건에 맞는 업무가 없어요" }),
   ).toBeVisible();
   await page
     .getByRole("main")
@@ -371,7 +371,7 @@ test("빈 보드 안내는 필터 유무에 따라 다르고, legacy 계정은 D
     .click();
   await expect(page).toHaveURL(/\/me$/);
   await expect(
-    page.getByRole("heading", { name: "업무가 없습니다" }),
+    page.getByRole("heading", { name: "업무가 없어요" }),
   ).toBeVisible();
 
   await page.goto("/account");

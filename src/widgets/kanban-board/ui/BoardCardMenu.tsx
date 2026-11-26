@@ -186,9 +186,7 @@ export function BoardCardMenu({
                   role="menuitem"
                   tabIndex={-1}
                   disabled={pending || !manual}
-                  title={
-                    !manual ? "수동 순서에서 사용할 수 있습니다" : undefined
-                  }
+                  title={!manual ? "수동 순서에서 사용할 수 있어요" : undefined}
                   className="board-menu-item"
                   onClick={() => {
                     onOrder(direction);

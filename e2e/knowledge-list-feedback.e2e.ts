@@ -48,7 +48,7 @@ test("an empty placeholder does not claim the new document filter has zero resul
   });
   await page.goto("/docs?status=PUBLISHED");
   await expect(
-    page.getByText("조건에 맞는 문서가 없습니다", { exact: true }),
+    page.getByText("조건에 맞는 문서가 없어요", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: /^상태:/ }).click();
   await page.getByRole("option", { name: "초안" }).click();
@@ -58,7 +58,7 @@ test("an empty placeholder does not claim the new document filter has zero resul
       page.getByRole("status", { name: "불러오는 중" }),
     ).toBeVisible();
     await expect(
-      page.getByText("조건에 맞는 문서가 없습니다", { exact: true }),
+      page.getByText("조건에 맞는 문서가 없어요", { exact: true }),
     ).toBeHidden();
     await expect(page.locator("main .page-subtitle")).toHaveText(
       "전체 문서 집계 중",

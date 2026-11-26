@@ -117,7 +117,7 @@ export function KanbanBoard({
   if (board.groups.length === 0 || boardTotal(board) === 0)
     return filtered ? (
       <EmptyState
-        title="조건에 맞는 업무가 없습니다"
+        title="조건에 맞는 업무가 없어요"
         description="필터를 바꾸거나 초기화해 주세요."
         action={
           <Button variant="secondary" onClick={onClearFilters}>
@@ -127,7 +127,7 @@ export function KanbanBoard({
       />
     ) : (
       <EmptyState
-        title="업무가 없습니다"
+        title="업무가 없어요"
         description={onCreate ? "첫 업무를 추가해 주세요." : undefined}
         action={
           onCreate && (

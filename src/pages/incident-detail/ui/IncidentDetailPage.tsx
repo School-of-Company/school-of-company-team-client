@@ -139,8 +139,8 @@ function IncidentDetailContent({
   if (isNotFound(detail.error))
     return (
       <ErrorState
-        title="장애를 찾을 수 없습니다"
-        description="삭제되었거나 주소가 잘못되었습니다. 장애 목록에서 다시 고르세요."
+        title="장애를 찾을 수 없어요"
+        description="삭제되었거나 주소가 잘못됐어요. 장애 목록에서 다시 고르세요."
       />
     );
   if (!detail.data && detail.isError)

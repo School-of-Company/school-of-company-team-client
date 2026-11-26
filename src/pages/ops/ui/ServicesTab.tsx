@@ -60,7 +60,7 @@ export function ServicesTab({ canCreate }: { readonly canCreate: boolean }) {
             : count !== undefined
               ? `${status} 서비스 ${count}개`
               : services.isError && !services.data
-                ? "서비스 집계를 불러오지 못했습니다"
+                ? "서비스 집계를 불러오지 못했어요"
                 : `${status} 서비스 집계 중`
         }
         actions={
@@ -115,14 +115,14 @@ export function ServicesTab({ canCreate }: { readonly canCreate: boolean }) {
           errorMessage={serviceErrorMessage}
           empty={
             archived ? (
-              <EmptyState title="아카이브된 서비스가 없습니다" />
+              <EmptyState title="아카이브된 서비스가 없어요" />
             ) : (
               <EmptyState
-                title="등록된 서비스가 없습니다"
+                title="등록된 서비스가 없어요"
                 description={
                   canCreate
                     ? "운영하는 배포 단위를 서비스로 등록하고 소유자와 저장소를 정하세요."
-                    : "헤드 어드민이 서비스를 등록하면 여기에 나타납니다."
+                    : "헤드 어드민이 서비스를 등록하면 여기에 나타나요."
                 }
               />
             )
@@ -205,7 +205,7 @@ function GraphView() {
       }
       errorMessage={serviceErrorMessage}
       isEmpty={(data) => data.nodes.length === 0}
-      empty={<EmptyState title="등록된 서비스가 없습니다" />}
+      empty={<EmptyState title="등록된 서비스가 없어요" />}
     >
       {(data) => (
         <>
@@ -237,7 +237,7 @@ function EdgeTable({ graph }: { readonly graph: Graph }) {
       </h2>
       {edges.length === 0 ? (
         <p className="text-sm text-muted">
-          아직 등록된 의존관계가 없습니다. 서비스 상세에서 추가합니다.
+          아직 등록된 의존관계가 없어요. 서비스 상세에서 추가해요.
         </p>
       ) : (
         <table className="service-edge-table">

@@ -73,7 +73,7 @@ function ProjectDocuments({
   if (project.isError)
     return (
       <ErrorState
-        description="프로젝트를 불러오지 못했습니다."
+        description="프로젝트를 불러오지 못했어요."
         onRetry={() => void project.refetch()}
       />
     );
@@ -150,7 +150,7 @@ function KnowledgeListContent({
           count !== undefined
             ? `${kindLabel} ${count}개`
             : documents.isError && !documents.data
-              ? "문서 집계를 불러오지 못했습니다"
+              ? "문서 집계를 불러오지 못했어요"
               : `${kindLabel} 문서 집계 중`
         }
         actions={
@@ -206,7 +206,7 @@ function KnowledgeListContent({
         />
         {projects.isError && !fixedProjectId && (
           <span role="alert" className="text-sm text-danger">
-            프로젝트 필터를 불러오지 못했습니다.{" "}
+            프로젝트 필터를 불러오지 못했어요.{" "}
             <Button
               variant="ghost"
               className="ui-button-sm"
@@ -226,11 +226,11 @@ function KnowledgeListContent({
         empty={
           !kind && !status ? (
             <EmptyState
-              title="아직 문서가 없습니다"
+              title="아직 문서가 없어요"
               description="결정은 ADR, 제안은 RFC, 장애, 운영 대응 절차는 Runbook으로 남기세요."
             />
           ) : (
-            <EmptyState title="조건에 맞는 문서가 없습니다" />
+            <EmptyState title="조건에 맞는 문서가 없어요" />
           )
         }
       >

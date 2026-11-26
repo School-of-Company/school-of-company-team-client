@@ -81,13 +81,13 @@ test("an expired access token is refreshed once and the request replayed", async
 
 test("fieldErrors maps validation details to known fields only", () => {
   const error = new ApiError(400, "VALIDATION_ERROR", "bad", {
-    dueDate: "마감일 형식이 잘못되었습니다.",
+    dueDate: "마감일 형식이 잘못됐어요.",
     other: "무시",
     name: 3,
   });
   // 폼에 없는 other 와 문자열이 아닌 name 이 남으니 폼 전체 오류도 함께 보인다.
   assert.deepEqual(fieldErrors(error, ["dueDate", "name"], "x"), {
-    dueDate: "마감일 형식이 잘못되었습니다.",
+    dueDate: "마감일 형식이 잘못됐어요.",
     form: "x",
   });
   assert.deepEqual(

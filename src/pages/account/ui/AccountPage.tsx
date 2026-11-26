@@ -96,12 +96,12 @@ function AvatarSetting({ user }: { readonly user: User }) {
         )}
       </div>
       <p className="text-xs text-muted">
-        PNG, JPEG, WebP, 2MB 이하. 올리지 않으면 GitHub 프로필 사진을 씁니다.
+        PNG, JPEG, WebP, 2MB 이하. 올리지 않으면 GitHub 프로필 사진을 써요.
       </p>
       {(tooLarge || failure) && (
         <p role="alert" className="text-sm text-danger">
           {tooLarge
-            ? "2MB 이하 사진만 올릴 수 있습니다."
+            ? "2MB 이하 사진만 올릴 수 있어요."
             : normalizeApiError(failure).message}
         </p>
       )}
@@ -155,7 +155,7 @@ function ProfileForm({ user }: { readonly user: User }) {
         </Button>
         {mutation.isSuccess && (
           <p role="status" className="text-sm">
-            프로필을 저장했습니다.
+            프로필을 저장했어요.
           </p>
         )}
       </div>
@@ -174,16 +174,11 @@ function ProfileForm({ user }: { readonly user: User }) {
           disabled={mutation.isPending}
         />
       </Field>
-      <Field
-        id="major"
-        label="전공 (선택)"
-        hint="전공은 권한과 관계없는 프로필 정보입니다."
-      >
+      <Field id="major" label="전공">
         <Select
           id="major"
           name="major"
           defaultValue={user.major ?? ""}
-          aria-describedby="major-hint"
           disabled={mutation.isPending}
         >
           <option value="">선택 안 함</option>
@@ -238,7 +233,7 @@ function AccountContent({ user }: { readonly user: User }) {
     <div className="settings-page mx-auto grid w-full min-w-0 gap-6 break-keep">
       <PageHeader
         title="설정"
-        subtitle="프로필과 로그인 계정, 알림 계정, AI 도구용 API 토큰을 관리합니다."
+        subtitle={user.githubLogin ? `@${user.githubLogin}` : user.name}
       />
       <section
         aria-labelledby="profile-title"
@@ -255,11 +250,10 @@ function AccountContent({ user }: { readonly user: User }) {
         className="settings-card grid gap-4"
       >
         <h2 id="github-title" className="text-lg font-semibold">
-          로그인 계정 (GitHub)
+          GitHub 로그인
         </h2>
         <p className="text-sm text-muted">
-          GitHub 계정은 로그인에 사용합니다. 프로젝트 저장소 접근은 별도의
-          GitHub App 설치와 저장소 권한이 필요합니다.
+          로그인에만 써요. 저장소 접근은 GitHub App 설치로 따로 받아요.
         </p>
         <dl className="grid gap-3 text-sm">
           <div>
@@ -279,7 +273,7 @@ function AccountContent({ user }: { readonly user: User }) {
         className="settings-card grid gap-4"
       >
         <h2 id="discord-title" className="text-lg font-semibold">
-          알림 (Discord)
+          Discord 알림
         </h2>
         <div>
           <Badge>
@@ -312,7 +306,7 @@ function AccountContent({ user }: { readonly user: User }) {
           className="settings-card grid gap-4"
         >
           <h2 id="api-tokens-title" className="text-lg font-semibold">
-            API 토큰 (MCP)
+            API 토큰
           </h2>
           <ApiTokens />
         </section>
@@ -324,9 +318,6 @@ function AccountContent({ user }: { readonly user: User }) {
         <h2 id="appearance-title" className="text-lg font-semibold">
           화면 테마
         </h2>
-        <p className="text-sm text-muted">
-          시스템을 고르면 기기 설정을 따라 자동으로 바뀝니다.
-        </p>
         <ThemeSelect />
       </section>
       <Dialog
@@ -338,8 +329,8 @@ function AccountContent({ user }: { readonly user: User }) {
       >
         <div className="grid gap-5">
           <p className="text-sm leading-6 text-muted">
-            기존 업무와 기록은 보존됩니다. 다시 연결할 때까지 업무 기능을 이용할
-            수 없습니다.
+            기존 업무와 기록은 보존돼요. 다시 연결할 때까지 업무 기능을 이용할
+            수 없어요.
           </p>
           {unlink.isError && (
             <p role="alert" className="text-sm text-danger">

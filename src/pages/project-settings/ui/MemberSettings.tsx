@@ -37,7 +37,7 @@ export function MemberSettings({
     <Panel
       title="참여자"
       count={project.members.length}
-      info="PM은 한 명이고 헤드 어드민이 정해요. 바꾸거나 해제한 PM은 참여자로 남아요. 참여자를 제외해도 기록은 남고, 업무 배정과 파트 소속은 풀려요."
+      info="PM은 한 명이고 헤드 어드민이 정해요. 바뀐 PM은 참여자로 남아요. 참여자를 제외해도 기록은 남고, 업무 배정과 파트 소속은 풀려요."
       actions={
         project.pmUserId === null && (
           <span className="text-xs text-muted">PM 미지정</span>

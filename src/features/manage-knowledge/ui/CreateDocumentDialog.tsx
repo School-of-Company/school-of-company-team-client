@@ -100,7 +100,7 @@ function CreateForm({
     if (!kind) next.kind = "종류를 고르세요.";
     if (!title.trim()) next.title = "제목을 입력하세요.";
     else if (title.trim().length > 200)
-      next.title = "제목은 200자까지 쓸 수 있습니다.";
+      next.title = "제목은 200자까지 쓸 수 있어요.";
     setErrors(next);
     if (Object.keys(next).length) return;
     create.mutate(undefined, {
@@ -159,7 +159,7 @@ function CreateForm({
         />
       </Field>
       <p className="text-sm text-muted">
-        초안으로 만들고 본문은 종류별 기본 목차로 시작합니다.
+        초안으로 만들고 본문은 종류별 기본 목차로 시작해요.
         {context ? ` ${context}` : ""}
       </p>
       {create.error ? (

@@ -80,9 +80,8 @@ export function IntakeFormSettings({
   });
   const copy = (url: string) =>
     void navigator.clipboard.writeText(url).then(
-      () => toast("링크를 복사했습니다.", "success"),
-      () =>
-        toast("복사하지 못했습니다. 링크를 직접 선택해 복사하세요.", "error"),
+      () => toast("링크를 복사했어요.", "success"),
+      () => toast("복사하지 못했어요. 링크를 직접 선택해 복사하세요.", "error"),
     );
 
   if (forms.isPending)
@@ -109,10 +108,10 @@ export function IntakeFormSettings({
         <span className="flex items-center gap-1 text-sm text-muted">
           양식 {forms.data.length}개
           <InfoTip label="접수 양식 설명">
-            링크를 받은 외부 요청자가 로그인 없이 요구사항을 제출해요.
+            링크만 있으면 로그인 없이 제출할 수 있어요.
             {projectId
-              ? " 접수되면 이 프로젝트의 요구사항 탭에 쌓여요."
-              : " 프로젝트가 아직 없는 요청용이고 헤드 어드민만 봐요."}
+              ? " 접수된 요청은 요구사항 탭에 쌓여요."
+              : " 프로젝트가 없는 요청용이라 헤드 어드민만 봐요."}
           </InfoTip>
         </span>
         {editable && (
@@ -123,7 +122,7 @@ export function IntakeFormSettings({
       </div>
       {forms.data.length === 0 ? (
         <EmptyState
-          title="접수 양식이 없습니다"
+          title="접수 양식이 없어요"
           description="외주 문의, 요구사항을 받을 링크를 만들어 요청자에게 전달하세요."
         />
       ) : (
@@ -212,7 +211,7 @@ export function IntakeFormSettings({
               onSuccess: () => {
                 setEditing(null);
                 toast(
-                  editing === "new" ? "양식을 만들었습니다." : "저장했습니다.",
+                  editing === "new" ? "양식을 만들었어요." : "저장했어요.",
                   "success",
                 );
               },
@@ -249,8 +248,8 @@ export function IntakeFormSettings({
       >
         <p className="mb-6 text-sm text-muted">
           {confirm?.action === "rotate"
-            ? "이전 링크는 바로 열리지 않습니다. 이미 전달한 요청자에게 새 링크를 다시 보내야 합니다."
-            : "링크가 바로 닫힙니다. 이미 받은 요구사항은 남습니다. 되돌릴 수 없습니다."}
+            ? "이전 링크는 바로 열리지 않아요. 이미 전달한 요청자에게 새 링크를 다시 보내야 해요."
+            : "링크가 바로 닫혀요. 이미 받은 요구사항은 남아요. 되돌릴 수 없어요."}
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button
@@ -271,8 +270,8 @@ export function IntakeFormSettings({
                   onSuccess: () => {
                     toast(
                       confirm.action === "rotate"
-                        ? "새 링크를 만들었습니다. 요청자에게 다시 전달하세요."
-                        : "양식을 삭제했습니다.",
+                        ? "새 링크를 만들었어요. 요청자에게 다시 전달하세요."
+                        : "양식을 삭제했어요.",
                       "success",
                     );
                     setConfirm(null);
@@ -329,11 +328,11 @@ function FormDialog({
     const found: Record<string, string> = {};
     const limit = Number(dailyLimit);
     if (!title.trim() || title.trim().length > 100)
-      found.title = "공개 제목은 1~100자입니다.";
+      found.title = "공개 제목은 1~100자예요.";
     if (description.length > 2000)
-      found.description = "안내 문구는 2000자 이하입니다.";
+      found.description = "안내 문구는 2000자 이하예요.";
     if (!Number.isInteger(limit) || limit < 1 || limit > 500)
-      found.dailyLimit = "하루 한도는 1~500입니다.";
+      found.dailyLimit = "하루 한도는 1~500건이에요.";
     if (expiresAt && Number.isNaN(Date.parse(expiresAt)))
       found.expiresAt = "날짜와 시각을 확인하세요.";
     setErrors(found);
@@ -371,7 +370,7 @@ function FormDialog({
         <Field
           id={`${id}-description`}
           label="안내 문구"
-          hint="요청자가 양식 맨 위에서 봅니다."
+          hint="양식 맨 위에 보여요."
           error={errors.description}
         >
           <Textarea
@@ -384,7 +383,7 @@ function FormDialog({
         <Field
           id={`${id}-expires`}
           label="마감 시각"
-          hint="비우면 마감 없이 받습니다."
+          hint="비우면 마감 없이 받아요."
           error={errors.expiresAt}
         >
           <DateTimePicker
@@ -400,7 +399,7 @@ function FormDialog({
         <Field
           id={`${id}-limit`}
           label="하루 접수 한도"
-          hint="한국 시각 자정 기준, 1~500건."
+          hint="1~500건, 한국 시각 자정에 초기화"
           error={errors.dailyLimit}
         >
           <Input
@@ -419,7 +418,7 @@ function FormDialog({
             checked={active}
             onChange={(event) => setActive(event.target.checked)}
           />
-          접수 받기 (끄면 링크가 열리지 않습니다)
+          접수 받기
         </label>
         <div className="flex flex-wrap justify-end gap-2">
           <Button variant="secondary" disabled={pending} onClick={onClose}>

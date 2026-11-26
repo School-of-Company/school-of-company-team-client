@@ -46,8 +46,8 @@ export function DeleteIncident({
       <Dialog open={open} onClose={close} title="장애를 삭제할까요?">
         <div className="grid gap-4">
           <p className="text-sm text-foreground-2">
-            타임라인과 사후 검토가 함께 지워집니다. 조치 항목으로 만든 업무와
-            Discord 대화는 남습니다.
+            타임라인과 사후 검토가 함께 지워져요. 조치 항목으로 만든 업무와
+            Discord 대화는 남아요.
           </p>
           {remove.error ? (
             <p role="alert" className="text-sm text-danger">

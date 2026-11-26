@@ -85,7 +85,7 @@ function LinkFormBody({
       <Field
         id={`${id}-url`}
         label="주소"
-        hint="붙여 넣으면 종류(Notion, Figma, Google 문서 등)는 서버가 알아봅니다."
+        hint="Notion, Figma 같은 종류는 자동으로 알아봐요."
         error={errors.url}
       >
         <Input
@@ -103,7 +103,7 @@ function LinkFormBody({
       <Field
         id={`${id}-title`}
         label="제목"
-        hint="비우면 페이지 제목이나 도메인으로 보입니다."
+        hint="비우면 페이지 제목이나 도메인이 보여요."
         error={errors.title}
       >
         <Input

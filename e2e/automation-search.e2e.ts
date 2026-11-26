@@ -112,6 +112,9 @@ test("PM·헤드 어드민이 규칙을 만들고 끄고 켠다", async ({ page 
     "확인 필요로 표시",
     "리뷰어 지정",
     "버킷으로 옮기기",
+    "담당자 지정",
+    "우선순위 변경",
+    "업무 만들기",
   ]);
   await dialog.getByLabel("이름").fill("P0 막힘이면 PM 호출");
   await dialog.getByLabel("언제").selectOption("TASK_BLOCKED");
@@ -357,7 +360,7 @@ test("남의 개인 업무와 참여하지 않은 프로젝트 업무는 검색�
   await page.keyboard.press("ControlOrMeta+k");
   const palette = page.getByRole("dialog", { name: "검색" });
   await palette.getByRole("combobox", { name: "검색어" }).fill(personalTitle);
-  await expect(palette.getByText("검색 결과가 없습니다")).toBeVisible();
+  await expect(palette.getByText("검색 결과가 없어요")).toBeVisible();
   await capture(page, "search-empty-1440");
 
   type Search = { groups: { type: string; items: { title: string }[] }[] };
@@ -398,8 +401,8 @@ test("전체 결과 화면과 검색 실패 상태", async ({ page }) => {
   await page.route("**/api/v1/search**", (route) => route.abort());
   await page.goto(`/search?q=${encodeURIComponent(`없는검색어${seed.run}`)}`);
   await expect(
-    page.getByRole("alert").filter({ hasText: "검색하지 못했습니다" }),
-  ).toContainText("서버에 연결할 수 없습니다");
+    page.getByRole("alert").filter({ hasText: "검색하지 못했어요" }),
+  ).toContainText("서버에 연결할 수 없어요");
   await capture(page, "search-error-390");
 });
 

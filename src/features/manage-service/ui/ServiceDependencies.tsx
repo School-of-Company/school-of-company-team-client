@@ -46,7 +46,7 @@ export function ServiceDependencies({
       </div>
       <DependencyGroup
         title="이 서비스가 의존하는 서비스"
-        empty="의존하는 서비스가 없습니다."
+        empty="의존하는 서비스가 없어요."
         items={service.upstream}
         onRemove={
           service.canEdit
@@ -59,7 +59,7 @@ export function ServiceDependencies({
       />
       <DependencyGroup
         title="이 서비스에 의존하는 서비스"
-        empty="이 서비스에 의존하는 서비스가 없습니다."
+        empty="이 서비스에 의존하는 서비스가 없어요."
         items={service.downstream}
       />
       {adding && (
@@ -71,7 +71,7 @@ export function ServiceDependencies({
       <ConfirmDialog
         open={removing !== null}
         title="의존관계 삭제"
-        description={`이 서비스의 ${removing?.name ?? ""} 의존 기록을 지웁니다. 다시 추가할 수 있습니다.`}
+        description={`이 서비스의 ${removing?.name ?? ""} 의존 기록을 지워요. 다시 추가할 수 있어요.`}
         confirmLabel="삭제"
         pending={remove.isPending}
         error={remove.error ? serviceErrorMessage(remove.error) : undefined}
@@ -184,7 +184,7 @@ function AddDependencyDialog({
         }}
       >
         <p className="text-sm text-muted">
-          이 서비스가 의존하는 서비스를 고릅니다.
+          이 서비스가 의존하는 서비스를 골라요.
         </p>
         {services.isPending ? (
           <Spinner label="서비스 불러오는 중" />
@@ -194,7 +194,7 @@ function AddDependencyDialog({
           </p>
         ) : candidates.length === 0 ? (
           <p className="text-sm text-muted">
-            더 추가할 수 있는 서비스가 없습니다.
+            더 추가할 수 있는 서비스가 없어요.
           </p>
         ) : (
           <Field id="dependency-target" label="대상 서비스">

@@ -139,7 +139,7 @@ export function SettingsPanels(props: SettingsProps) {
   const readOnly = !manager && (
     <span className="flex items-center gap-1">
       <Badge>읽기 전용</Badge>
-      <InfoTip label="읽기 전용 이유" align="end">
+      <InfoTip label="읽기 전용 이유">
         헤드 어드민과 PM만 설정을 바꿀 수 있어요.
       </InfoTip>
     </span>

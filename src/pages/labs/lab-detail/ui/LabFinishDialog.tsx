@@ -99,7 +99,7 @@ function FinishForm({
       <Field
         id={`${id}-result`}
         label="결과"
-        hint="측정한 값과 무슨 일이 있었는지 적습니다."
+        hint="측정한 값과 있었던 일을 적어요."
       >
         <Textarea
           id={`${id}-result`}

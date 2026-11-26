@@ -148,7 +148,7 @@ export function GeneralSettings({ project, user, onSaved }: SettingsProps) {
           <SettingsField
             id="project-visibility"
             label="공개 범위"
-            info="참여자만 공개로 바꾸면 Discord 연결이 꺼져요. 관리자가 채널과 기존 스레드 권한을 점검한 뒤 다시 연결해야 해요."
+            info="참여자만 공개로 바꾸면 Discord 연결이 꺼져요. 채널과 스레드 권한을 확인한 뒤 다시 연결해야 해요."
           >
             <Select
               id="project-visibility"

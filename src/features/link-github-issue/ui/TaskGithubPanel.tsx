@@ -60,7 +60,7 @@ export function TaskGithubPanel({
     try {
       await action();
       await client.invalidateQueries({ queryKey: taskKeys.all });
-      toast("GitHub 연결을 변경했습니다.", "success");
+      toast("GitHub 연결을 변경했어요.", "success");
     } catch (cause) {
       const problem = normalizeApiError(cause);
       if (validating && [400, 409, 422].includes(problem.status))
@@ -97,7 +97,7 @@ export function TaskGithubPanel({
   if (github.isError)
     return (
       <ErrorState
-        title="GitHub 연결을 불러오지 못했습니다"
+        title="GitHub 연결을 불러오지 못했어요"
         description={normalizeApiError(github.error).message}
         onRetry={() => void github.refetch()}
       />
@@ -139,11 +139,11 @@ export function TaskGithubPanel({
         <div className="grid gap-1 text-sm empty:hidden">
           {publication.publiclyVisible && publication.state !== "SUCCEEDED" && (
             <p className="text-danger">
-              공개 저장소라 제목, 설명, 업무 링크가 공개됩니다.
+              공개 저장소라 제목, 설명, 업무 링크가 공개돼요.
             </p>
           )}
           {publication.state === "UNCERTAIN" && (
-            <p className="text-muted">발행 결과를 확인하고 있습니다.</p>
+            <p className="text-muted">발행 결과를 확인하고 있어요.</p>
           )}
           {publication.errorMessage && (
             <p className="text-danger">
@@ -169,11 +169,7 @@ export function TaskGithubPanel({
           <Field
             id="publication-target"
             label="Issue 발행 저장소"
-            hint={
-              publication
-                ? undefined
-                : "저장소를 고르면 바로 Issue로 발행됩니다."
-            }
+            hint={publication ? undefined : "고르는 즉시 Issue로 발행돼요."}
           >
             <Select
               id="publication-target"
@@ -213,14 +209,14 @@ export function TaskGithubPanel({
       )}
       {repositories.isError && editable && (
         <ErrorState
-          title="발행 저장소를 불러오지 못했습니다"
+          title="발행 저장소를 불러오지 못했어요"
           onRetry={() => void repositories.refetch()}
         />
       )}
       {suggestsDone(mergedPr, task.status) && (
         <div className="signal-suggest" role="status">
           <p className="min-w-0 text-sm">
-            연결된 PR이 merge됐습니다. 업무 상태는 자동으로 바뀌지 않습니다.
+            연결된 PR이 merge됐어요. 업무 상태는 자동으로 바뀌지 않아요.
           </p>
           {editable && onComplete ? (
             <Button
@@ -233,7 +229,7 @@ export function TaskGithubPanel({
             </Button>
           ) : (
             <p className="text-xs text-muted">
-              수정 권한이 있는 참여자가 완료로 옮길 수 있습니다.
+              수정 권한이 있는 참여자가 완료로 옮길 수 있어요.
             </p>
           )}
         </div>

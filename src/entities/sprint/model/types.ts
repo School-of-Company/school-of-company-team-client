@@ -273,30 +273,30 @@ export function nextSprintDefaults(
 }
 
 const errors: Readonly<Record<string, string>> = {
-  SPRINT_NOT_FOUND: "스프린트를 찾을 수 없습니다. 목록을 다시 확인하세요.",
-  DUPLICATE_SPRINT_NAME: "같은 이름의 스프린트가 있습니다. 다른 이름을 쓰세요.",
+  SPRINT_NOT_FOUND: "스프린트를 찾을 수 없어요. 목록을 다시 확인하세요.",
+  DUPLICATE_SPRINT_NAME: "같은 이름의 스프린트가 있어요. 다른 이름을 쓰세요.",
   SPRINT_ALREADY_ACTIVE:
-    "이미 진행 중인 스프린트가 있습니다. 그 스프린트를 종료한 뒤 시작하세요.",
-  SPRINT_NOT_PLANNED: "예정 상태의 스프린트만 시작하거나 삭제할 수 있습니다.",
+    "이미 진행 중인 스프린트가 있어요. 그 스프린트를 종료한 뒤 시작하세요.",
+  SPRINT_NOT_PLANNED: "예정 상태의 스프린트만 시작하거나 삭제할 수 있어요.",
   SPRINT_NOT_ACTIVE:
-    "진행 중인 스프린트만 종료할 수 있습니다. 그 사이 종료됐는지 확인하세요.",
-  SPRINT_NOT_STARTED: "스프린트를 시작한 뒤에 쓸 수 있습니다.",
-  SPRINT_CLOSED: "종료된 스프린트는 바꿀 수 없습니다.",
-  SPRINT_TASK_NOT_IN_PROJECT: "이 프로젝트의 업무만 넣을 수 있습니다.",
-  TASK_NOT_IN_SPRINT: "이미 스프린트에서 빠진 업무입니다.",
+    "진행 중인 스프린트만 종료할 수 있어요. 그 사이 종료됐는지 확인하세요.",
+  SPRINT_NOT_STARTED: "스프린트를 시작한 뒤에 쓸 수 있어요.",
+  SPRINT_CLOSED: "종료된 스프린트는 바꿀 수 없어요.",
+  SPRINT_TASK_NOT_IN_PROJECT: "이 프로젝트의 업무만 넣을 수 있어요.",
+  TASK_NOT_IN_SPRINT: "이미 스프린트에서 빠진 업무예요.",
   STALE_SPRINT_SCOPE:
-    "그 사이 스프린트 업무가 바뀌었습니다. 최신 목록을 보고 다시 시도하세요.",
+    "그 사이 스프린트 업무가 바뀌었어요. 최신 목록을 보고 다시 시도하세요.",
   INVALID_CARRY_OVER_TARGET:
-    "이월 대상이 올바르지 않습니다. 예정 스프린트 또는 사용 중인 버킷을 고르세요.",
-  INVALID_PARAMETER: "요청 값이 올바르지 않습니다.",
-  SPRINT_REVIEW_NOT_FOUND: "저장된 결과 보고가 없습니다. 먼저 저장하세요.",
-  RETRO_ENTRY_NOT_FOUND: "이미 삭제된 회고 항목입니다.",
-  RETRO_ENTRY_FORBIDDEN: "작성자만 고칠 수 있습니다.",
-  INVALID_SCOPE: "프로젝트 업무만 스프린트, 마일스톤에 넣을 수 있습니다.",
-  TASK_NOT_FOUND: "업무를 찾을 수 없거나 볼 수 없습니다.",
-  PROJECT_FORBIDDEN: "이 작업을 할 권한이 없습니다.",
-  PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능합니다.",
-  PROJECT_NOT_FOUND: "프로젝트가 없거나 볼 수 없습니다.",
+    "이월 대상이 올바르지 않아요. 예정 스프린트 또는 사용 중인 버킷을 고르세요.",
+  INVALID_PARAMETER: "요청 값이 올바르지 않아요.",
+  SPRINT_REVIEW_NOT_FOUND: "저장된 결과 보고가 없어요. 먼저 저장하세요.",
+  RETRO_ENTRY_NOT_FOUND: "이미 삭제된 회고 항목이에요.",
+  RETRO_ENTRY_FORBIDDEN: "작성자만 고칠 수 있어요.",
+  INVALID_SCOPE: "프로젝트 업무만 스프린트, 마일스톤에 넣을 수 있어요.",
+  TASK_NOT_FOUND: "업무를 찾을 수 없거나 볼 수 없어요.",
+  PROJECT_FORBIDDEN: "이 작업을 할 권한이 없어요.",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능해요.",
+  PROJECT_NOT_FOUND: "프로젝트가 없거나 볼 수 없어요.",
 };
 export function sprintErrorMessage(error: {
   readonly code: string;

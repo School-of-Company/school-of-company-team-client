@@ -52,9 +52,8 @@ export function RepositorySettings({
         <span className="flex min-w-0 items-center gap-1 text-sm text-muted">
           연결 {repositories.data.length}개
           <InfoTip label="저장소 연결 설명">
-            저장소 접근에는 GitHub App 설치가 따로 필요해요. 설치에서 허용한
-            저장소만 연결할 수 있어요. 기본 발행 저장소는 새 업무의 선택
-            기본값이고, 기존 업무를 발행하지 않아요.
+            GitHub App 설치에서 허용한 저장소만 연결할 수 있어요. 기본 발행
+            저장소는 새 업무의 기본값이고, 기존 업무를 발행하지는 않아요.
           </InfoTip>
         </span>
         {!disabled && (

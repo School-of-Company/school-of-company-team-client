@@ -272,12 +272,12 @@ export function TaskEditor({
             {description.trim() ? (
               <Markdown>{description}</Markdown>
             ) : (
-              <p className="text-sm text-muted">미리 볼 내용이 없습니다.</p>
+              <p className="text-sm text-muted">미리 볼 내용이 없어요.</p>
             )}
           </div>
         )}
         <p id={`${prefix}-description-hint`} className="text-xs text-muted">
-          마크다운을 지원합니다. (## 제목, - 목록, `코드`, [링크](url))
+          마크다운을 쓸 수 있어요.
         </p>
       </div>
       <fieldset className="min-w-0">
@@ -323,7 +323,7 @@ export function TaskEditor({
       <div className="grid items-start gap-4 sm:grid-cols-2">
         <Field
           id={`${prefix}-start`}
-          label="시작일 (선택)"
+          label="시작일"
           error={dateError.startDate}
         >
           <DatePicker
@@ -447,7 +447,7 @@ export function TaskEditor({
         )}
       </div>
       {scope === "PERSONAL" ? (
-        <p className="text-sm text-muted">담당자는 본인으로 고정됩니다.</p>
+        <p className="text-sm text-muted">담당자는 본인으로 고정돼요.</p>
       ) : (
         <TaskAssignees
           people={people}
@@ -470,7 +470,7 @@ export function TaskEditor({
                 ? `일반 업무로 바꾸면 리뷰어 ${initialReviewers.length}명이 해제돼요.`
                 : "개발 업무에서만 리뷰어를 지정할 수 있어요."
           }
-          empty="선택할 수 있는 리뷰어가 없습니다."
+          empty="선택할 수 있는 리뷰어가 없어요."
           disabled={!reviewing}
           people={reviewerPeople}
           selected={reviewing ? reviewers : []}

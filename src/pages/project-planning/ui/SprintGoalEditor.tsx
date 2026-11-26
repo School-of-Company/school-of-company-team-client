@@ -7,7 +7,7 @@ export function SprintGoalEditor({
   onChange,
   error,
   max = 500,
-  hint = "마크다운을 지원합니다.",
+  hint = "마크다운을 지원해요.",
 }: {
   readonly id: string;
   readonly value: string;
@@ -51,7 +51,7 @@ export function SprintGoalEditor({
           {value.trim() ? (
             <Markdown>{value}</Markdown>
           ) : (
-            <p className="text-sm text-muted">미리 볼 내용이 없습니다.</p>
+            <p className="text-sm text-muted">미리 볼 내용이 없어요.</p>
           )}
         </div>
       )}

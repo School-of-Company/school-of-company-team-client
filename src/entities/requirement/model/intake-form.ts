@@ -98,52 +98,52 @@ export function validateIntake(
       if (field.required && list.length === 0)
         errors[path] = "한 개 이상 적어 주세요.";
       else if (field.maxItems && list.length > field.maxItems)
-        errors[path] = `${field.maxItems}개 이하여야 합니다.`;
+        errors[path] = `${field.maxItems}개 이하여야 해요.`;
       else if (
         field.maxLength &&
         list.some((item) => item.length > field.maxLength!)
       )
-        errors[path] = `항목은 ${field.maxLength}자 이하여야 합니다.`;
+        errors[path] = `항목은 ${field.maxLength}자 이하여야 해요.`;
     } else if (field.type === "URL_LIST") {
       const list = items(value);
       if (field.required && list.length === 0)
         errors[path] = "한 개 이상 적어 주세요.";
       else if (field.maxItems && list.length > field.maxItems)
-        errors[path] = `${field.maxItems}개 이하여야 합니다.`;
+        errors[path] = `${field.maxItems}개 이하여야 해요.`;
       list.forEach((url, index) => {
         if (
           (field.maxLength && url.length > field.maxLength) ||
           !isHttpUrl(url)
         )
-          errors[`references[${index}]`] = "http(s) 주소여야 합니다.";
+          errors[`references[${index}]`] = "http(s) 주소여야 해요.";
       });
     } else {
       const body = text(value);
       if (!body) {
-        if (field.required) errors[path] = "필수 항목입니다.";
+        if (field.required) errors[path] = "필수 항목이에요.";
       } else if (field.maxLength && body.length > field.maxLength)
-        errors[path] = `${field.maxLength}자 이하여야 합니다.`;
+        errors[path] = `${field.maxLength}자 이하여야 해요.`;
       else if (
         field.type === "SELECT" &&
         !form.priorities.some((p) => p.value === body)
       )
         errors[path] = "목록에서 고르세요.";
       else if (field.type === "DATE" && !/^\d{4}-\d{2}-\d{2}$/.test(body))
-        errors[path] = "날짜 형식이 아닙니다.";
+        errors[path] = "날짜 형식이 아니에요.";
     }
   }
   for (const field of requesterFields) {
     const value = draft.requester[field.key].trim();
     const path = `requester.${field.key}`;
     if (!value) {
-      if (field.required) errors[path] = "필수 항목입니다.";
+      if (field.required) errors[path] = "필수 항목이에요.";
     } else if (value.length > field.max)
-      errors[path] = `${field.max}자 이하여야 합니다.`;
+      errors[path] = `${field.max}자 이하여야 해요.`;
     else if (field.type === "email" && !EMAIL.test(value))
-      errors[path] = "이메일 형식이 아닙니다.";
+      errors[path] = "이메일 형식이 아니에요.";
   }
   if (!draft.consent)
-    errors.consent = "개인정보 수집, 이용에 동의해야 제출할 수 있습니다.";
+    errors.consent = "개인정보 수집, 이용에 동의해야 제출할 수 있어요.";
   return errors;
 }
 
