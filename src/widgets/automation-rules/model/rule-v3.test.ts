@@ -392,6 +392,15 @@ test("새 실행 결과 code 와 오류 code 는 한국어 문장이다", () => 
   );
   assert.equal(
     resultMessage(
+      "TASK_NOT_ELIGIBLE",
+      "SKIPPED",
+      "TASK_CREATED",
+      "ASSIGN_TO_AGENT",
+    ),
+    "완료되었거나 삭제된 업무라 대기열에 넣지 않았어요.",
+  );
+  assert.equal(
+    resultMessage(
       "RULE_ACTION_TARGET_MISSING",
       "FAILED",
       "SERVICE_DOWN",

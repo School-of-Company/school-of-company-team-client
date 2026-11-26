@@ -158,7 +158,10 @@ export type RuleRun = {
   readonly ruleName: string;
   readonly event: RuleEvent;
   readonly task: TaskSummary | null;
+  /** 계기 장애, 또는 장애 동작이 만들거나 메모를 남긴 장애. */
   readonly incidentId: string | null;
+  /** 장애 등록이 성공해 만든 장애. 지워졌으면 null. */
+  readonly createdIncidentId?: string | null;
   readonly status: RuleRunStatus;
   readonly resultCode: string | null;
   readonly attempts: number;
@@ -622,6 +625,8 @@ function actionResultMessage(code: string, action?: RuleAction) {
   }
   if (code === "RULE_ACTION_TARGET_INVALID" && action === "ADD_TO_SPRINT")
     return "넣을 스프린트가 이미 끝났어요.";
+  if (code === "TASK_NOT_ELIGIBLE" && action === "ASSIGN_TO_AGENT")
+    return "완료되었거나 삭제된 업무라 대기열에 넣지 않았어요.";
   if (code === "ALREADY_APPLIED") {
     if (action === "ASSIGN_TO_AGENT") return "이미 에이전트 대기열에 있어요.";
     if (action === "ESCALATE")
@@ -694,7 +699,7 @@ const errorMessages: Readonly<Record<string, string>> = {
   RULE_ACTION_TARGET_REQUIRED:
     "동작에 필요한 대상이 없습니다. 편집에서 대상을 고르세요.",
   RULE_ACTION_TARGET_INVALID:
-    "고른 스프린트가 끝났거나 DM 받을 사람이 활성 사용자가 아니에요.",
+    "고른 스프린트가 끝났거나, DM 받을 사람이 활성 사용자가 아니거나 이 프로젝트를 볼 수 없어요.",
   RULE_TEMPLATE_INVALID:
     "문구에 이 이벤트에서 쓸 수 없는 변수나 멘션 문법이 있습니다.",
   RULE_SCOPE_OPTION_NOT_APPLICABLE:

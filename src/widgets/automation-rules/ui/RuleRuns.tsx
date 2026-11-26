@@ -174,7 +174,8 @@ export function RuleRuns({
                       </span>
                       <span className="truncate">{run.task.title}</span>
                     </Link>
-                  ) : run.incidentId ? (
+                  ) : run.incidentId &&
+                    run.incidentId !== run.createdIncidentId ? (
                     <Link
                       href={routes.incident(run.incidentId)}
                       className="rule-run-task"
@@ -214,6 +215,14 @@ export function RuleRuns({
                         {run.createdTask.key}
                       </span>
                       <span className="truncate">{run.createdTask.title}</span>
+                    </Link>
+                  )}
+                  {run.createdIncidentId && (
+                    <Link
+                      href={routes.incident(run.createdIncidentId)}
+                      className="rule-run-task text-xs"
+                    >
+                      <span className="truncate">만든 장애 보기</span>
                     </Link>
                   )}
                   {resultMessage(
