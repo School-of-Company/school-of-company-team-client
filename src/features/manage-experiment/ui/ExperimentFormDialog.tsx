@@ -116,10 +116,10 @@ function ExperimentForm({
     const next: Record<string, string> = {};
     if (!title.trim()) next.title = "제목을 입력하세요.";
     else if (title.trim().length > 120)
-      next.title = "제목은 120자까지 쓸 수 있습니다.";
+      next.title = "제목은 120자까지 쓸 수 있어요.";
     if (!hypothesis.trim()) next.hypothesis = "가설을 입력하세요.";
     if (startDate && endDate && endDate < startDate)
-      next.endDate = "끝나는 날은 시작일보다 앞설 수 없습니다.";
+      next.endDate = "끝나는 날은 시작일보다 앞설 수 없어요.";
     setErrors(next);
     if (Object.keys(next).length) return;
     save.mutate(undefined, { onSuccess: (saved) => saved && onSaved(saved) });
@@ -140,7 +140,7 @@ function ExperimentForm({
       <Field
         id={`${id}-hypothesis`}
         label="가설"
-        hint="무엇을 하면 어떻게 될 거라고 생각하는지 한두 문장으로 적습니다."
+        hint="무엇을 하면 어떻게 될지 한두 문장으로 적어요."
         error={shown.hypothesis}
       >
         <Textarea
@@ -156,7 +156,7 @@ function ExperimentForm({
       <Field
         id={`${id}-metric`}
         label="측정 기준"
-        hint="무엇을 보면 성공인지 미리 정해 둡니다. 나중에 채워도 됩니다."
+        hint="무엇을 보면 성공인지 적어요. 나중에 채워도 돼요."
       >
         <Textarea
           id={`${id}-metric`}
@@ -169,7 +169,7 @@ function ExperimentForm({
       <Field
         id={`${id}-method`}
         label="해볼 것"
-        hint="마크다운을 쓸 수 있습니다."
+        hint="마크다운을 쓸 수 있어요."
       >
         <Textarea
           id={`${id}-method`}

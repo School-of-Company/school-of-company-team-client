@@ -12,22 +12,12 @@ import {
 import { activeUsersQueryOptions, type User } from "@/entities/user";
 import { AuthGuard } from "@/features/auth";
 import { settingsErrorMessage } from "@/features/project-settings";
-import { SettingsPanels } from "./SettingsPanels";
+import { SettingsBodySkeleton, SettingsPanels } from "./SettingsPanels";
 import { isAccessLost } from "../model/access-lost";
 import { normalizeApiError } from "@/shared/api";
 import { ProjectNav } from "@/widgets/project-nav";
-import { ErrorState, ListSkeleton, StaleNotice } from "@/shared/ui";
+import { ErrorState, StaleNotice } from "@/shared/ui";
 
-// 설정은 PM과 헤드 어드민이 여는 화면이라 그 사람들이 보는 탭 수(자동화, 접수 양식 포함)로 잡는다.
-const settingsTabs = [
-  "기본 정보",
-  "멤버와 권한",
-  "연동",
-  "계획 버킷",
-  "알림",
-  "자동화",
-  "접수 양식",
-];
 const projectTabs = [
   "보드",
   "문서",
@@ -39,23 +29,6 @@ const projectTabs = [
   "요구사항",
   "설정",
 ];
-
-/** 설정 탭 줄과 본문 자리. 탭을 바꾸거나 설정이 늦게 와도 탭 줄 아래가 같은 높이에서 시작한다. */
-function SettingsBodySkeleton() {
-  return (
-    <div className="grid gap-10">
-      <div aria-hidden="true" className="settings-nav">
-        {settingsTabs.map((label) => (
-          // 탭 줄 스타일이 `.settings-nav a`에 걸려 있어 같은 요소로 그린다(href 없는 a 는 초점을 받지 않는다).
-          <a key={label} className="ui-nav-link">
-            <span className="ui-skeleton-text">{label}</span>
-          </a>
-        ))}
-      </div>
-      <ListSkeleton label="설정 불러오는 중" rows={5} />
-    </div>
-  );
-}
 
 /** 머리글(경로, 이미지와 이름), 프로젝트 탭 줄, 설정 본문을 실제와 같은 클래스로 잡는다. */
 export function ProjectSettingsSkeleton() {
@@ -86,7 +59,7 @@ export function ProjectSettingsSkeleton() {
           </span>
         ))}
       </div>
-      <div className="settings-page grid w-full min-w-0">
+      <div className="settings-layout">
         <SettingsBodySkeleton />
       </div>
     </div>
@@ -128,7 +101,7 @@ function ProjectSettingsContent({
   if (!project.data || (project.isError && isAccessLost(project.error)))
     return (
       <ErrorState
-        title="프로젝트를 표시할 수 없습니다"
+        title="프로젝트를 표시할 수 없어요"
         description={settingsErrorMessage(normalizeApiError(project.error))}
         onRetry={() => void project.refetch()}
       />
@@ -167,8 +140,8 @@ function ProjectSettingsContent({
         </div>
       </header>
       <ProjectNav project={project.data} user={user} />
-      {/* 머리글, 프로젝트 탭은 다른 탭과 같은 폭, 설정 본문만 읽기 좋은 폭으로 줄인다. */}
-      <div className="settings-page grid w-full min-w-0">
+      {/* 머리글, 프로젝트 탭은 다른 탭과 같은 폭. 설정은 섹션 내비 + 읽기 폭 본문. */}
+      <div className="settings-layout">
         <Suspense fallback={<SettingsBodySkeleton />}>
           <SettingsPanels
             key={projectId}

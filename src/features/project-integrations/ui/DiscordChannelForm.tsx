@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { normalizeApiError } from "@/shared/api";
 import {
   Badge,
@@ -8,8 +8,9 @@ import {
   Checkbox,
   ErrorState,
   Field,
+  InfoTip,
   Input,
-  Spinner,
+  Skeleton,
 } from "@/shared/ui";
 import { useDiscordChannel, useLinkDiscordChannel } from "../api/integrations";
 import { validateDiscordChannel } from "../model/validation";
@@ -18,17 +19,35 @@ export function DiscordChannelForm({
   projectId,
   membersOnly = false,
   disabled = false,
+  onDirtyChange,
 }: {
   readonly projectId: string | null;
   readonly membersOnly?: boolean;
   readonly disabled?: boolean;
+  /** 고치던 채널 ID 가 저장된 값과 다르면 true(나가기 경고용). */
+  readonly onDirtyChange?: (dirty: boolean) => void;
 }) {
   const channel = useDiscordChannel(projectId, true);
   const link = useLinkDiscordChannel(projectId);
   const [validation, setValidation] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditingState] = useState(false);
+  const [draft, setDraft] = useState<string | null>(null);
+  const setEditing = (next: boolean) => {
+    setDraft(null);
+    setEditingState(next);
+  };
+  const dirty =
+    editing &&
+    draft !== null &&
+    draft.trim() !== (channel.data?.channelId ?? "");
+  useEffect(() => onDirtyChange?.(dirty), [dirty, onDirtyChange]);
   const prefix = projectId === null ? "team-channel" : "project-channel";
-  if (channel.isPending) return <Spinner label="Discord 채널 불러오는 중" />;
+  if (channel.isPending)
+    return (
+      <div role="status" aria-label="Discord 채널 불러오는 중">
+        <Skeleton className="h-10" />
+      </div>
+    );
   if (channel.isError)
     return (
       <ErrorState
@@ -37,43 +56,54 @@ export function DiscordChannelForm({
       />
     );
   const statusLabels = {
-    NOT_CONFIGURED: "미연결",
-    ACTIVE: "활성",
-    DISABLED: "비활성",
+    NOT_CONFIGURED: "연결 안 됨",
+    ACTIVE: "연결됨",
+    DISABLED: "꺼짐",
+  } as const;
+  const tone = {
+    NOT_CONFIGURED: undefined,
+    ACTIVE: "badge-green",
+    DISABLED: "badge-red",
   } as const;
   return (
     <div className="grid gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Badge>{statusLabels[channel.data.status]}</Badge>
-        <span className="text-sm break-all text-muted">
-          {channel.data.channelId ?? "연결된 채널이 없습니다."}
-        </span>
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <Badge className={tone[channel.data.status]}>
+            {statusLabels[channel.data.status]}
+          </Badge>
+          <span className="min-w-0 truncate font-mono text-sm">
+            {channel.data.channelId ?? (
+              <span className="font-sans text-muted">연결된 채널이 없어요</span>
+            )}
+          </span>
+          <InfoTip label="Discord 권한 설명">
+            Discord 권한은 자동으로 바뀌지 않아요. 공개 범위나 참여자가 바뀌면
+            권한을 확인하고 다시 연결해 주세요.
+          </InfoTip>
+        </div>
+        {!disabled && !editing && (
+          <Button
+            variant="secondary"
+            className="ui-button-sm"
+            onClick={() => {
+              link.reset();
+              setEditing(true);
+            }}
+          >
+            {channel.data.channelId ? "채널 변경" : "채널 연결"}
+          </Button>
+        )}
       </div>
       {channel.data.status === "DISABLED" && (
-        <div role="status" className="grid gap-2 text-sm">
-          <p>비활성 사유: {channel.data.disabledReason}</p>
+        <div role="status" className="grid gap-1 text-xs text-danger">
+          <p>꺼진 이유: {channel.data.disabledReason}</p>
           <p>{channel.data.requiredAction}</p>
         </div>
       )}
-      <p className="text-sm text-muted">
-        Discord 역할, 채널, 기존 스레드 권한은 자동으로 변경되지 않습니다. 공개
-        범위나 참여자가 바뀌면 관리자가 직접 점검한 뒤 다시 연결하세요.
-      </p>
-      {!disabled && !editing && (
-        <Button
-          variant="secondary"
-          className="justify-self-start"
-          onClick={() => {
-            link.reset();
-            setEditing(true);
-          }}
-        >
-          Discord 채널 편집
-        </Button>
-      )}
       {link.isSuccess && !editing && (
-        <p role="status" className="text-sm">
-          채널 검증을 마쳤습니다. 현재 상태: {statusLabels[link.data.status]}
+        <p role="status" className="text-xs text-muted">
+          채널을 확인했어요. 지금 상태: {statusLabels[link.data.status]}
         </p>
       )}
       {editing && (
@@ -106,7 +136,7 @@ export function DiscordChannelForm({
             <Field
               id={prefix}
               label="Discord 채널 ID"
-              hint="Discord 개발자 모드 → 채널 우클릭 → ID 복사"
+              hint="Discord 개발자 모드에서 채널을 우클릭하고 ID 복사"
             >
               <Input
                 id={prefix}
@@ -116,6 +146,7 @@ export function DiscordChannelForm({
                 required
                 defaultValue={channel.data.channelId ?? ""}
                 aria-describedby={`${prefix}-hint`}
+                onChange={(event) => setDraft(event.target.value)}
               />
             </Field>
             {membersOnly && (
@@ -127,7 +158,7 @@ export function DiscordChannelForm({
                 />
                 <span>
                   이 채널을 볼 수 있는 역할, 사용자를 프로젝트 참여자로
-                  제한했고, 기존 스레드 권한도 직접 점검했습니다.
+                  제한했고, 기존 스레드 권한도 직접 점검했어요.
                 </span>
               </label>
             )}
@@ -159,9 +190,8 @@ export function DiscordChannelForm({
             </p>
           )}
           {link.isSuccess && (
-            <p role="status" className="text-sm">
-              채널 검증을 마쳤습니다. 현재 상태:{" "}
-              {statusLabels[link.data.status]}
+            <p role="status" className="text-xs text-muted">
+              채널을 확인했어요. 지금 상태: {statusLabels[link.data.status]}
             </p>
           )}
         </form>

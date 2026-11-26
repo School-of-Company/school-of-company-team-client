@@ -170,7 +170,7 @@ test("댓글을 달고 해결하며, 이력으로 처음 템플릿 상태로 되
     .filter({ hasText: "v1" })
     .getByRole("button", { name: "되돌리기" })
     .click();
-  await expect(page.getByText("이 이력으로 되돌렸습니다.")).toBeVisible();
+  await expect(page.getByText("이 이력으로 되돌렸어요.")).toBeVisible();
   await expect(page.getByText("저장됨")).toBeVisible({ timeout: 10_000 });
   const restored = await apiGet<Detail>(
     `/api/v1/whiteboards/${boardId}`,
@@ -209,7 +209,7 @@ test("비공개 프로젝트 보드는 비참여자에게 없는 것처럼 보�
   await signIn(outsider, seed.outsider.tokens);
   await outsider.goto(`/whiteboards/${secretId}`);
   await expect(
-    outsider.getByText("화이트보드가 없거나 볼 권한이 없습니다."),
+    outsider.getByText("화이트보드가 없거나 볼 권한이 없어요."),
   ).toBeVisible();
   await outsider.goto(`/search?q=${encodeURIComponent(seed.run)}`);
   await expect(outsider.getByRole("link", { name: title })).toBeVisible();

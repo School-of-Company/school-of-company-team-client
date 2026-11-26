@@ -74,7 +74,7 @@ export function OpsSettingsDialog({
               <Field
                 id="ops-health-url"
                 label="주소"
-                hint="https 주소만 됩니다. 서버는 리다이렉트를 따라가지 않고, 주소를 바꾸면 검사 기록을 지웁니다."
+                hint="https 주소만 돼요. 리다이렉트는 따라가지 않고, 주소를 바꾸면 검사 기록이 지워져요."
               >
                 <Input
                   id="ops-health-url"
@@ -150,7 +150,7 @@ export function OpsSettingsDialog({
                 http 주소 허용
                 {!lead && (
                   <span className="text-xs text-muted">
-                    헤드 어드민만 바꿀 수 있습니다
+                    헤드 어드민만 바꿀 수 있어요
                   </span>
                 )}
               </label>
@@ -179,16 +179,11 @@ export function OpsSettingsDialog({
               />
             </Field>
           ))}
-          <Field
-            id="ops-runbook"
-            label="Runbook"
-            hint="장애 때 따라 할 Runbook 문서를 고릅니다."
-          >
+          <Field id="ops-runbook" label="Runbook">
             <Select
               id="ops-runbook"
               value={form.runbookDocumentId}
               disabled={disabled || runbooks.isPending}
-              aria-describedby="ops-runbook-hint"
               onChange={(event) => set("runbookDocumentId", event.target.value)}
             >
               <option value="">없음</option>
@@ -210,8 +205,8 @@ export function OpsSettingsDialog({
           <legend className="text-md mb-2 font-semibold">Sentry</legend>
           {ops.sentry.status === "NOT_CONFIGURED" && (
             <p className="service-notice text-sm">
-              서버에 Sentry 토큰이 없어(NOT_CONFIGURED) 수치를 가져오지
-              않습니다. slug는 미리 저장해 둘 수 있습니다.
+              서버에 Sentry 토큰이 없어(NOT_CONFIGURED) 수치를 가져오지 않아요.
+              slug는 미리 저장해 둘 수 있어요.
             </p>
           )}
           <div className="ops-form-row">
@@ -243,7 +238,7 @@ export function OpsSettingsDialog({
             </Field>
           </div>
           <p className="text-xs text-muted">
-            둘 다 넣거나 둘 다 비웁니다. 바꾸면 수치를 다시 가져옵니다.
+            둘 다 넣거나 둘 다 비워요. 바꾸면 수치를 다시 가져와요.
           </p>
         </fieldset>
         {save.isError && (

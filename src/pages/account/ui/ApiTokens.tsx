@@ -21,6 +21,7 @@ import {
   Button,
   CopyField,
   Dialog,
+  DisabledReason,
   EmptyState,
   ErrorState,
   Field,
@@ -115,8 +116,8 @@ function CreatedToken({ token }: { readonly token: CreatedApiToken }) {
         role="alert"
         className="rounded-xl bg-surface-box p-4 text-sm leading-6 font-semibold"
       >
-        이 토큰은 지금 한 번만 보여요. 창을 닫으면 다시 볼 수 없어요. 저장소,
-        Issue, PR, Discord에 붙여 넣지 마세요.
+        이 토큰은 지금 한 번만 보여 드려요. 창을 닫으면 다시 볼 수 없어요. 레포,
+        이슈, PR, Discord에 붙여 넣지 마세요.
       </p>
       <CopyField id="api-token-value" label="토큰" value={token.token} />
       <dl className="agent-limits">
@@ -219,13 +220,7 @@ function CreateTokenForm({
           ]}
           onChange={setScope}
           disabled={pending}
-          describedBy={writeBlocked ? "api-token-scope-blocked" : undefined}
         />
-        {writeBlocked && (
-          <p id="api-token-scope-blocked" className="text-xs text-muted">
-            {writeBlocked}
-          </p>
-        )}
       </div>
       <div className="grid gap-2">
         <label htmlFor="api-token-expiry" className="text-sm font-medium">
@@ -246,7 +241,7 @@ function CreateTokenForm({
               title={
                 option.allowed
                   ? undefined
-                  : `팀 정책상 최대 ${limits.maxTokenDays}일이에요.`
+                  : `팀 정책상 최대 ${limits.maxTokenDays}일이에요`
               }
             >
               {option.days}일
@@ -426,9 +421,20 @@ export function ApiTokens() {
     <div className="grid gap-4">
       <PolicyLimits policy={policy} />
       <div className="flex flex-wrap items-center gap-3">
-        <Button disabled={!limits} onClick={() => dispatch({ type: "open" })}>
-          토큰 만들기
-        </Button>
+        <DisabledReason
+          align="start"
+          reason={
+            limits
+              ? null
+              : policy.isError
+                ? "팀 정책을 불러오지 못해 만들 수 없어요"
+                : "팀 정책을 불러오는 중이에요"
+          }
+        >
+          <Button disabled={!limits} onClick={() => dispatch({ type: "open" })}>
+            토큰 만들기
+          </Button>
+        </DisabledReason>
       </div>
       <SetupSnippets />
       {/* 재조회가 실패하면 캐시(폐기된 토큰이 남아 있을 수 있음) 대신 오류를 보인다. QueryState를 쓰지 않는다. */}

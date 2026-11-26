@@ -99,7 +99,7 @@ export function EditableSection({
         autoFocus
         onChange={(event) => setDraft(event.target.value)}
       />
-      <p className="text-xs text-muted">마크다운을 쓸 수 있습니다.</p>
+      <p className="text-xs text-muted">마크다운을 쓸 수 있어요.</p>
       {save.isError && (
         <p role="alert" className="text-sm text-danger">
           {experimentErrorMessage(save.error)}

@@ -156,7 +156,7 @@ export function CloseSprintDialog({
             if (!nextEnd) local["nextSprint.endDate"] = "종료일을 고르세요.";
             else if (nextStart && nextEnd < nextStart)
               local["nextSprint.endDate"] =
-                "종료일은 시작일과 같거나 뒤여야 합니다.";
+                "종료일은 시작일과 같거나 뒤여야 해요.";
             if (Object.keys(local).length) return showErrors(local);
           }
           const body: CloseSprint = {
@@ -238,7 +238,7 @@ export function CloseSprintDialog({
               ))}
             </ul>
             <p className="text-xs text-muted">
-              고르지 않은 항목은 미기록으로 남습니다.
+              고르지 않은 항목은 미기록으로 남아요.
             </p>
             {errors.goalResults && (
               <p
@@ -337,8 +337,8 @@ export function CloseSprintDialog({
             ))}
           </Select>
           <p id={`${id}-hint`} className="text-xs text-muted">
-            목록에 없는 업무(볼 수 없는 업무)도 기본 대상으로 옮깁니다. 완료
-            업무는 이 스프린트에 남습니다.
+            내가 볼 수 없어 목록에 없는 업무도 함께 옮겨요. 완료 업무는 이
+            스프린트에 남아요.
             {planned.length === 0 &&
               !createNext &&
               " 다음 스프린트로 옮기려면 다음 스프린트 만들기를 켜세요."}
@@ -357,7 +357,7 @@ export function CloseSprintDialog({
             />
           ) : tasks.length === 0 ? (
             <p className="text-sm text-muted">
-              미완료 업무가 없습니다. 바로 종료할 수 있습니다.
+              미완료 업무가 없어요. 바로 종료할 수 있어요.
             </p>
           ) : (
             <ul className="close-rows">

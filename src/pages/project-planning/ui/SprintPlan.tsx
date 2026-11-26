@@ -122,7 +122,7 @@ export function SprintPlan({
     change(
       Object.fromEntries(ids.map((id) => [id, "add" as const])),
       { action: "add", taskIds: ids },
-      `${ids.length}개를 스프린트에 넣었습니다.`,
+      `${ids.length}개를 스프린트에 넣었어요.`,
     );
     setChecked([]);
   }
@@ -130,7 +130,7 @@ export function SprintPlan({
     change(
       { [task.id]: "remove" },
       { action: "remove", taskId: task.id },
-      `${task.key}을(를) 스프린트에서 뺐습니다.`,
+      `${task.key}을(를) 스프린트에서 뺐어요.`,
     );
   }
   function handleDrop(event: DragEvent, target: "in" | "out") {
@@ -223,8 +223,7 @@ export function SprintPlan({
             />
           </div>
           <p className="planning-note">
-            어느 스프린트에도 없는 업무입니다. 오른쪽으로 끌거나 넣기를
-            누르세요.
+            어느 스프린트에도 없는 업무예요. 오른쪽으로 끌거나 넣기를 눌러요.
           </p>
           {/* 원천을 바꾸면 이전 후보를 흐리게 두고, 비었으면 문구 없는 같은 크기 박스로 기다린다. */}
           <QueryState
@@ -272,8 +271,8 @@ export function SprintPlan({
         </QueryState>
         {!!scoped.data && (scoped.data.counts.DONE ?? 0) > (shownDone ?? 0) && (
           <p className="planning-note">
-            완료 업무는 최근 {shownDone}개만 보입니다(전체{" "}
-            {scoped.data.counts.DONE}개).
+            완료 업무는 전체 {scoped.data.counts.DONE}개 중 최근 {shownDone}개만
+            보여요.
           </p>
         )}
       </section>

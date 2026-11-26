@@ -123,20 +123,20 @@ function SearchContent() {
       {!q ? (
         <EmptyState
           title="검색어를 입력하세요"
-          description="업무 키(HUB-142)나 제목, 문서, 장애 제목, 서비스 이름, 스프린트 이름으로 찾습니다. 어디서든 ⌘K 또는 Ctrl+K로 열 수 있습니다."
+          description="업무 키나 제목, 문서, 장애, 서비스, 스프린트 이름으로 찾아요. 어디서든 ⌘K 또는 Ctrl+K로 열 수 있어요."
         />
       ) : search.isPending ? (
         <ListSkeleton label="검색하는 중" rowClassName="h-10" />
       ) : search.isError && !search.data ? (
         <ErrorState
-          title="검색하지 못했습니다"
+          title="검색하지 못했어요"
           description={searchErrorMessage(normalizeApiError(search.error))}
           onRetry={() => void search.refetch()}
         />
       ) : groups.length === 0 ? (
         <EmptyState
-          title="일치하는 결과가 없습니다"
-          description={`‘${search.data.query}’ ${type ? `${searchTypeLabels[type]} ` : ""}검색 결과가 없습니다. 다른 검색어를 입력해 보세요.`}
+          title="일치하는 결과가 없어요"
+          description={`‘${search.data.query}’ ${type ? `${searchTypeLabels[type]} ` : ""}검색 결과가 없어요. 다른 검색어를 입력해 보세요.`}
         />
       ) : (
         <div
@@ -176,7 +176,7 @@ function SearchContent() {
               </ul>
               {group.hasMore && (
                 <p className="text-xs text-muted">
-                  상위 {group.items.length}건만 보여 줍니다. 검색어를 더 자세히
+                  상위 {group.items.length}건만 보여 줘요. 검색어를 더 자세히
                   입력하세요.
                 </p>
               )}

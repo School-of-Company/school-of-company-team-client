@@ -34,7 +34,7 @@ export function OwnerFields({
   if (users.isError)
     return (
       <p role="alert" className="text-sm text-danger">
-        팀원 목록을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.
+        팀원 목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.
       </p>
     );
   const candidates = [

@@ -60,7 +60,7 @@ export function ActionItems({
       </h3>
       {items.length === 0 ? (
         <p className="text-sm text-muted">
-          재발을 막을 일을 적고 업무로 만들어 추적하세요.
+          재발을 막을 일을 적고 업무로 만들어요.
         </p>
       ) : (
         <ul className="action-items">
@@ -226,10 +226,7 @@ function CreateTaskForm({
       <div className="grid gap-1">
         <p className="text-sm text-muted">업무 제목</p>
         <p className="break-words">{item.title}</p>
-        <p className="text-xs text-muted">
-          종류 TASK, 상태 백로그로 만듭니다. 설명은 비워 사후 검토 글이 업무로
-          퍼지지 않게 합니다.
-        </p>
+        <p className="text-xs text-muted">TASK 종류, 백로그 상태로 만들어요.</p>
       </div>
       <fieldset className="grid gap-2">
         <legend className="mb-2 text-sm font-medium">범위</legend>
@@ -292,8 +289,8 @@ function CreateTaskForm({
         ) : people.length === 0 ? (
           <p className="text-sm text-muted">
             {scope === "PROJECT" && !projectId
-              ? "프로젝트를 고르면 참여자가 나옵니다."
-              : "고를 수 있는 담당자가 없습니다."}
+              ? "프로젝트를 고르면 참여자가 나와요."
+              : "고를 수 있는 담당자가 없어요."}
           </p>
         ) : (
           <div className="incident-checklist">

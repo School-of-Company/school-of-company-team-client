@@ -57,7 +57,7 @@ export function TaskDetailWorkspace({
     onSuccess: async () => {
       client.removeQueries({ queryKey: taskKeys.detail(taskId) });
       await client.invalidateQueries({ queryKey: taskKeys.all });
-      toast("업무를 삭제했습니다.", "success");
+      toast("업무를 삭제했어요.", "success");
       router.push("/me");
     },
     onError: (cause) => {
@@ -111,7 +111,7 @@ export function TaskDetailWorkspace({
         <div className="task-main">
           {project.data?.archived && (
             <p className="text-sm text-muted">
-              아카이브된 프로젝트입니다. 조회만 가능합니다.
+              아카이브된 프로젝트예요. 조회만 가능해요.
             </p>
           )}
           {project.isError && (
@@ -202,7 +202,7 @@ export function TaskDetailWorkspace({
                 await taskApi.update(taskId, body);
                 await client.invalidateQueries({ queryKey: taskKeys.all });
                 setEditing(false);
-                toast("업무를 수정했습니다.", "success");
+                toast("업무를 수정했어요.", "success");
               } catch (cause) {
                 const problem = normalizeApiError(cause);
                 if (problem.status === 403 || problem.status === 404)
@@ -223,7 +223,7 @@ export function TaskDetailWorkspace({
         title="업무를 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          업무를 삭제해도 외부 Issue, PR, Discord 대화는 삭제하지 않습니다.
+          업무를 삭제해도 외부 Issue, PR, Discord 대화는 삭제하지 않아요.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

@@ -1,5 +1,6 @@
-/* Design tokens, modelled on TDS (Toss Design System): Toss grey scale, t1–t7 type,
-   rounded surfaces, fills instead of borders. Components read the semantic layer only.
+/* Design tokens: Toss grey scale and t1–t7 type, with a quiet tool-like finish —
+   small radii, 1px borders to separate, shadows only for lifted cards and overlays.
+   Components read the semantic layer only.
    Rules of use live in /design.md. */
 :root {
   color-scheme: light;
@@ -59,7 +60,7 @@
   --muted: var(--gray-10);
   /* faint 는 아이콘·장식 전용(3:1 이상). 읽어야 하는 글자는 muted 이상을 쓴다. */
   --faint: var(--gray-9);
-  --border: var(--gray-3);
+  --border: var(--gray-4);
   --border-strong: var(--gray-5);
   /* 입력 경계는 배경 대비 3:1 이상. */
   --border-input: var(--gray-9);
@@ -71,17 +72,10 @@
   --danger-foreground: #c91c2f;
   --success: var(--hue-green);
   --overlay: rgb(0 23 51 / 0.35);
-  --identity-glow: color-mix(
-    in oklab,
-    var(--color-brand-logo) 30%,
-    transparent
-  );
-  --login-width: 26rem;
-  --login-ambient-size: 52rem;
-  --login-grid-size: 48px;
-  --login-drift: 64px;
-  --login-ambient-duration: 24s;
+  --login-width: 24rem;
   --login-enter-duration: 200ms;
+  /* 통계 막대: 데이터는 회색(3:1)으로, 색은 상태에만 쓴다. */
+  --chart-bar: var(--gray-9);
 
   /* Type: Pretendard for everything, mono for machine values. */
   --font-body: var(--font-pretendard), "Pretendard", system-ui, sans-serif;
@@ -108,11 +102,11 @@
   --space-10: 40px;
 
   /* Shape */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
   --radius-pill: 999px;
 
   /* Sizes */
@@ -147,8 +141,8 @@
   --time-input-width: 8rem;
 
   /* Elevation: borders separate, shadows only lift overlays. */
-  --shadow-card: 0 1px 3px rgb(0 27 55 / 0.06);
-  --shadow-card-hover: 0 4px 16px rgb(0 27 55 / 0.1);
+  --shadow-card: 0 1px 2px rgb(0 27 55 / 0.06);
+  --shadow-card-hover: 0 2px 6px rgb(0 27 55 / 0.08);
   --shadow-overlay: 0 8px 32px rgb(0 27 55 / 0.16), 0 0 1px rgb(0 27 55 / 0.2);
 
   /* Motion: state changes only. */
@@ -220,20 +214,16 @@
   --surface-active: var(--gray-5);
   --surface-sidebar: var(--gray-1);
   --segment-active: var(--gray-5);
-  --border: var(--gray-3);
+  --border: var(--gray-4);
   --border-strong: var(--gray-5);
   --on-brand: #17171c;
   --danger: var(--hue-red);
   --danger-foreground: var(--hue-red);
   --overlay: rgb(0 0 0 / 0.6);
-  --identity-glow: color-mix(
-    in oklab,
-    var(--color-brand-logo) 28%,
-    transparent
-  );
+  --chart-bar: var(--gray-9);
 
-  --shadow-card: none;
-  --shadow-card-hover: 0 2px 10px -2px rgb(0 0 0 / 0.5);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-card-hover: 0 2px 6px rgb(0 0 0 / 0.5);
   --shadow-overlay:
     0 0 0 1px rgb(255 255 255 / 0.06), 0 8px 24px -4px rgb(0 0 0 / 0.5),
     0 24px 48px -12px rgb(0 0 0 / 0.6);

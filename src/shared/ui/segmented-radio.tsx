@@ -1,4 +1,6 @@
-/** 라디오 세그먼트. 막힌 칸은 `blocked`(이유)를 title 로 보이고 고를 수 없게 한다. */
+import { DisabledReason } from "./disabled-reason";
+
+/** 라디오 세그먼트. 막힌 칸은 고를 수 없고 `blocked`(이유)를 비활성 이유 말풍선으로 보인다. */
 export function SegmentedRadio<T extends string>({
   name,
   label,
@@ -28,21 +30,23 @@ export function SegmentedRadio<T extends string>({
       className="ui-segmented"
     >
       {options.map((option) => (
-        <label
+        <DisabledReason
           key={option.value}
-          className="ui-segmented-option"
-          title={option.blocked}
+          reason={option.blocked}
+          align="start"
         >
-          <input
-            type="radio"
-            name={name}
-            value={option.value}
-            checked={value === option.value}
-            disabled={disabled || !!option.blocked}
-            onChange={() => onChange(option.value)}
-          />
-          {option.label}
-        </label>
+          <label className="ui-segmented-option">
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              disabled={disabled || !!option.blocked}
+              onChange={() => onChange(option.value)}
+            />
+            {option.label}
+          </label>
+        </DisabledReason>
       ))}
     </div>
   );

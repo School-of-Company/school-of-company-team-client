@@ -100,7 +100,7 @@ export function ProjectShortcuts({
           );
         })}
         {shown.length === 0 && (
-          <p className="px-3 text-sm text-muted">검색 결과가 없습니다.</p>
+          <p className="px-3 text-sm text-muted">검색 결과가 없어요.</p>
         )}
       </div>
       <Link className="ui-nav-link" href={routes.projects} onClick={onNavigate}>

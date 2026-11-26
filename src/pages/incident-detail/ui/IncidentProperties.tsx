@@ -131,7 +131,7 @@ export function IncidentProperties({
       {!incident.canEdit && (
         <p className="text-xs text-muted">
           장애 작성자, 대응 책임자, 영향 서비스 소유자, 헤드 어드민이 바꿀 수
-          있습니다. 메모는 누구나 남길 수 있습니다.
+          있어요. 메모는 누구나 남길 수 있어요.
         </p>
       )}
       <PropSection title="Discord">
@@ -145,8 +145,8 @@ export function IncidentProperties({
         {incident.runbooks.length === 0 ? (
           <p className="text-sm text-muted">
             {incident.services.length
-              ? "영향 서비스에 게시된 Runbook이 없습니다."
-              : "영향 서비스를 고르면 그 서비스의 Runbook이 여기에 나옵니다."}
+              ? "영향 서비스에 게시된 Runbook이 없어요."
+              : "영향 서비스를 고르면 그 서비스의 Runbook이 여기에 나와요."}
           </p>
         ) : (
           <DocumentList documents={incident.runbooks} />
@@ -166,7 +166,7 @@ export function IncidentProperties({
         }
       >
         {incident.documents.length === 0 ? (
-          <p className="text-sm text-muted">연결된 문서가 없습니다.</p>
+          <p className="text-sm text-muted">연결된 문서가 없어요.</p>
         ) : (
           <DocumentList documents={incident.documents} showStatus />
         )}
@@ -174,7 +174,7 @@ export function IncidentProperties({
       <CreateDocumentDialog
         open={creating}
         incidentId={incident.id}
-        context="이 장애에 연결합니다."
+        context="이 장애에 연결해요."
         onClose={() => setCreating(false)}
         onCreated={(document) => {
           setCreating(false);

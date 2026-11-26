@@ -73,18 +73,18 @@ function SprintList({ project, manages }: PlanningContext) {
         }
         error={(error, retry) => (
           <ErrorState
-            title="스프린트를 불러오지 못했습니다"
+            title="스프린트를 불러오지 못했어요"
             description={sprintErrorMessage(normalizeApiError(error))}
             onRetry={retry}
           />
         )}
         empty={
           <EmptyState
-            title="아직 스프린트가 없습니다"
+            title="아직 스프린트가 없어요"
             description={
               manages
                 ? "기간과 목표를 정해 첫 스프린트를 만들고, 버킷이나 검토 필요 업무를 넣으세요."
-                : "PM 또는 헤드 어드민이 스프린트를 만들면 여기에 보입니다."
+                : "PM 또는 헤드 어드민이 스프린트를 만들면 여기에 보여요."
             }
           />
         }
@@ -99,10 +99,10 @@ function SprintList({ project, manages }: PlanningContext) {
               />
             ) : (
               <p className="planning-note">
-                진행 중인 스프린트가 없습니다.
+                진행 중인 스프린트가 없어요.
                 {manages &&
                   planned.length > 0 &&
-                  " 예정 스프린트를 열어 시작하세요."}
+                  " 예정 스프린트를 열어 시작해요."}
               </p>
             )}
             <SprintRows projectId={project.id} title="예정" sprints={planned} />

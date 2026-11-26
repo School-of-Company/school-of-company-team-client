@@ -36,7 +36,7 @@ async function convert(definition: string): Promise<Converted> {
     if (files && Object.keys(files).length > 0)
       return {
         error:
-          "이 종류는 도형으로 바꿀 수 없습니다. flowchart, sequenceDiagram, classDiagram 으로 쓰세요.",
+          "이 종류는 도형으로 바꿀 수 없어요. flowchart, sequenceDiagram, classDiagram 으로 쓰세요.",
       };
     return {
       elements: convertToExcalidrawElements(
@@ -113,8 +113,8 @@ export default function MermaidDialog({
     >
       <div className="grid gap-3">
         <p className="text-sm text-muted">
-          Mermaid 코드를 붙여 넣으면 고칠 수 있는 도형으로 바꿔 보드 가운데
-          넣습니다. 흐름도, 시퀀스, 클래스 다이어그램을 쓸 수 있습니다.
+          흐름도, 시퀀스, 클래스 다이어그램 코드를 고칠 수 있는 도형으로 바꿔
+          보드 가운데 넣어요.
         </p>
         <div className="whiteboard-mermaid">
           <div className="grid content-start gap-1">

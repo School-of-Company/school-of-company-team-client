@@ -52,8 +52,7 @@ export function HiddenRepositoriesNote({
   if (hidden === 0) return null;
   return (
     <p className="text-xs text-muted">
-      GitHub 원본 권한이 없는 비공개 저장소 {hidden}개의 {what}은 보이지
-      않습니다.
+      GitHub 원본 권한이 없는 비공개 저장소 {hidden}개의 {what}은 보이지 않아요.
     </p>
   );
 }
@@ -100,24 +99,24 @@ export function ReleasesState({
         compact ? (
           <p className="text-sm text-muted">
             {service.repositories.length === 0
-              ? "저장소를 연결하면 릴리스가 쌓입니다."
+              ? "저장소를 연결하면 릴리스가 쌓여요."
               : visible
-                ? "수집된 릴리스가 없습니다."
-                : "볼 수 있는 릴리스가 없습니다."}
+                ? "수집된 릴리스가 없어요."
+                : "볼 수 있는 릴리스가 없어요."}
           </p>
         ) : (
           <EmptyState
             title={
               visible || service.repositories.length === 0
-                ? "수집된 릴리스가 없습니다"
-                : "볼 수 있는 릴리스가 없습니다"
+                ? "수집된 릴리스가 없어요"
+                : "볼 수 있는 릴리스가 없어요"
             }
             description={
               service.repositories.length === 0
-                ? "이 서비스에 저장소를 연결하면 GitHub 릴리스가 여기에 쌓입니다."
+                ? "이 서비스에 저장소를 연결하면 GitHub 릴리스가 여기에 쌓여요."
                 : visible
-                  ? "연결한 저장소에 릴리스를 게시하면 여기에 쌓입니다. GitHub App이 release 이벤트를 구독하기 전에는 수집 대기 상태입니다."
-                  : "이 서비스의 저장소는 모두 비공개입니다. GitHub 원본 권한이 있어야 릴리스가 보입니다."
+                  ? "연결한 저장소에 릴리스를 게시하면 여기에 쌓여요. GitHub App이 release 이벤트를 구독하기 전에는 수집 대기 상태예요."
+                  : "이 서비스의 저장소는 모두 비공개예요. GitHub 원본 권한이 있어야 릴리스가 보여요."
             }
           />
         )
@@ -181,8 +180,7 @@ export function ServiceReleases({
   return (
     <section aria-label="릴리스" className="grid gap-3">
       <p className="text-sm text-muted">
-        직전 릴리스 이후 merge된 PR과 그 PR에 연결된 업무를 보여 줍니다. 업무
-        상태는 바꾸지 않습니다.
+        직전 릴리스 이후 머지된 PR과 연결된 업무예요.
       </p>
       <ReleasesState service={service} query={releases}>
         {(items) => (
@@ -210,12 +208,11 @@ export function ServiceReleases({
 function ItemsNotice({ release }: { readonly release: ReleaseDetail }) {
   const text = {
     READY: null,
-    PENDING: "PR 목록을 계산하고 있습니다. 잠시 후 자동으로 다시 불러옵니다.",
-    TRUNCATED:
-      "범위가 커서 일부 PR만 표시합니다. 전체는 GitHub에서 확인하세요.",
-    NO_BASE: "첫 릴리스라 비교할 이전 릴리스가 없어 PR 목록이 없습니다.",
+    PENDING: "PR 목록을 계산하고 있어요. 잠시 후 자동으로 다시 불러와요.",
+    TRUNCATED: "범위가 커서 일부 PR만 표시해요. 전체는 GitHub에서 확인하세요.",
+    NO_BASE: "첫 릴리스라 비교할 이전 릴리스가 없어 PR 목록이 없어요.",
     FAILED:
-      "GitHub에서 PR 목록을 가져오지 못했습니다. GitHub 릴리스 페이지에서 확인하세요.",
+      "GitHub에서 PR 목록을 가져오지 못했어요. GitHub 릴리스 페이지에서 확인하세요.",
   }[release.itemsStatus];
   return text ? (
     <p role="status" className="service-notice text-sm">
@@ -251,7 +248,7 @@ function ReleaseNote({
         </div>
       ) : release.isError ? (
         <ErrorState
-          title="릴리스를 볼 수 없습니다"
+          title="릴리스를 볼 수 없어요"
           description={serviceErrorMessage(release.error)}
         />
       ) : data ? (
@@ -325,8 +322,8 @@ function ReleaseNote({
           )}
           {data.items.length > 0 && (
             <p className="text-xs text-muted">
-              내가 볼 수 있는 업무만 표시합니다. 개인 업무와 원본 권한이 없는
-              비공개 업무는 빠집니다.
+              내가 볼 수 있는 업무만 표시해요. 개인 업무와 원본 권한이 없는
+              비공개 업무는 빠져요.
             </p>
           )}
           <a

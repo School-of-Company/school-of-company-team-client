@@ -101,14 +101,14 @@ function ScopedTasks({
         />
       ) : tasks.length === 0 ? (
         <EmptyState
-          title="스프린트에 업무가 없습니다"
-          description="계획 탭에서 업무를 넣으면 여기서 진행을 봅니다."
+          title="스프린트에 업무가 없어요"
+          description="계획 탭에서 업무를 넣으면 여기서 진행을 봐요."
         />
       ) : (
         <>
           {blocked.length > 0 && (
             <p className="text-sm text-danger" role="status">
-              막힌 업무 {blocked.length}개가 있습니다.
+              막힌 업무 {blocked.length}개가 있어요.
             </p>
           )}
           <ul className="plan-list" aria-label="스프린트 업무">
@@ -135,9 +135,6 @@ function CarryOvers({
       <h3 id="carry-overs" className="planning-subhead">
         이월 기록
       </h3>
-      <p className="planning-note">
-        종료할 때 남은 업무를 어디로 옮겼는지 남긴 기록입니다.
-      </p>
       {records.isPending ? (
         <ListSkeleton
           label="이월 기록 불러오는 중"
@@ -151,8 +148,8 @@ function CarryOvers({
         />
       ) : records.data.length === 0 ? (
         <EmptyState
-          title="이월한 업무가 없습니다"
-          description="모든 업무를 끝내고 종료했습니다."
+          title="이월한 업무가 없어요"
+          description="모든 업무를 끝내고 종료했어요."
         />
       ) : (
         <ul className="plan-list" aria-label="이월 기록">

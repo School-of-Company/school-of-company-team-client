@@ -101,12 +101,12 @@ function StatusForm({
             </label>
           ))}
         </div>
-        {same && <p className="text-sm text-muted">지금 상태와 같습니다.</p>}
+        {same && <p className="text-sm text-muted">지금 상태와 같아요.</p>}
       </fieldset>
       <Field
         id={`${id}-at`}
         label="변경 시각"
-        hint="비우면 지금으로 기록합니다. 시작 시각보다 이를 수 없습니다."
+        hint="비우면 지금 시각으로 기록해요. 시작 시각보다 앞설 수 없어요."
         error={server.at}
       >
         <DateTimePicker

@@ -28,8 +28,8 @@ export function AdminPage() {
           </Suspense>
         ) : (
           <ErrorState
-            title="관리자 권한이 필요합니다"
-            description="헤드 어드민만 조직 사용자와 프로젝트를 관리할 수 있습니다."
+            title="관리자 권한이 필요해요"
+            description="헤드 어드민만 조직 사용자와 프로젝트를 관리할 수 있어요."
           />
         )
       }
@@ -48,8 +48,8 @@ function AdminContent({ user }: { readonly user: User }) {
         title={creating ? "새 프로젝트" : "관리자 설정"}
         subtitle={
           creating
-            ? "기본 정보를 만든 뒤 팀원과 저장소를 연결합니다."
-            : "조직 사용자와 공용 연동을 관리합니다."
+            ? "기본 정보를 만들고 팀원과 저장소를 연결해요"
+            : "사용자와 공용 연동"
         }
         actions={
           <Link

@@ -7,7 +7,7 @@ export function TaskAssignees({
   onChange,
   legend = "담당자",
   hint = "여러 명 선택할 수 있어요. 비워두면 미지정이에요.",
-  empty = "선택할 수 있는 담당자가 없습니다.",
+  empty = "선택할 수 있는 담당자가 없어요.",
   disabled = false,
   blocked = () => undefined,
 }: {

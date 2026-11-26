@@ -80,7 +80,7 @@ export function linkSummary(link: ProjectLink): string {
     case "OK":
       return link.meta.description || link.meta.siteName || link.url;
     case "PENDING":
-      return "페이지 정보를 가져오는 중입니다.";
+      return "페이지 정보를 가져오는 중이에요.";
     case "FAILED":
       return link.url;
     case "SKIPPED":
@@ -110,26 +110,26 @@ export function linkErrorMessage(error: unknown): string {
   const problem = normalizeApiError(error);
   switch (problem.code) {
     case "LINK_URL_INVALID":
-      return "http 또는 https 주소만 넣을 수 있습니다. 아이디, 비밀번호가 들어간 주소는 쓸 수 없습니다.";
+      return "http 또는 https 주소만 넣을 수 있어요. 아이디, 비밀번호가 들어간 주소는 쓸 수 없어요.";
     case "VALIDATION_ERROR":
-      return "입력값을 확인하세요. 주소는 2000자, 제목은 100자, 라벨은 30자까지입니다.";
+      return "입력값을 확인하세요. 주소는 2000자, 제목은 100자, 라벨은 30자까지예요.";
     case "PROJECT_FORBIDDEN":
-      return "이 프로젝트의 링크를 바꿀 권한이 없습니다. 삭제는 만든 사람과 PM, 헤드 어드민만 할 수 있습니다.";
+      return "이 프로젝트의 링크를 바꿀 권한이 없어요. 삭제는 만든 사람과 PM, 헤드 어드민만 할 수 있어요.";
     case "PROJECT_NOT_FOUND":
-      return "프로젝트를 찾을 수 없거나 접근할 수 없습니다.";
+      return "프로젝트를 찾을 수 없거나 접근할 수 없어요.";
     case "LINK_NOT_FOUND":
-      return "링크가 없습니다. 다른 사람이 삭제했을 수 있어 목록을 새로 불러옵니다.";
+      return "링크가 없어요. 다른 사람이 삭제했을 수 있어 목록을 새로 불러와요.";
     case "PROJECT_ARCHIVED":
-      return "아카이브된 프로젝트는 조회만 가능합니다.";
+      return "아카이브된 프로젝트는 조회만 가능해요.";
     case "LINK_LIMIT_EXCEEDED":
-      return `링크는 프로젝트당 ${detail(problem.details, "limit") ?? 50}개까지 둘 수 있습니다. 안 쓰는 링크를 지운 뒤 추가하세요.`;
+      return `링크는 프로젝트당 ${detail(problem.details, "limit") ?? 50}개까지 둘 수 있어요. 안 쓰는 링크를 지운 뒤 추가하세요.`;
     case "STALE_LINK_ORDER":
-      return "그사이 링크가 추가되거나 삭제되었습니다. 목록을 새로 불러왔으니 다시 옮겨 주세요.";
+      return "그사이 링크가 추가되거나 삭제됐어요. 목록을 새로 불러왔으니 다시 옮겨 주세요.";
     case "LINK_REFRESH_TOO_SOON": {
       const seconds = detail(problem.details, "retryAfterSeconds");
       return seconds
-        ? `방금 가져왔습니다. ${waitText(seconds)} 뒤에 다시 시도하세요.`
-        : "방금 가져왔습니다. 잠시 뒤에 다시 시도하세요.";
+        ? `방금 가져왔어요. ${waitText(seconds)} 뒤에 다시 시도하세요.`
+        : "방금 가져왔어요. 잠시 뒤에 다시 시도하세요.";
     }
     default:
       return problem.message;

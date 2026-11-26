@@ -225,7 +225,7 @@ function SpecDocumentField({
       hint={
         project.isError || org.isError
           ? "문서 목록을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요."
-          : "이 프로젝트 문서나 조직 문서 하나를 골라요."
+          : "이 프로젝트나 조직의 문서를 하나 골라요."
       }
     >
       <Select
@@ -283,8 +283,8 @@ function StatusOverrideField({
       label="상태"
       hint={
         value
-          ? `수동으로 지정하면 자동 계산(지금은 ${auto}) 대신 이 상태를 써요. 자동을 고르면 되돌아가요.`
-          : `업무 진행, 마감일, 연결 릴리스로 계산해요. 지금은 ${auto}예요.`
+          ? `자동 계산 대신 이 상태를 써요. 자동이면 지금은 ${auto}예요.`
+          : `업무 진행, 마감일, 릴리스로 계산해요. 지금은 ${auto}예요.`
       }
     >
       <Select

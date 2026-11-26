@@ -13,7 +13,7 @@ export function validateLinkForm(form: LinkForm): Record<string, string> {
   const errors: Record<string, string> = {};
   const url = form.url.trim();
   if (!url) errors.url = "주소를 입력하세요.";
-  else if (url.length > 2000) errors.url = "주소는 2000자까지 쓸 수 있습니다.";
+  else if (url.length > 2000) errors.url = "주소는 2000자까지 쓸 수 있어요.";
   else {
     let parsed: URL | null = null;
     try {
@@ -29,12 +29,12 @@ export function validateLinkForm(form: LinkForm): Record<string, string> {
       parsed.password
     )
       errors.url =
-        "http:// 또는 https://로 시작하는 주소를 넣으세요. 아이디, 비밀번호가 들어간 주소는 쓸 수 없습니다.";
+        "http:// 또는 https://로 시작하는 주소를 넣으세요. 아이디, 비밀번호가 들어간 주소는 쓸 수 없어요.";
   }
   if (form.title.trim().length > 100)
-    errors.title = "제목은 100자까지 쓸 수 있습니다.";
+    errors.title = "제목은 100자까지 쓸 수 있어요.";
   if (form.label.trim().length > 30)
-    errors.label = "라벨은 30자까지 쓸 수 있습니다.";
+    errors.label = "라벨은 30자까지 쓸 수 있어요.";
   return errors;
 }
 

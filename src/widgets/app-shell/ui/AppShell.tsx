@@ -309,13 +309,13 @@ export function AppShell({
         </div>
       ) : projects.isError ? (
         <div role="alert" className="grid gap-2 px-3 text-sm">
-          <p className="text-danger">프로젝트를 불러오지 못했습니다.</p>
+          <p className="text-danger">프로젝트를 불러오지 못했어요.</p>
           <Button variant="secondary" onClick={() => void projects.refetch()}>
             다시 시도
           </Button>
         </div>
       ) : activeProjects.length === 0 ? (
-        <p className="px-3 text-sm text-muted">표시할 프로젝트가 없습니다.</p>
+        <p className="px-3 text-sm text-muted">표시할 프로젝트가 없어요.</p>
       ) : (
         <ProjectShortcuts
           projects={activeProjects}

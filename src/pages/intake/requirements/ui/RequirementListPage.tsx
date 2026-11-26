@@ -16,10 +16,7 @@ export function RequirementListPage() {
     <AuthGuard require="work">
       {(user) => (
         <div className="grid min-w-0 gap-5">
-          <PageHeader
-            title="요구사항"
-            subtitle="외부 요청자가 접수 양식으로 보낸 요구사항입니다."
-          />
+          <PageHeader title="요구사항" subtitle="접수 양식으로 받은 요청" />
           <Suspense fallback={<RequirementInboxSkeleton />}>
             <RequirementInbox isLead={isHeadAdmin(user)} />
           </Suspense>

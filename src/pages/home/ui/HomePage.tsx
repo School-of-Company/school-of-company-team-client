@@ -84,7 +84,7 @@ function HomeContent({
       {stale && (
         <RetryNote
           role="status"
-          message="최신 정보를 불러오지 못해 마지막으로 받은 내용을 보여 줍니다."
+          message="최신 정보를 불러오지 못해 마지막으로 받은 내용을 보여 줘요."
           onRetry={() => void home.refetch()}
         />
       )}
@@ -93,7 +93,7 @@ function HomeContent({
         <HomeBodySkeleton />
       ) : home.isError && !data ? (
         <ErrorState
-          title="최신 정보를 불러오지 못했습니다"
+          title="최신 정보를 불러오지 못했어요"
           description={normalizeApiError(home.error).message}
           onRetry={() => void home.refetch()}
         />
@@ -201,7 +201,7 @@ function MyTasks({
   if (error)
     return (
       <ErrorState
-        title="내 업무를 불러오지 못했습니다"
+        title="내 업무를 불러오지 못했어요"
         description={normalizeApiError(error).message}
         onRetry={onRetry}
       />
@@ -217,7 +217,7 @@ function MyTasks({
   if (filled.length === 0)
     return (
       <EmptyState
-        title="맡은 업무가 없습니다"
+        title="맡은 업무가 없어요"
         description="새 업무를 등록하거나 프로젝트 보드에서 업무를 가져오세요."
       />
     );

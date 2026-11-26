@@ -80,8 +80,8 @@ export function WebhookPanel({
       </div>
       <p className="text-sm text-muted">
         {ops.webhook.configured
-          ? `비밀값 발급됨${ops.webhook.rotatedAt ? `, ${formatDate(ops.webhook.rotatedAt)} 마지막 발급` : ""}. 모니터링 도구가 다운을 알리면 장애가 자동으로 만들어집니다.`
-          : "비밀값을 발급하면 모니터링 도구가 이 주소로 다운과 복구를 알릴 수 있습니다."}
+          ? `비밀값 발급됨${ops.webhook.rotatedAt ? `, ${formatDate(ops.webhook.rotatedAt)} 마지막 발급` : ""}`
+          : "비밀값을 발급하면 모니터링 도구가 이 주소로 다운과 복구를 알려요."}
       </p>
       <CopyField id="ops-webhook-url" label="웹훅 주소" value={url} />
       {error !== null && !confirming && (
@@ -95,34 +95,33 @@ export function WebhookPanel({
           <p>
             운영 서버 API 주소는{" "}
             <code>https://school-of-company.https.gsmsv.site</code>
-            입니다(화면은 https://team.schoolofcompany.com). 위 웹훅 주소는 이
-            화면이 쓰는 API 주소로 만듭니다.
+            예요(화면은 https://team.schoolofcompany.com). 위 웹훅 주소는 이
+            화면이 쓰는 API 주소로 만들어요.
           </p>
           <p>
             비밀값은 헤더 <code>X-Hub-Webhook-Secret</code>에 넣는 것을
-            권장합니다. 헤더를 넣을 수 없으면 주소 끝에{" "}
-            <code>?token=비밀값</code>을 붙입니다(프록시 로그에 남을 수
-            있습니다).
+            권장해요. 헤더를 넣을 수 없으면 주소 끝에 <code>?token=비밀값</code>
+            을 붙여요(프록시 로그에 남을 수 있어요).
           </p>
           <p>
             <strong>BetterStack</strong>: 알림 연동에서 Webhook을 추가하고 위
-            주소를 넣은 뒤, 사용자 지정 헤더에 비밀값을 넣습니다. 사건 생성과
-            해결 알림을 모두 켭니다.
+            주소를 넣은 뒤, 사용자 지정 헤더에 비밀값을 넣어요. 사건 생성과 해결
+            알림을 모두 켜요.
           </p>
           <p>
             <strong>UptimeRobot</strong>: Alert Contact에서 Webhook을 고르고 위
-            주소를 넣습니다. JSON으로 보내기를 켜고 본문을{" "}
+            주소를 넣어요. JSON으로 보내기를 켜고 본문을{" "}
             <code>
               {'{"alertType": *alertType*, "alertDetails": "*alertDetails*"}'}
             </code>
-            로 둡니다. 다운과 복구 알림을 모두 켭니다.
+            로 둬요. 다운과 복구 알림을 모두 켜요.
           </p>
         </div>
       </details>
       <ConfirmDialog
         open={confirming}
         title="비밀값을 재발급할까요?"
-        description="새 비밀값을 만들면 이전 값은 바로 쓸 수 없습니다. 모니터링 도구의 설정도 새 값으로 바꿔야 합니다."
+        description="새 비밀값을 만들면 이전 값은 바로 못 써요. 모니터링 도구 설정도 새 값으로 바꿔야 해요."
         confirmLabel="재발급"
         pending={pending}
         error={error !== null ? serviceErrorMessage(error) : undefined}
@@ -137,7 +136,7 @@ export function WebhookPanel({
         {issued && (
           <div className="grid gap-4">
             <p role="alert" className="service-notice text-sm">
-              이 비밀값은 지금 한 번만 보여 드립니다. 창을 닫으면 다시 볼 수
+              이 비밀값은 지금 한 번만 보여 드려요. 창을 닫으면 다시 볼 수
               없으니 모니터링 도구에 바로 넣으세요.
             </p>
             <CopyField

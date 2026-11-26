@@ -44,7 +44,7 @@ export function validateCalendarEvent(
   if (!input.startDate) errors.startDate = "시작일을 고르세요.";
   if (!input.endDate) errors.endDate = "종료일을 고르세요.";
   else if (input.startDate && input.endDate < input.startDate)
-    errors.endDate = "종료일은 시작일보다 이를 수 없습니다.";
+    errors.endDate = "종료일은 시작일보다 이를 수 없어요.";
   if (!!input.startTime !== !!input.endTime)
     errors.endTime = "시작, 종료 시각을 함께 고르세요.";
   else if (
@@ -52,19 +52,19 @@ export function validateCalendarEvent(
     input.startDate === input.endDate &&
     input.endTime < input.startTime
   )
-    errors.endTime = "종료 시각은 시작 시각보다 이를 수 없습니다.";
+    errors.endTime = "종료 시각은 시작 시각보다 이를 수 없어요.";
   return errors;
 }
 
 const errors: Readonly<Record<string, string>> = {
   CALENDAR_EVENT_NOT_FOUND:
-    "일정이 없거나 볼 권한이 없습니다. 이미 지워졌을 수 있습니다.",
+    "일정이 없거나 볼 권한이 없어요. 이미 지워졌을 수 있어요.",
   CALENDAR_EVENT_FORBIDDEN:
-    "만든 사람, PM, 헤드 어드민만 일정을 고치거나 지울 수 있습니다.",
-  CALENDAR_RANGE_INVALID: "조회 기간이 너무 깁니다. 달을 바꿔 다시 보세요.",
-  PROJECT_FORBIDDEN: "이 프로젝트는 볼 수만 있습니다.",
-  PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능합니다.",
-  PROJECT_NOT_FOUND: "프로젝트가 없거나 볼 수 없습니다.",
+    "만든 사람, PM, 헤드 어드민만 일정을 고치거나 지울 수 있어요.",
+  CALENDAR_RANGE_INVALID: "조회 기간이 너무 길어요. 달을 바꿔 다시 보세요.",
+  PROJECT_FORBIDDEN: "이 프로젝트는 볼 수만 있어요.",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능해요.",
+  PROJECT_NOT_FOUND: "프로젝트가 없거나 볼 수 없어요.",
 };
 
 export function calendarErrorMessage(error: {

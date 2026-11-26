@@ -20,13 +20,13 @@ export function TaskError({
 }) {
   const problem = normalizeApiError(error);
   const titles: Readonly<Record<string, string>> = {
-    PROJECT_NOT_FOUND: "프로젝트를 찾을 수 없거나 접근할 수 없습니다",
-    TASK_NOT_FOUND: "업무를 찾을 수 없거나 접근할 수 없습니다",
-    PROJECT_FORBIDDEN: "이 프로젝트를 수정할 권한이 없습니다",
-    PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능합니다",
-    SUSPENDED: "이용이 중지된 계정입니다",
-    ACCESS_DENIED: "접근 권한이 없습니다",
-    ONBOARDING_REQUIRED: "승인 및 Discord 연결이 필요합니다",
+    PROJECT_NOT_FOUND: "프로젝트를 찾을 수 없거나 접근할 수 없어요",
+    TASK_NOT_FOUND: "업무를 찾을 수 없거나 접근할 수 없어요",
+    PROJECT_FORBIDDEN: "이 프로젝트를 수정할 권한이 없어요",
+    PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능해요",
+    SUSPENDED: "이용이 중지된 계정이에요",
+    ACCESS_DENIED: "접근 권한이 없어요",
+    ONBOARDING_REQUIRED: "승인 및 Discord 연결이 필요해요",
   };
   return (
     <div>

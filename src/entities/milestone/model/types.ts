@@ -123,7 +123,7 @@ export function validateMilestone(input: MilestoneInput) {
   if (input.goal.length > MILESTONE_GOAL_MAX)
     errors.goal = `목표는 ${MILESTONE_GOAL_MAX}자 이하로 입력하세요.`;
   if (input.startDate && input.dueDate && input.dueDate < input.startDate)
-    errors.dueDate = "마감일은 시작일과 같거나 뒤여야 합니다.";
+    errors.dueDate = "마감일은 시작일과 같거나 뒤여야 해요.";
   if (input.releaseRepositoryId) {
     const tag = input.releaseTag.trim();
     if (!tag || tag.length > 255 || /\s/.test(tag))
@@ -211,19 +211,19 @@ export function milestonePercent(progress: Milestone["progress"]) {
 }
 
 const errors: Readonly<Record<string, string>> = {
-  MILESTONE_NOT_FOUND: "마일스톤을 찾을 수 없습니다. 목록을 다시 확인하세요.",
+  MILESTONE_NOT_FOUND: "마일스톤을 찾을 수 없어요. 목록을 다시 확인하세요.",
   DUPLICATE_MILESTONE_NAME:
-    "같은 이름의 마일스톤이 있습니다. 다른 이름을 쓰세요.",
-  MILESTONE_NOT_IN_PROJECT: "이 프로젝트의 마일스톤만 고를 수 있습니다.",
+    "같은 이름의 마일스톤이 있어요. 다른 이름을 쓰세요.",
+  MILESTONE_NOT_IN_PROJECT: "이 프로젝트의 마일스톤만 고를 수 있어요.",
   MILESTONE_RELEASE_REPOSITORY_NOT_LINKED:
-    "서비스에 연결된 저장소만 고를 수 있습니다.",
+    "서비스에 연결된 저장소만 고를 수 있어요.",
   MILESTONE_SPEC_DOCUMENT_INVALID:
-    "이 프로젝트 문서나 볼 수 있는 조직 문서만 고를 수 있습니다.",
-  SPRINT_NOT_FOUND: "이 프로젝트의 스프린트가 아닙니다.",
-  INVALID_SCOPE: "프로젝트 업무만 마일스톤에 넣을 수 있습니다.",
-  PROJECT_FORBIDDEN: "이 작업을 할 권한이 없습니다.",
-  PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능합니다.",
-  PROJECT_NOT_FOUND: "프로젝트가 없거나 볼 수 없습니다.",
+    "이 프로젝트 문서나 볼 수 있는 조직 문서만 고를 수 있어요.",
+  SPRINT_NOT_FOUND: "이 프로젝트의 스프린트가 아니에요.",
+  INVALID_SCOPE: "프로젝트 업무만 마일스톤에 넣을 수 있어요.",
+  PROJECT_FORBIDDEN: "이 작업을 할 권한이 없어요.",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트는 조회만 가능해요.",
+  PROJECT_NOT_FOUND: "프로젝트가 없거나 볼 수 없어요.",
 };
 export function milestoneErrorMessage(error: {
   readonly code: string;

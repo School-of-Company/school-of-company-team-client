@@ -82,7 +82,7 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
           count !== undefined
             ? `활성 팀원 ${count}명`
             : members.isError && !data
-              ? "팀원 집계를 불러오지 못했습니다"
+              ? "팀원 집계를 불러오지 못했어요"
               : "팀원 집계 중"
         }
       />
@@ -101,7 +101,7 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
           ))}
         </div>
         <p className="text-sm text-muted">
-          진행 중, 리뷰 수에 개인 업무는 세지 않습니다.
+          진행 중, 리뷰 수에 개인 업무는 세지 않아요.
         </p>
       </div>
       <QueryState
@@ -115,12 +115,12 @@ function MembersContent({ viewer }: { readonly viewer: User }) {
         }
         error={(error, retry) => (
           <ErrorState
-            title="최신 정보를 불러오지 못했습니다"
+            title="최신 정보를 불러오지 못했어요"
             description={normalizeApiError(error).message}
             onRetry={retry}
           />
         )}
-        empty={<EmptyState title="활성 팀원이 없습니다" />}
+        empty={<EmptyState title="활성 팀원이 없어요" />}
       >
         {(list) => (
           <table className="members-table">
