@@ -35,3 +35,4 @@ export { restoreFocus } from "./focus-return";
 export { DatePicker, DateTimePicker } from "./date-picker";
 export { CopyField } from "./copy-field";
 export { anchoredPosition, useAnchoredPosition } from "./anchored-position";
+export { InfoTip } from "./info-tip";
