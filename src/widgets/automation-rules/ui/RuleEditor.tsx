@@ -461,7 +461,7 @@ function RuleEditorForm({
             </Select>
           </div>
           <p className="text-xs text-muted">
-            한국 시간 기준입니다. 저장한 뒤에 오는 시각부터 실행합니다.
+            한국 시간 기준이에요. 저장한 뒤에 오는 시각부터 실행해요.
           </p>
           {errors.schedule && (
             <p
@@ -520,8 +520,8 @@ function RuleEditorForm({
                 {chips.length === 0 ? (
                   <span className="text-xs text-muted">
                     {field === "PART"
-                      ? "이 프로젝트에 파트가 없습니다."
-                      : "이 프로젝트에 버킷이 없습니다."}
+                      ? "이 프로젝트에 파트가 없어요."
+                      : "이 프로젝트에 버킷이 없어요."}
                   </span>
                 ) : (
                   <span className="rule-chips">
@@ -797,8 +797,8 @@ function RuleEditorForm({
             {action === "DISCORD_DM"
               ? "Discord를 연결했고 지금 이 업무를 볼 수 있는 사람에게만 보내요."
               : taskless
-                ? "Discord를 연결한 사람만 멘션합니다."
-                : "업무 스레드, 없으면 고른 채널로 보냅니다. Discord를 연결한 사람만 멘션합니다."}
+                ? "Discord를 연결한 사람만 멘션해요."
+                : "업무 스레드, 없으면 고른 채널로 보내요. Discord를 연결한 사람만 멘션해요."}
           </p>
         </fieldset>
       )}
@@ -1276,7 +1276,7 @@ function TemplateInput(props: {
           </span>
         ) : (
           <span className="text-xs text-muted">
-            이 이벤트에는 넣을 수 있는 변수가 없습니다.
+            이 이벤트에는 넣을 수 있는 변수가 없어요.
           </span>
         )}
         <span
@@ -1331,8 +1331,8 @@ function RulePreviewPanel({
     body = (
       <p className="text-sm text-muted">
         {preview.isPending
-          ? "지난 14일을 살펴보는 중입니다."
-          : "미리보기를 누르면 지난 14일 동안 이 규칙이 걸렸을 일과 각 동작의 예상 결과를 보여 줍니다. 저장하거나 보내는 것은 없습니다."}
+          ? "지난 14일을 살펴보는 중이에요."
+          : "미리보기를 누르면 지난 14일 동안 이 규칙이 걸렸을 일과 각 동작의 예상 결과를 보여 줘요. 저장하거나 보내는 것은 없어요."}
       </p>
     );
   else if (!data.supported)
@@ -1345,8 +1345,7 @@ function RulePreviewPanel({
   else if (data.items.length === 0)
     body = (
       <p className="text-sm text-muted">
-        {formatDate(data.since, previewTime)} 이후 이 규칙이 걸렸을 일이
-        없습니다.
+        {formatDate(data.since, previewTime)} 이후 이 규칙이 걸렸을 일이 없어요.
       </p>
     );
   else
@@ -1354,8 +1353,8 @@ function RulePreviewPanel({
       <>
         <p className="text-xs text-muted">
           {formatDate(data.since, previewTime)} 이후 {data.items.length}건
-          {data.truncated ? "(최근 50건만 보여 줍니다)" : ""}. 조건은 지금 업무
-          상태로 판단한 예상입니다.
+          {data.truncated ? ", 최근 50건만 보여 줘요" : ""}. 조건은 지금 업무
+          상태로 판단한 예상이에요.
         </p>
         <ul className="rule-preview-list" aria-label="미리보기 결과">
           {data.items.map((item, index) => (
@@ -1407,7 +1406,7 @@ function RulePreviewPanel({
     >
       {stale && !preview.isPending && (
         <p className="text-xs text-muted">
-          규칙을 바꿨습니다. 다시 미리보기를 누르면 새로 살펴봅니다.
+          규칙을 바꿨어요. 다시 미리보기를 누르면 새로 살펴봐요.
         </p>
       )}
       {body}

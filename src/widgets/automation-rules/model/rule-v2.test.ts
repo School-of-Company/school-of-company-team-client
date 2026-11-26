@@ -376,15 +376,15 @@ test("v2 rules read back into the form and toggle without losing fields", () => 
 test("new run codes and taskless targets read in Korean", () => {
   assert.equal(
     resultMessage("TASK_REVIEWER_IS_ASSIGNEE", "SKIPPED", "TASK_CREATED"),
-    "담당자와 리뷰어는 같은 사람일 수 없어 지정하지 않았습니다.",
+    "담당자와 리뷰어는 같은 사람일 수 없어 지정하지 않았어요.",
   );
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "MILESTONE_AT_RISK"),
-    "마일스톤이 삭제되었거나 더 이상 위험하지 않습니다.",
+    "마일스톤이 삭제되었거나 더 이상 위험하지 않아요.",
   );
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "SERVICE_DOWN"),
-    "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼습니다.",
+    "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼어요.",
   );
   assert.equal(runTargetFallback("SCHEDULE"), "예약 실행");
   assert.equal(runTargetFallback("DEPLOY_FAILED"), "서비스");

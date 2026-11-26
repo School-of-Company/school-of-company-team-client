@@ -101,7 +101,7 @@ test("PM·헤드 어드민이 규칙을 만들고 끄고 켠다", async ({ page 
   await expect(
     page.getByRole("heading", { name: "자동화 규칙" }),
   ).toBeVisible();
-  await expect(page.getByText("규칙이 없습니다")).toBeVisible();
+  await expect(page.getByText("규칙이 없어요")).toBeVisible();
   await capture(page, "rules-empty-1440");
 
   await page.getByRole("button", { name: "규칙 추가" }).click();

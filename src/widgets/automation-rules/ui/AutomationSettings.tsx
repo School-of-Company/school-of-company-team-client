@@ -156,7 +156,7 @@ function AutomationRules({
   if (rules.isError && !rules.data)
     return (
       <ErrorState
-        title="규칙을 불러오지 못했습니다"
+        title="규칙을 불러오지 못했어요"
         description={ruleErrorMessage(normalizeApiError(rules.error))}
         onRetry={() => void rules.refetch()}
       />
@@ -186,7 +186,7 @@ function AutomationRules({
         <StaleNotice query={rules} />
         {list.length === 0 ? (
           <EmptyState
-            title="규칙이 없습니다"
+            title="규칙이 없어요"
             description={
               editable
                 ? "막힌 업무를 PM에게 알리거나, 리뷰 단계에 들어가면 리뷰어를 지정하는 규칙을 만들어 보세요."
@@ -236,7 +236,7 @@ function AutomationRules({
         {change.isError && !deleting && (
           <p role="alert" className="text-sm text-danger">
             {ruleErrorMessage(normalizeApiError(change.error))} 이전 상태로
-            되돌렸습니다.
+            되돌렸어요.
           </p>
         )}
       </div>
@@ -271,8 +271,8 @@ function AutomationRules({
         title="규칙을 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          {deleting?.name} 규칙과 실행 기록이 함께 지워집니다. 잠시 멈추려면
-          삭제 대신 끄세요.
+          {deleting?.name} 규칙과 실행 기록이 함께 지워져요. 잠시 멈추려면 삭제
+          대신 끄세요.
         </p>
         {change.isError && deleting && (
           <p role="alert" className="mb-4 text-sm text-danger">
@@ -378,7 +378,7 @@ function RuleRow({
         )}
         {broken.length > 0 && (
           <p className="text-xs text-danger">
-            제대로 실행되지 않습니다({broken.join(", ")}). 편집에서 고치세요.
+            제대로 실행되지 않아요({broken.join(", ")}). 편집에서 고치세요.
           </p>
         )}
       </div>

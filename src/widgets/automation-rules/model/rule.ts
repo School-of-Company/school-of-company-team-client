@@ -265,129 +265,129 @@ const eventSpecs: Readonly<
 > = {
   TASK_STATUS_CHANGED: {
     label: "상태가 바뀔 때",
-    help: "업무 상태가 바뀌면 실행합니다. 특정 상태로 바뀔 때만 고를 수도 있습니다.",
+    help: "업무 상태가 바뀌면 실행해요. 특정 상태로 바뀔 때만 고를 수도 있어요.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
   TASK_CREATED: {
     label: "업무가 만들어질 때",
-    help: "이 프로젝트에 업무가 새로 생기면 실행합니다. 규칙이 만든 업무에는 걸리지 않습니다.",
+    help: "이 프로젝트에 업무가 새로 생기면 실행해요. 규칙이 만든 업무에는 걸리지 않아요.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
   TASK_BLOCKED: {
     label: "막힘으로 표시될 때",
-    help: "누군가 업무를 막힘으로 표시하면 실행합니다.",
+    help: "누군가 업무를 막힘으로 표시하면 실행해요.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
   TASK_STALE: {
     label: "업무가 멈춰 있을 때",
-    help: "끝나지 않은 업무가 정한 일수 동안 바뀌지 않으면 실행합니다. 규칙이 만든 업무는 빼고 봅니다.",
+    help: "끝나지 않은 업무가 정한 일수 동안 바뀌지 않으면 실행해요. 규칙이 만든 업무는 빼고 봐요.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
   CI_FAILED: {
     label: "연결된 PR의 CI가 실패할 때",
-    help: "업무에 연결된 PR의 CI가 실패하면 실행합니다.",
+    help: "업무에 연결된 PR의 CI가 실패하면 실행해요.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
   REVIEW_REQUESTED: {
     label: "연결된 PR에 리뷰가 요청될 때",
-    help: "업무에 연결된 PR에 리뷰 요청이 오면 실행합니다.",
+    help: "업무에 연결된 PR에 리뷰 요청이 오면 실행해요.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
   DEADLINE_APPROACHING: {
     label: "마감 하루 전",
-    help: "끝나지 않은 업무의 마감 전날 오전 9시에 실행합니다.",
+    help: "끝나지 않은 업무의 마감 전날 오전 9시에 실행해요.",
     kind: "task",
     variables: TASK_VARIABLES,
   },
   INCIDENT_CREATED: {
     label: "장애가 생길 때",
-    help: "장애의 영향 서비스가 이 프로젝트에 연결된 저장소를 쓰면 걸립니다.",
+    help: "장애의 영향 서비스가 이 프로젝트에 연결된 저장소를 쓰면 걸려요.",
     kind: "taskless",
     variables: [],
     target: "삭제된 장애",
-    targetGone: "장애가 삭제되었습니다.",
+    targetGone: "장애가 삭제되었어요.",
   },
   SERVICE_DOWN: {
     label: "서비스가 다운될 때",
-    help: "모니터링이 이 프로젝트 저장소의 서비스가 멈췄다고 알리면 실행합니다. 장애 하나에 한 번입니다.",
+    help: "모니터링이 이 프로젝트 저장소의 서비스가 멈췄다고 알리면 실행해요. 장애 하나에 한 번이에요.",
     kind: "taskless",
     variables: SERVICE_VARIABLES,
     target: "서비스",
-    targetGone: "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼습니다.",
+    targetGone: "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼어요.",
   },
   DEPLOY_FAILED: {
     label: "프로덕션 배포가 실패할 때",
-    help: "이 프로젝트 저장소의 프로덕션 배포가 실패하면 실행합니다. 배포 하나에 한 번입니다.",
+    help: "이 프로젝트 저장소의 프로덕션 배포가 실패하면 실행해요. 배포 하나에 한 번이에요.",
     kind: "taskless",
     variables: SERVICE_VARIABLES,
     target: "서비스",
-    targetGone: "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼습니다.",
+    targetGone: "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼어요.",
   },
   REQUIREMENT_SUBMITTED: {
     label: "요구사항이 접수될 때",
-    help: "외부 요청자가 요구사항을 보내면 실행합니다. Discord 알림만 됩니다.",
+    help: "외부 요청자가 요구사항을 보내면 실행해요. Discord 알림만 돼요.",
     kind: "requirement",
     variables: [],
     target: "요구사항",
-    targetGone: "요구사항이 삭제되었거나 스팸으로 분류되었습니다.",
+    targetGone: "요구사항이 삭제되었거나 스팸으로 분류되었어요.",
   },
   REQUIREMENT_REPLIED: {
     label: "요청자가 요구사항에 답글을 달 때",
-    help: "요청자가 요구사항에 답글을 달면 실행합니다. Discord 알림만 됩니다.",
+    help: "요청자가 요구사항에 답글을 달면 실행해요. Discord 알림만 돼요.",
     kind: "requirement",
     variables: [],
     target: "요구사항",
-    targetGone: "요구사항이 삭제되었거나 스팸으로 분류되었습니다.",
+    targetGone: "요구사항이 삭제되었거나 스팸으로 분류되었어요.",
   },
   SPRINT_STARTED: {
     label: "스프린트가 시작될 때",
-    help: "스프린트를 시작하면 실행합니다.",
+    help: "스프린트를 시작하면 실행해요.",
     kind: "taskless",
     variables: SPRINT_VARIABLES,
     target: "스프린트",
-    targetGone: "스프린트가 삭제되었거나 이미 끝났습니다.",
+    targetGone: "스프린트가 삭제되었거나 이미 끝났어요.",
   },
   SPRINT_ENDING_SOON: {
     label: "스프린트 종료 2일 전부터",
-    help: "진행 중인 스프린트의 종료일이 2일 남으면 한 번 실행합니다.",
+    help: "진행 중인 스프린트의 종료일이 2일 남으면 한 번 실행해요.",
     kind: "taskless",
     variables: SPRINT_VARIABLES,
     target: "스프린트",
-    targetGone: "스프린트가 삭제되었거나 이미 끝났습니다.",
+    targetGone: "스프린트가 삭제되었거나 이미 끝났어요.",
   },
   SPRINT_OVERDUE: {
     label: "스프린트 종료일이 지났을 때",
-    help: "종료일이 지났는데 아직 끝내지 않은 스프린트가 있으면 한 번 실행합니다.",
+    help: "종료일이 지났는데 아직 끝내지 않은 스프린트가 있으면 한 번 실행해요.",
     kind: "taskless",
     variables: SPRINT_VARIABLES,
     target: "스프린트",
-    targetGone: "스프린트가 삭제되었거나 이미 끝났습니다.",
+    targetGone: "스프린트가 삭제되었거나 이미 끝났어요.",
   },
   SPRINT_CLOSED: {
     label: "스프린트가 종료될 때",
-    help: "스프린트를 종료하면 실행합니다. 회고 업무를 만들 때 좋습니다.",
+    help: "스프린트를 종료하면 실행해요. 회고 업무를 만들 때 좋아요.",
     kind: "taskless",
     variables: SPRINT_VARIABLES,
     target: "스프린트",
-    targetGone: "스프린트가 삭제되었습니다.",
+    targetGone: "스프린트가 삭제되었어요.",
   },
   MILESTONE_AT_RISK: {
     label: "마일스톤이 위험해질 때",
-    help: "마일스톤이 위험 또는 지연이 되면 마감일마다 한 번 실행합니다. 진행률은 규칙을 저장한 사람 기준입니다.",
+    help: "마일스톤이 위험 또는 지연이 되면 마감일마다 한 번 실행해요. 진행률은 규칙을 저장한 사람 기준이에요.",
     kind: "taskless",
     variables: ["milestone.name"],
     target: "마일스톤",
-    targetGone: "마일스톤이 삭제되었거나 더 이상 위험하지 않습니다.",
+    targetGone: "마일스톤이 삭제되었거나 더 이상 위험하지 않아요.",
   },
   SCHEDULE: {
     label: "정한 요일과 시각에",
-    help: "고른 요일의 정한 시각(한국 시간)에 하루 한 번 실행합니다. Discord 알림은 열린 업무, 막힌 업무, 이번 주 마감 개수를 요약합니다.",
+    help: "고른 요일의 정한 시각(한국 시간)에 하루 한 번 실행해요. Discord 알림은 열린 업무, 막힌 업무, 이번 주 마감 개수를 요약해요.",
     kind: "taskless",
     variables: [],
     target: "예약 실행",
@@ -465,15 +465,15 @@ export const actionLabels: Readonly<Record<RuleAction, string>> = {
   ADD_INCIDENT_NOTE: "장애에 메모 남기기",
 };
 export const actionHelp: Readonly<Record<RuleAction, string>> = {
-  NOTIFY_DISCORD: "Discord에 메시지를 올립니다. 문구를 직접 쓸 수도 있습니다.",
-  MARK_ATTENTION: "업무를 확인 필요 목록에 올립니다.",
-  ASSIGN_REVIEWER: "개발 업무에 리뷰어를 추가합니다.",
-  MOVE_BUCKET: "업무를 고른 버킷으로 옮깁니다.",
+  NOTIFY_DISCORD: "Discord에 메시지를 올려요. 문구를 직접 쓸 수도 있어요.",
+  MARK_ATTENTION: "업무를 확인 필요 목록에 올려요.",
+  ASSIGN_REVIEWER: "개발 업무에 리뷰어를 추가해요.",
+  MOVE_BUCKET: "업무를 고른 버킷으로 옮겨요.",
   ASSIGN_USER:
-    "업무에 담당자를 추가합니다. 이미 리뷰어인 사람은 추가하지 않습니다.",
-  SET_PRIORITY: "업무 우선순위를 고른 값으로 바꿉니다.",
+    "업무에 담당자를 추가해요. 이미 리뷰어인 사람은 추가하지 않아요.",
+  SET_PRIORITY: "업무 우선순위를 고른 값으로 바꿔요.",
   CREATE_TASK:
-    "이 프로젝트 백로그 맨 아래에 담당자 없는 업무를 하나 만듭니다. 만든 업무에는 다른 규칙이 걸리지 않습니다.",
+    "이 프로젝트 백로그 맨 아래에 담당자 없는 업무를 하나 만들어요. 만든 업무에는 다른 규칙이 걸리지 않아요.",
   MOVE_STATUS:
     "업무를 고른 상태 컬럼 맨 아래로 옮겨요. 일반 업무는 리뷰로 옮기지 않아요.",
   ADD_TO_SPRINT:
@@ -577,22 +577,22 @@ export function disabledReasonText(reason: string): string {
 }
 
 const resultMessages: Readonly<Record<string, string>> = {
-  ALREADY_APPLIED: "이미 적용되어 있었습니다.",
-  REVIEWER_NOT_APPLICABLE: "개발 업무가 아니라 리뷰어를 지정하지 않았습니다.",
+  ALREADY_APPLIED: "이미 적용되어 있었어요.",
+  REVIEWER_NOT_APPLICABLE: "개발 업무가 아니라 리뷰어를 지정하지 않았어요.",
   TASK_REVIEWER_IS_ASSIGNEE:
-    "담당자와 리뷰어는 같은 사람일 수 없어 지정하지 않았습니다.",
-  TASK_NOT_ELIGIBLE: "업무가 삭제되었거나 프로젝트 업무가 아닙니다.",
-  PROJECT_ARCHIVED: "프로젝트가 아카이브되었습니다.",
-  RULE_DISABLED: "실행 전에 규칙이 꺼졌습니다.",
-  DISCORD_NOT_CONFIGURED: "Discord 봇이 설정되지 않았습니다.",
-  DISCORD_CHANNEL_MISSING: "보낼 업무 스레드나 프로젝트 채널이 없습니다.",
-  DISCORD_SEND_FAILED: "Discord 전송이 여러 번 실패했습니다.",
-  DISCORD_RESULT_UNKNOWN: "Discord 전송 결과를 확인하지 못했습니다.",
+    "담당자와 리뷰어는 같은 사람일 수 없어 지정하지 않았어요.",
+  TASK_NOT_ELIGIBLE: "업무가 삭제되었거나 프로젝트 업무가 아니에요.",
+  PROJECT_ARCHIVED: "프로젝트가 아카이브되었어요.",
+  RULE_DISABLED: "실행 전에 규칙이 꺼졌어요.",
+  DISCORD_NOT_CONFIGURED: "Discord 봇이 설정되지 않았어요.",
+  DISCORD_CHANNEL_MISSING: "보낼 업무 스레드나 프로젝트 채널이 없어요.",
+  DISCORD_SEND_FAILED: "Discord 전송이 여러 번 실패했어요.",
+  DISCORD_RESULT_UNKNOWN: "Discord 전송 결과를 확인하지 못했어요.",
   RULE_ACTION_TARGET_MISSING:
-    "대상 버킷이나 사용자, 또는 규칙을 저장한 사람이 삭제되었습니다.",
+    "대상 버킷이나 사용자, 또는 규칙을 저장한 사람이 삭제되었어요.",
   RULE_ACTION_TARGET_INVALID:
-    "대상 버킷이 보관되었거나 지정할 사람이 활성 참여자가 아닙니다.",
-  RULE_ACTION_ERROR: "예상하지 못한 오류로 실행하지 못했습니다.",
+    "대상 버킷이 보관되었거나 지정할 사람이 활성 참여자가 아니에요.",
+  RULE_ACTION_ERROR: "예상하지 못한 오류로 실행하지 못했어요.",
   // 자동화 v3(s23 9절).
   REVIEW_NOT_ALLOWED: "일반 업무는 리뷰 상태로 옮기지 않아요.",
   NO_ACTIVE_SPRINT: "진행 중인 스프린트가 없어요.",
@@ -611,7 +611,7 @@ const resultMessages: Readonly<Record<string, string>> = {
 function tasklessResultMessage(code: string, event: RuleEvent) {
   if (code === "TASK_NOT_ELIGIBLE") return specOf(event)?.targetGone;
   if (code === "DISCORD_CHANNEL_MISSING")
-    return "Discord 프로젝트 채널이 연결되지 않았습니다.";
+    return "Discord 프로젝트 채널이 연결되지 않았어요.";
   return undefined;
 }
 /** 동작마다 뜻이 갈리는 code. */
@@ -664,8 +664,8 @@ export function resultMessage(
     resultMessages[code];
   if (known) return known;
   if (status === "SKIPPED")
-    return `조건이 맞지 않아 실행하지 않았습니다(${code}).`;
-  if (status === "FAILED") return `실행하지 못했습니다(${code}).`;
+    return `조건이 맞지 않아 실행하지 않았어요(${code}).`;
+  if (status === "FAILED") return `실행하지 못했어요(${code}).`;
   return code;
 }
 
@@ -686,38 +686,38 @@ export function deliveryText(run: {
 }
 
 const errorMessages: Readonly<Record<string, string>> = {
-  RULE_NOT_FOUND: "이미 삭제된 규칙입니다. 목록을 새로 불러왔습니다.",
-  DUPLICATE_RULE_NAME: "같은 이름의 규칙이 있습니다. 다른 이름을 입력하세요.",
-  RULE_EVENT_STATUS_NOT_APPLICABLE: "상태는 '상태가 바뀔 때'에서만 고릅니다.",
+  RULE_NOT_FOUND: "이미 삭제된 규칙이에요. 목록을 새로 불러왔어요.",
+  DUPLICATE_RULE_NAME: "같은 이름의 규칙이 있어요. 다른 이름을 입력하세요.",
+  RULE_EVENT_STATUS_NOT_APPLICABLE: "상태는 '상태가 바뀔 때'에서만 골라요.",
   RULE_EVENT_OPTION_REQUIRED: "멈춘 일수나 예약 요일과 시각을 입력하세요.",
   RULE_EVENT_OPTION_NOT_APPLICABLE:
-    "이 이벤트에는 멈춘 일수나 예약 시각을 둘 수 없습니다.",
-  RULE_CONDITION_INVALID: "조건 값이 올바르지 않습니다.",
-  RULE_CONDITION_NOT_APPLICABLE: "이 이벤트에는 조건을 둘 수 없습니다.",
+    "이 이벤트에는 멈춘 일수나 예약 시각을 둘 수 없어요.",
+  RULE_CONDITION_INVALID: "조건 값이 올바르지 않아요.",
+  RULE_CONDITION_NOT_APPLICABLE: "이 이벤트에는 조건을 둘 수 없어요.",
   RULE_ACTION_NOT_APPLICABLE:
-    "이 이벤트나 동작에 맞지 않는 대상, 멘션, 문구가 있습니다.",
+    "이 이벤트나 동작에 맞지 않는 대상, 멘션, 문구가 있어요.",
   RULE_ACTION_TARGET_REQUIRED:
-    "동작에 필요한 대상이 없습니다. 편집에서 대상을 고르세요.",
+    "동작에 필요한 대상이 없어요. 편집에서 대상을 고르세요.",
   RULE_ACTION_TARGET_INVALID:
     "고른 스프린트가 끝났거나, DM 받을 사람이 활성 사용자가 아니거나 이 프로젝트를 볼 수 없어요.",
   RULE_TEMPLATE_INVALID:
-    "문구에 이 이벤트에서 쓸 수 없는 변수나 멘션 문법이 있습니다.",
+    "문구에 이 이벤트에서 쓸 수 없는 변수나 멘션 문법이 있어요.",
   RULE_SCOPE_OPTION_NOT_APPLICABLE:
     "팀 규칙에는 파트, 버킷, 스프린트, 리뷰어, 담당자를 고를 수 없어요.",
   RULE_WEBHOOK_URL_INVALID:
     "웹훅 주소는 사용자 정보가 없는 공개 https 주소여야 해요.",
   PART_NOT_IN_PROJECT:
-    "삭제되었거나 이 프로젝트에 없는 파트 조건이 있습니다. 편집에서 빼 주세요.",
+    "삭제되었거나 이 프로젝트에 없는 파트 조건이 있어요. 편집에서 빼 주세요.",
   PLANNING_BUCKET_NOT_IN_PROJECT:
-    "삭제되었거나 이 프로젝트에 없는 버킷이 있습니다. 편집에서 다시 고르세요.",
+    "삭제되었거나 이 프로젝트에 없는 버킷이 있어요. 편집에서 다시 고르세요.",
   PLANNING_BUCKET_ARCHIVED:
-    "보관된 버킷으로는 옮길 수 없습니다. 다른 버킷을 고르세요.",
-  REVIEWER_NOT_ALLOWED: "리뷰어는 이 프로젝트의 활성 참여자여야 합니다.",
-  ASSIGNEE_NOT_ALLOWED: "담당자는 이 프로젝트의 활성 참여자여야 합니다.",
-  PROJECT_FORBIDDEN: "헤드 어드민 또는 PM만 자동화 규칙을 관리합니다.",
+    "보관된 버킷으로는 옮길 수 없어요. 다른 버킷을 고르세요.",
+  REVIEWER_NOT_ALLOWED: "리뷰어는 이 프로젝트의 활성 참여자여야 해요.",
+  ASSIGNEE_NOT_ALLOWED: "담당자는 이 프로젝트의 활성 참여자여야 해요.",
+  PROJECT_FORBIDDEN: "헤드 어드민 또는 PM만 자동화 규칙을 관리해요.",
   ACCESS_DENIED: "헤드 어드민만 팀 규칙과 자동화 현황을 볼 수 있어요.",
-  PROJECT_ARCHIVED: "아카이브된 프로젝트는 규칙을 바꿀 수 없습니다.",
-  PROJECT_NOT_FOUND: "프로젝트가 없거나 조회 권한이 없습니다.",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트는 규칙을 바꿀 수 없어요.",
+  PROJECT_NOT_FOUND: "프로젝트가 없거나 조회 권한이 없어요.",
   VALIDATION_ERROR: "입력값을 확인해 주세요.",
 };
 export function ruleErrorMessage(error: {
@@ -1070,16 +1070,16 @@ export function templateProblem(
   template: string,
   event: RuleEvent,
 ): string | null {
-  if (!template.trim()) return "문구가 비어 있습니다.";
+  if (!template.trim()) return "문구가 비어 있어요.";
   if (FORBIDDEN_MENTION.test(template))
-    return "@everyone, @here, <@…>, <#…> 같은 멘션 문법은 쓸 수 없습니다. 멘션은 아래 체크로 고르세요.";
+    return "@everyone, @here, <@…>, <#…> 같은 멘션 문법은 쓸 수 없어요. 멘션은 아래 체크로 고르세요.";
   const allowed = templateVariables(event);
   for (const match of template.matchAll(PLACEHOLDER)) {
     const name = match[1] ?? "";
     if (!allowed.includes(name))
       return allowed.length
-        ? `{${name}}은(는) 이 이벤트에서 쓸 수 없습니다. 쓸 수 있는 변수: ${allowed.map((v) => `{${v}}`).join(", ")}`
-        : `{${name}}은(는) 쓸 수 없습니다. 이 이벤트에는 변수가 없습니다.`;
+        ? `{${name}}은(는) 이 이벤트에서 쓸 수 없어요. 쓸 수 있는 변수: ${allowed.map((v) => `{${v}}`).join(", ")}`
+        : `{${name}}은(는) 쓸 수 없어요. 이 이벤트에는 변수가 없어요.`;
   }
   return null;
 }
@@ -1160,7 +1160,7 @@ export function validateRuleForm(
   const name = form.name.trim();
   const action = form.action;
   if (!name) errors.name = "규칙 이름을 입력하세요.";
-  else if (name.length > 100) errors.name = "규칙 이름은 100자 이하입니다.";
+  else if (name.length > 100) errors.name = "규칙 이름은 100자 이하예요.";
   if (form.event === "TASK_STALE") {
     const days = Number(form.staleDays);
     if (!Number.isInteger(days) || days < 1 || days > 30)
@@ -1174,7 +1174,7 @@ export function validateRuleForm(
       form.scheduleHour < 0 ||
       form.scheduleHour > 23
     )
-      errors.schedule = "시각은 0시에서 23시 사이입니다.";
+      errors.schedule = "시각은 0시에서 23시 사이예요.";
   }
   if (
     !isTasklessEvent(form.event) &&
@@ -1221,7 +1221,7 @@ export function validateRuleForm(
   if (usesTitleTemplate(action)) {
     const title = form.titleTemplate.trim();
     if (title.length > TITLE_TEMPLATE_MAX)
-      errors.titleTemplate = `제목은 ${TITLE_TEMPLATE_MAX}자 이하입니다.`;
+      errors.titleTemplate = `제목은 ${TITLE_TEMPLATE_MAX}자 이하예요.`;
     else {
       const problem = templateProblem(title, form.event);
       if (problem)
@@ -1233,7 +1233,7 @@ export function validateRuleForm(
     if (message) {
       const problem =
         message.length > MESSAGE_TEMPLATE_MAX
-          ? `문구는 ${MESSAGE_TEMPLATE_MAX}자 이하입니다.`
+          ? `문구는 ${MESSAGE_TEMPLATE_MAX}자 이하예요.`
           : templateProblem(message, form.event);
       if (problem) errors.messageTemplate = problem;
     } else if (action === "ADD_COMMENT")

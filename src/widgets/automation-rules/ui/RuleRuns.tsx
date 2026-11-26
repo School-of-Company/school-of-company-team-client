@@ -121,7 +121,7 @@ export function RuleRuns({
         <ListSkeleton label="실행 기록 불러오는 중" rows={3} />
       ) : runs.isError && !runs.data ? (
         <ErrorState
-          title="실행 기록을 불러오지 못했습니다"
+          title="실행 기록을 불러오지 못했어요"
           description={ruleErrorMessage(normalizeApiError(runs.error))}
           onRetry={() => void runs.refetch()}
         />
@@ -129,13 +129,13 @@ export function RuleRuns({
         <EmptyState
           title={
             selectedRule || status
-              ? "조건에 맞는 실행 기록이 없습니다"
-              : "실행 기록이 없습니다"
+              ? "조건에 맞는 실행 기록이 없어요"
+              : "실행 기록이 없어요"
           }
           description={
             selectedRule || status
               ? undefined
-              : "규칙이 걸리면 여기에 결과와 이유가 남습니다."
+              : "규칙이 걸리면 여기에 결과와 이유가 남아요."
           }
         />
       ) : (
@@ -258,7 +258,7 @@ export function RuleRuns({
           )}
           {runs.isFetchNextPageError && (
             <p role="alert" className="text-sm text-danger">
-              다음 기록을 불러오지 못했습니다. 다시 시도해 주세요.
+              다음 기록을 불러오지 못했어요. 다시 시도해 주세요.
             </p>
           )}
         </>
