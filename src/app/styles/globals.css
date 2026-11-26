@@ -1744,6 +1744,8 @@ html[data-sidebar-closed~="account"]
 }
 .task-detail-back {
   flex-basis: 100%;
+  /* 긴 보드 이름은 줄임표로 줄이고 버튼이 화면 밖으로 나가지 않는다. */
+  max-width: 100%;
   justify-content: start;
 }
 .task-detail-heading > header {
