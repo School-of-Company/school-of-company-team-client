@@ -1026,6 +1026,317 @@ html[data-sidebar-closed~="account"]
   box-shadow: 0 1px 3px rgb(0 27 55 / 0.1);
 }
 
+/* 프로젝트 설정: 왼쪽 섹션 내비(넓을 때 고정) + 오른쪽 본문(읽기 폭).
+   좁으면 내비가 본문 위 가로 스크롤 줄이 된다. 두 열 폭이 고정이라 섹션을 바꿔도 자리가 같다. */
+.settings-layout {
+  --settings-nav: 11rem;
+  --settings-label: 9rem;
+  display: grid;
+  min-width: 0;
+  container-type: inline-size;
+}
+.settings-columns {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-6);
+}
+@container (min-width: 52rem) {
+  .settings-columns {
+    grid-template-columns: var(--settings-nav) minmax(0, var(--content-narrow));
+    align-items: start;
+    gap: var(--space-10);
+  }
+  .settings-sidenav {
+    position: sticky;
+    top: var(--space-6);
+    flex-direction: column;
+    overflow: visible;
+  }
+  .settings-sidenav a {
+    min-height: var(--control-md);
+  }
+}
+.settings-sidenav {
+  display: flex;
+  min-width: 0;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.settings-sidenav a {
+  display: flex;
+  flex-shrink: 0;
+  min-height: var(--control-sm);
+  align-items: center;
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.settings-sidenav a:hover {
+  background: var(--surface-hover);
+  color: var(--foreground);
+}
+.settings-sidenav a[aria-current="page"] {
+  background: var(--surface-active);
+  color: var(--foreground);
+}
+.settings-sidenav a:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+@media (pointer: coarse) {
+  .settings-sidenav a {
+    min-height: var(--control-touch);
+  }
+}
+.settings-section {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-5);
+}
+.settings-section-head {
+  display: flex;
+  min-height: var(--control-md);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+.settings-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+.settings-panel {
+  display: grid;
+  min-width: 0;
+  border-radius: var(--radius-xl);
+  background: var(--surface-box);
+}
+.settings-panel[data-tone="danger"] {
+  border: 1px solid color-mix(in oklab, var(--danger) 45%, var(--border));
+  background: color-mix(in oklab, var(--danger) 4%, var(--surface));
+}
+.settings-panel[data-tone="danger"] .settings-panel-title {
+  color: var(--danger-foreground);
+}
+.settings-panel[data-tone="danger"] .ui-button-danger {
+  color: var(--danger-foreground);
+}
+.settings-panel-head {
+  display: flex;
+  min-height: calc(var(--control-sm) + var(--space-8));
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-3);
+}
+.settings-panel-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+.settings-panel-count {
+  color: var(--muted);
+  font-weight: 500;
+}
+.settings-panel-body {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-4);
+  padding: 0 var(--space-5) var(--space-5);
+}
+.settings-panel-foot {
+  display: flex;
+  min-height: calc(var(--control-md) + var(--space-6));
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--border);
+}
+.settings-panel-foot > .settings-foot-status {
+  margin-right: auto;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+.settings-panel-foot > .settings-foot-status[role="alert"] {
+  color: var(--danger-foreground);
+}
+/* 라벨 | 입력. 본문이 좁으면 라벨이 위로 간다. */
+.settings-field {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-2);
+}
+.settings-field-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.settings-field-error {
+  color: var(--danger-foreground);
+  font-size: var(--text-xs);
+}
+.settings-field-value {
+  font-size: var(--text-md);
+  overflow-wrap: anywhere;
+}
+@container (min-width: 36rem) {
+  .settings-field {
+    grid-template-columns: var(--settings-label) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-1) var(--space-4);
+  }
+  /* 입력 높이(42px)의 가운데에 라벨 첫 줄을 맞춘다. */
+  .settings-field-label {
+    min-height: 42px;
+  }
+  .settings-field-value {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+  }
+  .settings-field > :not(.settings-field-label) {
+    grid-column: 2;
+  }
+}
+/* 패널 안 목록: 한 줄 = 아바타 · 이름 · 오른쪽 동작. 줄바꿈 대신 이름을 말줄임한다. */
+.settings-list {
+  display: grid;
+  min-width: 0;
+  margin-inline: calc(var(--space-5) * -1);
+}
+.settings-list-row {
+  display: flex;
+  min-width: 0;
+  min-height: calc(var(--control-md) + var(--space-4));
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-5);
+  border-top: 1px solid var(--border);
+}
+/* 목록이 본문 끝이면 아래 여백을 빼서 저장 줄 구분선(또는 패널 끝)과 겹친 선이 생기지 않게 한다. */
+.settings-panel-body:has(> .settings-list:last-child) {
+  padding-bottom: 0;
+}
+.settings-list-main {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+}
+.settings-list-name {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.settings-list-name > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 칩이 있는 줄(파트)은 좁으면 동작을 다음 줄로 내린다. */
+.settings-list-row[data-wrap] {
+  flex-wrap: wrap;
+}
+.settings-list-row[data-wrap] > .settings-list-main {
+  min-width: 12rem;
+}
+.settings-list-meta {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.settings-list-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+.settings-list-actions select.ui-input,
+.settings-select-auto {
+  width: auto;
+  max-width: 100%;
+}
+.settings-list-actions select.ui-input {
+  min-height: var(--control-sm);
+  padding-inline: var(--space-3);
+  font-size: var(--text-sm);
+}
+/* 파트: 이름 줄 아래 구성원 칩. */
+.settings-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+.settings-chip {
+  display: inline-flex;
+  min-height: var(--chip-height);
+  align-items: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-fill);
+  font-size: var(--text-xs);
+}
+.settings-chip button {
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+}
+.settings-chip button:hover {
+  color: var(--foreground);
+}
+.settings-chip svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+/* 알림 토글 목록은 설정 패널 안에서 패널 면을 그대로 쓰고 목록 줄처럼 그린다. */
+.settings-panel .notify-list {
+  margin-inline: calc(var(--space-5) * -1);
+  border-radius: 0;
+  background: none;
+}
+.settings-panel .notify-row {
+  padding-inline: var(--space-5);
+  border-top: 1px solid var(--border);
+}
+/* 한 줄 입력 + 버튼(새 파트, 새 버킷, 참여자 추가). */
+.settings-inline-form {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-2);
+}
+.settings-inline-form[data-actions="2"] {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+.settings-inline-form .settings-field-error {
+  grid-column: 1 / -1;
+}
+
 /* 정보 아이콘 말풍선과 비활성 이유 말풍선. 마우스를 올리거나 초점을 주면 보인다. */
 .ui-tip {
   position: relative;
@@ -1088,7 +1399,7 @@ html[data-sidebar-closed~="account"]
   outline: 2px solid var(--brand);
 }
 
-/* Project headers stay fluid; only the settings form is centered. */
+/* Admin settings column. */
 .settings-page {
   max-width: var(--content-narrow);
   margin-inline: 0;

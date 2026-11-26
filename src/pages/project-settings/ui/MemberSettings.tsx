@@ -6,9 +6,17 @@ import {
   getSettingsPermissions,
   useAssignPm,
 } from "@/features/project-settings";
-import { Badge, Button, EmptyState, Field, Select } from "@/shared/ui";
+import {
+  Avatar,
+  Badge,
+  Button,
+  DisabledReason,
+  EmptyState,
+  Select,
+} from "@/shared/ui";
 import type { SettingsProps } from "../model/props";
 import { MutationFeedback } from "./MutationFeedback";
+import { Panel } from "./Panel";
 
 export function MemberSettings({
   project,
@@ -20,135 +28,131 @@ export function MemberSettings({
   const pm = useAssignPm(project.id, onSaved);
   const permissions = getSettingsPermissions(user, project);
   const [candidate, setCandidate] = useState("");
-  const [editing, setEditing] = useState(false);
   const pending = members.isPending || pm.isPending;
+  const usernames = new Map(candidates.map((item) => [item.id, item.username]));
+  const addable = candidates.filter(
+    (item) => !project.members.some((member) => member.userId === item.id),
+  );
   return (
-    <div className="grid gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          PM:{" "}
-          {candidates.find((item) => item.id === project.pmUserId)?.name ??
-            project.members.find((item) => item.userId === project.pmUserId)
-              ?.name ??
-            "미지정"}
-        </p>
-        {permissions.manage && (
-          <Button
-            variant="secondary"
-            disabled={pending}
-            onClick={() => setEditing(!editing)}
-          >
-            {editing ? "편집 마침" : "참여자와 PM 편집"}
-          </Button>
-        )}
-      </div>
-      {editing && user.role === "LEAD" && (
-        <div className="grid gap-2">
-          <Field
-            id="project-pm"
-            label="PM"
-            hint="PM은 한 명이며, 교체하거나 해제한 기존 PM은 참여자로 남습니다."
+    <Panel
+      title="참여자"
+      count={project.members.length}
+      info="PM은 한 명이고 헤드 어드민이 정해요. 바꾸거나 해제한 PM은 참여자로 남아요. 참여자를 제외해도 기록은 남고, 업무 배정과 파트 소속은 풀려요."
+      actions={
+        project.pmUserId === null && (
+          <span className="text-xs text-muted">PM 미지정</span>
+        )
+      }
+      footer={
+        permissions.manage && (
+          <form
+            className="settings-inline-form w-full"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (pending || !candidate) return;
+              members.mutate(
+                { action: "add", userId: candidate },
+                { onSuccess: () => setCandidate("") },
+              );
+            }}
           >
             <Select
-              id="project-pm"
-              value={project.pmUserId ?? ""}
-              disabled={!permissions.assignPm || pending}
-              onChange={(event) => pm.mutate(event.target.value || null)}
-              aria-describedby="project-pm-hint"
+              aria-label="추가할 팀원"
+              value={candidate}
+              onChange={(event) => setCandidate(event.target.value)}
+              disabled={pending || addable.length === 0}
             >
-              <option value="">미지정</option>
-              {candidates.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name} ({member.username})
+              <option value="">
+                {addable.length === 0 ? "추가할 팀원이 없어요" : "팀원 선택"}
+              </option>
+              {addable.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name} @{item.username}
                 </option>
               ))}
             </Select>
-          </Field>
-          <MutationFeedback error={pm.error} success={pm.isSuccess} />
-        </div>
-      )}
-      {project.members.length === 0 ? (
-        <EmptyState title="참여자가 없습니다" />
-      ) : (
-        <ul className="divide-y divide-border">
-          {project.members.map((member) => (
-            <li
-              key={member.userId}
-              className="flex flex-wrap items-center justify-between gap-3 py-3"
+            <Button
+              type="submit"
+              variant="secondary"
+              disabled={!candidate}
+              loading={members.isPending && members.variables?.action === "add"}
             >
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <span className="break-all">{member.name}</span>
-                {member.userId === project.pmUserId && <Badge>PM</Badge>}
-              </div>
-              {editing && permissions.manage && (
-                <Button
-                  variant="ghost"
-                  disabled={pending || member.userId === project.pmUserId}
-                  title={
-                    member.userId === project.pmUserId
-                      ? "PM은 먼저 교체하거나 해제해야 합니다."
-                      : undefined
-                  }
-                  aria-label={`${member.name} 참여자 제외`}
-                  onClick={() =>
-                    members.mutate({ action: "remove", userId: member.userId })
-                  }
-                >
-                  제외
-                </Button>
-              )}
-            </li>
-          ))}
+              추가
+            </Button>
+          </form>
+        )
+      }
+    >
+      {project.members.length === 0 ? (
+        <EmptyState title="참여자가 없어요" />
+      ) : (
+        <ul className="settings-list" aria-label="참여자">
+          {project.members.map((member) => {
+            const isPm = member.userId === project.pmUserId;
+            const username = usernames.get(member.userId);
+            return (
+              <li key={member.userId} className="settings-list-row">
+                <Avatar name={member.name} />
+                <div className="settings-list-main">
+                  <span className="settings-list-name">
+                    <span>{member.name}</span>
+                  </span>
+                  {username && (
+                    <span className="settings-list-meta">@{username}</span>
+                  )}
+                </div>
+                <div className="settings-list-actions">
+                  {permissions.assignPm ? (
+                    <Select
+                      aria-label={`${member.name} 역할`}
+                      value={isPm ? "PM" : "MEMBER"}
+                      disabled={pending}
+                      onChange={(event) =>
+                        pm.mutate(
+                          event.target.value === "PM" ? member.userId : null,
+                        )
+                      }
+                    >
+                      <option value="MEMBER">참여자</option>
+                      <option value="PM">PM</option>
+                    </Select>
+                  ) : (
+                    isPm && <Badge>PM</Badge>
+                  )}
+                  {permissions.manage && (
+                    <DisabledReason
+                      reason={
+                        isPm
+                          ? "PM은 먼저 다른 사람으로 바꾸거나 해제해야 제외할 수 있어요"
+                          : null
+                      }
+                    >
+                      <Button
+                        variant="ghost"
+                        className="ui-button-sm"
+                        disabled={pending || isPm}
+                        aria-label={`${member.name} 참여자 제외`}
+                        onClick={() =>
+                          members.mutate({
+                            action: "remove",
+                            userId: member.userId,
+                          })
+                        }
+                      >
+                        제외
+                      </Button>
+                    </DisabledReason>
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
-      {editing && permissions.manage && (
-        <form
-          className="grid gap-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (pending || !candidate.trim()) return;
-            members.mutate(
-              { action: "add", userId: candidate.trim() },
-              { onSuccess: () => setCandidate("") },
-            );
-          }}
-        >
-          <Field id="project-member" label="추가할 활성 팀원">
-            <Select
-              id="project-member"
-              name="userId"
-              value={candidate}
-              onChange={(event) => setCandidate(event.target.value)}
-              disabled={pending}
-              required
-            >
-              <option value="" disabled>
-                팀원 선택
-              </option>
-              {candidates
-                .filter(
-                  (item) =>
-                    !project.members.some(
-                      (member) => member.userId === item.id,
-                    ),
-                )
-                .map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name} ({item.username})
-                  </option>
-                ))}
-            </Select>
-          </Field>
-          <Button type="submit" variant="secondary" loading={members.isPending}>
-            참여자 추가
-          </Button>
-          <p className="text-sm text-muted">
-            PM을 제외하려면 헤드 어드민이 먼저 교체하거나 해제해야 합니다.
-            참여자 제외 시 기록은 보존되며 업무 배정, 파트 소속은 해제됩니다.
-          </p>
-        </form>
-      )}
-      <MutationFeedback error={members.error} success={members.isSuccess} />
-    </div>
+      <MutationFeedback
+        error={members.error ?? pm.error}
+        success={members.isSuccess || pm.isSuccess}
+      />
+    </Panel>
   );
 }

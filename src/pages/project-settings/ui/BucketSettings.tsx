@@ -10,7 +10,6 @@ import {
   Dialog,
   EmptyState,
   ErrorState,
-  Field,
   Icon,
   IconButton,
   Input,
@@ -25,6 +24,7 @@ import { validatePartName } from "../model/part-validation";
 import type { SettingsProps } from "../model/props";
 import { isAccessLost } from "../model/access-lost";
 import { MutationFeedback } from "./MutationFeedback";
+import { Panel } from "./Panel";
 
 function validateBucketName(name: string) {
   return (
@@ -40,26 +40,14 @@ export function BucketSettings({ project, user }: SettingsProps) {
   const [deleting, setDeleting] = useState<PlanningBucket | null>(null);
   const [validation, setValidation] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
-  const intro = (
-    <div className="grid gap-1 text-sm text-muted">
-      <p>
-        버킷은 프로젝트 안에서 업무를 이름 붙인 묶음으로 나누는 기능이에요.
-        상태와는 따로 움직이고, 업무 하나는 버킷 하나에만 들어가요.
-      </p>
-      <p>
-        예: 다음 주기, 아이디어, 보류, 기술 부채. 보드에서 버킷별로 묶어 보고
-        레인 사이로 끌어 옮겨요.
-        {!manage && " 버킷 관리는 헤드 어드민 또는 PM이 해요."}
-      </p>
-    </div>
-  );
-  // 안내 문단은 바로 그리고 목록 자리만 빈 상태 높이로 잡아, 버킷이 와도 아래가 밀리지 않는다.
+  const info =
+    "버킷은 업무를 이름 붙인 묶음으로 나눠요. 상태와는 따로 움직이고, 업무 하나는 버킷 하나에만 들어가요. 보드에서 버킷별로 묶어 보고 레인 사이로 끌어 옮겨요.";
+  // 패널 머리와 아래 추가 줄은 바로 그리고 목록 자리만 빈 상태 높이로 잡아, 버킷이 와도 아래가 밀리지 않는다.
   if (buckets.isPending)
     return (
-      <div className="grid gap-5">
-        {intro}
+      <Panel title="사용 중인 버킷" info={info}>
         <ListSkeleton label="버킷 불러오는 중" rows={2} rowClassName="h-10" />
-      </div>
+      </Panel>
     );
   if (!buckets.data || (buckets.isError && isAccessLost(buckets.error)))
     return (
@@ -95,7 +83,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
   function row(bucket: PlanningBucket, index: number) {
     if (renaming === bucket.id && manage)
       return (
-        <li key={bucket.id} className="bucket-row">
+        <li key={bucket.id} className="settings-list-row">
           <form
             className="bucket-rename"
             onSubmit={(event) => {
@@ -135,7 +123,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
         </li>
       );
     return (
-      <li key={bucket.id} className="bucket-row">
+      <li key={bucket.id} className="settings-list-row">
         {manage && !bucket.archived && (
           <span className="bucket-order">
             <IconButton
@@ -205,72 +193,83 @@ export function BucketSettings({ project, user }: SettingsProps) {
       </li>
     );
   }
-  return (
-    <div className="grid gap-5">
-      {intro}
-      <StaleNotice query={buckets} />
-      {list.length === 0 ? (
-        <EmptyState
-          title="아직 버킷이 없어요"
-          description={
-            manage
-              ? "아래에 이름을 적고 버킷 추가를 누르면 첫 버킷이 생겨요."
-              : "헤드 어드민 또는 PM이 만들면 여기에 보여요."
-          }
-        />
-      ) : (
-        <>
-          {active.length > 0 && (
-            <ul className="bucket-list" aria-label="사용 중인 버킷">
-              {active.map(row)}
-            </ul>
-          )}
-          {archived.length > 0 && (
-            <section className="grid gap-2" aria-labelledby="archived-buckets">
-              <h3
-                id="archived-buckets"
-                className="text-sm font-medium text-muted"
-              >
-                보관된 버킷
-              </h3>
-              <p className="text-xs text-muted">
-                기존 배정은 남고, 새 업무를 넣을 수는 없습니다.
-              </p>
-              <ul className="bucket-list">{archived.map(row)}</ul>
-            </section>
-          )}
-        </>
-      )}
-      {manage && (
-        <form
-          className="bucket-create"
-          onSubmit={(event) => {
-            event.preventDefault();
-            submitName(newName);
-          }}
-        >
-          <Field id="new-bucket" label="새 버킷 이름">
-            <Input
-              id="new-bucket"
-              name="name"
-              value={newName}
-              onChange={(event) => setNewName(event.target.value)}
-              maxLength={50}
-              required
-              disabled={change.isPending}
-            />
-          </Field>
-          <Button type="submit" variant="secondary" loading={change.isPending}>
-            버킷 추가
-          </Button>
-        </form>
-      )}
-      {validation && (
-        <p role="alert" className="text-sm text-danger">
+  const createForm = manage && (
+    <form
+      noValidate
+      className="settings-inline-form w-full"
+      onSubmit={(event) => {
+        event.preventDefault();
+        submitName(newName);
+      }}
+    >
+      <Input
+        aria-label="새 버킷 이름"
+        placeholder="새 버킷 이름"
+        value={newName}
+        onChange={(event) => {
+          setNewName(event.target.value);
+          if (validation) setValidation(null);
+        }}
+        maxLength={50}
+        disabled={change.isPending}
+        aria-invalid={validation && !renaming ? true : undefined}
+      />
+      <Button
+        type="submit"
+        variant="secondary"
+        disabled={!newName.trim()}
+        loading={change.isPending && change.variables?.action === "create"}
+      >
+        추가
+      </Button>
+      {validation && !renaming && (
+        <p role="alert" className="settings-field-error">
           {validation}
         </p>
       )}
-      <MutationFeedback error={change.error} success={change.isSuccess} />
+    </form>
+  );
+  return (
+    <>
+      <StaleNotice query={buckets} />
+      <Panel
+        title="사용 중인 버킷"
+        count={active.length}
+        info={info}
+        footer={createForm}
+      >
+        {active.length === 0 ? (
+          <EmptyState
+            title="아직 버킷이 없어요"
+            description={
+              manage
+                ? "아래에 이름을 적어 첫 버킷을 만들어요. 예: 다음 주기, 아이디어, 보류"
+                : "헤드 어드민이나 PM이 만들면 여기에 보여요."
+            }
+          />
+        ) : (
+          <ul className="settings-list" aria-label="사용 중인 버킷">
+            {active.map(row)}
+          </ul>
+        )}
+        {validation && renaming && (
+          <p role="alert" className="text-xs text-danger">
+            {validation}
+          </p>
+        )}
+        <MutationFeedback error={change.error} success={change.isSuccess} />
+      </Panel>
+      {archived.length > 0 && (
+        <Panel
+          title="보관된 버킷"
+          count={archived.length}
+          info="기존 배정은 남고, 새 업무는 넣을 수 없어요."
+        >
+          <ul className="settings-list" aria-label="보관된 버킷">
+            {archived.map(row)}
+          </ul>
+        </Panel>
+      )}
       <Dialog
         open={!!deleting}
         onClose={() => {
@@ -280,7 +279,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
       >
         <p className="mb-6 text-sm text-muted">
           {deleting?.name} 버킷을 삭제해도 업무는 그대로 남고 버킷 배정만
-          풀립니다. 기록을 남기려면 삭제 대신 보관하세요.
+          풀려요. 기록을 남기려면 삭제 대신 보관하세요.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button
@@ -305,6 +304,6 @@ export function BucketSettings({ project, user }: SettingsProps) {
           </Button>
         </div>
       </Dialog>
-    </div>
+    </>
   );
 }
