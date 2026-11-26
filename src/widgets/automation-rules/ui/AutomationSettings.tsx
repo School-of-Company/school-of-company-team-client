@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { projectQueries, type ProjectDetail } from "@/entities/project";
+import { sprintQueries } from "@/entities/sprint";
+import { activeUsersQueryOptions } from "@/entities/user";
 import { normalizeApiError } from "@/shared/api";
 import { relativeSince } from "@/shared/lib";
 import {
@@ -12,6 +14,7 @@ import {
   EmptyState,
   ErrorState,
   Icon,
+  InfoTip,
   ListSkeleton,
   StaleNotice,
 } from "@/shared/ui";
@@ -20,6 +23,7 @@ import {
   actionText,
   brokenReferences,
   conditionValueLabel,
+  disabledReasonText,
   fieldLabels,
   resultMessage,
   ruleErrorMessage,
@@ -29,7 +33,7 @@ import {
   type RuleConditionField,
   type RuleForm,
 } from "../model/rule";
-import { RuleEditor } from "./RuleEditor";
+import { RuleEditor, type RuleEditorContext } from "./RuleEditor";
 import { RuleTemplatePicker } from "./RuleTemplatePicker";
 import { RuleRuns, RunStatus } from "./RuleRuns";
 
@@ -47,9 +51,82 @@ export function AutomationSettings({
   readonly activeUserIds: ReadonlySet<string>;
   readonly editable: boolean;
 }) {
-  const rules = useQuery(ruleQueries.rules(project.id));
   const buckets = useQuery(projectQueries.buckets(project.id));
-  const change = useRuleChange(project.id);
+  const sprints = useQuery(sprintQueries.list(project.id));
+  const context: RuleEditorContext = {
+    target: { scope: "PROJECT", projectId: project.id },
+    parts: project.parts.map((part) => ({ value: part.id, label: part.name })),
+    buckets: buckets.data ?? [],
+    sprints: (sprints.data ?? [])
+      .filter((sprint) => sprint.status !== "CLOSED")
+      .map((sprint) => ({ value: sprint.id, label: sprint.name })),
+    people: project.members
+      .filter((member) => activeUserIds.has(member.userId))
+      .map((member) => ({ value: member.userId, label: member.name })),
+    projects: [],
+    archivedProjects: [],
+  };
+  return (
+    <AutomationRules
+      context={context}
+      editable={editable}
+      intro={
+        <p className="max-w-xl text-sm text-muted">
+          업무, 장애, 배포, 스프린트 같은 일이 생기거나 정한 시각이 되면 조건에
+          맞을 때 동작 하나를 실행해요. 개인, 팀 공용 업무에는 걸리지 않아요.
+        </p>
+      }
+    />
+  );
+}
+
+/** 관리자 설정 > 팀 규칙. 헤드 어드민만 본다(서버 LEAD 전용). 아카이브가 아닌 모든 프로젝트, 또는 고른 프로젝트에 걸린다. */
+export function TeamRules() {
+  const projects = useQuery(projectQueries.list(true));
+  const users = useQuery(activeUsersQueryOptions());
+  const context: RuleEditorContext = {
+    target: { scope: "TEAM" },
+    parts: [],
+    buckets: [],
+    sprints: [],
+    people: (users.data ?? []).map((user) => ({
+      value: user.id,
+      label: user.name,
+    })),
+    projects: projectOptions(projects.data ?? [], false),
+    archivedProjects: projectOptions(projects.data ?? [], true),
+  };
+  return (
+    <AutomationRules
+      context={context}
+      editable
+      intro={
+        <div className="flex max-w-xl items-center gap-1 text-sm text-muted">
+          모든 프로젝트에 같은 규칙을 걸어요.
+          <InfoTip label="팀 규칙 설명">
+            프로젝트 규칙과 함께 걸릴 수 있어요. 겹치면 프로젝트 규칙을 끄세요.
+            파트, 버킷, 스프린트, 리뷰어, 담당자처럼 프로젝트마다 다른 대상은
+            고를 수 없어요.
+          </InfoTip>
+        </div>
+      }
+    />
+  );
+}
+
+/** 규칙 목록 + 실행 기록 + 편집기. 프로젝트 규칙과 팀 규칙이 같이 쓴다. */
+function AutomationRules({
+  context,
+  editable,
+  intro,
+}: {
+  readonly context: RuleEditorContext;
+  readonly editable: boolean;
+  readonly intro: ReactNode;
+}) {
+  const target = context.target;
+  const rules = useQuery(ruleQueries.rules(target));
+  const change = useRuleChange(target);
   // rule = null 은 새 규칙, initial 은 템플릿으로 채운 값.
   const [editing, setEditing] = useState<
     | { readonly rule: AutomationRule | null; readonly initial?: RuleForm }
@@ -62,17 +139,7 @@ export function AutomationSettings({
     readonly ruleId: string;
     readonly enabled: boolean;
   } | null>(null);
-  const participants = project.members
-    .filter((member) => activeUserIds.has(member.userId))
-    .map((member) => ({ value: member.userId, label: member.name }));
 
-  const intro = (
-    <p className="max-w-xl text-sm text-muted">
-      업무, 장애, 배포, 스프린트 같은 일이 생기거나 정한 시각이 되면 조건에 맞을
-      때 동작 하나를 실행합니다. 업무 상태는 바꾸지 않고, 개인, 팀 공용 업무에는
-      걸리지 않습니다.
-    </p>
-  );
   // 안내 문단은 바로 그리고 목록 자리만 빈 상태 높이로 잡는다.
   if (rules.isPending)
     return (
@@ -86,7 +153,7 @@ export function AutomationSettings({
   if (rules.isError && !rules.data)
     return (
       <ErrorState
-        title="규칙을 불러오지 못했습니다"
+        title="규칙을 불러오지 못했어요"
         description={ruleErrorMessage(normalizeApiError(rules.error))}
         onRetry={() => void rules.refetch()}
       />
@@ -116,7 +183,7 @@ export function AutomationSettings({
         <StaleNotice query={rules} />
         {list.length === 0 ? (
           <EmptyState
-            title="규칙이 없습니다"
+            title="규칙이 없어요"
             description={
               editable
                 ? "막힌 업무를 PM에게 알리거나, 리뷰 단계에 들어가면 리뷰어를 지정하는 규칙을 만들어 보세요."
@@ -166,12 +233,14 @@ export function AutomationSettings({
         {change.isError && !deleting && (
           <p role="alert" className="text-sm text-danger">
             {ruleErrorMessage(normalizeApiError(change.error))} 이전 상태로
-            되돌렸습니다.
+            되돌렸어요.
           </p>
         )}
       </div>
       <RuleRuns
-        projectId={project.id}
+        target={target}
+        projects={context.projects}
+        archivedProjects={context.archivedProjects}
         rules={list}
         ruleId={runRuleId}
         onRuleChange={setRunRuleId}
@@ -187,9 +256,7 @@ export function AutomationSettings({
       />
       <RuleEditor
         open={editing !== undefined}
-        project={project}
-        buckets={buckets.data ?? []}
-        participants={participants}
+        context={context}
         rule={editing?.rule ?? null}
         initial={editing?.initial}
         onClose={() => setEditing(undefined)}
@@ -202,8 +269,8 @@ export function AutomationSettings({
         title="규칙을 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          {deleting?.name} 규칙과 실행 기록이 함께 지워집니다. 잠시 멈추려면
-          삭제 대신 끄세요.
+          {deleting?.name} 규칙과 실행 기록이 함께 지워져요. 잠시 멈추려면 삭제
+          대신 끄세요.
         </p>
         {change.isError && deleting && (
           <p role="alert" className="mb-4 text-sm text-danger">
@@ -294,9 +361,22 @@ function RuleRow({
             ))}
           </ul>
         )}
+        {rule.disabledReason && !enabled && (
+          <p className="text-xs text-danger">
+            {disabledReasonText(rule.disabledReason)} 원인을 고친 뒤 다시
+            켜세요.
+          </p>
+        )}
+        {rule.scope === "TEAM" && (
+          <p className="text-xs text-muted">
+            {rule.projects?.length
+              ? rule.projects.map((project) => project.key).join(", ")
+              : "모든 프로젝트"}
+          </p>
+        )}
         {broken.length > 0 && (
           <p className="text-xs text-danger">
-            제대로 실행되지 않습니다({broken.join(", ")}). 편집에서 고치세요.
+            제대로 실행되지 않아요({broken.join(", ")}). 편집에서 고치세요.
           </p>
         )}
       </div>
@@ -357,4 +437,21 @@ function RuleRow({
       )}
     </li>
   );
+}
+
+function projectOptions(
+  projects: readonly {
+    readonly id: string;
+    readonly key: string;
+    readonly name: string;
+    readonly archived: boolean;
+  }[],
+  archived: boolean,
+) {
+  return projects
+    .filter((project) => project.archived === archived)
+    .map((project) => ({
+      value: project.id,
+      label: `${project.key} ${project.name}`,
+    }));
 }

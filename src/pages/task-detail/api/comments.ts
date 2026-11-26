@@ -17,6 +17,8 @@ export interface TaskComment {
   readonly body: string;
   readonly author: TaskPersonSummary | null;
   readonly viaAgent: boolean;
+  /** s23: 자동화 규칙(ADD_COMMENT)이 쓴 댓글. 작성자는 규칙을 저장한 사람이다. */
+  readonly viaAutomation?: boolean;
   readonly createdAt: string;
   readonly editedAt: string | null;
 }

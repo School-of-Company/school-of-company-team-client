@@ -1,3 +1,4 @@
+import type { TaskAgentQueue } from "./agent-queue";
 import type { DevSignal } from "./dev-signal";
 
 export const taskStatuses = [
@@ -102,6 +103,8 @@ export type TaskDetail = Omit<TaskCard, "reviewers"> & {
     readonly id: string;
     readonly title: string;
   }[];
+  /** s23: 에이전트 대기열의 열린 항목. 없거나 서버가 아직 보내지 않으면 null·없음. */
+  readonly agentQueue?: TaskAgentQueue | null;
   readonly createdBy: string;
   readonly createdAt: string;
   readonly updatedAt: string;

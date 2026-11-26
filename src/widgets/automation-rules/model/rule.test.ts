@@ -62,6 +62,15 @@ test("toggling sends the full definition back with only enabled changed", () => 
     priority: null,
     titleTemplate: null,
     messageTemplate: null,
+    projectIds: null,
+    status: null,
+    sprintId: null,
+    days: null,
+    dmUserId: null,
+    channel: null,
+    digestHour: null,
+    webhookUrl: null,
+    escalation: null,
   });
 });
 
@@ -102,10 +111,13 @@ test("incident rules carry no conditions and can only mention the PM", () => {
   assert.deepEqual(allowedActions("INCIDENT_CREATED"), [
     "NOTIFY_DISCORD",
     "CREATE_TASK",
+    "DISCORD_DM",
+    "WEBHOOK",
+    "ESCALATE",
   ]);
 });
 
-test("there is no status-changing or external write action, and the incident event is offered", () => {
+test("task events offer every action except the incident ones, and the incident event is offered", () => {
   assert.deepEqual(allowedActions("TASK_STATUS_CHANGED"), [
     "NOTIFY_DISCORD",
     "MARK_ATTENTION",
@@ -114,6 +126,15 @@ test("there is no status-changing or external write action, and the incident eve
     "ASSIGN_USER",
     "SET_PRIORITY",
     "CREATE_TASK",
+    "MOVE_STATUS",
+    "ADD_TO_SPRINT",
+    "SET_DEADLINE",
+    "ADD_COMMENT",
+    "CREATE_SUBTASK",
+    "DISCORD_DM",
+    "WEBHOOK",
+    "ASSIGN_TO_AGENT",
+    "ESCALATE",
   ]);
   assert.ok(selectableEvents.includes("INCIDENT_CREATED"));
 });
@@ -154,7 +175,7 @@ test("summaries read as short Korean phrases", () => {
   assert.equal(resultMessage(null), null);
   assert.equal(
     resultMessage("DISCORD_CHANNEL_MISSING"),
-    "보낼 업무 스레드나 프로젝트 채널이 없습니다.",
+    "보낼 업무 스레드나 프로젝트 채널이 없어요.",
   );
   assert.equal(resultMessage("NEW_CODE"), "NEW_CODE");
   assert.equal(
@@ -182,11 +203,11 @@ test("summaries read as short Korean phrases", () => {
   );
   assert.equal(
     resultMessage("SOMETHING_NEW", "SKIPPED"),
-    "조건이 맞지 않아 실행하지 않았습니다(SOMETHING_NEW).",
+    "조건이 맞지 않아 실행하지 않았어요(SOMETHING_NEW).",
   );
   assert.equal(
     resultMessage("SOMETHING_NEW", "FAILED"),
-    "실행하지 못했습니다(SOMETHING_NEW).",
+    "실행하지 못했어요(SOMETHING_NEW).",
   );
 });
 
@@ -234,20 +255,20 @@ test("toggling an incident rule sends a body the server accepts", () => {
 test("incident runs explain reasons without task wording", () => {
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "INCIDENT_CREATED"),
-    "장애가 삭제되었습니다.",
+    "장애가 삭제되었어요.",
   );
   assert.equal(
     resultMessage("DISCORD_CHANNEL_MISSING", "SKIPPED", "INCIDENT_CREATED"),
-    "Discord 프로젝트 채널이 연결되지 않았습니다.",
+    "Discord 프로젝트 채널이 연결되지 않았어요.",
   );
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "TASK_BLOCKED"),
-    "업무가 삭제되었거나 프로젝트 업무가 아닙니다.",
+    "업무가 삭제되었거나 프로젝트 업무가 아니에요.",
   );
 });
 
+// 장애 이벤트는 에스컬레이션도 받아 rule-v2.test 의 서버 표에서 본다.
 const tasklessEvents = [
-  "INCIDENT_CREATED",
   "REQUIREMENT_SUBMITTED",
   "REQUIREMENT_REPLIED",
   "SPRINT_STARTED",
@@ -262,8 +283,8 @@ test("requirement and sprint events are taskless like the server's TASKLESS_EVEN
     assert.deepEqual(
       allowedActions(event),
       event.startsWith("REQUIREMENT_")
-        ? ["NOTIFY_DISCORD"]
-        : ["NOTIFY_DISCORD", "CREATE_TASK"],
+        ? ["NOTIFY_DISCORD", "WEBHOOK"]
+        : ["NOTIFY_DISCORD", "CREATE_TASK", "DISCORD_DM", "WEBHOOK"],
     );
     const body = formToRequest(
       changeEvent({ ...ruleToForm(rule), action: "MOVE_BUCKET" }, event),
@@ -287,22 +308,22 @@ test("requirement and sprint events are taskless like the server's TASKLESS_EVEN
   );
   assert.equal(
     ruleErrorMessage({ code: "RULE_CONDITION_NOT_APPLICABLE", message: "" }),
-    "이 이벤트에는 조건을 둘 수 없습니다.",
+    "이 이벤트에는 조건을 둘 수 없어요.",
   );
 });
 
 test("requirement and sprint runs explain reasons and targets without task wording", () => {
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "REQUIREMENT_SUBMITTED"),
-    "요구사항이 삭제되었거나 스팸으로 분류되었습니다.",
+    "요구사항이 삭제되었거나 스팸으로 분류되었어요.",
   );
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "SPRINT_ENDING_SOON"),
-    "스프린트가 삭제되었거나 이미 끝났습니다.",
+    "스프린트가 삭제되었거나 이미 끝났어요.",
   );
   assert.equal(
     resultMessage("DISCORD_CHANNEL_MISSING", "SKIPPED", "SPRINT_STARTED"),
-    "Discord 프로젝트 채널이 연결되지 않았습니다.",
+    "Discord 프로젝트 채널이 연결되지 않았어요.",
   );
   assert.equal(runTargetFallback("REQUIREMENT_REPLIED"), "요구사항");
   assert.equal(runTargetFallback("SPRINT_STARTED"), "스프린트");
@@ -320,7 +341,7 @@ test("an event the client does not know yet renders safely and round-trips on to
   assert.equal(runTargetFallback(future), "대상 없음");
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", future),
-    "업무가 삭제되었거나 프로젝트 업무가 아닙니다.",
+    "업무가 삭제되었거나 프로젝트 업무가 아니에요.",
   );
   const body = toggleRequest({ ...rule, event: future }, false);
   assert.equal(body.event, future);

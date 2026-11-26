@@ -39,30 +39,51 @@ const REQUIREMENT_EVENTS: readonly RuleEvent[] = [
   "REQUIREMENT_REPLIED",
 ];
 
+// 서버 AutomationRuleValidator.allowedActions(s23 4.2)를 옮긴 기대값.
+function serverAllowedActions(event: RuleEvent, task: boolean) {
+  const base = ["NOTIFY_DISCORD", "CREATE_TASK", "DISCORD_DM", "WEBHOOK"];
+  const incident = ["CREATE_INCIDENT", "ADD_INCIDENT_NOTE"];
+  if (task)
+    return [
+      "NOTIFY_DISCORD",
+      "MARK_ATTENTION",
+      "ASSIGN_REVIEWER",
+      "MOVE_BUCKET",
+      "ASSIGN_USER",
+      "SET_PRIORITY",
+      "CREATE_TASK",
+      "MOVE_STATUS",
+      "ADD_TO_SPRINT",
+      "SET_DEADLINE",
+      "ADD_COMMENT",
+      "CREATE_SUBTASK",
+      "DISCORD_DM",
+      "WEBHOOK",
+      "ASSIGN_TO_AGENT",
+      "ESCALATE",
+    ];
+  if (REQUIREMENT_EVENTS.includes(event)) return ["NOTIFY_DISCORD", "WEBHOOK"];
+  if (event === "SERVICE_DOWN") return [...base, ...incident, "ESCALATE"];
+  if (event === "SERVICE_DEGRADED" || event === "DEPLOY_FAILED")
+    return [...base, ...incident];
+  if (event === "SERVICE_RECOVERED")
+    return ["NOTIFY_DISCORD", "DISCORD_DM", "WEBHOOK", "ADD_INCIDENT_NOTE"];
+  if (event === "INCIDENT_CREATED") return [...base, "ESCALATE"];
+  return base;
+}
+
 test("every event maps to the server's conditions, actions and template variables", () => {
   for (const event of selectableEvents) {
     const task = TASK_EVENTS.includes(event);
     assert.equal(isTasklessEvent(event), !task, event);
     assert.ok(eventHelp(event), event);
     assert.deepEqual(
-      allowedActions(event),
-      task
-        ? [
-            "NOTIFY_DISCORD",
-            "MARK_ATTENTION",
-            "ASSIGN_REVIEWER",
-            "MOVE_BUCKET",
-            "ASSIGN_USER",
-            "SET_PRIORITY",
-            "CREATE_TASK",
-          ]
-        : REQUIREMENT_EVENTS.includes(event)
-          ? ["NOTIFY_DISCORD"]
-          : ["NOTIFY_DISCORD", "CREATE_TASK"],
+      [...allowedActions(event)].sort(),
+      [...serverAllowedActions(event, task)].sort(),
       event,
     );
   }
-  assert.equal(selectableEvents.length, 18);
+  assert.equal(selectableEvents.length, 20);
   assert.deepEqual(templateVariables("TASK_STALE"), ["task.key", "task.title"]);
   assert.deepEqual(templateVariables("SERVICE_DOWN"), ["service.name"]);
   assert.deepEqual(templateVariables("DEPLOY_FAILED"), ["service.name"]);
@@ -95,9 +116,13 @@ test("form becomes a request with only the fields the event and action use", () 
     conditions: {
       PRIORITY: [],
       TYPE: ["DEV"],
+      SIZE: [],
       PART: [],
       BUCKET: [],
       UNASSIGNED: ["true"],
+      ASSIGNEE: [],
+      SPRINT: [],
+      DEADLINE: [],
     },
     action: "ASSIGN_USER",
     assigneeId: "U1",
@@ -254,6 +279,15 @@ const templates: readonly RuleTemplate[] = [
       priority: null,
       titleTemplate: null,
       messageTemplate: null,
+      projectIds: null,
+      status: null,
+      sprintId: null,
+      days: null,
+      dmUserId: null,
+      channel: null,
+      digestHour: null,
+      webhookUrl: null,
+      escalation: null,
     },
   },
   {
@@ -342,15 +376,15 @@ test("v2 rules read back into the form and toggle without losing fields", () => 
 test("new run codes and taskless targets read in Korean", () => {
   assert.equal(
     resultMessage("TASK_REVIEWER_IS_ASSIGNEE", "SKIPPED", "TASK_CREATED"),
-    "담당자와 리뷰어는 같은 사람일 수 없어 지정하지 않았습니다.",
+    "담당자와 리뷰어는 같은 사람일 수 없어 지정하지 않았어요.",
   );
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "MILESTONE_AT_RISK"),
-    "마일스톤이 삭제되었거나 더 이상 위험하지 않습니다.",
+    "마일스톤이 삭제되었거나 더 이상 위험하지 않아요.",
   );
   assert.equal(
     resultMessage("TASK_NOT_ELIGIBLE", "SKIPPED", "SERVICE_DOWN"),
-    "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼습니다.",
+    "서비스가 삭제되었거나 이 프로젝트와 연결이 끊겼어요.",
   );
   assert.equal(runTargetFallback("SCHEDULE"), "예약 실행");
   assert.equal(runTargetFallback("DEPLOY_FAILED"), "서비스");

@@ -16,8 +16,9 @@ import {
   type IconName,
   StaleNotice,
 } from "@/shared/ui";
-import { ruleQueries } from "../api/rules";
+import { ruleQueries, type RuleTarget } from "../api/rules";
 import {
+  deliveryText,
   eventLabel,
   resultMessage,
   runTargetFallback,
@@ -53,12 +54,23 @@ const time: Intl.DateTimeFormatOptions = {
 };
 
 export function RuleRuns({
-  projectId,
+  target,
+  projects,
+  archivedProjects,
   rules,
   ruleId,
   onRuleChange,
 }: {
-  readonly projectId: string;
+  readonly target: RuleTarget;
+  /** 팀 규칙 기록에서 어느 프로젝트의 계기인지 보여 줄 이름. */
+  readonly archivedProjects: readonly {
+    readonly value: string;
+    readonly label: string;
+  }[];
+  readonly projects: readonly {
+    readonly value: string;
+    readonly label: string;
+  }[];
   readonly rules: readonly AutomationRule[];
   readonly ruleId: string;
   readonly onRuleChange: (ruleId: string) => void;
@@ -67,11 +79,15 @@ export function RuleRuns({
   // 지워진 규칙을 고른 채로 남지 않게 한다(서버는 404 RULE_NOT_FOUND).
   const selectedRule = rules.some((rule) => rule.id === ruleId) ? ruleId : "";
   const runs = useInfiniteQuery(
-    ruleQueries.runs(projectId, { ruleId: selectedRule, status }),
+    ruleQueries.runs(target, { ruleId: selectedRule, status }),
   );
   const items = runs.data?.pages.flatMap((page) => page.items) ?? [];
   // ponytail: 실행 기록에 action 이 없어 지금 규칙의 동작을 쓴다. 실행 뒤 동작을 바꿨으면 문구가 어긋난다(서버가 run.action 을 주면 그걸로).
   const actionOf = new Map(rules.map((rule) => [rule.id, rule.action]));
+  const archivedIds = new Set(archivedProjects.map((project) => project.value));
+  const projectName = new Map(
+    projects.map((project) => [project.value, project.label]),
+  );
   return (
     <section className="grid gap-4" aria-labelledby="rule-runs-heading">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -111,7 +127,7 @@ export function RuleRuns({
         <ListSkeleton label="실행 기록 불러오는 중" rows={3} />
       ) : runs.isError && !runs.data ? (
         <ErrorState
-          title="실행 기록을 불러오지 못했습니다"
+          title="실행 기록을 불러오지 못했어요"
           description={ruleErrorMessage(normalizeApiError(runs.error))}
           onRetry={() => void runs.refetch()}
         />
@@ -119,13 +135,13 @@ export function RuleRuns({
         <EmptyState
           title={
             selectedRule || status
-              ? "조건에 맞는 실행 기록이 없습니다"
-              : "실행 기록이 없습니다"
+              ? "조건에 맞는 실행 기록이 없어요"
+              : "실행 기록이 없어요"
           }
           description={
             selectedRule || status
               ? undefined
-              : "규칙이 걸리면 여기에 결과와 이유가 남습니다."
+              : "규칙이 걸리면 여기에 결과와 이유가 남아요."
           }
         />
       ) : (
@@ -147,6 +163,14 @@ export function RuleRuns({
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{run.ruleName}</p>
                   <p className="truncate text-xs text-muted">
+                    {target.scope === "TEAM" && run.projectId
+                      ? `${
+                          projectName.get(run.projectId) ??
+                          (archivedIds.has(run.projectId)
+                            ? "보관된 프로젝트"
+                            : "삭제된 프로젝트")
+                        }, `
+                      : ""}
                     {eventLabel(run.event)}
                   </p>
                 </div>
@@ -161,7 +185,8 @@ export function RuleRuns({
                       </span>
                       <span className="truncate">{run.task.title}</span>
                     </Link>
-                  ) : run.incidentId ? (
+                  ) : run.incidentId &&
+                    run.incidentId !== run.createdIncidentId ? (
                     <Link
                       href={routes.incident(run.incidentId)}
                       className="rule-run-task"
@@ -177,21 +202,38 @@ export function RuleRuns({
                 </div>
                 <div className="min-w-0">
                   <RunStatus status={run.status} />
-                  {run.attempts > 1 && (
+                  {run.attempts > 1 && !deliveryText(run) && (
                     <span className="ml-2 text-xs text-muted tabular-nums">
                       {run.attempts}회 시도
                     </span>
+                  )}
+                  {deliveryText(run) && (
+                    <p className="text-xs text-muted tabular-nums">
+                      {deliveryText(run)}
+                    </p>
                   )}
                   {run.createdTask && (
                     <Link
                       href={routes.task(run.createdTask.id)}
                       className="rule-run-task text-xs"
                     >
-                      <span className="shrink-0 text-muted">만든 업무</span>
+                      <span className="shrink-0 text-muted">
+                        {actionOf.get(run.ruleId) === "CREATE_SUBTASK"
+                          ? "연결 업무"
+                          : "만든 업무"}
+                      </span>
                       <span className="shrink-0 text-muted tabular-nums">
                         {run.createdTask.key}
                       </span>
                       <span className="truncate">{run.createdTask.title}</span>
+                    </Link>
+                  )}
+                  {run.createdIncidentId && (
+                    <Link
+                      href={routes.incident(run.createdIncidentId)}
+                      className="rule-run-task text-xs"
+                    >
+                      <span className="truncate">만든 장애 보기</span>
                     </Link>
                   )}
                   {resultMessage(
@@ -227,7 +269,7 @@ export function RuleRuns({
           )}
           {runs.isFetchNextPageError && (
             <p role="alert" className="text-sm text-danger">
-              다음 기록을 불러오지 못했습니다. 다시 시도해 주세요.
+              다음 기록을 불러오지 못했어요. 다시 시도해 주세요.
             </p>
           )}
         </>

@@ -15,7 +15,7 @@ import {
 import { IntakeFormSettings } from "@/features/manage-intake-forms";
 import { routes } from "@/shared/config";
 import { Badge, EmptyState, InfoTip, Skeleton } from "@/shared/ui";
-import { AutomationSettings } from "./AutomationSettings";
+import { AutomationSettings } from "@/widgets/automation-rules";
 import type { SettingsProps } from "../model/props";
 import {
   resolveSection,

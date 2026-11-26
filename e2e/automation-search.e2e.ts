@@ -101,12 +101,12 @@ test("PM·헤드 어드민이 규칙을 만들고 끄고 켠다", async ({ page 
   await expect(
     page.getByRole("heading", { name: "자동화 규칙" }),
   ).toBeVisible();
-  await expect(page.getByText("규칙이 없습니다")).toBeVisible();
+  await expect(page.getByText("규칙이 없어요")).toBeVisible();
   await capture(page, "rules-empty-1440");
 
   await page.getByRole("button", { name: "규칙 추가" }).click();
   const dialog = page.getByRole("dialog", { name: "새 규칙" });
-  // 금지 동작(상태 변경·PR merge → 완료·외부 저장소 쓰기)은 선택지에 없다.
+  // 업무 이벤트는 장애 동작을 빼고 모두 고른다. GitHub·캘린더에 직접 쓰는 동작은 없다(s23 4.2).
   await expect(dialog.getByLabel("동작").locator("option")).toHaveText([
     "Discord로 알림",
     "확인 필요로 표시",
@@ -115,6 +115,15 @@ test("PM·헤드 어드민이 규칙을 만들고 끄고 켠다", async ({ page 
     "담당자 지정",
     "우선순위 변경",
     "업무 만들기",
+    "상태 바꾸기",
+    "스프린트에 넣기",
+    "마감일 정하기",
+    "댓글 남기기",
+    "연결 업무 만들기",
+    "Discord DM 보내기",
+    "웹훅 보내기",
+    "에이전트에게 맡기기",
+    "에스컬레이션",
   ]);
   await dialog.getByLabel("이름").fill("P0 막힘이면 PM 호출");
   await dialog.getByLabel("언제").selectOption("TASK_BLOCKED");

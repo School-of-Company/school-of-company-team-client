@@ -1,4 +1,6 @@
+import { useState } from "react";
 import {
+  agentQueueLabel,
   priorityLabels,
   sizeLabels,
   statusLabels,
@@ -15,7 +17,7 @@ import { sprintStatusLabels } from "@/entities/sprint";
 import { WhiteboardChips } from "@/entities/whiteboard";
 import { routes } from "@/shared/config";
 import { formatDate } from "@/shared/lib";
-import { Select } from "@/shared/ui";
+import { Badge, Select } from "@/shared/ui";
 
 export function TaskProperties({
   task,
@@ -140,6 +142,7 @@ export function TaskProperties({
             )}
           </dd>
         </div>
+        {task.agentQueue && <AgentQueueRow item={task.agentQueue} />}
         {task.scope === "PROJECT" && (
           <div className="task-prop-control">
             <dt>버킷</dt>
@@ -290,5 +293,35 @@ export function TaskProperties({
         )}
       </dl>
     </aside>
+  );
+}
+
+function AgentQueueRow({
+  item,
+}: {
+  readonly item: NonNullable<TaskDetail["agentQueue"]>;
+}) {
+  // ponytail: 처음 그린 시각으로 선점 만료를 본다. 서버도 만료된 선점을 대기로 보내므로 폴링이 맞춰 준다.
+  const [now] = useState(() => Date.now());
+  const label = agentQueueLabel(item, now);
+  const claimed = label === "에이전트 진행 중";
+  return (
+    <div>
+      <dt>에이전트</dt>
+      <dd className="grid gap-1">
+        <span>
+          <Badge className="badge-blue">{label}</Badge>
+        </span>
+        {claimed && item.claimedBy && (
+          <span className="text-xs text-muted">{item.claimedBy.name}</span>
+        )}
+        {item.note && <span className="text-sm">{item.note}</span>}
+        {item.dueAt && (
+          <span className="text-xs text-muted">
+            기한 {formatDate(item.dueAt)}
+          </span>
+        )}
+      </dd>
+    </div>
   );
 }

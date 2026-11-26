@@ -25,13 +25,13 @@ export function RuleTemplatePicker({
       className="rule-dialog"
     >
       <p className="mb-4 text-sm text-muted">
-        고르면 새 규칙 편집 창이 채워집니다. 저장하기 전에 고칠 수 있습니다.
+        고르면 새 규칙 편집 창이 채워져요. 저장하기 전에 고칠 수 있어요.
       </p>
       {templates.isPending ? (
         <ListSkeleton label="템플릿 불러오는 중" rows={4} rowClassName="h-16" />
       ) : templates.isError ? (
         <ErrorState
-          title="템플릿을 불러오지 못했습니다"
+          title="템플릿을 불러오지 못했어요"
           description={ruleErrorMessage(normalizeApiError(templates.error))}
           onRetry={() => void templates.refetch()}
         />
