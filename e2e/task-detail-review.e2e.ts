@@ -53,7 +53,7 @@ for (const surface of ["page", "panel"] as const)
     await expect(page).toHaveURL(/\/me$/);
     await expect(page.locator(".ui-toast")).toHaveCount(1);
     await expect(page.locator(".ui-toast").getByRole("status")).toHaveText(
-      "업무를 삭제했습니다.",
+      "업무를 삭제했어요.",
     );
     expect(deletes).toBe(1);
   });

@@ -105,7 +105,7 @@ function DetailContent({
       <ErrorState
         title={
           normalizeApiError(detail.error).status === 404
-            ? "요구사항을 찾을 수 없습니다"
+            ? "요구사항을 찾을 수 없어요"
             : undefined
         }
         description={requirementErrorMessage(detail.error)}

@@ -105,8 +105,8 @@ export function CommentsPanel({
           />
           <p id="whiteboard-comment-hint" className="text-sm text-muted">
             {target
-              ? "고른 요소에 답니다."
-              : "요소를 하나 고르면 그 요소에 답니다."}
+              ? "고른 요소에 달아요."
+              : "요소를 하나 고르면 그 요소에 달아요."}
           </p>
           <Button
             type="submit"
@@ -126,7 +126,7 @@ export function CommentsPanel({
           onRetry={() => void comments.refetch()}
         />
       ) : open.length === 0 && resolved.length === 0 ? (
-        <EmptyState title="댓글이 없습니다" />
+        <EmptyState title="댓글이 없어요" />
       ) : (
         <>
           <ul className="grid gap-2" aria-label="열린 댓글">

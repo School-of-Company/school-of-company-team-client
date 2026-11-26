@@ -289,8 +289,8 @@ function CreateTaskForm({
         ) : people.length === 0 ? (
           <p className="text-sm text-muted">
             {scope === "PROJECT" && !projectId
-              ? "프로젝트를 고르면 참여자가 나옵니다."
-              : "고를 수 있는 담당자가 없습니다."}
+              ? "프로젝트를 고르면 참여자가 나와요."
+              : "고를 수 있는 담당자가 없어요."}
           </p>
         ) : (
           <div className="incident-checklist">

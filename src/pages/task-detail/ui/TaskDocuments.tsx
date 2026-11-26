@@ -58,7 +58,7 @@ export function TaskDocuments({ taskId }: { readonly taskId: string }) {
             </Button>
           </div>
         ) : documents.data.length === 0 ? (
-          <p className="text-sm text-muted">연결된 문서가 없습니다.</p>
+          <p className="text-sm text-muted">연결된 문서가 없어요.</p>
         ) : (
           <ul className="doc-links">
             {documents.data.map((document) => (

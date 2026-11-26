@@ -132,8 +132,8 @@ function Boards({
         errorMessage={whiteboardErrorMessage}
         empty={
           <EmptyState
-            title="화이트보드가 없습니다"
-            description="회의, 계획, 다이어그램 템플릿으로 바로 시작할 수 있습니다."
+            title="화이트보드가 없어요"
+            description="회의, 계획, 다이어그램 템플릿으로 바로 시작할 수 있어요."
           />
         }
       >
@@ -279,13 +279,13 @@ function CreateDialog({
               />
             ) : (
               <p className="text-sm text-muted">
-                템플릿을 불러오지 못했습니다. 빈 화이트보드로 만듭니다.
+                템플릿을 불러오지 못했어요. 빈 화이트보드로 만들어요.
               </p>
             )}
             {canManageTemplates && (
               <p className="text-sm text-muted">
                 팀 템플릿은 화이트보드 편집 화면의 팀 템플릿으로 저장에서
-                만듭니다.
+                만들어요.
               </p>
             )}
           </div>

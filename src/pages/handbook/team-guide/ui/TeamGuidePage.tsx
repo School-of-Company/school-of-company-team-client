@@ -85,7 +85,7 @@ function TeamGuideContent({
             <>
               {data.updatedBy
                 ? `${formatDate(data.updatedAt)} ${data.updatedBy.name} 수정`
-                : "처음 작성된 내용입니다"}
+                : "처음 작성된 내용이에요"}
               {", "}
               <button
                 type="button"
@@ -96,7 +96,7 @@ function TeamGuideContent({
               </button>
             </>
           ) : guide.isError ? (
-            `${current.label} 내용을 불러오지 못했습니다`
+            `${current.label} 내용을 불러오지 못했어요`
           ) : (
             `${current.label} 불러오는 중`
           )
@@ -200,7 +200,7 @@ function GuideEditor({
             미리보기
           </button>
         </div>
-        <p className="text-xs text-muted">마크다운을 쓸 수 있습니다.</p>
+        <p className="text-xs text-muted">마크다운을 쓸 수 있어요.</p>
       </div>
       {preview ? (
         <article className="guide-body guide-preview">
@@ -219,7 +219,7 @@ function GuideEditor({
         <div role="alert" className="flex flex-wrap items-center gap-3 text-sm">
           <span className="text-danger">
             {conflict
-              ? "그사이 다른 사람이 먼저 고쳤습니다. 쓴 내용을 복사해 두고 최신 내용을 불러온 뒤 다시 고쳐 주세요."
+              ? "그사이 다른 사람이 먼저 고쳤어요. 쓴 내용을 복사해 두고 최신 내용을 불러온 뒤 다시 고쳐 주세요."
               : normalizeApiError(save.error).message}
           </span>
           {conflict && (

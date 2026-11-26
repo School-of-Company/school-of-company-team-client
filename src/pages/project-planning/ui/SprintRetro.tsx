@@ -52,8 +52,8 @@ export function SprintRetro({
   if (sprint.status === "PLANNED")
     return (
       <EmptyState
-        title="스프린트를 시작하면 회고를 씁니다"
-        description="Keep, Problem, Try 세 칸에 참여자가 한 줄씩 남깁니다."
+        title="스프린트를 시작하면 회고를 써요"
+        description="Keep, Problem, Try 세 칸에 참여자가 한 줄씩 남겨요."
       />
     );
   if (entries.isPending)
@@ -67,7 +67,7 @@ export function SprintRetro({
   if (entries.isError)
     return (
       <ErrorState
-        title="회고를 불러오지 못했습니다"
+        title="회고를 불러오지 못했어요"
         description={sprintErrorMessage(normalizeApiError(entries.error))}
         onRetry={() => void entries.refetch()}
       />
@@ -148,7 +148,7 @@ function RetroColumn({
         </span>
       </h3>
       {entries.length === 0 ? (
-        <p className="retro-empty">아직 없습니다.</p>
+        <p className="retro-empty">아직 없어요.</p>
       ) : (
         <ul className="retro-list">
           {entries.map((entry) =>

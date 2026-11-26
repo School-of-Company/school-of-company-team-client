@@ -59,8 +59,8 @@ function ReviewContent({
   if (sprint.status === "PLANNED")
     return (
       <EmptyState
-        title="아직 결과 보고를 쓸 수 없습니다"
-        description="스프린트를 시작한 뒤 초안을 불러올 수 있습니다. 종료 후 결과를 정리해 게시하세요."
+        title="아직 결과 보고를 쓸 수 없어요"
+        description="스프린트를 시작한 뒤 초안을 불러올 수 있어요. 종료 후 결과를 정리해 게시하세요."
       />
     );
   if (review.isPending)
@@ -77,7 +77,7 @@ function ReviewContent({
   if (review.isError)
     return (
       <ErrorState
-        title="결과 보고를 불러오지 못했습니다"
+        title="결과 보고를 불러오지 못했어요"
         description={sprintErrorMessage(normalizeApiError(review.error))}
         onRetry={() => void review.refetch()}
       />
@@ -95,8 +95,8 @@ function ReviewContent({
   if (!review.data)
     return (
       <EmptyState
-        title="게시된 결과 보고가 없습니다"
-        description="PM이 결과 보고를 게시하면 여기에서 볼 수 있습니다."
+        title="게시된 결과 보고가 없어요"
+        description="PM이 결과 보고를 게시하면 여기에서 볼 수 있어요."
       />
     );
   return (
@@ -117,11 +117,11 @@ const discordLabels: Readonly<
   FAILED: "Discord 공유 실패",
 };
 const discordReasons: Readonly<Record<string, string>> = {
-  DISCORD_NOT_CONFIGURED: "Discord가 설정되지 않았습니다",
-  DISCORD_CHANNEL_MISSING: "연결된 채널이 없습니다",
-  PROJECT_ARCHIVED: "아카이브된 프로젝트입니다",
-  DISCORD_SEND_FAILED: "보내지 못했습니다",
-  DISCORD_RESULT_UNKNOWN: "결과를 알 수 없습니다",
+  DISCORD_NOT_CONFIGURED: "Discord가 설정되지 않았어요",
+  DISCORD_CHANNEL_MISSING: "연결된 채널이 없어요",
+  PROJECT_ARCHIVED: "아카이브된 프로젝트예요",
+  DISCORD_SEND_FAILED: "보내지 못했어요",
+  DISCORD_RESULT_UNKNOWN: "결과를 알 수 없어요",
 };
 
 function ReviewStamp({ review }: { readonly review: SprintReview }) {
@@ -193,7 +193,7 @@ function ReviewEditor({
       setMode("write");
       setNotice({
         tone: "ok",
-        text: "초안을 불러왔습니다. 고친 뒤 저장하세요.",
+        text: "초안을 불러왔어요. 고친 뒤 저장하세요.",
       });
     } catch (cause) {
       fail(cause);
@@ -232,7 +232,7 @@ function ReviewEditor({
       {current ? (
         <ReviewStamp review={current} />
       ) : (
-        <p className="sprint-meta">저장한 결과 보고가 없습니다.</p>
+        <p className="sprint-meta">저장한 결과 보고가 없어요.</p>
       )}
       <label htmlFor={`${id}-body`} className="sr-only">
         결과 보고 본문
@@ -252,7 +252,7 @@ function ReviewEditor({
           {body.trim() ? (
             <Markdown>{body}</Markdown>
           ) : (
-            <p className="text-sm text-muted">미리 볼 내용이 없습니다.</p>
+            <p className="text-sm text-muted">미리 볼 내용이 없어요.</p>
           )}
         </div>
       )}
@@ -271,7 +271,7 @@ function ReviewEditor({
       <div className="flex flex-wrap items-center justify-end gap-2">
         {dirty && current?.publishedAt && (
           <span className="text-xs text-muted">
-            저장하면 게시된 본문도 바뀝니다.
+            저장하면 게시된 본문도 바뀌어요.
           </span>
         )}
         <Button
@@ -281,7 +281,7 @@ function ReviewEditor({
           onClick={() =>
             save.mutate(body, {
               onSuccess: () =>
-                setNotice({ tone: "ok", text: "결과 보고를 저장했습니다." }),
+                setNotice({ tone: "ok", text: "결과 보고를 저장했어요." }),
               onError: fail,
             })
           }
@@ -320,8 +320,8 @@ function ReviewEditor({
         title="초안으로 바꿀까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          지금 작성 중인 본문을 새 초안으로 덮어씁니다. 저장하지 않은 내용은
-          사라집니다.
+          지금 작성 중인 본문을 새 초안으로 덮어써요. 저장하지 않은 내용은
+          사라져요.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button variant="secondary" onClick={() => setConfirmDraft(false)}>

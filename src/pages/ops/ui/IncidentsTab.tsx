@@ -74,7 +74,7 @@ export function IncidentsTab() {
           count !== undefined
             ? `${view.label} 장애 ${count}건`
             : incidents.isError && !incidents.data
-              ? "장애 집계를 불러오지 못했습니다"
+              ? "장애 집계를 불러오지 못했어요"
               : `${view.label} 장애 집계 중`
         }
         actions={
@@ -121,11 +121,11 @@ export function IncidentsTab() {
         empty={
           view.value === "active" && !serviceId ? (
             <EmptyState
-              title="진행 중인 장애가 없습니다"
+              title="진행 중인 장애가 없어요"
               description="장애나 이상을 발견하면 바로 등록하고 대응 기록을 남기세요."
             />
           ) : (
-            <EmptyState title="조건에 맞는 장애가 없습니다" />
+            <EmptyState title="조건에 맞는 장애가 없어요" />
           )
         }
       >

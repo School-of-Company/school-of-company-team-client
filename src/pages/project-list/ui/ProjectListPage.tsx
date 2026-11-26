@@ -71,7 +71,7 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
           count !== undefined
             ? `${scope}${count}개`
             : projects.isError && !projects.data
-              ? "프로젝트 집계를 불러오지 못했습니다"
+              ? "프로젝트 집계를 불러오지 못했어요"
               : `${scope}프로젝트 집계 중`
         }
         actions={
@@ -118,12 +118,12 @@ function ProjectListContent({ canCreate }: { readonly canCreate: boolean }) {
         empty={
           stage ? (
             <EmptyState
-              title={`${stageLabels[stage]} 단계 프로젝트가 없습니다`}
+              title={`${stageLabels[stage]} 단계 프로젝트가 없어요`}
               description="다른 단계를 선택해 보세요."
             />
           ) : (
             <EmptyState
-              title="참여할 수 있는 프로젝트가 없습니다"
+              title="참여할 수 있는 프로젝트가 없어요"
               description="프로젝트 관리자에게 참여를 요청해 주세요."
             />
           )

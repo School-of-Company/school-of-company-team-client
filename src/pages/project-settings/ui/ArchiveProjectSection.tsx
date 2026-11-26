@@ -24,8 +24,7 @@ export function ArchiveProjectSection({
         위험 영역
       </h2>
       <p className="text-sm">
-        아카이브하면 조회만 가능하며 보드와 내 업무에서 빠집니다. 기록은
-        보존됩니다.
+        아카이브하면 조회만 가능하며 보드와 내 업무에서 빠져요. 기록은 보존돼요.
       </p>
       <div>
         <Button
@@ -53,7 +52,7 @@ export function ArchiveProjectSection({
       >
         <div className="grid gap-5">
           <p className="text-sm text-foreground-2">
-            기록은 보존되며 나중에 복원할 수 있습니다. 확인하려면 프로젝트 키{" "}
+            기록은 보존되며 나중에 복원할 수 있어요. 확인하려면 프로젝트 키{" "}
             <strong className="font-mono">{project.key}</strong>를 입력하세요.
           </p>
           <Field id={`${id}-key`} label="프로젝트 키">

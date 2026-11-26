@@ -401,8 +401,8 @@ test("전체 결과 화면과 검색 실패 상태", async ({ page }) => {
   await page.route("**/api/v1/search**", (route) => route.abort());
   await page.goto(`/search?q=${encodeURIComponent(`없는검색어${seed.run}`)}`);
   await expect(
-    page.getByRole("alert").filter({ hasText: "검색하지 못했습니다" }),
-  ).toContainText("서버에 연결할 수 없습니다");
+    page.getByRole("alert").filter({ hasText: "검색하지 못했어요" }),
+  ).toContainText("서버에 연결할 수 없어요");
   await capture(page, "search-error-390");
 });
 

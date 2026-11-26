@@ -83,8 +83,8 @@ function TemplateForm({
       await client.invalidateQueries({ queryKey: whiteboardKeys.templates });
       toast(
         mode.kind === "create"
-          ? "팀 템플릿으로 저장했습니다. 새 화이트보드를 만들 때 고를 수 있습니다."
-          : "팀 템플릿을 고쳤습니다.",
+          ? "팀 템플릿으로 저장했어요. 새 화이트보드를 만들 때 고를 수 있어요."
+          : "팀 템플릿을 고쳤어요.",
         "success",
       );
       onClose();

@@ -225,13 +225,13 @@ function HealthChart({ serviceId }: { readonly serviceId: string }) {
     return history.isPending ? (
       <div aria-hidden="true" className="ops-chart-plot" />
     ) : (
-      <p className="text-sm text-muted">24시간 기록을 불러오지 못했습니다.</p>
+      <p className="text-sm text-muted">24시간 기록을 불러오지 못했어요.</p>
     );
   const { buckets } = history.data;
   const totals = historySummary(history.data);
   const summary =
     totals.ok + totals.failed === 0
-      ? "최근 24시간 검사 기록이 없습니다"
+      ? "최근 24시간 검사 기록이 없어요"
       : `최근 24시간 검사 ${totals.ok + totals.failed}회 중 성공 ${totals.ok}회, 실패 ${totals.failed}회`;
   const recorded = buckets.filter((bucket) => bucketState(bucket) !== "EMPTY");
   const failBuckets = buckets.filter(
@@ -314,7 +314,7 @@ function HealthChart({ serviceId }: { readonly serviceId: string }) {
       </svg>
       <figcaption className="text-xs text-muted">
         {label}. 15분 구간마다 성공은 지연 중앙값만큼, 모두 실패한 구간은 통
-        막대, 일부 실패한 구간은 틈으로 나뉜 막대(아래가 실패 몫)로 그립니다.
+        막대, 일부 실패한 구간은 틈으로 나뉜 막대(아래가 실패 몫)로 그려요.
       </figcaption>
       {recorded.length > 0 && (
         <details className="text-sm">

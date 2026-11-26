@@ -38,7 +38,7 @@ export function ImportIssueForm({
       const problem = normalizeApiError(cause);
       setError(
         problem.code === "GITHUB_PRIVATE_IMPORT_RESTRICTED"
-          ? "비공개 Issue 본문은 개인 업무에만 가져올 수 있습니다. 프로젝트에서는 기존 Issue 링크를 연결해 주세요."
+          ? "비공개 Issue 본문은 개인 업무에만 가져올 수 있어요. 프로젝트에서는 기존 Issue 링크를 연결해 주세요."
           : problem.message,
       );
     } finally {

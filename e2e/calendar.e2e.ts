@@ -48,11 +48,11 @@ test("팀원이 사이드바에서 달력을 열고 시각 있는 팀 일정을 
   await dialog.getByLabel("종료 시각").fill("13:00");
   await dialog.getByRole("button", { name: "일정 만들기" }).click();
   await expect(
-    dialog.getByText("종료 시각은 시작 시각보다 이를 수 없습니다."),
+    dialog.getByText("종료 시각은 시작 시각보다 이를 수 없어요."),
   ).toBeVisible();
   await dialog.getByLabel("종료 시각").fill("15:00");
   await dialog.getByRole("button", { name: "일정 만들기" }).click();
-  await expect(page.getByText("일정을 만들었습니다.")).toBeVisible();
+  await expect(page.getByText("일정을 만들었어요.")).toBeVisible();
   await expect(chip(page, teamTitle)).toContainText("14:00");
 });
 
@@ -117,7 +117,7 @@ test("만든 사람이 일정을 고치고 지운다", async ({ page }) => {
   await dialog.getByLabel("종일").check();
   await dialog.getByLabel("설명").fill("안건: 달력 리뷰");
   await dialog.getByRole("button", { name: "변경 저장" }).click();
-  await expect(page.getByText("일정을 고쳤습니다.")).toBeVisible();
+  await expect(page.getByText("일정을 고쳤어요.")).toBeVisible();
   await expect(chip(page, teamTitle)).not.toContainText("14:00");
 
   await chip(page, teamTitle).click();
@@ -125,7 +125,7 @@ test("만든 사람이 일정을 고치고 지운다", async ({ page }) => {
   await expect(again.getByLabel("설명")).toHaveValue("안건: 달력 리뷰");
   await again.getByRole("button", { name: "일정 지우기" }).click();
   await again.getByRole("button", { name: "지우기", exact: true }).click();
-  await expect(page.getByText("일정을 지웠습니다.")).toBeVisible();
+  await expect(page.getByText("일정을 지웠어요.")).toBeVisible();
   await expect(chip(page, teamTitle)).toHaveCount(0);
 });
 

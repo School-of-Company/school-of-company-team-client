@@ -118,10 +118,10 @@ export function SprintCapacity({
       >
         {error ??
           (over
-            ? `${sprint.capacity === null ? "제안 수용량" : "수용량"}보다 ${sprint.size.planned - (limit ?? 0)}만큼 많습니다. 업무를 빼거나 수용량을 늘리세요.`
+            ? `${sprint.capacity === null ? "제안 수용량" : "수용량"}보다 ${sprint.size.planned - (limit ?? 0)}만큼 많아요. 업무를 빼거나 수용량을 늘리세요.`
             : sprint.suggestedCapacity === null
-              ? "S=1, M=2, L=4, XL=8로 더합니다. 종료한 스프린트가 쌓이면 수용량을 제안합니다."
-              : `S=1, M=2, L=4, XL=8로 더합니다. 제안 수용량 ${sprint.suggestedCapacity}은 최근 종료 스프린트의 완료 평균입니다.`)}
+              ? "S=1, M=2, L=4, XL=8로 더해요. 종료한 스프린트가 쌓이면 수용량을 제안해요."
+              : `S=1, M=2, L=4, XL=8로 더해요. 제안 수용량 ${sprint.suggestedCapacity}은 최근 종료 스프린트의 완료 평균이에요.`)}
       </p>
     </div>
   );

@@ -53,7 +53,7 @@ export function ArchiveService({
       <ConfirmDialog
         open={confirming}
         title="서비스 아카이브"
-        description={`아카이브하면 이 서비스는 조회만 됩니다. 기존 의존관계는 남고, 새 의존 대상으로 고를 수 없습니다. 헤드 어드민이 복원할 수 있습니다.`}
+        description={`아카이브하면 이 서비스는 조회만 돼요. 기존 의존관계는 남고, 새 의존 대상으로 고를 수 없어요. 헤드 어드민이 복원할 수 있어요.`}
         confirmLabel="아카이브"
         pending={toggle.isPending}
         error={toggle.error ? serviceErrorMessage(toggle.error) : undefined}

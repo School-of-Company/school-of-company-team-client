@@ -61,7 +61,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
   if (!buckets.data || (buckets.isError && isAccessLost(buckets.error)))
     return (
       <ErrorState
-        title="버킷을 불러오지 못했습니다"
+        title="버킷을 불러오지 못했어요"
         description={settingsErrorMessage(normalizeApiError(buckets.error))}
         onRetry={() => void buckets.refetch()}
       />
@@ -231,7 +231,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
                 보관된 버킷
               </h3>
               <p className="text-xs text-muted">
-                기존 배정은 남고, 새 업무를 넣을 수는 없습니다.
+                기존 배정은 남고, 새 업무를 넣을 수는 없어요.
               </p>
               <ul className="bucket-list">{archived.map(row)}</ul>
             </section>
@@ -277,7 +277,7 @@ export function BucketSettings({ project, user }: SettingsProps) {
       >
         <p className="mb-6 text-sm text-muted">
           {deleting?.name} 버킷을 삭제해도 업무는 그대로 남고 버킷 배정만
-          풀립니다. 기록을 남기려면 삭제 대신 보관하세요.
+          풀려요. 기록을 남기려면 삭제 대신 보관하세요.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

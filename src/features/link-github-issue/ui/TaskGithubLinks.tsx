@@ -47,7 +47,7 @@ export function TaskGithubLinks({
                     {item.primary && (
                       <span
                         className="ml-2"
-                        title="이 업무를 대표하는 Issue입니다. 업무당 하나만 지정할 수 있습니다."
+                        title="이 업무를 대표하는 Issue예요. 업무당 하나만 지정할 수 있어요."
                       >
                         <Badge>대표 Issue</Badge>
                       </span>
@@ -118,7 +118,7 @@ export function TaskGithubLinks({
             {!linkedPrimary && (
               <label
                 className="flex items-center gap-2 text-xs text-muted"
-                title="업무당 하나의 Issue를 대표로 지정할 수 있습니다."
+                title="업무당 하나의 Issue를 대표로 지정할 수 있어요."
               >
                 <Checkbox name="primary" />
                 대표 Issue로 지정

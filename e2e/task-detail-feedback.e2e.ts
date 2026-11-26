@@ -61,7 +61,7 @@ for (const colorScheme of ["light", "dark"] as const)
           await detail
             .getByRole("combobox", { name: "상태 변경" })
             .selectOption("DONE");
-          await expect(detail.getByText("상태를 변경했습니다.")).toBeVisible();
+          await expect(detail.getByText("상태를 변경했어요.")).toBeVisible();
           await page.screenshot({
             path: `${dir}/${phase}/toast-${surface}-${colorScheme}-${width}.png`,
             fullPage: true,
@@ -86,10 +86,10 @@ for (const colorScheme of ["light", "dark"] as const)
             .selectOption("DONE");
           const toast = page
             .locator(".ui-toast")
-            .filter({ hasText: "상태를 변경했습니다." });
+            .filter({ hasText: "상태를 변경했어요." });
           await expect(toast).toBeVisible();
           await expect(toast).toHaveCSS("animation-name", "none");
-          await expect(detail.getByText("상태를 변경했습니다.")).toHaveCount(0);
+          await expect(detail.getByText("상태를 변경했어요.")).toHaveCount(0);
           await page.screenshot({
             path: `${dir}/${phase}/toast-${surface}-${colorScheme}-${width}.png`,
             fullPage: true,
@@ -153,7 +153,7 @@ test("알림은 쌓이고 오류는 오래 유지되며 수정 저장도 토스�
     detail.getByRole("heading", { name: "수정한 업무 제목" }),
   ).toBeVisible();
   await expect(page.locator(".ui-toast").getByRole("status")).toHaveText(
-    "업무를 수정했습니다.",
+    "업무를 수정했어요.",
   );
 });
 

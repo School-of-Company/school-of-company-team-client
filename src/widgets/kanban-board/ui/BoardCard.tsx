@@ -159,7 +159,7 @@ function CardSignals({ task }: { readonly task: TaskCard }) {
     <div className="board-card-signals" role="group" aria-label="개발 신호">
       {chips}
       {suggest && (
-        <SignalChip tone="merged" icon="merge" title="PR이 merge됐습니다">
+        <SignalChip tone="merged" icon="merge" title="PR이 merge됐어요">
           merge됨, 완료로 옮기세요
         </SignalChip>
       )}

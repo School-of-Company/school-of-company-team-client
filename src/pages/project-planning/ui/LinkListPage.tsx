@@ -100,13 +100,13 @@ function LinkBoard({ project, writes }: PlanningContext) {
       {head}
       {!links ? (
         <ErrorState
-          title="링크를 불러오지 못했습니다"
+          title="링크를 불러오지 못했어요"
           description={linkErrorMessage(query.error)}
           onRetry={() => void query.refetch()}
         />
       ) : links.length === 0 ? (
         <EmptyState
-          title="링크가 없습니다"
+          title="링크가 없어요"
           description={
             writes
               ? "기획 문서, 디자인, 배포 주소처럼 자주 여는 링크를 모아 둬요."
@@ -208,7 +208,7 @@ function LinkBoard({ project, writes }: PlanningContext) {
                                 {
                                   onSuccess: () =>
                                     toast(
-                                      "페이지 정보를 다시 가져옵니다.",
+                                      "페이지 정보를 다시 가져와요.",
                                       "success",
                                     ),
                                 },
@@ -289,7 +289,7 @@ function LinkBoard({ project, writes }: PlanningContext) {
         title="링크를 삭제할까요?"
       >
         <p className="mb-6 text-sm text-muted">
-          {deleting?.title} 링크를 목록에서 지웁니다. 되돌릴 수 없습니다.
+          {deleting?.title} 링크를 목록에서 지워요. 되돌릴 수 없어요.
         </p>
         <div className="flex flex-wrap justify-end gap-2">
           <Button

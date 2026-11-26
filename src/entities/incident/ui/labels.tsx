@@ -48,8 +48,8 @@ export function MonitorSourceBadge({
       className="ui-badge"
       title={
         source === "MONITOR_HEALTH"
-          ? "헬스체크가 다운을 감지해 만들었습니다"
-          : "업타임 웹훅이 다운을 알려 만들었습니다"
+          ? "헬스체크가 다운을 감지해 만들었어요"
+          : "업타임 웹훅이 다운을 알려 만들었어요"
       }
     >
       모니터링이 만듦

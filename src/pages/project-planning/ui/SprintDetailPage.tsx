@@ -65,8 +65,8 @@ function SprintDetail(props: PlanningContext & { readonly sprintId: string }) {
         <ErrorState
           title={
             problem.status === 404
-              ? "스프린트를 찾을 수 없습니다"
-              : "스프린트를 불러오지 못했습니다"
+              ? "스프린트를 찾을 수 없어요"
+              : "스프린트를 불러오지 못했어요"
           }
           description={sprintErrorMessage(problem)}
           onRetry={
@@ -146,7 +146,7 @@ function SprintScreen({
                       onSuccess: () => {
                         setMessage({
                           tone: "ok",
-                          text: "스프린트를 시작했습니다.",
+                          text: "스프린트를 시작했어요.",
                         });
                         goTab("progress");
                       },
@@ -195,7 +195,7 @@ function SprintScreen({
           // 목표가 있을 때(Markdown)와 같은 줄 높이를 쓴다.
           <div className="sprint-goal">
             <div className="ui-markdown">
-              <p className="text-muted">목표가 없습니다.</p>
+              <p className="text-muted">목표가 없어요.</p>
             </div>
           </div>
         )}
@@ -293,7 +293,7 @@ function SprintScreen({
           onClose={() => setEditing(false)}
           onSubmit={async (input) => {
             await update.mutateAsync(input);
-            setMessage({ tone: "ok", text: "스프린트를 수정했습니다." });
+            setMessage({ tone: "ok", text: "스프린트를 수정했어요." });
           }}
         />
       )}
@@ -313,9 +313,9 @@ function SprintScreen({
                 setMessage({
                   tone: "ok",
                   text: [
-                    `스프린트를 종료했습니다. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했습니다.`,
+                    `스프린트를 종료했어요. 미완료 업무 이월 ${result.carryOvers.length}건을 기록했어요.`,
                     result.nextSprint &&
-                      `다음 스프린트 ${result.nextSprint.name}을(를) ${result.nextSprint.status === "ACTIVE" ? "만들고 시작했습니다" : "만들었습니다"}.`,
+                      `다음 스프린트 ${result.nextSprint.name}을(를) ${result.nextSprint.status === "ACTIVE" ? "만들고 시작했어요" : "만들었어요"}.`,
                     "결과 보고 초안을 다듬어 게시하세요.",
                   ]
                     .filter(Boolean)

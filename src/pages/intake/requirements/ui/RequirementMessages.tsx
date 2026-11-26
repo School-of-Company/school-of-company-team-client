@@ -36,7 +36,7 @@ export function Messages({
     >
       <h2 id="req-messages">메시지</h2>
       {requirement.messages.length === 0 ? (
-        <p className="text-sm text-muted">아직 메시지가 없습니다.</p>
+        <p className="text-sm text-muted">아직 메시지가 없어요.</p>
       ) : (
         <ol className="grid gap-3">
           {requirement.messages.map((message) => (

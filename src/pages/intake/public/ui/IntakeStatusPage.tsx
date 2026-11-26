@@ -148,12 +148,12 @@ function StatusView({
             if (next === token) void status.refetch();
             else onReset();
           }}
-          problem="이 링크로는 요구사항을 찾을 수 없습니다. 링크가 재발급되었다면 새 링크를 붙여 넣으세요."
+          problem="이 링크로는 요구사항을 찾을 수 없어요. 링크가 재발급되었다면 새 링크를 붙여 넣으세요."
         />
       );
     return (
       <ErrorState
-        title="진행 상황을 불러오지 못했습니다"
+        title="진행 상황을 불러오지 못했어요"
         description={requirementErrorMessage(status.error)}
         onRetry={() => void status.refetch()}
       />
@@ -266,8 +266,8 @@ function StatusDetail({
         </h2>
         {data.messages.length === 0 ? (
           <EmptyState
-            title="아직 답변이 없습니다"
-            description="팀이 검토한 뒤 이곳에 답변을 남깁니다."
+            title="아직 답변이 없어요"
+            description="팀이 검토한 뒤 이곳에 답변을 남겨요."
           />
         ) : (
           <ol className="grid gap-3">
@@ -326,7 +326,7 @@ function StatusDetail({
           </form>
         ) : (
           <p className="text-sm text-muted">
-            철회했거나 닫힌 요구사항에는 답글을 달 수 없습니다.
+            철회했거나 닫힌 요구사항에는 답글을 달 수 없어요.
           </p>
         )}
       </section>
@@ -334,8 +334,8 @@ function StatusDetail({
       {data.canWithdraw && (
         <section className="grid gap-3 border-t border-border pt-6">
           <p className="text-sm text-muted">
-            검토 전이라면 요구사항을 철회할 수 있습니다. 철회하면 되돌릴 수
-            없습니다.
+            검토 전이라면 요구사항을 철회할 수 있어요. 철회하면 되돌릴 수
+            없어요.
           </p>
           <div>
             <Button variant="danger" onClick={() => setConfirmWithdraw(true)}>
@@ -352,8 +352,8 @@ function StatusDetail({
         title="요구사항을 철회할까요?"
       >
         <p className="mb-4 text-sm text-muted">
-          철회하면 팀이 더 이상 검토하지 않고 답글도 달 수 없습니다. 되돌릴 수
-          없습니다.
+          철회하면 팀이 더 이상 검토하지 않고 답글도 달 수 없어요. 되돌릴 수
+          없어요.
         </p>
         {withdraw.isError && (
           <p role="alert" className="mb-4 text-sm text-danger">

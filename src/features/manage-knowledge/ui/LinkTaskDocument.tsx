@@ -84,7 +84,7 @@ function LinkForm({
           {knowledgeErrorMessage(documents.error)}
         </p>
       ) : options.length === 0 ? (
-        <p className="text-sm text-muted">연결할 수 있는 문서가 없습니다.</p>
+        <p className="text-sm text-muted">연결할 수 있는 문서가 없어요.</p>
       ) : (
         <Field id={`${id}-doc`} label="문서" error={error}>
           <Select

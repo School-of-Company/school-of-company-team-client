@@ -96,12 +96,12 @@ function AvatarSetting({ user }: { readonly user: User }) {
         )}
       </div>
       <p className="text-xs text-muted">
-        PNG, JPEG, WebP, 2MB 이하. 올리지 않으면 GitHub 프로필 사진을 씁니다.
+        PNG, JPEG, WebP, 2MB 이하. 올리지 않으면 GitHub 프로필 사진을 써요.
       </p>
       {(tooLarge || failure) && (
         <p role="alert" className="text-sm text-danger">
           {tooLarge
-            ? "2MB 이하 사진만 올릴 수 있습니다."
+            ? "2MB 이하 사진만 올릴 수 있어요."
             : normalizeApiError(failure).message}
         </p>
       )}
@@ -155,7 +155,7 @@ function ProfileForm({ user }: { readonly user: User }) {
         </Button>
         {mutation.isSuccess && (
           <p role="status" className="text-sm">
-            프로필을 저장했습니다.
+            프로필을 저장했어요.
           </p>
         )}
       </div>
@@ -329,8 +329,8 @@ function AccountContent({ user }: { readonly user: User }) {
       >
         <div className="grid gap-5">
           <p className="text-sm leading-6 text-muted">
-            기존 업무와 기록은 보존됩니다. 다시 연결할 때까지 업무 기능을 이용할
-            수 없습니다.
+            기존 업무와 기록은 보존돼요. 다시 연결할 때까지 업무 기능을 이용할
+            수 없어요.
           </p>
           {unlink.isError && (
             <p role="alert" className="text-sm text-danger">

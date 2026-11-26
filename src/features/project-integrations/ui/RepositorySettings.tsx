@@ -53,7 +53,7 @@ export function RepositorySettings({
       </p>
       {repositories.data.length === 0 ? (
         <EmptyState
-          title="연결된 저장소가 없습니다"
+          title="연결된 저장소가 없어요"
           description="GitHub App 설치에서 저장소를 허용한 뒤 연결하세요."
         />
       ) : (
@@ -172,7 +172,7 @@ export function RepositorySettings({
       )}
       {change.isSuccess && (
         <p role="status" className="text-sm">
-          저장소 설정을 변경했습니다.
+          저장소 설정을 변경했어요.
         </p>
       )}
     </div>
