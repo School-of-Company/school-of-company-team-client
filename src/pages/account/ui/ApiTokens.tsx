@@ -76,7 +76,7 @@ function tokenErrorMessage(error: unknown) {
   const problem = normalizeApiError(error);
   const reason = detail(problem.details, "reason");
   if (problem.code === "TOKEN_LIMIT")
-    return "활성 토큰은 10개까지 만들 수 있어요. 쓰지 않는 토큰을 폐기한 뒤 다시 만들어 주세요.";
+    return "만료되지 않은 토큰은 10개까지 둘 수 있어요. 쓰지 않는 토큰을 폐기한 뒤 다시 만들어 주세요.";
   if (
     problem.code === "AGENT_POLICY_DENIED" &&
     reason === "WRITE_TOKENS_DISABLED"

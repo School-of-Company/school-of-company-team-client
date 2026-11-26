@@ -5,6 +5,7 @@ import {
   hasPolicyErrors,
   policyDraft,
   policyRequest,
+  resultLabel,
   validatePolicy,
   type AgentPolicy,
 } from "./policy";
@@ -131,4 +132,22 @@ test("activity params drop empty filters and keep the limit", () => {
     }).toString(),
     "tool=create_task&from=2026-11-01&limit=100",
   );
+});
+
+test("policy request never sends blank project ids (server rejects nulls with 400)", () => {
+  const draft = {
+    ...policyDraft(policy),
+    allProjects: false,
+    projectIds: ["p1", " ", "", " p2 "],
+  };
+  const body = policyRequest(draft, policy);
+  assert.deepEqual(body.allowedProjectIds, ["p1", "p2"]);
+  assert.ok(Object.values(body.areas).every((value) => value !== null));
+});
+
+test("result codes read as Korean labels, unknown codes stay as-is", () => {
+  assert.equal(resultLabel("OK"), "성공");
+  assert.equal(resultLabel("GITHUB_NOT_PULL_REQUEST"), "PR이 아닌 번호");
+  assert.equal(resultLabel("AGENT_POLICY_DENIED"), "팀 정책으로 막힘");
+  assert.equal(resultLabel("SOMETHING_NEW"), "SOMETHING_NEW");
 });

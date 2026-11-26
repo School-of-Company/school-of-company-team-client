@@ -139,9 +139,10 @@ export function policyRequest(
     mcpEnabled: draft.mcpEnabled,
     allowWriteTokens: draft.allowWriteTokens,
     maxTokenDays: Number(draft.maxTokenDays.trim()),
+    // 서버는 목록 안의 null·빈 값을 400 으로 거절한다(s22 2절). "모든 프로젝트"만 null 이다.
     allowedProjectIds: draft.allProjects
       ? null
-      : [...new Set(draft.projectIds)],
+      : [...new Set(draft.projectIds.map((id) => id.trim()).filter(Boolean))],
     areas: Object.fromEntries(
       agentAreas
         .filter((area) => draft.areas[area] !== current.areas[area])
@@ -149,6 +150,23 @@ export function policyRequest(
     ),
   };
 }
+
+// 감사 기록 결과 코드 중 자주 보이는 것(s22 4절, D22-18·19). 모르는 코드는 코드 그대로 보인다.
+export const resultLabels: Readonly<Record<string, string>> = {
+  OK: "성공",
+  AGENT_POLICY_DENIED: "팀 정책으로 막힘",
+  INSUFFICIENT_SCOPE: "토큰 권한 부족",
+  VALIDATION_ERROR: "잘못된 입력",
+  TASK_NOT_FOUND: "업무 없음",
+  PROJECT_NOT_FOUND: "프로젝트 없음",
+  GITHUB_NOT_PULL_REQUEST: "PR이 아닌 번호",
+  GITHUB_REPOSITORY_NOT_FOUND: "연결되지 않은 저장소",
+  GITHUB_LINK_EXISTS: "이미 연결됨",
+  DOCUMENT_NOT_DRAFT: "초안이 아닌 문서",
+  REVIEW_NOT_ALLOWED: "리뷰로 옮길 수 없음",
+};
+
+export const resultLabel = (code: string) => resultLabels[code] ?? code;
 
 export interface AgentActivity {
   readonly id: string;

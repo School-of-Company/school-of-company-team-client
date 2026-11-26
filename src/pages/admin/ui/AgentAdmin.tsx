@@ -261,6 +261,10 @@ function PolicyForm({ policy }: { readonly policy: AgentPolicy }) {
             <span className="block">
               화이트보드와 통계는 쓰기 도구가 없어 읽기까지만 열 수 있어요.
             </span>
+            <span className="block">
+              댓글과 스프린트 업무 배정, 요구사항 업무 전환은 업무 영역도 읽기
+              이상이어야 써요.
+            </span>
           </InfoTip>
         </legend>
         {agentAreas.map((area) => (

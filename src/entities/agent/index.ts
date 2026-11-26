@@ -12,6 +12,7 @@ export {
   policyDraft,
   policyRequest,
   projectKeysLabel,
+  resultLabel,
   validatePolicy,
 } from "./model/policy";
 export type {
