@@ -17,6 +17,7 @@ import {
 } from "@/shared/ui";
 import { CreateProjectForm } from "./CreateProjectForm";
 import { DocumentTemplates } from "@/features/manage-knowledge";
+import { AutomationOverview, TeamRules } from "@/widgets/automation-rules";
 
 export function AdminPage() {
   return (
@@ -69,6 +70,8 @@ function AdminContent({ user }: { readonly user: User }) {
               { id: "integrations", label: "연동" },
               { id: "templates", label: "문서 템플릿" },
               { id: "agent", label: "에이전트" },
+              { id: "team-rules", label: "팀 규칙" },
+              { id: "automation", label: "자동화 현황" },
             ].map((item) => ({
               href: `/admin?tab=${item.id}`,
               label: item.label,
@@ -83,6 +86,10 @@ function AdminContent({ user }: { readonly user: User }) {
         <DocumentTemplates />
       ) : tab === "agent" ? (
         <AgentAdmin />
+      ) : tab === "team-rules" ? (
+        <TeamRules />
+      ) : tab === "automation" ? (
+        <AutomationOverview />
       ) : (
         <AdminSettings
           user={user}

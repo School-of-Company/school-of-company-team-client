@@ -16,8 +16,9 @@ import {
   type IconName,
   StaleNotice,
 } from "@/shared/ui";
-import { ruleQueries } from "../api/rules";
+import { ruleQueries, type RuleTarget } from "../api/rules";
 import {
+  deliveryText,
   eventLabel,
   resultMessage,
   runTargetFallback,
@@ -53,12 +54,18 @@ const time: Intl.DateTimeFormatOptions = {
 };
 
 export function RuleRuns({
-  projectId,
+  target,
+  projects,
   rules,
   ruleId,
   onRuleChange,
 }: {
-  readonly projectId: string;
+  readonly target: RuleTarget;
+  /** 팀 규칙 기록에서 어느 프로젝트의 계기인지 보여 줄 이름. */
+  readonly projects: readonly {
+    readonly value: string;
+    readonly label: string;
+  }[];
   readonly rules: readonly AutomationRule[];
   readonly ruleId: string;
   readonly onRuleChange: (ruleId: string) => void;
@@ -67,11 +74,14 @@ export function RuleRuns({
   // 지워진 규칙을 고른 채로 남지 않게 한다(서버는 404 RULE_NOT_FOUND).
   const selectedRule = rules.some((rule) => rule.id === ruleId) ? ruleId : "";
   const runs = useInfiniteQuery(
-    ruleQueries.runs(projectId, { ruleId: selectedRule, status }),
+    ruleQueries.runs(target, { ruleId: selectedRule, status }),
   );
   const items = runs.data?.pages.flatMap((page) => page.items) ?? [];
   // ponytail: 실행 기록에 action 이 없어 지금 규칙의 동작을 쓴다. 실행 뒤 동작을 바꿨으면 문구가 어긋난다(서버가 run.action 을 주면 그걸로).
   const actionOf = new Map(rules.map((rule) => [rule.id, rule.action]));
+  const projectName = new Map(
+    projects.map((project) => [project.value, project.label]),
+  );
   return (
     <section className="grid gap-4" aria-labelledby="rule-runs-heading">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -147,6 +157,9 @@ export function RuleRuns({
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{run.ruleName}</p>
                   <p className="truncate text-xs text-muted">
+                    {target.scope === "TEAM" && run.projectId
+                      ? `${projectName.get(run.projectId) ?? "삭제된 프로젝트"}, `
+                      : ""}
                     {eventLabel(run.event)}
                   </p>
                 </div>
@@ -177,17 +190,26 @@ export function RuleRuns({
                 </div>
                 <div className="min-w-0">
                   <RunStatus status={run.status} />
-                  {run.attempts > 1 && (
+                  {run.attempts > 1 && !deliveryText(run) && (
                     <span className="ml-2 text-xs text-muted tabular-nums">
                       {run.attempts}회 시도
                     </span>
+                  )}
+                  {deliveryText(run) && (
+                    <p className="text-xs text-muted tabular-nums">
+                      {deliveryText(run)}
+                    </p>
                   )}
                   {run.createdTask && (
                     <Link
                       href={routes.task(run.createdTask.id)}
                       className="rule-run-task text-xs"
                     >
-                      <span className="shrink-0 text-muted">만든 업무</span>
+                      <span className="shrink-0 text-muted">
+                        {actionOf.get(run.ruleId) === "CREATE_SUBTASK"
+                          ? "연결 업무"
+                          : "만든 업무"}
+                      </span>
                       <span className="shrink-0 text-muted tabular-nums">
                         {run.createdTask.key}
                       </span>
