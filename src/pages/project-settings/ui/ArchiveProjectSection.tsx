@@ -1,10 +1,11 @@
 "use client";
 
 import { useId, useState } from "react";
-import { Button, Dialog, Field, Icon, Input } from "@/shared/ui";
+import { Button, Dialog, Field, Input } from "@/shared/ui";
 import { useProjectArchive } from "../api/archive";
 import type { SettingsProps } from "../model/props";
 import { MutationFeedback } from "./MutationFeedback";
+import { Panel } from "./Panel";
 
 export function ArchiveProjectSection({
   project,
@@ -18,15 +19,13 @@ export function ArchiveProjectSection({
     if (!archive.isPending) setConfirming(false);
   };
   return (
-    <section className="project-danger-zone" aria-labelledby={`${id}-heading`}>
-      <h2 id={`${id}-heading`} className="project-danger-heading">
-        <Icon name="alert" />
-        위험 영역
-      </h2>
-      <p className="text-sm">
-        아카이브하면 조회만 가능하며 보드와 내 업무에서 빠져요. 기록은 보존돼요.
-      </p>
-      <div>
+    <Panel title="위험 영역" tone="danger">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+        <p className="min-w-0 flex-1 text-sm text-foreground-2">
+          {project.archived
+            ? "복원하면 다시 보드와 내 업무에 보여요."
+            : "아카이브하면 조회만 할 수 있고 보드와 내 업무에서 빠져요. 기록은 남아요."}
+        </p>
         <Button
           variant={project.archived ? "secondary" : "danger"}
           loading={archive.isPending}
@@ -52,7 +51,7 @@ export function ArchiveProjectSection({
       >
         <div className="grid gap-5">
           <p className="text-sm text-foreground-2">
-            기록은 보존되며 나중에 복원할 수 있어요. 확인하려면 프로젝트 키{" "}
+            기록은 남고 나중에 복원할 수 있어요. 확인하려면 프로젝트 키{" "}
             <strong className="font-mono">{project.key}</strong>를 입력하세요.
           </p>
           <Field id={`${id}-key`} label="프로젝트 키">
@@ -91,6 +90,6 @@ export function ArchiveProjectSection({
           </div>
         </div>
       </Dialog>
-    </section>
+    </Panel>
   );
 }

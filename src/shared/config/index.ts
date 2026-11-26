@@ -8,8 +8,9 @@ export const routes = {
   team: "/team",
   projects: "/projects",
   project: (projectId: string) => `/projects/${encodeURIComponent(projectId)}`,
-  projectSettings: (projectId: string) =>
-    `/projects/${encodeURIComponent(projectId)}/settings`,
+  /** section 은 설정 섹션 경로(members, integrations 등). 없으면 기본 정보다. */
+  projectSettings: (projectId: string, section?: string) =>
+    `/projects/${encodeURIComponent(projectId)}/settings${section ? `/${section}` : ""}`,
   projectSprints: (projectId: string) =>
     `/projects/${encodeURIComponent(projectId)}/sprints`,
   projectSprint: (projectId: string, sprintId: string) =>
