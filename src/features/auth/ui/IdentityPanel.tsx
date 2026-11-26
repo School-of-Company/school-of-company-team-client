@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { BrandMark, ThemeToggle } from "@/shared/ui";
-import { PointerGlow } from "./PointerGlow";
 
 /**
  * Shared frame for the sign-in flow screens (login, pending, Discord link, OAuth callback).
@@ -19,11 +18,6 @@ export function IdentityPanel({
     <div
       className={`ui-identity ui-identity-${variant} relative grid min-h-dvh place-items-center px-5 py-10`}
     >
-      {variant === "login" ? (
-        <div className="ui-login-backdrop" aria-hidden="true" />
-      ) : (
-        <PointerGlow />
-      )}
       <div className="absolute top-4 right-4 z-10 sm:top-5 sm:right-6">
         <ThemeToggle />
       </div>
