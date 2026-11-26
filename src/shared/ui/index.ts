@@ -25,6 +25,7 @@ export { SegmentedLinks } from "./segmented-links";
 export { Markdown } from "./markdown";
 export { ToastProvider, useToast } from "./toast";
 export { Icon } from "./icons";
+export { DisabledReason } from "./disabled-reason";
 export type { IconName } from "./icons";
 export { ThemeToggle } from "./theme-toggle";
 export { BrandMark } from "./brand-mark";

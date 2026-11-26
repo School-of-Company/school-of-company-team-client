@@ -85,7 +85,10 @@ export function ProjectSetup({
         </>
       )}
       <Link
-        href={`${routes.projectSettings(project.id)}?tab=${step === "team" ? "members" : "integrations"}`}
+        href={routes.projectSettings(
+          project.id,
+          step === "team" ? "members" : "integrations",
+        )}
         className="ui-link-button justify-self-start"
       >
         프로젝트 설정에서 이어하기

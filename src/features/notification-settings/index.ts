@@ -6,4 +6,7 @@ export type {
   NotificationKind,
   NotificationSettings,
 } from "./api/notification-settings";
-export { NotificationSettingsForm } from "./ui/NotificationSettingsForm";
+export {
+  NotificationSettingsForm,
+  notificationPolicy,
+} from "./ui/NotificationSettingsForm";

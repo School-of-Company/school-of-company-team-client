@@ -54,14 +54,20 @@ const channelText = {
   DISABLED: "Discord 채널 연결이 비활성이라 알림이 가지 않아요.",
 } as const;
 
+export const notificationPolicy =
+  "같은 알림은 하루 한 번만 Discord로 가요. 개인 업무와 비공개 원본 업무는 보내지 않아요.";
+
 /** 고정 알림 토글. projectId=null 이면 팀 공용 설정이고 서비스 다운이 더 보인다. */
 export function NotificationSettingsForm({
   projectId,
   editable,
   channelHref,
+  showPolicy = true,
 }: {
   readonly projectId: string | null;
   readonly editable: boolean;
+  /** 발송 규칙 안내 줄. 감싼 화면이 정보 아이콘으로 보여 주면 false. */
+  readonly showPolicy?: boolean;
   /** 채널이 ACTIVE가 아닐 때 연결 화면으로 보내는 주소. */
   readonly channelHref?: string;
 }) {
@@ -131,10 +137,7 @@ export function NotificationSettingsForm({
           );
         })}
       </fieldset>
-      <p className="text-xs text-muted">
-        같은 알림은 하루 한 번만 Discord로 가요. 개인 업무와 비공개 원본 업무는
-        보내지 않아요.
-      </p>
+      {showPolicy && <p className="text-xs text-muted">{notificationPolicy}</p>}
       {update.isError && (
         <p role="alert" className="text-sm text-danger">
           {message(update.error)} 이전 값으로 되돌렸어요.
